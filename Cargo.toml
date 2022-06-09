@@ -1,0 +1,12 @@
+[package]
+name = "taxel"
+version = "0.1.0"
+authors = ["quambene <contact.quambene@gmail.com>"]
+edition = "2021"
+build = "build.rs"
+
+[lib]
+name = "ericapi_sys"
+
+[build-dependencies]
+bindgen = "0.60.1"
