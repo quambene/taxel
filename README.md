@@ -43,12 +43,13 @@ cd taxel
     touch .env
     ```
 
-2. Set environment variables `LIBRARY_PATH`, `LIBRARY_NAME` and `HEADER_FILE` in your `.env`. For example:
+2. Set environment variables `LIBRARY_PATH`, `LIBRARY_NAME`, `HEADER_FILE`, and `PLUGIN_PATH` in your `.env`. For example:
 
     ``` bash
     LIBRARY_PATH=ERiC-36.1.8.0-Linux-x86_64/ERiC-36.1.8.0/Linux-x86_64/lib
     LIBRARY_NAME=ericapi
     HEADER_FILE=ERiC-36.1.8.0-Linux-x86_64/ERiC-36.1.8.0/Linux-x86_64/include/ericapi.h
+    PLUGIN_PATH=ERiC-36.1.8.0-Linux-x86_64/ERiC-36.1.8.0/Linux-x86_64/lib/plugins2
     ```
 
 3. Source your environment:
@@ -76,3 +77,5 @@ The bindings are included in `src/lib.rs` via `include!` macro and tested by:
 ``` bash
 cargo test
 ```
+
+Logs are written to `eric.log`.

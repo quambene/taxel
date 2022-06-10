@@ -11,6 +11,7 @@ fn main() -> io::Result<()> {
     println!("cargo:rustc-link-search={}", library_path);
     println!("cargo:rustc-link-lib={}", library_name);
     println!("cargo:rerun-if-changed={}", header_file);
+    println!("cargo:rustc-env=LD_LIBRARY_PATH={}", library_path);
 
     let bindings = bindgen::Builder::default()
         .header(header_file)
