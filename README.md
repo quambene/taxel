@@ -78,4 +78,4 @@ The bindings are included in `src/lib.rs` via `include!` macro and tested by:
 cargo test
 ```
 
-Logs are written to `eric.log`.
+Logs are written to `eric.log` in the current directory.
