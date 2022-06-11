@@ -16,8 +16,8 @@ mod tests {
         let plugin_path = CString::new(plugin_path).unwrap();
         let plugin_path = plugin_path.as_ptr();
 
-        let log_path = "./";
-        let log_path = CString::new(log_path).unwrap();
+        let log_path = env::current_dir().unwrap();
+        let log_path = CString::new(log_path.to_str().unwrap()).unwrap();
         let log_path = log_path.as_ptr();
 
         unsafe {
