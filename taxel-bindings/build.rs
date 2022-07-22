@@ -1,12 +1,15 @@
-use bindgen;
 use std::{env, io, path::PathBuf};
 
 fn main() -> io::Result<()> {
+    let cargo_manifest_dir = env::var("CARGO_MANIFEST_DIR").expect("Missing environment variable 'CARGO_MANIFEST_DIR'");
     let library_path =
         env::var("LIBRARY_PATH").expect("Missing environment variable 'LIBRARY_PATH'");
     let library_name =
         env::var("LIBRARY_NAME").expect("Missing environment variable 'LIBRARY_NAME'");
     let header_file = env::var("HEADER_FILE").expect("Missing environment variable 'HEADER_FILE'");
+
+    let library_path = cargo_manifest_dir.to_string() + "/" + &library_path;
+    let header_file = cargo_manifest_dir + "/" + &header_file;
 
     println!("cargo:rustc-link-search={}", library_path);
     println!("cargo:rustc-link-lib={}", library_name);

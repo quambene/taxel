@@ -65,7 +65,7 @@ _Remark_: In step 2, note the difference between file name (e.g. `libericapi.so`
 The bindings have to be generated on-the-fly for your specific platform and architecture:
 
 ``` bash
-cargo build
+cargo build -p taxel-bindings
 ```
 
 The bindings are generated in `target/debug/build/taxel-<random-id>/out/bindings.rs`.
@@ -75,7 +75,7 @@ The bindings are generated in `target/debug/build/taxel-<random-id>/out/bindings
 The bindings are included in `src/lib.rs` via `include!` macro and tested by:
 
 ``` bash
-cargo test
+cargo test -p taxel-bindings --lib
 ```
 
 Logs are written to `eric.log` in the current directory.
