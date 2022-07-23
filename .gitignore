@@ -6,6 +6,9 @@ Cargo.lock
 ERiC-*
 eric.log
 
+# Test data
+test_data
+
 # Environment
 **/.env
 
