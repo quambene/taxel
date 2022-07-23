@@ -1,0 +1,12 @@
+[package]
+name = "taxel-util"
+version = "0.1.0"
+authors = ["quambene <contact.quambene@gmail.com>"]
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+name = "taxel_util"
+
+[dependencies]
+anyhow = "1.0.58"
