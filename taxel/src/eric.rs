@@ -15,6 +15,7 @@ use taxel_bindings::{
 };
 use taxel_util::ToCString;
 
+#[derive(Debug)]
 pub enum ProcessingFlag {
     Validate = 2,
     Send = 4,
@@ -101,17 +102,16 @@ pub fn close() -> Result<(), anyhow::Error> {
 pub fn process(
     xml: String,
     version: String,
-    processing_flag: u32,
+    processing_flag: ProcessingFlag,
     mut transfer_code: u32,
 ) -> Result<EricResponse, anyhow::Error> {
     println!("Processing xml file");
 
     match processing_flag {
-        x if x == ProcessingFlag::Validate as u32 => println!("Validating xml file"),
-        x if x == ProcessingFlag::Send as u32 => println!("Sending xml file"),
-        x if x == ProcessingFlag::Print as u32 => println!("Print"),
-        x if x == ProcessingFlag::CheckHints as u32 => println!("Check hints"),
-        others => return Err(anyhow!(format!("Invalid processing flag {}", others))),
+        ProcessingFlag::Validate => println!("Validating xml file"),
+        ProcessingFlag::Send => println!("Sending xml file"),
+        ProcessingFlag::Print => println!("Print"),
+        ProcessingFlag::CheckHints => println!("Check hints"),
     }
 
     let xml = xml.try_to_cstring()?;
@@ -143,7 +143,7 @@ pub fn process(
         EricBearbeiteVorgang(
             xml.as_ptr(),
             version.as_ptr(),
-            processing_flag,
+            processing_flag as u32,
             // TODO: pass ptr::null() or &print_settings
             ptr::null(),
             // TODO: pass ptr::null() or &crypto_settings,
@@ -182,6 +182,14 @@ pub fn process(
     Ok(response)
 }
 
+pub fn validate(
+    xml: String,
+    version: String,
+    transfer_code: u32,
+) -> Result<EricResponse, anyhow::Error> {
+    process(xml, version, ProcessingFlag::Validate, transfer_code)
+}
+
 #[cfg(test)]
 mod tests {
     use roxmltree::Document;
@@ -217,13 +225,12 @@ mod tests {
         let xml = fs::read_to_string(xml_path).unwrap();
 
         let version = "Bilanz_6.5".to_string();
-        let processing_flag = ProcessingFlag::Validate as u32;
         // TODO: Bei allen Verfahren außer der Datenabholung sollte das Transferhandle NULL sein. Wird bei solchen Verfahren ein Handle übergeben, so wird dieses ignoriert.
         let transfer_code = 0;
 
         init(config.plugin_path, config.log_path).unwrap();
-        
-        let res = process(xml, version, processing_flag, transfer_code);
+
+        let res = validate(xml, version, transfer_code);
 
         close().unwrap();
 
