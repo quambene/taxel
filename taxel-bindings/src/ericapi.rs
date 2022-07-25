@@ -7,19 +7,13 @@ include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::{env, path::Path};
+    use std::env;
     use taxel_util::ToCString;
 
     #[test]
     fn test_ericapi() {
-        let cargo_manifest_dir = env::var("CARGO_MANIFEST_DIR")
-            .expect("Missing environment variable 'CARGO_MANIFEST_DIR'");
-        let cargo_manifest_dir = Path::new(&cargo_manifest_dir).join("..");
-
-        let plugin_path =
-            env::var("PLUGIN_PATH").expect("Missing environment variable 'PLUGIN_PATH'");
-        let plugin_path = cargo_manifest_dir
-            .join(plugin_path)
+        let plugin_path = env::var("PLUGIN_PATH")
+            .expect("Missing environment variable 'PLUGIN_PATH'")
             .try_to_cstring()
             .unwrap();
 
