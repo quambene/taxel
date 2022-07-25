@@ -5,6 +5,8 @@ Cargo.lock
 # Eric
 ERiC-*
 eric.log
+eric_response.xml
+server_response.xml
 
 # Test data
 test_data
