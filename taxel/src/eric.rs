@@ -1,17 +1,19 @@
 use anyhow::{anyhow, Context};
 use std::{
-    env,
+    env::{self, current_dir},
     ffi::CStr,
+    fs::{self, File},
+    io::Write,
     path::{Path, PathBuf},
     ptr,
 };
 use taxel_bindings::{
-    ericapi::{
+    ErrorCode,
+    {
         eric_druck_parameter_t, eric_verschluesselungs_parameter_t, EricBearbeiteVorgang,
         EricBeende, EricInitialisiere, EricRueckgabepufferErzeugen, EricRueckgabepufferFreigeben,
         EricRueckgabepufferInhalt,
     },
-    ErrorCode,
 };
 use taxel_util::ToCString;
 
@@ -40,9 +42,9 @@ impl Config {
 
 #[derive(Debug)]
 pub struct EricResponse {
-    error_code: i32,
-    validation_response: String,
-    server_response: String,
+    pub error_code: i32,
+    pub validation_response: String,
+    pub server_response: String,
 }
 
 impl EricResponse {
@@ -66,6 +68,7 @@ pub fn configure() -> Result<Config, anyhow::Error> {
 
     println!("Setting plugin path '{}'", plugin_path.display());
     println!("Setting log path '{}'", log_path.display());
+    println!("Logging to '{}'", log_path.join("eric.log").display());
 
     let config = Config::new(plugin_path.into(), log_path);
 
@@ -98,12 +101,50 @@ pub fn close() -> Result<(), anyhow::Error> {
     }
 }
 
+pub fn log(response: EricResponse) -> Result<(), anyhow::Error> {
+    println!("Response code: {}", response.error_code);
+
+    let current_dir = current_dir()?;
+
+    let validation_response_path = current_dir.join("validation_response.xml");
+    let server_response_path = current_dir.join("server_response.xml");
+
+    if !response.validation_response.is_empty() {
+        println!(
+            "Logging validation result to '{}'",
+            validation_response_path.display()
+        );
+    }
+
+    if !response.server_response.is_empty() {
+        println!(
+            "Logging server reponse to '{}'",
+            server_response_path.display()
+        );
+    }
+
+    let mut validation_response_file = File::create(validation_response_path).unwrap();
+    let mut server_response_file = File::create(server_response_path).unwrap();
+
+    validation_response_file.write_all(response.validation_response.as_bytes())?;
+    server_response_file.write_all(response.server_response.as_bytes())?;
+
+    Ok(())
+}
+
+pub fn read(xml_file: &str) -> Result<String, anyhow::Error> {
+    let xml_path = Path::new(xml_file);
+    println!("Reading xml file '{}'", xml_path.display());
+    let xml = fs::read_to_string(Path::new(xml_path))?;
+    Ok(xml)
+}
+
 // TODO: Eric has to be initiated
 pub fn process(
     xml: String,
-    version: String,
+    type_version: String,
     processing_flag: ProcessingFlag,
-    mut transfer_code: u32,
+    transfer_code: Option<u32>,
 ) -> Result<EricResponse, anyhow::Error> {
     println!("Processing xml file");
 
@@ -115,8 +156,13 @@ pub fn process(
     }
 
     let xml = xml.try_to_cstring()?;
-    let version = version.try_to_cstring()?;
-    let transfer_code = &mut transfer_code;
+    let type_version = type_version.try_to_cstring()?;
+
+    // transfer_code should be NULL except for data retrieval; if transfer_code is not NULL in the other cases, it will be ignored
+    let transfer_code = match transfer_code {
+        Some(mut code) => &mut code,
+        None => ptr::null::<u32>() as *mut u32,
+    };
 
     // TODO: set parameters
     // let print_settings = eric_druck_parameter_t {
@@ -142,7 +188,7 @@ pub fn process(
     let error_code = unsafe {
         EricBearbeiteVorgang(
             xml.as_ptr(),
-            version.as_ptr(),
+            type_version.as_ptr(),
             processing_flag as u32,
             // TODO: pass ptr::null() or &print_settings
             ptr::null(),
@@ -155,8 +201,12 @@ pub fn process(
         )
     };
 
-    // TODO: handle transfer code
-    println!("Transfer code: {}", transfer_code);
+    let transfer_code = unsafe { transfer_code.as_ref() };
+
+    match transfer_code {
+        Some(code) => println!("Transfer code: {}", code),
+        None => (),
+    }
 
     let validation_response = unsafe {
         let c_buffer = EricRueckgabepufferInhalt(validation_response_buffer);
@@ -182,19 +232,14 @@ pub fn process(
     Ok(response)
 }
 
-pub fn validate(
-    xml: String,
-    version: String,
-    transfer_code: u32,
-) -> Result<EricResponse, anyhow::Error> {
-    process(xml, version, ProcessingFlag::Validate, transfer_code)
+pub fn validate(xml: String, type_version: String) -> Result<EricResponse, anyhow::Error> {
+    process(xml, type_version, ProcessingFlag::Validate, None)
 }
 
 #[cfg(test)]
 mod tests {
-    use roxmltree::Document;
-
     use super::*;
+    use roxmltree::Document;
     use std::{
         env::current_dir,
         fs::{self, File},
@@ -225,12 +270,10 @@ mod tests {
         let xml = fs::read_to_string(xml_path).unwrap();
 
         let version = "Bilanz_6.5".to_string();
-        // TODO: Bei allen Verfahren außer der Datenabholung sollte das Transferhandle NULL sein. Wird bei solchen Verfahren ein Handle übergeben, so wird dieses ignoriert.
-        let transfer_code = 0;
 
         init(config.plugin_path, config.log_path).unwrap();
 
-        let res = validate(xml, version, transfer_code);
+        let res = validate(xml, version);
 
         close().unwrap();
 
