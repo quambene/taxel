@@ -1,3 +1,4 @@
+use crate::ErrorCode;
 use anyhow::{anyhow, Context};
 use std::{
     env::{self, current_dir},
@@ -13,7 +14,6 @@ use taxel_bindings::{
     EricRueckgabepufferInhalt,
 };
 use taxel_util::ToCString;
-use crate::ErrorCode;
 
 #[derive(Debug)]
 pub enum ProcessingFlag {
@@ -232,6 +232,10 @@ pub fn process(
 
 pub fn validate(xml: String, type_version: String) -> Result<EricResponse, anyhow::Error> {
     process(xml, type_version, ProcessingFlag::Validate, None)
+}
+
+pub fn send(xml: String, type_version: String) -> Result<EricResponse, anyhow::Error> {
+    process(xml, type_version, ProcessingFlag::Send, None)
 }
 
 #[cfg(test)]
