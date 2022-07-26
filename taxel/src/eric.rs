@@ -8,14 +8,12 @@ use std::{
     ptr,
 };
 use taxel_bindings::{
-    ErrorCode,
-    {
-        eric_druck_parameter_t, eric_verschluesselungs_parameter_t, EricBearbeiteVorgang,
-        EricBeende, EricInitialisiere, EricRueckgabepufferErzeugen, EricRueckgabepufferFreigeben,
-        EricRueckgabepufferInhalt,
-    },
+    eric_druck_parameter_t, eric_verschluesselungs_parameter_t, EricBearbeiteVorgang, EricBeende,
+    EricInitialisiere, EricRueckgabepufferErzeugen, EricRueckgabepufferFreigeben,
+    EricRueckgabepufferInhalt,
 };
 use taxel_util::ToCString;
+use crate::ErrorCode;
 
 #[derive(Debug)]
 pub enum ProcessingFlag {
