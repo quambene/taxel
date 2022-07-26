@@ -31,13 +31,13 @@ pub fn validate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let config = taxel::configure()?;
 
     let xml_file = matches
-        .value_of(arg::XML_FILE)
+        .get_one::<String>(arg::XML_FILE)
         .expect("Missing value for argument");
     let tax_type = matches
-        .value_of(arg::TAX_TYPE)
+        .get_one::<String>(arg::TAX_TYPE)
         .expect("Missing value for argument");
     let tax_version = matches
-        .value_of(arg::TAX_VERSION)
+        .get_one::<String>(arg::TAX_VERSION)
         .expect("Missing value for argument");
     let type_version = format!("{}_{}", tax_type, tax_version);
 
