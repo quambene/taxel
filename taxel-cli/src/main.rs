@@ -15,7 +15,7 @@ fn main() -> Result<(), anyhow::Error> {
     match matches.subcommand() {
         Some((cmd::VALIDATE, matches)) => cmd::validate(matches),
         Some((cmd::SEND, matches)) => cmd::send(matches),
-        Some((cmd::DECODE, matches)) => cmd::decode(matches),
+        Some((cmd::DECRYPT, matches)) => cmd::decrypt(matches),
         _ => Err(anyhow!("Subcommand not found")),
     }
 }
@@ -40,8 +40,8 @@ pub fn app() -> App<'static> {
                 .about("Validate and send xml file"),
         )
         .subcommand(
-            SubCommand::with_name(cmd::DECODE)
-                .args(cmd::decode_args())
-                .about("Decode certificate"),
+            SubCommand::with_name(cmd::DECRYPT)
+                .args(cmd::decrypt_args())
+                .about("Decrypt retrieved file"),
         )
 }

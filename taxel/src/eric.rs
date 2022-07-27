@@ -10,10 +10,11 @@ use std::{
 };
 use taxel_bindings::{
     eric_druck_parameter_t, eric_verschluesselungs_parameter_t, EricBearbeiteVorgang, EricBeende,
+    EricCloseHandleToCertificate, EricDekodiereDaten, EricGetHandleToCertificate,
     EricInitialisiere, EricRueckgabepufferErzeugen, EricRueckgabepufferFreigeben,
-    EricRueckgabepufferInhalt,
+    EricRueckgabepufferInhalt, EricZertifikatHandle,
 };
-use taxel_util::ToCString;
+use taxel_util::{ToCString, ToOsString};
 
 #[derive(Debug)]
 pub enum ProcessingFlag {
@@ -36,6 +37,39 @@ impl Config {
             log_path,
         }
     }
+}
+
+pub struct Certificate {
+    file: String,
+    password: String,
+}
+
+impl Certificate {
+    pub fn new(file: String, password: String) -> Self {
+        Self { file, password }
+    }
+}
+
+pub struct PrintSettings {
+    name: String,
+}
+
+impl PrintSettings {
+    pub fn new(name: String) -> Self {
+        Self { name }
+    }
+}
+
+impl Default for PrintSettings {
+    fn default() -> Self {
+        let name = "ebilanz.pdf".to_string();
+        Self::new(name)
+    }
+}
+
+pub enum Preview {
+    Yes = 1,
+    No = 0,
 }
 
 #[derive(Debug)]
@@ -88,6 +122,7 @@ pub fn init(plugin_path: PathBuf, log_path: PathBuf) -> Result<(), anyhow::Error
 }
 
 // TODO: implement drop for Eric
+// TODO: implement EricEntladePlugins
 pub fn close() -> Result<(), anyhow::Error> {
     println!("Closing eric");
 
@@ -137,11 +172,13 @@ pub fn read(xml_file: &str) -> Result<String, anyhow::Error> {
     Ok(xml)
 }
 
-// TODO: Eric has to be initiated
+// TODO: Eric has to be initiated; impl Eric::new() for struct Eric
 pub fn process(
     xml: String,
     type_version: String,
     processing_flag: ProcessingFlag,
+    print_settings: Option<PrintSettings>,
+    certificate: Option<Certificate>,
     transfer_code: Option<u32>,
 ) -> Result<EricResponse, anyhow::Error> {
     println!("Processing xml file");
@@ -149,36 +186,89 @@ pub fn process(
     match processing_flag {
         ProcessingFlag::Validate => println!("Validating xml file"),
         ProcessingFlag::Send => println!("Sending xml file"),
-        ProcessingFlag::Print => println!("Print"),
+        ProcessingFlag::Print => {
+            println!("Validating xml file");
+            println!("Prepare printing");
+        }
         ProcessingFlag::CheckHints => println!("Check hints"),
     }
 
     let xml = xml.try_to_cstring()?;
     let type_version = type_version.try_to_cstring()?;
 
-    // transfer_code should be NULL except for data retrieval; if transfer_code is not NULL in the other cases, it will be ignored
+    // Transfer_code should be NULL except for data retrieval; if transfer_code is not NULL in the other cases, it will be ignored
     let transfer_code = match transfer_code {
         Some(mut code) => &mut code,
         None => ptr::null::<u32>() as *mut u32,
     };
 
-    // TODO: set parameters
-    // let print_settings = eric_druck_parameter_t {
-    //     version: 2,
-    //     vorschau: todo!(),
-    //     ersteSeite: todo!(),
-    //     duplexDruck: todo!(),
-    //     pdfName: todo!(),
-    //     fussText: todo!(),
-    // };
+    match &print_settings {
+        Some(print_settings) => println!("Printing transmission log to '{}'", print_settings.name),
+        None => (),
+    }
 
-    // TODO: set parameters
-    // let crypto_settings = eric_verschluesselungs_parameter_t {
-    //     abrufCode: ptr::null(),
-    //     pin: todo!(),
-    //     version: 2,
-    //     zertifikatHandle: todo!(),
-    // };
+    // allocate pdf_name as CString
+    let pdf_name = print_settings
+        .map(|el| el.name.to_osstring().try_to_cstring())
+        .transpose()?;
+
+    // match a reference to pdf_name; don't move it; otherwise pdf_name.as_ptr() would be dangling
+    let print_settings = match &pdf_name {
+        // allocate eric_druck_parameter_t
+        Some(pdf_name) => Some(eric_druck_parameter_t {
+            version: 2,
+            // TODO: Implement Preview::No
+            vorschau: Preview::Yes as u32,
+            ersteSeite: 0,
+            duplexDruck: 0,
+            pdfName: pdf_name.as_ptr(),
+            fussText: ptr::null(),
+        }),
+        None => None,
+    };
+
+    let crypto_settings = match certificate {
+        Some(certificate) => {
+            let certificate_file = certificate.file.try_to_cstring()?;
+            let certificate_password = certificate.password.try_to_cstring()?;
+
+            let certificate_handle =
+                ptr::null::<EricZertifikatHandle>() as *mut EricZertifikatHandle;
+            let pin_support = ptr::null::<u32>() as *mut u32;
+
+            println!("Preparing certificate");
+
+            // TODO: check validity of certificate
+            // unsafe { EricHoleZertifikatseigenschaften() }
+
+            let error_code = unsafe {
+                EricGetHandleToCertificate(
+                    certificate_handle,
+                    pin_support,
+                    certificate_file.as_ptr(),
+                )
+            };
+
+            match error_code {
+                0 => {
+                    unsafe { EricCloseHandleToCertificate(*certificate_handle) };
+                    let crypto_settings = eric_verschluesselungs_parameter_t {
+                        abrufCode: ptr::null(),
+                        pin: certificate_password.as_ptr(),
+                        version: 2,
+                        zertifikatHandle: unsafe { *certificate_handle },
+                    };
+                    unsafe { EricCloseHandleToCertificate(*certificate_handle) };
+                    Ok(&crypto_settings as *const eric_verschluesselungs_parameter_t)
+                }
+                others => {
+                    unsafe { EricCloseHandleToCertificate(*certificate_handle) };
+                    return Err(anyhow!(format!("Can't get certificate: {}", others)));
+                }
+            }
+        }
+        None => Ok(ptr::null() as *const eric_verschluesselungs_parameter_t),
+    } as Result<*const eric_verschluesselungs_parameter_t, anyhow::Error>;
 
     let validation_response_buffer = unsafe { EricRueckgabepufferErzeugen() };
     let server_response_buffer = unsafe { EricRueckgabepufferErzeugen() };
@@ -188,16 +278,18 @@ pub fn process(
             xml.as_ptr(),
             type_version.as_ptr(),
             processing_flag as u32,
-            // TODO: pass ptr::null() or &print_settings
-            ptr::null(),
-            // TODO: pass ptr::null() or &crypto_settings,
-            ptr::null(),
-            // TODO: pass ptr::null() or transfer_code
+            match print_settings {
+                Some(el) => &el,
+                None => ptr::null(),
+            },
+            crypto_settings?,
             transfer_code,
             validation_response_buffer,
             server_response_buffer,
         )
     };
+
+    println!("error code: {}", error_code);
 
     let transfer_code = unsafe { transfer_code.as_ref() };
 
@@ -213,6 +305,10 @@ pub fn process(
     .to_str()?
     .to_string();
 
+    unsafe {
+        EricRueckgabepufferFreigeben(validation_response_buffer);
+    }
+
     let server_response = unsafe {
         let c_buffer = EricRueckgabepufferInhalt(server_response_buffer);
         CStr::from_ptr(c_buffer)
@@ -221,7 +317,6 @@ pub fn process(
     .to_string();
 
     unsafe {
-        EricRueckgabepufferFreigeben(validation_response_buffer);
         EricRueckgabepufferFreigeben(server_response_buffer);
     }
 
@@ -230,12 +325,83 @@ pub fn process(
     Ok(response)
 }
 
-pub fn validate(xml: String, type_version: String) -> Result<EricResponse, anyhow::Error> {
-    process(xml, type_version, ProcessingFlag::Validate, None)
+pub fn validate(
+    xml: String,
+    type_version: String,
+    print_settings: Option<PrintSettings>,
+) -> Result<EricResponse, anyhow::Error> {
+    process(
+        xml,
+        type_version,
+        ProcessingFlag::Validate,
+        print_settings,
+        None,
+        None,
+    )
 }
 
-pub fn send(xml: String, type_version: String) -> Result<EricResponse, anyhow::Error> {
-    process(xml, type_version, ProcessingFlag::Send, None)
+pub fn validate_and_print(
+    xml: String,
+    type_version: String,
+    print_settings: Option<PrintSettings>,
+) -> Result<EricResponse, anyhow::Error> {
+    process(
+        xml,
+        type_version,
+        ProcessingFlag::Print,
+        print_settings,
+        None,
+        None,
+    )
+}
+
+pub fn send(
+    xml: String,
+    type_version: String,
+    certificate: Certificate,
+) -> Result<EricResponse, anyhow::Error> {
+    process(
+        xml,
+        type_version,
+        ProcessingFlag::Send,
+        None,
+        Some(certificate),
+        None,
+    )
+}
+
+pub fn decrypt(
+    encrypted_file: &str,
+    certificate_file: &str,
+    password: &str,
+) -> Result<i32, anyhow::Error> {
+    let encrypted_data = encrypted_file.try_to_cstring()?;
+    let certificate_file = certificate_file.try_to_cstring()?;
+    let password = password.try_to_cstring()?;
+    let pin_support = ptr::null::<u32>() as *mut u32;
+    let certificate_handle = ptr::null::<EricZertifikatHandle>() as *mut EricZertifikatHandle;
+
+    let error_code = unsafe {
+        EricGetHandleToCertificate(certificate_handle, pin_support, certificate_file.as_ptr())
+    };
+
+    let certificate_response_buffer = unsafe { EricRueckgabepufferErzeugen() };
+
+    let error_code = unsafe {
+        EricDekodiereDaten(
+            *certificate_handle,
+            password.as_ptr(),
+            encrypted_data.as_ptr(),
+            certificate_response_buffer,
+        )
+    };
+
+    unsafe {
+        EricCloseHandleToCertificate(*certificate_handle);
+        EricRueckgabepufferFreigeben(certificate_response_buffer);
+    }
+
+    Ok(error_code)
 }
 
 #[cfg(test)]
@@ -275,7 +441,7 @@ mod tests {
 
         init(config.plugin_path, config.log_path).unwrap();
 
-        let res = validate(xml, version);
+        let res = validate(xml, version, None);
 
         close().unwrap();
 
@@ -311,5 +477,20 @@ mod tests {
         assert_eq!(node.tag_name().name(), "Erfolg");
 
         assert!(response.server_response.is_empty());
+    }
+
+    #[test]
+    fn test_validate_and_print() {
+        todo!()
+    }
+
+    #[test]
+    fn test_send() {
+        todo!()
+    }
+
+    #[test]
+    fn test_send_and_print() {
+        todo!()
     }
 }
