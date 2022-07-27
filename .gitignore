@@ -7,6 +7,7 @@ ERiC-*
 eric.log
 validation_response.xml
 server_response.xml
+*.pdf
 
 # Test data
 test_data
