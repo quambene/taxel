@@ -18,6 +18,7 @@ test_data
 **/*.jks
 **/*.p8
 **/*.pem
+**/*.pfx
 
 # VS Code
 .vscode
