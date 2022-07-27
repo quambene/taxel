@@ -1,5 +1,9 @@
 use anyhow::Context;
-use std::{ffi::CString, path::PathBuf};
+use std::{
+    ffi::{CString, OsStr},
+    os::unix::prelude::OsStrExt,
+    path::PathBuf,
+};
 
 pub trait ToCString {
     fn try_to_cstring(self) -> Result<CString, anyhow::Error>;
@@ -20,7 +24,14 @@ impl ToCString for &str {
 impl ToCString for PathBuf {
     fn try_to_cstring(self) -> Result<CString, anyhow::Error> {
         self.to_str()
-            .context("Can't convert path to string")?
+            .context("Can't convert path to CString")?
             .try_to_cstring()
+    }
+}
+
+impl ToCString for &OsStr {
+    fn try_to_cstring(self) -> Result<CString, anyhow::Error> {
+        // TODO: implement conversion for Windows and macOS
+        CString::new(self.as_bytes()).context("Can't convert OsStr to CString")
     }
 }
