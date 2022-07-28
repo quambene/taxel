@@ -57,8 +57,8 @@ mod tests {
         println!("subcommand matches: {:#?}", subcommand_matches);
 
         let res = validate(&subcommand_matches);
-        println!("res: {:#?}", res);
 
+        println!("res: {:#?}", res);
         assert!(res.is_ok())
     }
 }

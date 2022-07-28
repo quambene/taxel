@@ -8,7 +8,7 @@ use crate::{
 use anyhow::{anyhow, Context};
 use std::{
     env::{self, current_dir},
-    fs::{self, File},
+    fs::File,
     io::Write,
     path::{Path, PathBuf},
 };
@@ -224,8 +224,7 @@ mod tests {
     use roxmltree::Document;
     use std::{
         env::current_dir,
-        fs::{self, File},
-        io::Write,
+        fs::{self},
     };
 
     #[test]
