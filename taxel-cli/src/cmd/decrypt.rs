@@ -1,5 +1,7 @@
 use crate::arg;
+use anyhow::anyhow;
 use clap::{Arg, ArgMatches};
+use taxel::{CertificateConfig, Eric, ErrorCode};
 
 pub fn decrypt_args() -> [Arg<'static>; 3] {
     [
@@ -22,33 +24,26 @@ pub fn decrypt_args() -> [Arg<'static>; 3] {
 }
 
 pub fn decrypt(matches: &ArgMatches) -> Result<(), anyhow::Error> {
-    let encrypted_file = matches
-        .get_one::<String>(arg::ENCRYPTED_FILE)
-        .expect("Missing value for argument");
-    let certificate_file = matches
-        .get_one::<String>(arg::CERTIFICATE_FILE)
-        .expect("Missing value for argument");
-    let password = matches
-        .get_one::<String>(arg::PASSWORD)
-        .expect("Missing value for argument");
+    let encrypted_file = arg::get_one(matches, arg::ENCRYPTED_FILE)?;
+    let certificate_file = arg::get_one(matches, arg::CERTIFICATE_FILE)?;
+    let password = arg::get_one(matches, arg::PASSWORD)?;
 
-    let config = taxel::configure()?;
+    let config = CertificateConfig::new(certificate_file.to_string(), password.to_string());
 
-    taxel::init(config.plugin_path, config.log_path)?;
+    let eric = Eric::new()?;
 
-    let res = taxel::decrypt(encrypted_file, certificate_file, password);
+    let error_code = eric.decrypt(encrypted_file, config)?;
 
-    taxel::close()?;
-
-    Ok(())
+    match error_code {
+        x if x == ErrorCode::ERIC_OK as i32 => Ok(()),
+        others => Err(anyhow!("Can't decrypt file: {}", others)),
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     #[test]
-    fn test_decode() {
+    fn test_decrypt() {
         todo!()
     }
 }

@@ -1,6 +1,6 @@
 use crate::arg;
 use clap::{Arg, ArgMatches};
-use taxel::Certificate;
+use taxel::{CertificateConfig, Eric};
 
 pub fn send_args() -> [Arg<'static>; 5] {
     [
@@ -13,36 +13,22 @@ pub fn send_args() -> [Arg<'static>; 5] {
 }
 
 pub fn send(matches: &ArgMatches) -> Result<(), anyhow::Error> {
-    let xml_file = matches
-        .get_one::<String>(arg::XML_FILE)
-        .expect("Missing value for argument");
-    let tax_type = matches
-        .get_one::<String>(arg::TAX_TYPE)
-        .expect("Missing value for argument");
-    let tax_version = matches
-        .get_one::<String>(arg::TAX_VERSION)
-        .expect("Missing value for argument");
-    let certificate_file = matches
-        .get_one::<String>(arg::CERTIFICATE_FILE)
-        .expect("Missing value for argument");
-    let password = matches
-        .get_one::<String>(arg::PASSWORD)
-        .expect("Missing value for argument");
+    let xml_file = arg::get_one(matches, arg::XML_FILE)?;
+    let tax_type = arg::get_one(matches, arg::TAX_TYPE)?;
+    let tax_version = arg::get_one(matches, arg::TAX_VERSION)?;
+    let certificate_file = arg::get_one(matches, arg::CERTIFICATE_FILE)?;
+    let password = arg::get_one(matches, arg::PASSWORD)?;
     let type_version = format!("{}_{}", tax_type, tax_version);
 
-    let certificate = Certificate::new(certificate_file.to_string(), password.to_string());
-
-    let config = taxel::configure()?;
+    let config = CertificateConfig::new(certificate_file.to_string(), password.to_string());
 
     let xml = taxel::read(xml_file)?;
 
-    taxel::init(config.plugin_path, config.log_path)?;
+    let eric = Eric::new()?;
 
-    let res = taxel::send(xml, type_version, certificate);
+    let response = eric.send(xml, type_version, config)?;
 
-    taxel::close()?;
-
-    taxel::log(res?)?;
+    eric.log(&response)?;
 
     Ok(())
 }

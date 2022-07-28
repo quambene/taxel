@@ -1,6 +1,6 @@
 use crate::arg;
 use clap::{Arg, ArgMatches};
-use taxel::PrintSettings;
+use taxel::{Eric, PrintConfig};
 
 pub fn validate_args() -> [Arg<'static>; 4] {
     [
@@ -12,36 +12,27 @@ pub fn validate_args() -> [Arg<'static>; 4] {
 }
 
 pub fn validate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
-    let xml_file = matches
-        .get_one::<String>(arg::XML_FILE)
-        .expect("Missing value for argument");
-    let tax_type = matches
-        .get_one::<String>(arg::TAX_TYPE)
-        .expect("Missing value for argument");
-    let tax_version = matches
-        .get_one::<String>(arg::TAX_VERSION)
-        .expect("Missing value for argument");
+    let xml_file = arg::get_one(matches, arg::XML_FILE)?;
+    let tax_type = arg::get_one(matches, arg::TAX_TYPE)?;
+    let tax_version = arg::get_one(matches, arg::TAX_VERSION)?;
     let type_version = format!("{}_{}", tax_type, tax_version);
-    let print_settings = if matches.contains_id(arg::PRINT) {
-        Some(PrintSettings::default())
+
+    let print_config = if matches.contains_id(arg::PRINT) {
+        Some(PrintConfig::default())
     } else {
         None
     };
 
-    let config = taxel::configure()?;
-
     let xml = taxel::read(xml_file)?;
 
-    taxel::init(config.plugin_path, config.log_path)?;
+    let eric = Eric::new()?;
 
-    let res = match print_settings {
-        Some(_) => taxel::validate_and_print(xml, type_version, print_settings),
-        None => taxel::validate(xml, type_version, print_settings),
+    let response = match print_config {
+        Some(print_config) => eric.validate_and_print(xml, type_version, print_config)?,
+        None => eric.validate(xml, type_version)?,
     };
 
-    taxel::close()?;
-
-    taxel::log(res?)?;
+    eric.log(&response)?;
 
     Ok(())
 }

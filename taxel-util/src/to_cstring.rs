@@ -2,7 +2,7 @@ use anyhow::Context;
 use std::{
     ffi::{CString, OsStr},
     os::unix::prelude::OsStrExt,
-    path::PathBuf,
+    path::{Path, PathBuf},
 };
 
 pub trait ToCString {
@@ -22,6 +22,14 @@ impl ToCString for &str {
 }
 
 impl ToCString for PathBuf {
+    fn try_to_cstring(self) -> Result<CString, anyhow::Error> {
+        self.to_str()
+            .context("Can't convert path to CString")?
+            .try_to_cstring()
+    }
+}
+
+impl ToCString for &Path {
     fn try_to_cstring(self) -> Result<CString, anyhow::Error> {
         self.to_str()
             .context("Can't convert path to CString")?

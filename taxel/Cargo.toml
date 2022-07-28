@@ -12,4 +12,6 @@ name = "taxel"
 taxel-bindings = { version = "0.1.0", path = "../taxel-bindings" }
 taxel-util = { version = "0.1.0", path = "../taxel-util" }
 anyhow = "1.0.58"
+
+[dev-dependencies]
 roxmltree = "0.14.1"

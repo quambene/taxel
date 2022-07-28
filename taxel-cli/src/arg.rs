@@ -1,4 +1,5 @@
-use clap::Arg;
+use anyhow::anyhow;
+use clap::{Arg, ArgMatches};
 
 // args for command
 pub const VERBOSE: &str = "verbose";
@@ -8,10 +9,23 @@ pub const XML_FILE: &str = "xml-file";
 pub const TAX_TYPE: &str = "tax-type";
 pub const TAX_VERSION: &str = "tax-version";
 pub const PRINT: &str = "print";
+pub const NO_PRINT: &str = "no-print";
 pub const PDF_NAME: &str = "pdf-name";
 pub const ENCRYPTED_FILE: &str = "encrypted-file";
 pub const CERTIFICATE_FILE: &str = "certificate-file";
 pub const PASSWORD: &str = "password";
+
+pub fn get_one<'a>(matches: &'a ArgMatches, id: &str) -> Result<&'a str, anyhow::Error> {
+    match matches.get_one::<String>(id) {
+        Some(el) => Ok(el),
+        None => return Err(anyhow!("Missing value for argument '{}'", id)),
+    }
+}
+
+#[allow(dead_code)]
+pub fn get_maybe_one<'a>(matches: &'a ArgMatches, id: &str) -> Option<&'a str> {
+    matches.get_one::<String>(id).map(|el| el.as_str())
+}
 
 pub fn xml_file() -> Arg<'static> {
     Arg::new(XML_FILE)
