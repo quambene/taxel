@@ -1,6 +1,6 @@
 use crate::{
     certificate::Certificate,
-    config::{CertificateConfig, EricConfig, PrintConfig},
+    config::{CertificateConfig, PrintConfig},
     processing::process,
     response_buffer::ResponseBuffer,
     EricResponse, ErrorCode, ProcessingFlag,
@@ -10,7 +10,7 @@ use std::{
     env::{self, current_dir},
     fs::File,
     io::Write,
-    path::{Path, PathBuf},
+    path::Path,
 };
 use taxel_bindings::{EricBeende, EricDekodiereDaten, EricInitialisiere};
 use taxel_util::ToCString;
@@ -163,7 +163,7 @@ impl Drop for Eric {
     fn drop(&mut self) {
         println!("Closing eric");
 
-        // TODO: drop ResponseBuffer and Certificate before dropping Eric
+        // TODO: implement EricEntladePlugins
 
         let error_code = unsafe { EricBeende() };
 
@@ -171,50 +171,6 @@ impl Drop for Eric {
             x if x == ErrorCode::ERIC_OK as i32 => (),
             error_code => panic!("Can't close eric: {}", error_code),
         }
-    }
-}
-
-pub fn configure() -> Result<EricConfig, anyhow::Error> {
-    println!("Configuring eric");
-
-    let plugin_path =
-        env::var("PLUGIN_PATH").context("Missing environment variable 'PLUGIN_PATH'")?;
-    let plugin_path = Path::new(&plugin_path);
-
-    let log_path = env::current_dir().context("Can't get current directory")?;
-
-    println!("Setting plugin path '{}'", plugin_path.display());
-    println!("Setting log path '{}'", log_path.display());
-    println!("Logging to '{}'", log_path.join("eric.log").display());
-
-    let config = EricConfig::new(plugin_path.into(), log_path);
-
-    Ok(config)
-}
-
-pub fn init(plugin_path: PathBuf, log_path: PathBuf) -> Result<(), anyhow::Error> {
-    println!("Initializing eric");
-
-    let plugin_path = plugin_path.try_to_cstring()?;
-    let log_path = log_path.try_to_cstring()?;
-
-    let error_code = unsafe { EricInitialisiere(plugin_path.as_ptr(), log_path.as_ptr()) };
-
-    match error_code {
-        x if x == ErrorCode::ERIC_OK as i32 => Ok(()),
-        error_code => Err(anyhow!("Can't init eric: {}", error_code)),
-    }
-}
-
-// TODO: implement EricEntladePlugins
-pub fn close() -> Result<(), anyhow::Error> {
-    println!("Closing eric");
-
-    let error_code = unsafe { EricBeende() };
-
-    match error_code {
-        x if x == ErrorCode::ERIC_OK as i32 => Ok(()),
-        error_code => Err(anyhow!("Can't close eric: {}", error_code)),
     }
 }
 
