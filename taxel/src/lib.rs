@@ -7,8 +7,9 @@ mod response_buffer;
 mod xml;
 
 pub use config::{CertificateConfig, EricConfig, PrintConfig};
-pub use eric::{close, configure, init, read, Eric};
+pub use eric::{close, configure, init, Eric};
 pub use error_code::ErrorCode;
+pub use xml::read;
 
 #[derive(Debug)]
 pub enum ProcessingFlag {
