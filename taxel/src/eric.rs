@@ -229,7 +229,36 @@ mod tests {
 
     #[test]
     fn test_validate_and_print() {
-        todo!()
+        let current_dir = current_dir().unwrap();
+        println!("current dir: {:#?}", current_dir);
+
+        let xml_path = "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
+        println!("Reading xml file '{}'", xml_path);
+        let xml = fs::read_to_string(xml_path).unwrap();
+
+        let version = "Bilanz_6.5".to_string();
+
+        let eric = Eric::new().unwrap();
+
+        let res = eric.validate_and_print(xml, version, PrintConfig::default());
+
+        println!("{:#?}", res);
+        assert!(res.is_ok());
+
+        let response = res.unwrap();
+
+        eric.log(&response).unwrap();
+
+        assert_eq!(response.error_code, ErrorCode::ERIC_OK as i32);
+
+        let doc = Document::parse(&response.validation_response).unwrap();
+        println!("Doc: {:#?}", doc);
+        let node = doc.descendants().find(|node| node.has_tag_name("Erfolg"));
+        assert!(node.is_some());
+        let node = node.unwrap();
+        assert_eq!(node.tag_name().name(), "Erfolg");
+
+        assert!(response.server_response.is_empty());
     }
 
     #[test]
