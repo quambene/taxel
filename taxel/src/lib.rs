@@ -11,11 +11,37 @@ pub use eric::Eric;
 pub use error_code::ErrorCode;
 pub use xml::read;
 
+/*
+    ProcessingFlag
+    Validate = 2
+    Send = 4
+    Print = 32
+    CheckHints = 128
+
+    binary operation: 2 | 4 = 6
+    ValidateAndSend = 6
+
+    binary operation: 2 | 32 = 34
+    ValidateAndPrint = 34
+
+    binary operation: 4 | 32 = 36
+    SendAndPrint = 36
+
+    binary operation: 2 | 4 | 32 = 38
+    ValidateAndSendAndPrint = 38
+
+    Send and Print are always validated, i.e.
+        Send = ValidateAndSend
+        Print = ValidateAndPrint
+        SendAndPrint = ValidateAndSendAndPrint
+*/
+
 #[derive(Debug)]
 pub enum ProcessingFlag {
     Validate = 2,
     Send = 4,
     Print = 32,
+    SendAndPrint = 36,
     CheckHints = 128,
 }
 

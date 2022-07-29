@@ -23,10 +23,8 @@ pub fn process(
     match processing_flag {
         ProcessingFlag::Validate => println!("Validating xml file"),
         ProcessingFlag::Send => println!("Sending xml file"),
-        ProcessingFlag::Print => {
-            println!("Validating xml file");
-            println!("Prepare printing");
-        }
+        ProcessingFlag::Print => println!("Validating xml file"),
+        ProcessingFlag::SendAndPrint => println!("Send and print"),
         ProcessingFlag::CheckHints => println!("Check hints"),
     }
 
@@ -54,8 +52,11 @@ pub fn process(
         // allocate eric_druck_parameter_t
         Some(pdf_name) => Some(eric_druck_parameter_t {
             version: 2,
-            // TODO: Implement Preview::No
-            vorschau: Preview::Yes as u32,
+            vorschau: match processing_flag {
+                // pdf preview is only allowed for ProcessingFlag::Validate
+                ProcessingFlag::Validate => Preview::Yes as u32,
+                _ => Preview::No as u32,
+            },
             ersteSeite: 0,
             duplexDruck: 0,
             pdfName: pdf_name.as_ptr(),
@@ -77,7 +78,7 @@ pub fn process(
             abrufCode: ptr::null(),
             pin: certificate.password.as_ptr(),
             version: 2,
-            zertifikatHandle: certificate.as_value(),
+            zertifikatHandle: certificate.handle,
         }),
         None => None,
     };

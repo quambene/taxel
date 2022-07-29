@@ -94,13 +94,13 @@ impl Eric {
         xml: String,
         type_version: String,
         certificate_config: CertificateConfig,
-        print_config: Option<PrintConfig>,
+        print_config: PrintConfig,
     ) -> Result<EricResponse, anyhow::Error> {
         process(
             xml,
             type_version,
-            ProcessingFlag::Send,
-            print_config,
+            ProcessingFlag::SendAndPrint,
+            Some(print_config),
             Some(certificate_config),
             None,
         )
@@ -148,7 +148,7 @@ impl Eric {
 
         let error_code = unsafe {
             EricDekodiereDaten(
-                certificate.as_value(),
+                certificate.handle,
                 certificate.password.as_ptr(),
                 encrypted_data.as_ptr(),
                 response_buffer.as_ptr(),
