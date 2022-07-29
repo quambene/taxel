@@ -55,6 +55,7 @@ pub fn process(
             vorschau: match processing_flag {
                 // pdf preview is only allowed for ProcessingFlag::Validate
                 ProcessingFlag::Validate => Preview::Yes as u32,
+                ProcessingFlag::Print => Preview::Yes as u32,
                 _ => Preview::No as u32,
             },
             ersteSeite: 0,
