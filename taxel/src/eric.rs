@@ -46,28 +46,13 @@ impl Eric {
         &self,
         xml: String,
         type_version: String,
+        print_config: Option<PrintConfig>,
     ) -> Result<EricResponse, anyhow::Error> {
         process(
             xml,
             type_version,
             ProcessingFlag::Validate,
-            None,
-            None,
-            None,
-        )
-    }
-
-    pub fn validate_and_print(
-        &self,
-        xml: String,
-        type_version: String,
-        print_config: PrintConfig,
-    ) -> Result<EricResponse, anyhow::Error> {
-        process(
-            xml,
-            type_version,
-            ProcessingFlag::Print,
-            Some(print_config),
+            print_config,
             None,
             None,
         )
@@ -78,30 +63,14 @@ impl Eric {
         xml: String,
         type_version: String,
         config: CertificateConfig,
+        print_config: Option<PrintConfig>,
     ) -> Result<EricResponse, anyhow::Error> {
         process(
             xml,
             type_version,
             ProcessingFlag::Send,
-            None,
+            print_config,
             Some(config),
-            None,
-        )
-    }
-
-    pub fn send_and_print(
-        &self,
-        xml: String,
-        type_version: String,
-        certificate_config: CertificateConfig,
-        print_config: PrintConfig,
-    ) -> Result<EricResponse, anyhow::Error> {
-        process(
-            xml,
-            type_version,
-            ProcessingFlag::SendAndPrint,
-            Some(print_config),
-            Some(certificate_config),
             None,
         )
     }
@@ -178,10 +147,7 @@ impl Drop for Eric {
 mod tests {
     use super::*;
     use roxmltree::Document;
-    use std::{
-        env::current_dir,
-        fs::{self},
-    };
+    use std::fs::{self};
 
     #[test]
     fn test_new() {
@@ -195,18 +161,14 @@ mod tests {
 
     #[test]
     fn test_validate() {
-        let current_dir = current_dir().unwrap();
-        println!("current dir: {:#?}", current_dir);
-
         let xml_path = "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
-        println!("Reading xml file '{}'", xml_path);
         let xml = fs::read_to_string(xml_path).unwrap();
-
         let version = "Bilanz_6.5".to_string();
+        let print_config = None;
 
         let eric = Eric::new().unwrap();
 
-        let res = eric.validate(xml, version);
+        let res = eric.validate(xml, version, print_config);
 
         println!("{:#?}", res);
         assert!(res.is_ok());
@@ -229,18 +191,14 @@ mod tests {
 
     #[test]
     fn test_validate_and_print() {
-        let current_dir = current_dir().unwrap();
-        println!("current dir: {:#?}", current_dir);
-
         let xml_path = "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
-        println!("Reading xml file '{}'", xml_path);
         let xml = fs::read_to_string(xml_path).unwrap();
-
         let version = "Bilanz_6.5".to_string();
+        let print_config = Some(PrintConfig::default());
 
         let eric = Eric::new().unwrap();
 
-        let res = eric.validate_and_print(xml, version, PrintConfig::default());
+        let res = eric.validate(xml, version, print_config);
 
         println!("{:#?}", res);
         assert!(res.is_ok());
@@ -263,11 +221,67 @@ mod tests {
 
     #[test]
     fn test_send() {
-        todo!()
+        let xml_path = "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
+        let xml = fs::read_to_string(xml_path).unwrap();
+        let version = "Bilanz_6.5".to_string();
+        let certificate_path = "../test_data/test-certificate.pfx".to_string();
+        let certificate_password = "123456".to_string();
+        let certificate_config = CertificateConfig::new(certificate_path, certificate_password);
+        let print_config = None;
+
+        let eric = Eric::new().unwrap();
+
+        let res = eric.send(xml, version, certificate_config, print_config);
+
+        println!("{:#?}", res);
+        assert!(res.is_ok());
+
+        let response = res.unwrap();
+
+        eric.log(&response).unwrap();
+
+        assert_eq!(response.error_code, ErrorCode::ERIC_OK as i32);
+
+        let doc = Document::parse(&response.validation_response).unwrap();
+        println!("Doc: {:#?}", doc);
+        let node = doc.descendants().find(|node| node.has_tag_name("Erfolg"));
+        assert!(node.is_some());
+        let node = node.unwrap();
+        assert_eq!(node.tag_name().name(), "Erfolg");
+
+        assert!(response.server_response.is_empty());
     }
 
     #[test]
     fn test_send_and_print() {
-        todo!()
+        let xml_path = "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
+        let xml = fs::read_to_string(xml_path).unwrap();
+        let version = "Bilanz_6.5".to_string();
+        let certificate_path = "../test_data/test-certificate.pfx".to_string();
+        let certificate_password = "123456".to_string();
+        let certificate_config = CertificateConfig::new(certificate_path, certificate_password);
+        let print_config = Some(PrintConfig::default());
+
+        let eric = Eric::new().unwrap();
+
+        let res = eric.send(xml, version, certificate_config, print_config);
+
+        println!("{:#?}", res);
+        assert!(res.is_ok());
+
+        let response = res.unwrap();
+
+        eric.log(&response).unwrap();
+
+        assert_eq!(response.error_code, ErrorCode::ERIC_OK as i32);
+
+        let doc = Document::parse(&response.validation_response).unwrap();
+        println!("Doc: {:#?}", doc);
+        let node = doc.descendants().find(|node| node.has_tag_name("Erfolg"));
+        assert!(node.is_some());
+        let node = node.unwrap();
+        assert_eq!(node.tag_name().name(), "Erfolg");
+
+        assert!(response.server_response.is_empty());
     }
 }

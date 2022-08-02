@@ -27,10 +27,7 @@ pub fn validate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
 
     let eric = Eric::new()?;
 
-    let response = match print_config {
-        Some(print_config) => eric.validate_and_print(xml, type_version, print_config)?,
-        None => eric.validate(xml, type_version)?,
-    };
+    let response = eric.validate(xml, type_version, print_config)?;
 
     eric.log(&response)?;
 

@@ -34,12 +34,7 @@ pub fn send(matches: &ArgMatches) -> Result<(), anyhow::Error> {
 
     let eric = Eric::new()?;
 
-    let response = match print_config {
-        Some(print_config) => {
-            eric.send_and_print(xml, type_version, certificate_config, print_config)?
-        }
-        None => eric.send(xml, type_version, certificate_config)?,
-    };
+    let response = eric.send(xml, type_version, certificate_config, print_config)?;
 
     eric.log(&response)?;
 
@@ -58,6 +53,35 @@ mod tests {
             cmd::SEND,
             "--xml-file",
             "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
+            "--certificate-file",
+            "../test_data/test-certificate.pfx",
+            "--password",
+            "123456",
+        ];
+
+        let app = app();
+        let matches = app.get_matches_from(args);
+        let subcommand_matches = matches.subcommand_matches(cmd::SEND).unwrap();
+        println!("subcommand matches: {:#?}", subcommand_matches);
+
+        let res = send(&subcommand_matches);
+        println!("res: {:#?}", res);
+
+        assert!(res.is_ok())
+    }
+
+    #[test]
+    fn test_send_and_print() {
+        let args = vec![
+            cmd::BIN,
+            cmd::SEND,
+            "--xml-file",
+            "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
+            "--certificate-file",
+            "../test_data/test-certificate.pfx",
+            "--password",
+            "123456",
+            "--print",
         ];
 
         let app = app();
