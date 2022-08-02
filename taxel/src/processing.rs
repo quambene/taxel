@@ -56,7 +56,6 @@ pub fn process(
         Some(pdf_name) => Some(eric_druck_parameter_t {
             version: 2,
             vorschau: match processing_flag {
-                // pdf preview is only allowed for ProcessingFlag::Validate
                 ProcessingFlag::Validate => Preview::Yes as u32,
                 ProcessingFlag::Print => Preview::Yes as u32,
                 _ => Preview::No as u32,
