@@ -38,7 +38,10 @@ pub fn process(
     };
 
     match &print_config {
-        Some(print_config) => println!("Printing transmission log to '{}'", print_config.pdf_name),
+        Some(print_config) => println!(
+            "Printing transmission confirmation to '{}'",
+            print_config.pdf_name
+        ),
         None => (),
     }
 

@@ -4,9 +4,9 @@ use taxel::{CertificateConfig, Eric, PrintConfig};
 
 pub fn send_args() -> [Arg<'static>; 6] {
     [
-        arg::xml_file(),
         arg::tax_type(),
         arg::tax_version(),
+        arg::xml_file(),
         arg::certificate_file(),
         arg::password(),
         arg::print(),
@@ -25,7 +25,8 @@ pub fn send(matches: &ArgMatches) -> Result<(), anyhow::Error> {
         CertificateConfig::new(certificate_file.to_string(), password.to_string());
 
     let print_config = if matches.contains_id(arg::PRINT) {
-        Some(PrintConfig::default())
+        let pdf_name = arg::get_one(matches, arg::PRINT)?;
+        Some(PrintConfig::new(pdf_name))
     } else {
         None
     };
@@ -82,6 +83,7 @@ mod tests {
             "--password",
             "123456",
             "--print",
+            "ebilanz.pdf",
         ];
 
         let app = app();

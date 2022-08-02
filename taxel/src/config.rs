@@ -1,4 +1,5 @@
 pub struct CertificateConfig {
+    // TODO: use PathBuf instead of String
     pub path: String,
     pub password: String,
 }
@@ -10,18 +11,14 @@ impl CertificateConfig {
 }
 
 pub struct PrintConfig {
+    // TODO: use PathBuf instead of String
     pub pdf_name: String,
 }
 
 impl PrintConfig {
-    pub fn new(pdf_name: String) -> Self {
-        Self { pdf_name }
-    }
-}
-
-impl Default for PrintConfig {
-    fn default() -> Self {
-        let pdf_name = "ebilanz.pdf".to_string();
-        Self::new(pdf_name)
+    pub fn new(pdf_name: &str) -> Self {
+        Self {
+            pdf_name: pdf_name.to_string(),
+        }
     }
 }

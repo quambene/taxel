@@ -9,7 +9,6 @@ pub const XML_FILE: &str = "xml-file";
 pub const TAX_TYPE: &str = "tax-type";
 pub const TAX_VERSION: &str = "tax-version";
 pub const PRINT: &str = "print";
-pub const PDF_NAME: &str = "pdf-name";
 pub const CERTIFICATE_FILE: &str = "certificate-file";
 pub const PASSWORD: &str = "password";
 
@@ -58,9 +57,10 @@ pub fn tax_version() -> Arg<'static> {
 pub fn print() -> Arg<'static> {
     Arg::new(PRINT)
         .long(PRINT)
+        .value_name("pdf-name")
         .required(false)
-        .takes_value(false)
-        .help("Print transmission log as pdf file")
+        .takes_value(true)
+        .help("Print transmission confirmation as pdf file")
 }
 
 pub fn certificate_file() -> Arg<'static> {

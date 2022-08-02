@@ -48,14 +48,12 @@ impl Eric {
         type_version: String,
         print_config: Option<PrintConfig>,
     ) -> Result<EricResponse, anyhow::Error> {
-        process(
-            xml,
-            type_version,
-            ProcessingFlag::Validate,
-            print_config,
-            None,
-            None,
-        )
+        let processing_flag = match print_config {
+            Some(_) => ProcessingFlag::Print,
+            None => ProcessingFlag::Validate,
+        };
+
+        process(xml, type_version, processing_flag, print_config, None, None)
     }
 
     pub fn send(
@@ -65,10 +63,15 @@ impl Eric {
         config: CertificateConfig,
         print_config: Option<PrintConfig>,
     ) -> Result<EricResponse, anyhow::Error> {
+        let processing_flag = match print_config {
+            Some(_) => ProcessingFlag::SendAndPrint,
+            None => ProcessingFlag::Send,
+        };
+
         process(
             xml,
             type_version,
-            ProcessingFlag::Send,
+            processing_flag,
             print_config,
             Some(config),
             None,
@@ -194,7 +197,7 @@ mod tests {
         let xml_path = "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
         let xml = fs::read_to_string(xml_path).unwrap();
         let version = "Bilanz_6.5".to_string();
-        let print_config = Some(PrintConfig::default());
+        let print_config = Some(PrintConfig::new("ebilanz.pdf"));
 
         let eric = Eric::new().unwrap();
 
@@ -260,7 +263,7 @@ mod tests {
         let certificate_path = "../test_data/test-certificate.pfx".to_string();
         let certificate_password = "123456".to_string();
         let certificate_config = CertificateConfig::new(certificate_path, certificate_password);
-        let print_config = Some(PrintConfig::default());
+        let print_config = Some(PrintConfig::new("ebilanz.pdf"));
 
         let eric = Eric::new().unwrap();
 

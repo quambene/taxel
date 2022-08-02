@@ -4,9 +4,9 @@ use taxel::{Eric, PrintConfig};
 
 pub fn validate_args() -> [Arg<'static>; 4] {
     [
-        arg::xml_file(),
         arg::tax_type(),
         arg::tax_version(),
+        arg::xml_file(),
         arg::print(),
     ]
 }
@@ -18,7 +18,8 @@ pub fn validate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let type_version = format!("{}_{}", tax_type, tax_version);
 
     let print_config = if matches.contains_id(arg::PRINT) {
-        Some(PrintConfig::default())
+        let pdf_name = arg::get_one(matches, arg::PRINT)?;
+        Some(PrintConfig::new(pdf_name))
     } else {
         None
     };
@@ -67,6 +68,7 @@ mod tests {
             "--xml-file",
             "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
             "--print",
+            "ebilanz.pdf",
         ];
 
         let app = app();
