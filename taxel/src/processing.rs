@@ -106,6 +106,8 @@ pub fn process(
         )
     };
 
+    // TODO: EricHoleFehlerText() for error code
+
     let transfer_code = unsafe { transfer_code.as_ref() };
 
     match transfer_code {
@@ -114,6 +116,7 @@ pub fn process(
     }
 
     let validation_response = validation_response_buffer.read()?;
+    // TODO: parse server response via EricGetErrormessagesFromXMLAnswer()
     let server_response = server_response_buffer.read()?;
     let response = EricResponse::new(
         error_code,

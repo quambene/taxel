@@ -9,9 +9,7 @@ pub const XML_FILE: &str = "xml-file";
 pub const TAX_TYPE: &str = "tax-type";
 pub const TAX_VERSION: &str = "tax-version";
 pub const PRINT: &str = "print";
-pub const NO_PRINT: &str = "no-print";
 pub const PDF_NAME: &str = "pdf-name";
-pub const ENCRYPTED_FILE: &str = "encrypted-file";
 pub const CERTIFICATE_FILE: &str = "certificate-file";
 pub const PASSWORD: &str = "password";
 

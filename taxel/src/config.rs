@@ -1,20 +1,3 @@
-use std::path::PathBuf;
-
-#[derive(Debug)]
-pub struct EricConfig {
-    pub plugin_path: PathBuf,
-    pub log_path: PathBuf,
-}
-
-impl EricConfig {
-    pub fn new(plugin_path: PathBuf, log_path: PathBuf) -> Self {
-        Self {
-            plugin_path,
-            log_path,
-        }
-    }
-}
-
 pub struct CertificateConfig {
     pub path: String,
     pub password: String,
