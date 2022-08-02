@@ -1,14 +1,16 @@
 # Taxel
 
-Taxel provides Rust bindings for the ELSTER Richt Client (ERiC).
+Taxel provides a command line interface (CLI) for sending the eBilanz to the tax authorities.
 
 - [What is ELSTER?](#what-is-elster)
 - [What is ERiC?](#what-is-eric)
+- [What is eBilanz?](#what-is-ebilanz)
 - [Requirements](#requirements)
-- [Install Taxel from Github.com](#install-taxel)
-- [Set library name](#set-library-name)
-- [Generate bindings](#generate-bindings)
-- [Test bindings](#test-bindings)
+- [Install Taxel](#install-taxel)
+- [Usage](#usage)
+- [Rust bindings for the ELSTER Rich Client (ERiC)](#rust-bindings-for-the-elster-rich-client-eric)
+  - [Generate bindings](#generate-bindings)
+  - [Test bindings](#test-bindings)
 
 ## What is ELSTER?
 
@@ -18,24 +20,33 @@ Elster (short for _Elektronische Steuererklärung_) is a project by the German t
 
 ERiC is a C library that is integrated into a tax application. ERiC checks the data supplied by the tax application for plausibility and transmits the data electronically to the computing center of the respective tax administration.
 
+## What is eBilanz?
+
+eBilanz (short for _Elektronische Bilanz_) is the electronic transmission of the company balance sheet and P&L in a standardized format (XBRL) to the tax authorities in the context of tax declaration.
+
 ## Requirements
 
 You need to have the shared library `libericapi.so` and the header file `ericapi.h` available on your system which can be downloaded from [ELSTER for developers](https://www.elster.de/elsterweb/entwickler/login) after access has been requested [here](https://www.elster.de/elsterweb/registrierung-entwickler/form).
 
-For generating the bindings for your platform and architecture, you need `libclang` as well. For example, on Debian/Ubuntu install:
+For generating the bindings on your platform and architecture, you need `libclang` as well. For example, on Debian/Ubuntu install:
 
 ``` bash
 apt install llvm-dev libclang-dev clang
 ```
 
-## Install Taxel from [Github.com](https://github.com/quambene/taxel)
+## Install Taxel
 
 ``` bash
 git clone git@github.com:quambene/taxel.git
 cd taxel
+
+# Build and install taxel binary to ~/.cargo/bin
+cargo install --path ./taxel-cli
 ```
 
-## Set library name
+_Note:_ Run `cargo install --path ./taxel-cli` again to update to the latest version. Uninstall the binary with `cargo uninstall taxel`.
+
+## Usage
 
 1. Create an environment file:
 
@@ -43,24 +54,71 @@ cd taxel
     touch .env
     ```
 
-2. Set environment variables `LIBRARY_PATH`, `LIBRARY_NAME`, `HEADER_FILE`, and `PLUGIN_PATH` in your `.env`. For example:
+1. Set environment variables `LIBRARY_PATH`, `LIBRARY_NAME`, `HEADER_FILE`, `PLUGIN_PATH`, and `LD_LIBRARY_PATH` in your `.env`. For example:
 
     ``` bash
     LIBRARY_PATH=ERiC-36.1.8.0-Linux-x86_64/ERiC-36.1.8.0/Linux-x86_64/lib
     LIBRARY_NAME=ericapi
     HEADER_FILE=ERiC-36.1.8.0-Linux-x86_64/ERiC-36.1.8.0/Linux-x86_64/include/ericapi.h
     PLUGIN_PATH=ERiC-36.1.8.0-Linux-x86_64/ERiC-36.1.8.0/Linux-x86_64/lib/plugins2
+    LD_LIBRARY_PATH=ERiC-36.1.8.0-Linux-x86_64/ERiC-36.1.8.0/Linux-x86_64/lib
     ```
 
-3. Source your environment:
+1. Source your environment:
 
     ``` bash
     set -a && source .env && set +a
     ```
 
+1. Run taxel:
+
+    ``` bash
+    # Validate xml file
+    taxel validate \
+        --tax-type "Bilanz" \
+        --tax-version 6.4 \
+        --xml-file "my_tax_data.xml"
+
+    # Validate xml file and print confirmation as pdf file
+    taxel validate \
+        --tax-type "Bilanz" \
+        --tax-version 6.4 \
+        --xml-file "my_tax_data.xml" \
+        --print "eBilanz 2021.pdf"
+
+    # Send xml file to tax authorities
+    taxel validate \
+        --tax-type "Bilanz" \
+        --tax-version 6.4 \
+        --xml-file "my_tax_data.xml" \
+        --certificate-file "my_elster_certificate.pfx" \
+        --password "my_password"
+
+    # Send xml file to tax authorities and print confirmation as pdf file
+    taxel validate \
+        --tax-type "Bilanz" \
+        --tax-version 6.4 \
+        --xml-file "my_tax_data.xml" \
+        --certificate-file "my_elster_certificate.pfx" \
+        --password "my_password" \
+        --print "eBilanz 2021.pdf"
+    ```
+
 _Remark_: In step 2, note the difference between file name (e.g. `libericapi.so` on Linux) and `LIBRARY_NAME` (which is `ericapi`).
 
-## Generate bindings
+## Testing
+
+``` bash
+# Test taxel
+cargo test -p taxel -- --test-threads=1
+
+# Test CLI for taxel
+cargo test -p taxel-cli -- --test-threads=1
+```
+
+## Rust bindings for the ELSTER Rich Client (ERiC)
+
+### Generate bindings
 
 The bindings have to be generated on-the-fly for your specific platform and architecture:
 
@@ -70,7 +128,7 @@ cargo build -p taxel-bindings
 
 The bindings are generated in `target/debug/build/taxel-<random-id>/out/bindings.rs`.
 
-## Test bindings
+### Test bindings
 
 The bindings are included in `src/lib.rs` via `include!` macro and tested by:
 
