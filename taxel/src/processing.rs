@@ -4,7 +4,7 @@ use crate::{
     response_buffer::ResponseBuffer,
     EricResponse, Preview, ProcessingFlag,
 };
-use std::ptr;
+use std::{ptr, mem::MaybeUninit};
 use taxel_bindings::{
     eric_druck_parameter_t, eric_verschluesselungs_parameter_t, EricBearbeiteVorgang,
 };
@@ -50,10 +50,12 @@ pub fn process(
         .map(|el| el.pdf_name.to_osstring().try_to_cstring())
         .transpose()?;
 
+    let mut print_params = MaybeUninit::<eric_druck_parameter_t>::uninit();
+
     // SAFETY: match reference of pdf_name; otherwise pdf_name is moved, and pdf_name.as_ptr() would be dangling
-    let print_params = match &pdf_name {
+    if let Some(pdf_name) = &pdf_name {
         // allocate eric_druck_parameter_t
-        Some(pdf_name) => Some(eric_druck_parameter_t {
+        print_params.write(eric_druck_parameter_t {
             version: 2,
             vorschau: match processing_flag {
                 ProcessingFlag::Validate => Preview::Yes as u32,
@@ -64,9 +66,8 @@ pub fn process(
             duplexDruck: 0,
             pdfName: pdf_name.as_ptr(),
             fussText: ptr::null(),
-        }),
-        None => None,
-    };
+        });
+    }
 
     let certificate = match certificate_config {
         Some(config) => Some(Certificate::new(config)),
@@ -94,8 +95,8 @@ pub fn process(
             xml.as_ptr(),
             type_version.as_ptr(),
             processing_flag as u32,
-            match print_params {
-                Some(el) => &el,
+            match pdf_name {
+                Some(_) => print_params.as_ptr(),
                 None => ptr::null(),
             },
             match crypto_params {
@@ -107,6 +108,8 @@ pub fn process(
             server_response_buffer.as_ptr(),
         )
     };
+
+    drop(print_params);
 
     // TODO: EricHoleFehlerText() for error code
 
