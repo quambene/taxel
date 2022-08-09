@@ -1,6 +1,6 @@
 use crate::arg;
 use clap::{Arg, ArgMatches};
-use taxel::{Eric, PrintConfig};
+use taxel::{Eric, PrintConfig, ProcessingFlag};
 
 pub fn validate_args() -> [Arg<'static>; 4] {
     [
@@ -16,11 +16,14 @@ pub fn validate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let tax_type = arg::get_one(matches, arg::TAX_TYPE)?;
     let tax_version = arg::get_one(matches, arg::TAX_VERSION)?;
     let type_version = format!("{}_{}", tax_type, tax_version);
+    let processing_flag: ProcessingFlag;
 
     let print_config = if matches.contains_id(arg::PRINT) {
+        processing_flag = ProcessingFlag::Print;
         let pdf_name = arg::get_one(matches, arg::PRINT)?;
-        Some(PrintConfig::new(pdf_name))
+        Some(PrintConfig::new(pdf_name, &processing_flag)?)
     } else {
+        processing_flag = ProcessingFlag::Validate;
         None
     };
 
@@ -28,7 +31,7 @@ pub fn validate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
 
     let eric = Eric::new()?;
 
-    let response = eric.validate(xml, type_version, print_config)?;
+    let response = eric.validate(xml, type_version, processing_flag, print_config)?;
 
     eric.log(&response)?;
 

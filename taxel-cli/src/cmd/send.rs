@@ -1,6 +1,6 @@
 use crate::arg;
 use clap::{Arg, ArgMatches};
-use taxel::{CertificateConfig, Eric, PrintConfig};
+use taxel::{CertificateConfig, Eric, PrintConfig, ProcessingFlag};
 
 pub fn send_args() -> [Arg<'static>; 6] {
     [
@@ -20,14 +20,17 @@ pub fn send(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let certificate_file = arg::get_one(matches, arg::CERTIFICATE_FILE)?;
     let password = arg::get_one(matches, arg::PASSWORD)?;
     let type_version = format!("{}_{}", tax_type, tax_version);
+    let processing_flag: ProcessingFlag;
 
     let certificate_config =
         CertificateConfig::new(certificate_file.to_string(), password.to_string());
 
     let print_config = if matches.contains_id(arg::PRINT) {
+        processing_flag = ProcessingFlag::SendAndPrint;
         let pdf_name = arg::get_one(matches, arg::PRINT)?;
-        Some(PrintConfig::new(pdf_name))
+        Some(PrintConfig::new(pdf_name, &processing_flag)?)
     } else {
+        processing_flag = ProcessingFlag::Send;
         None
     };
 
@@ -35,7 +38,13 @@ pub fn send(matches: &ArgMatches) -> Result<(), anyhow::Error> {
 
     let eric = Eric::new()?;
 
-    let response = eric.send(xml, type_version, certificate_config, print_config)?;
+    let response = eric.send(
+        xml,
+        type_version,
+        processing_flag,
+        certificate_config,
+        print_config,
+    )?;
 
     eric.log(&response)?;
 

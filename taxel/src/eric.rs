@@ -46,13 +46,9 @@ impl Eric {
         &self,
         xml: String,
         type_version: String,
+        processing_flag: ProcessingFlag,
         print_config: Option<PrintConfig>,
     ) -> Result<EricResponse, anyhow::Error> {
-        let processing_flag = match print_config {
-            Some(_) => ProcessingFlag::Print,
-            None => ProcessingFlag::Validate,
-        };
-
         process(xml, type_version, processing_flag, print_config, None, None)
     }
 
@@ -60,20 +56,16 @@ impl Eric {
         &self,
         xml: String,
         type_version: String,
-        config: CertificateConfig,
+        processing_flag: ProcessingFlag,
+        certificate_config: CertificateConfig,
         print_config: Option<PrintConfig>,
     ) -> Result<EricResponse, anyhow::Error> {
-        let processing_flag = match print_config {
-            Some(_) => ProcessingFlag::SendAndPrint,
-            None => ProcessingFlag::Send,
-        };
-
         process(
             xml,
             type_version,
             processing_flag,
             print_config,
-            Some(config),
+            Some(certificate_config),
             None,
         )
     }
@@ -166,12 +158,13 @@ mod tests {
     fn test_validate() {
         let xml_path = "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
         let xml = fs::read_to_string(xml_path).unwrap();
-        let version = "Bilanz_6.5".to_string();
+        let type_version = "Bilanz_6.5".to_string();
+        let processing_flag = ProcessingFlag::Validate;
         let print_config = None;
 
         let eric = Eric::new().unwrap();
 
-        let res = eric.validate(xml, version, print_config);
+        let res = eric.validate(xml, type_version, processing_flag, print_config);
 
         println!("{:#?}", res);
         assert!(res.is_ok());
@@ -196,12 +189,13 @@ mod tests {
     fn test_validate_and_print() {
         let xml_path = "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
         let xml = fs::read_to_string(xml_path).unwrap();
-        let version = "Bilanz_6.5".to_string();
-        let print_config = Some(PrintConfig::new("ebilanz.pdf"));
+        let type_version = "Bilanz_6.5".to_string();
+        let processing_flag = ProcessingFlag::Print;
+        let print_config = PrintConfig::new("ebilanz.pdf", &processing_flag).unwrap();
 
         let eric = Eric::new().unwrap();
 
-        let res = eric.validate(xml, version, print_config);
+        let res = eric.validate(xml, type_version, processing_flag, Some(print_config));
 
         println!("{:#?}", res);
         assert!(res.is_ok());
@@ -226,15 +220,22 @@ mod tests {
     fn test_send() {
         let xml_path = "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
         let xml = fs::read_to_string(xml_path).unwrap();
-        let version = "Bilanz_6.5".to_string();
+        let type_version = "Bilanz_6.5".to_string();
         let certificate_path = "../test_data/test-certificate.pfx".to_string();
         let certificate_password = "123456".to_string();
         let certificate_config = CertificateConfig::new(certificate_path, certificate_password);
+        let processing_flag = ProcessingFlag::Send;
         let print_config = None;
 
         let eric = Eric::new().unwrap();
 
-        let res = eric.send(xml, version, certificate_config, print_config);
+        let res = eric.send(
+            xml,
+            type_version,
+            processing_flag,
+            certificate_config,
+            print_config,
+        );
 
         println!("{:#?}", res);
         assert!(res.is_ok());
@@ -259,15 +260,22 @@ mod tests {
     fn test_send_and_print() {
         let xml_path = "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
         let xml = fs::read_to_string(xml_path).unwrap();
-        let version = "Bilanz_6.5".to_string();
+        let type_version = "Bilanz_6.5".to_string();
         let certificate_path = "../test_data/test-certificate.pfx".to_string();
         let certificate_password = "123456".to_string();
         let certificate_config = CertificateConfig::new(certificate_path, certificate_password);
-        let print_config = Some(PrintConfig::new("ebilanz.pdf"));
+        let processing_flag = ProcessingFlag::Print;
+        let print_config = PrintConfig::new("ebilanz.pdf", &processing_flag).unwrap();
 
         let eric = Eric::new().unwrap();
 
-        let res = eric.send(xml, version, certificate_config, print_config);
+        let res = eric.send(
+            xml,
+            type_version,
+            processing_flag,
+            certificate_config,
+            Some(print_config),
+        );
 
         println!("{:#?}", res);
         assert!(res.is_ok());

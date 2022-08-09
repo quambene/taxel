@@ -2,13 +2,11 @@ use crate::{
     certificate::Certificate,
     config::{CertificateConfig, PrintConfig},
     response_buffer::ResponseBuffer,
-    EricResponse, Preview, ProcessingFlag,
+    EricResponse, ProcessingFlag,
 };
-use std::{ptr, mem::MaybeUninit};
-use taxel_bindings::{
-    eric_druck_parameter_t, eric_verschluesselungs_parameter_t, EricBearbeiteVorgang,
-};
-use taxel_util::{ToCString, ToOsString};
+use std::ptr;
+use taxel_bindings::{eric_verschluesselungs_parameter_t, EricBearbeiteVorgang};
+use taxel_util::ToCString;
 
 pub fn process(
     xml: String,
@@ -22,8 +20,8 @@ pub fn process(
 
     match processing_flag {
         ProcessingFlag::Validate => println!("Validating xml file"),
-        ProcessingFlag::Send => println!("Sending xml file"),
         ProcessingFlag::Print => println!("Validating xml file"),
+        ProcessingFlag::Send => println!("Sending xml file"),
         ProcessingFlag::SendAndPrint => println!("Send and print"),
         ProcessingFlag::CheckHints => println!("Check hints"),
     }
@@ -39,34 +37,10 @@ pub fn process(
 
     match &print_config {
         Some(print_config) => println!(
-            "Printing transmission confirmation to '{}'",
-            print_config.pdf_name
+            "Printing confirmation to file '{}'",
+            print_config.pdf_name.to_str()?
         ),
         None => (),
-    }
-
-    // allocate pdf_name as CString
-    let pdf_name = print_config
-        .map(|el| el.pdf_name.to_osstring().try_to_cstring())
-        .transpose()?;
-
-    let mut print_params = MaybeUninit::<eric_druck_parameter_t>::uninit();
-
-    // SAFETY: match reference of pdf_name; otherwise pdf_name is moved, and pdf_name.as_ptr() would be dangling
-    if let Some(pdf_name) = &pdf_name {
-        // allocate eric_druck_parameter_t
-        print_params.write(eric_druck_parameter_t {
-            version: 2,
-            vorschau: match processing_flag {
-                ProcessingFlag::Validate => Preview::Yes as u32,
-                ProcessingFlag::Print => Preview::Yes as u32,
-                _ => Preview::No as u32,
-            },
-            ersteSeite: 0,
-            duplexDruck: 0,
-            pdfName: pdf_name.as_ptr(),
-            fussText: ptr::null(),
-        });
     }
 
     let certificate = match certificate_config {
@@ -94,9 +68,9 @@ pub fn process(
         EricBearbeiteVorgang(
             xml.as_ptr(),
             type_version.as_ptr(),
-            processing_flag as u32,
-            match pdf_name {
-                Some(_) => print_params.as_ptr(),
+            processing_flag.into_u32(),
+            match &print_config {
+                Some(el) => el.print_parameter.as_ptr(),
                 None => ptr::null(),
             },
             match crypto_params {
@@ -108,8 +82,6 @@ pub fn process(
             server_response_buffer.as_ptr(),
         )
     };
-
-    drop(print_params);
 
     // TODO: EricHoleFehlerText() for error code
 

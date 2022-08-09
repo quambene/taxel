@@ -36,13 +36,19 @@ pub use xml::read;
         SendAndPrint = ValidateAndSendAndPrint
 */
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum ProcessingFlag {
     Validate = 2,
     Send = 4,
     Print = 32,
     SendAndPrint = 36,
     CheckHints = 128,
+}
+
+impl ProcessingFlag {
+    pub fn into_u32(&self) -> u32 {
+        *self as u32
+    }
 }
 
 pub enum Preview {
