@@ -112,8 +112,14 @@ _Remark_: In step 2, note the difference between file name (e.g. `libericapi.so`
 # Test taxel
 cargo test -p taxel -- --test-threads=1
 
+# Test taxel in release mode
+cargo test -p taxel --release -- --test-threads=1
+
 # Test CLI for taxel
 cargo test -p taxel-cli -- --test-threads=1
+
+# Test CLI for taxel in release mode
+cargo test -p taxel --release -- --test-threads=1
 ```
 
 ## Rust bindings for the ELSTER Rich Client (ERiC)
