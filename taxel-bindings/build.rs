@@ -1,5 +1,7 @@
-use bindgen;
-use std::{env, io, path::PathBuf};
+use std::{
+    env, io,
+    path::{Path, PathBuf},
+};
 
 fn main() -> io::Result<()> {
     let library_path =
@@ -8,13 +10,18 @@ fn main() -> io::Result<()> {
         env::var("LIBRARY_NAME").expect("Missing environment variable 'LIBRARY_NAME'");
     let header_file = env::var("HEADER_FILE").expect("Missing environment variable 'HEADER_FILE'");
 
-    println!("cargo:rustc-link-search={}", library_path);
+    let library_path = Path::new(&library_path);
+    let header_file = Path::new(&header_file);
+
+    println!("cargo:rustc-link-search={}", library_path.display());
     println!("cargo:rustc-link-lib={}", library_name);
-    println!("cargo:rerun-if-changed={}", header_file);
-    println!("cargo:rustc-env=LD_LIBRARY_PATH={}", library_path);
+    println!("cargo:rerun-if-changed={}", header_file.display());
+    println!("cargo:rustc-env=LD_LIBRARY_PATH={}", library_path.display());
+
+    let header = header_file.to_str().expect("Can't convert path to string");
 
     let bindings = bindgen::Builder::default()
-        .header(header_file)
+        .header(header)
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
         .generate()
         .expect("Can't generate bindings");
