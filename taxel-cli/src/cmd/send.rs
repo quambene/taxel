@@ -22,8 +22,9 @@ pub fn send(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let type_version = format!("{}_{}", tax_type, tax_version);
     let processing_flag: ProcessingFlag;
 
-    let certificate_config =
-        CertificateConfig::new(certificate_file.to_string(), password.to_string());
+    let eric = Eric::new()?;
+
+    let certificate_config = CertificateConfig::new(certificate_file, password)?;
 
     let print_config = if matches.contains_id(arg::PRINT) {
         processing_flag = ProcessingFlag::SendAndPrint;
@@ -35,8 +36,6 @@ pub fn send(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     };
 
     let xml = taxel::read(xml_file)?;
-
-    let eric = Eric::new()?;
 
     let response = eric.send(
         xml,

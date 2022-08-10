@@ -1,5 +1,4 @@
 use crate::{
-    certificate::Certificate,
     config::{CertificateConfig, PrintConfig},
     processing::process,
     response_buffer::ResponseBuffer,
@@ -104,16 +103,15 @@ impl Eric {
     pub fn decrypt(
         &self,
         encrypted_file: &str,
-        config: CertificateConfig,
+        certificate_config: CertificateConfig,
     ) -> Result<i32, anyhow::Error> {
         let encrypted_data = encrypted_file.try_to_cstring()?;
         let response_buffer = ResponseBuffer::new()?;
-        let certificate = Certificate::new(config)?;
 
         let error_code = unsafe {
             EricDekodiereDaten(
-                certificate.handle,
-                certificate.password.as_ptr(),
+                certificate_config.certificate.handle,
+                certificate_config.password.as_ptr(),
                 encrypted_data.as_ptr(),
                 response_buffer.as_ptr(),
             )
@@ -218,16 +216,17 @@ mod tests {
 
     #[test]
     fn test_send() {
+        let eric = Eric::new().unwrap();
+
         let xml_path = "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
         let xml = fs::read_to_string(xml_path).unwrap();
         let type_version = "Bilanz_6.5".to_string();
-        let certificate_path = "../test_data/test-certificate.pfx".to_string();
-        let certificate_password = "123456".to_string();
-        let certificate_config = CertificateConfig::new(certificate_path, certificate_password);
+        let certificate_path = "../test_data/test-certificate.pfx";
+        let certificate_password = "123456";
+        let certificate_config =
+            CertificateConfig::new(certificate_path, certificate_password).unwrap();
         let processing_flag = ProcessingFlag::Send;
         let print_config = None;
-
-        let eric = Eric::new().unwrap();
 
         let res = eric.send(
             xml,
@@ -258,16 +257,17 @@ mod tests {
 
     #[test]
     fn test_send_and_print() {
+        let eric = Eric::new().unwrap();
+
         let xml_path = "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
         let xml = fs::read_to_string(xml_path).unwrap();
         let type_version = "Bilanz_6.5".to_string();
-        let certificate_path = "../test_data/test-certificate.pfx".to_string();
-        let certificate_password = "123456".to_string();
-        let certificate_config = CertificateConfig::new(certificate_path, certificate_password);
+        let certificate_path = "../test_data/test-certificate.pfx";
+        let certificate_password = "123456";
+        let certificate_config =
+            CertificateConfig::new(certificate_path, certificate_password).unwrap();
         let processing_flag = ProcessingFlag::Print;
         let print_config = PrintConfig::new("ebilanz.pdf", &processing_flag).unwrap();
-
-        let eric = Eric::new().unwrap();
 
         let res = eric.send(
             xml,

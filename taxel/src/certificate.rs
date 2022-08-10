@@ -1,28 +1,25 @@
-use crate::{config::CertificateConfig, ErrorCode};
+use crate::ErrorCode;
 use anyhow::anyhow;
-use std::{ffi::CString, path::Path, ptr};
+use std::{ffi::CStr, ptr};
 use taxel_bindings::{EricCloseHandleToCertificate, EricGetHandleToCertificate};
-use taxel_util::ToCString;
 
 pub struct Certificate {
     pub handle: u32,
-    pub password: CString,
 }
 
 impl Certificate {
-    pub fn new(config: CertificateConfig) -> Result<Self, anyhow::Error> {
-        println!("Preparing certificate '{}'", &config.path);
+    pub fn new(path: &CStr) -> Result<Self, anyhow::Error> {
+        println!("Preparing certificate '{}'", path.to_str()?);
 
         let mut handle = 0;
         let pin_support = ptr::null::<u32>() as *mut u32;
-        let path = Path::new(&config.path).try_to_cstring()?;
-        let password = config.password.try_to_cstring()?;
 
+        // SAFETY: path.as_ptr() is not dangling as path is allocated in struct CertificateConfig and path is not moved as a reference to the CString is given
         let error_code =
             unsafe { EricGetHandleToCertificate(&mut handle, pin_support, path.as_ptr()) };
 
         match error_code {
-            x if x == ErrorCode::ERIC_OK as i32 => Ok(Certificate { handle, password }),
+            x if x == ErrorCode::ERIC_OK as i32 => Ok(Certificate { handle }),
             error_code => Err(anyhow!("Can't create certificate: {}", error_code)),
         }
     }

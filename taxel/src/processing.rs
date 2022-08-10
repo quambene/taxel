@@ -1,11 +1,10 @@
 use crate::{
-    certificate::Certificate,
     config::{CertificateConfig, PrintConfig},
     response_buffer::ResponseBuffer,
     EricResponse, ProcessingFlag,
 };
 use std::ptr;
-use taxel_bindings::{eric_verschluesselungs_parameter_t, EricBearbeiteVorgang};
+use taxel_bindings::EricBearbeiteVorgang;
 use taxel_util::ToCString;
 
 pub fn process(
@@ -43,24 +42,6 @@ pub fn process(
         None => (),
     }
 
-    let certificate = match certificate_config {
-        Some(config) => Some(Certificate::new(config)),
-        None => None,
-    }
-    .transpose()?;
-
-    // SAFETY: match a reference of certificate; otherwise certificate is moved, and certificate.password.as_ptr() would be dangling
-    let crypto_params = match &certificate {
-        // allocate eric_verschluesselungs_parameter_t
-        Some(certificate) => Some(eric_verschluesselungs_parameter_t {
-            abrufCode: ptr::null(),
-            pin: certificate.password.as_ptr(),
-            version: 2,
-            zertifikatHandle: certificate.handle,
-        }),
-        None => None,
-    };
-
     let validation_response_buffer = ResponseBuffer::new()?;
     let server_response_buffer = ResponseBuffer::new()?;
 
@@ -69,12 +50,14 @@ pub fn process(
             xml.as_ptr(),
             type_version.as_ptr(),
             processing_flag.into_u32(),
+            // SAFETY: match a reference of print_config; otherwise print_config is moved, and print_parameter.as_ptr() would be dangling
             match &print_config {
                 Some(el) => el.print_parameter.as_ptr(),
                 None => ptr::null(),
             },
-            match crypto_params {
-                Some(el) => &el,
+            // SAFETY: match a reference of certificate_config; otherwise certificate_config is moved, and certificate_parameter.as_ptr() would be dangling
+            match &certificate_config {
+                Some(el) => el.certificate_parameter.as_ptr(),
                 None => ptr::null(),
             },
             transfer_code,
