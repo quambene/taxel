@@ -18,7 +18,7 @@ Elster (short for _Elektronische Steuererklärung_) is a project by the German t
 
 ## What is ERiC?
 
-ERiC is a C library that is integrated into a tax application. ERiC checks the data supplied by the tax application for plausibility and transmits the data electronically to the computing center of the respective tax administration.
+ERiC is a C library that is integrated into a tax application. ERiC checks the data supplied by the tax application for plausibility, and transmits the data encrypted to the computing center of the respective tax administration.
 
 ## What is eBilanz?
 
@@ -84,7 +84,7 @@ _Note:_ Run `cargo install --path ./taxel-cli` again to update to the latest ver
         --tax-type "Bilanz" \
         --tax-version 6.4 \
         --xml-file "my_tax_data.xml" \
-        --print "eBilanz 2021.pdf"
+        --print "my_eBilanz.pdf"
 
     # Send xml file to tax authorities
     taxel validate \
@@ -101,7 +101,7 @@ _Note:_ Run `cargo install --path ./taxel-cli` again to update to the latest ver
         --xml-file "my_tax_data.xml" \
         --certificate-file "my_elster_certificate.pfx" \
         --password "my_password" \
-        --print "eBilanz 2021.pdf"
+        --print "my_eBilanz.pdf"
     ```
 
 _Remark_: In step 2, note the difference between file name (e.g. `libericapi.so` on Linux) and `LIBRARY_NAME` (which is `ericapi`).
@@ -119,7 +119,7 @@ cargo test -p taxel --release -- --test-threads=1
 cargo test -p taxel-cli -- --test-threads=1
 
 # Test CLI for taxel in release mode
-cargo test -p taxel --release -- --test-threads=1
+cargo test -p taxel-cli --release -- --test-threads=1
 ```
 
 ## Rust bindings for the ELSTER Rich Client (ERiC)
