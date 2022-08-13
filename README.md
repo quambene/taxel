@@ -1,6 +1,12 @@
 # Taxel
 
-Taxel provides a command line interface (CLI) for sending the eBilanz to the tax authorities.
+Taxel provides a command line interface (CLI) and Rust bindings for the ELSTER Rich Client (ERiC).
+
+Supported features:
+
+- [x] eBilanz
+
+---
 
 - [What is ELSTER?](#what-is-elster)
 - [What is ERiC?](#what-is-eric)
