@@ -93,7 +93,7 @@ _Note:_ Run `cargo install --path ./taxel-cli` again to update to the latest ver
         --print "my_eBilanz.pdf"
 
     # Send xml file to tax authorities
-    taxel validate \
+    taxel send \
         --tax-type "Bilanz" \
         --tax-version 6.4 \
         --xml-file "my_tax_data.xml" \
@@ -101,7 +101,7 @@ _Note:_ Run `cargo install --path ./taxel-cli` again to update to the latest ver
         --password "my_password"
 
     # Send xml file to tax authorities and print confirmation as pdf file
-    taxel validate \
+    taxel send \
         --tax-type "Bilanz" \
         --tax-version 6.4 \
         --xml-file "my_tax_data.xml" \
