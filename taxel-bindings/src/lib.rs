@@ -1,3 +1,7 @@
+//! Rust bindings for the ELSTER Rich Client (ERiC)
+
+// TODO: Fix https://github.com/rust-lang/cargo/issues/6313
+
 mod ericapi;
 
 pub use ericapi::{
