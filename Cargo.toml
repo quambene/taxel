@@ -4,4 +4,5 @@ members = [
     "taxel-bindings",
     "taxel-cli",
     "taxel-util",
+    "taxel-xml",
 ]

@@ -1,0 +1,16 @@
+[package]
+name = "taxel-xml"
+version = "0.1.0"
+authors = ["quambene <contact.quambene@gmail.com>"]
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+name = "taxel_xml"
+
+[[bin]]
+path = "src/main.rs"
+name = "taxel-xml"
+
+[dependencies]
+quick-xml = "0.29.0"
