@@ -1,6 +1,14 @@
+# taxel-py
+taxel-py/ebilanz
+
 # Rust
 /target
 Cargo.lock
+
+# Python
+__pycache__
+.mypy_cache
+**/.venv
 
 # Eric
 ERiC-*
@@ -8,6 +16,12 @@ eric.log
 validation_response.xml
 server_response.xml
 *.pdf
+
+# Templates
+templates
+
+# Output
+output
 
 # Test data
 test_data
