@@ -1,5 +1,4 @@
 from typing import Any
-import sys
 from ebilanz import ebilanz
 
 
