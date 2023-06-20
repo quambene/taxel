@@ -1,8 +1,8 @@
 [package]
 name = "taxel-cli"
-version = "0.1.0"
-authors = ["quambene <contact.quambene@gmail.com>"]
-edition = "2021"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
 
 [[bin]]
 path = "src/main.rs"
@@ -10,6 +10,6 @@ name = "taxel"
 
 [dependencies]
 taxel = { version = "0.1.0", path = "../taxel" }
-anyhow = "1.0.58"
+anyhow = { workspace = true }
 clap = { version = "3.2.14", default-features = false, features = ["std", "cargo"] }
 

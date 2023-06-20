@@ -1,8 +1,8 @@
 [package]
 name = "taxel-xml"
-version = "0.1.0"
-authors = ["quambene <contact.quambene@gmail.com>"]
-edition = "2021"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
 
 [lib]
 path = "src/lib.rs"
@@ -13,4 +13,5 @@ path = "src/main.rs"
 name = "taxel-xml"
 
 [dependencies]
+anyhow = { workspace = true }
 quick-xml = "0.29.0"
