@@ -13,4 +13,4 @@ authors = ["quambene <contact.quambene@gmail.com>"]
 edition = "2021"
 
 [workspace.dependencies]
-anyhow = { workspace = true }
+anyhow = "1.0.71"

@@ -9,4 +9,4 @@ path = "src/lib.rs"
 name = "taxel_util"
 
 [dependencies]
-anyhow = "1.0.58"
+anyhow = { workspace = true }
