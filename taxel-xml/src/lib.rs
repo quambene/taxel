@@ -26,41 +26,43 @@ where
                 let tag_name = String::from_utf8(e.name().as_ref().to_vec())?;
 
                 if let Some(tag_value) = target_tags.get(tag_name.as_str()) {
-                    // Found the start of target tag
+                    // Found the start of target tag.
                     target_tag_value = Some(tag_value);
                 }
 
                 writer.write_event(Event::Start(e.clone()))?;
             }
             Ok(Event::End(e)) => {
-                let tag_name = String::from_utf8(e.name().as_ref().to_vec())?;
+                // TODO: validate tag name
 
-                if let Some(_) = target_tags.get(tag_name.as_str()) {
-                    // Found an empty tag for the target tag
+                if target_tag_value.is_some() {
+                    // Found the end tag for the target tag.
                     target_tag_value = None;
                 }
 
                 writer.write_event(Event::End(e))?;
             }
             Ok(Event::Empty(e)) => {
-                // Write the text content to the output XML file
+                // Write the text content to the output XML file.
                 writer.write_event(Event::Empty(e))?;
             }
             Ok(Event::Text(mut text)) => {
+                // TODO: validate tag name
+
                 if let Some(tag_value) = target_tag_value {
-                    // Modify the value inside the target tag
+                    // Modify the value inside the target tag.
                     text = BytesText::new(tag_value);
                 }
 
-                // Write the text content to the output XML file
+                // Write the text content to the output XML file.
                 writer.write_event(Event::Text(text))?;
             }
             Ok(Event::Eof) => {
-                // Reached the end of the xml file
+                // Reached the end of the xml file.
                 break;
             }
             Err(e) => {
-                // Handle error while reading the xml file
+                // Handle error while reading the xml file.
                 eprintln!("Error: {}", e);
                 break;
             }
