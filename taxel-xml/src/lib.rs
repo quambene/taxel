@@ -3,6 +3,7 @@ use quick_xml::Reader;
 use quick_xml::Writer;
 use std::io::BufRead;
 
+/// Update value for specific xml tag.
 pub fn xml_updater<R, W>(
     reader: &mut Reader<R>,
     writer: &mut Writer<W>,
