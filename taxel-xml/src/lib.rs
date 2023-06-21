@@ -1,21 +1,20 @@
 use quick_xml::events::{BytesDecl, BytesText, Event};
 use quick_xml::Reader;
 use quick_xml::Writer;
-use std::io::BufRead;
+use std::{collections::HashMap, io::BufRead};
 
 /// Update value for specific xml tag.
-pub fn xml_updater<R, W>(
+pub fn update_tags<R, W>(
+    target_tags: HashMap<&str, &str>,
     reader: &mut Reader<R>,
     writer: &mut Writer<W>,
-    target_tag_name: &[u8],
-    target_tag_value: &str,
 ) -> Result<(), anyhow::Error>
 where
     R: std::io::Read + BufRead,
     W: std::io::Write,
 {
     let mut buf = Vec::new();
-    let mut is_target_tag = false;
+    let mut target_tag_value = None;
 
     // Write the XML declaration to the destination file
     writer.write_event(Event::Decl(BytesDecl::new("1.0", Some("UTF-8"), None)))?;
@@ -24,17 +23,21 @@ where
     loop {
         match reader.read_event_into(&mut buf) {
             Ok(Event::Start(e)) => {
-                if e.name().as_ref() == target_tag_name {
+                let tag_name = String::from_utf8(e.name().as_ref().to_vec())?;
+
+                if let Some(tag_value) = target_tags.get(tag_name.as_str()) {
                     // Found the start of target tag
-                    is_target_tag = true;
+                    target_tag_value = Some(tag_value);
                 }
 
                 writer.write_event(Event::Start(e.clone()))?;
             }
             Ok(Event::End(e)) => {
-                if e.name().as_ref() == target_tag_name {
+                let tag_name = String::from_utf8(e.name().as_ref().to_vec())?;
+
+                if let Some(_) = target_tags.get(tag_name.as_str()) {
                     // Found an empty tag for the target tag
-                    is_target_tag = false;
+                    target_tag_value = None;
                 }
 
                 writer.write_event(Event::End(e))?;
@@ -44,9 +47,9 @@ where
                 writer.write_event(Event::Empty(e))?;
             }
             Ok(Event::Text(mut text)) => {
-                if is_target_tag {
+                if let Some(tag_value) = target_tag_value {
                     // Modify the value inside the target tag
-                    text = BytesText::new(target_tag_value);
+                    text = BytesText::new(tag_value);
                 }
 
                 // Write the text content to the output XML file
@@ -97,7 +100,7 @@ mod tests {
                     <Empfaenger id="F">1234</Empfaenger>
                     <Hersteller>
                         <ProduktName>ABC</ProduktName>
-                        <ProduktVersion>ABC</ProduktVersion>
+                        <ProduktVersion>CDE</ProduktVersion>
                     </Hersteller>
                 </NutzdatenHeader>
                 <Nutzdaten></Nutzdaten>
@@ -126,8 +129,8 @@ mod tests {
                     <NutzdatenTicket>0001</NutzdatenTicket>
                     <Empfaenger id="F">1234</Empfaenger>
                     <Hersteller>
-                        <ProduktName>ABC</ProduktName>
-                        <ProduktVersion>ABC</ProduktVersion>
+                        <ProduktName>XYZ</ProduktName>
+                        <ProduktVersion>UVW</ProduktVersion>
                     </Hersteller>
                 </NutzdatenHeader>
                 <Nutzdaten></Nutzdaten>
@@ -187,10 +190,12 @@ mod tests {
         reader.trim_text(true);
         let mut writer = Writer::new(Cursor::new(Vec::new()));
 
-        let target_tag_name = b"HerstellerID";
-        let target_tag_value = "99999";
+        let mut target_tags = HashMap::new();
+        target_tags.insert("HerstellerID", "99999");
+        target_tags.insert("ProduktName", "XYZ");
+        target_tags.insert("ProduktVersion", "UVW");
 
-        xml_updater(&mut reader, &mut writer, target_tag_name, target_tag_value).unwrap();
+        update_tags(target_tags, &mut reader, &mut writer).unwrap();
 
         let actual: Vec<u8> = writer.into_inner().into_inner();
         let expected = remove_formatting(OUTPUT_XML).unwrap();
