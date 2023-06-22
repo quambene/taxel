@@ -3,9 +3,23 @@ use quick_xml::Reader;
 use quick_xml::Writer;
 use std::{collections::HashMap, io::BufRead};
 
+pub struct Tag {
+    name: String,
+    value: String,
+}
+
+impl Tag {
+    pub fn new(name: impl Into<String>, value: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            value: value.into(),
+        }
+    }
+}
+
 /// Update value for specific xml tag.
 pub fn update_tags<R, W>(
-    target_tags: HashMap<&str, &str>,
+    target_tags: HashMap<Vec<u8>, Tag>,
     reader: &mut Reader<R>,
     writer: &mut Writer<W>,
 ) -> Result<(), anyhow::Error>
@@ -14,7 +28,7 @@ where
     W: std::io::Write,
 {
     let mut buf = Vec::new();
-    let mut target_tag_value = None;
+    let mut target_tag = None;
 
     // Write the XML declaration to the destination file
     writer.write_event(Event::Decl(BytesDecl::new("1.0", Some("UTF-8"), None)))?;
@@ -23,21 +37,19 @@ where
     loop {
         match reader.read_event_into(&mut buf) {
             Ok(Event::Start(e)) => {
-                let tag_name = String::from_utf8(e.name().as_ref().to_vec())?;
+                let tag_name = e.name();
 
-                if let Some(tag_value) = target_tags.get(tag_name.as_str()) {
+                if let Some(tag_value) = target_tags.get(tag_name.as_ref()) {
                     // Found the start of target tag.
-                    target_tag_value = Some(tag_value);
+                    target_tag = Some(tag_value);
                 }
 
                 writer.write_event(Event::Start(e.clone()))?;
             }
             Ok(Event::End(e)) => {
-                // TODO: validate tag name
-
-                if target_tag_value.is_some() {
+                if target_tag.is_some_and(|tag| tag.name.as_bytes() == e.name().as_ref()) {
                     // Found the end tag for the target tag.
-                    target_tag_value = None;
+                    target_tag = None;
                 }
 
                 writer.write_event(Event::End(e))?;
@@ -47,11 +59,9 @@ where
                 writer.write_event(Event::Empty(e))?;
             }
             Ok(Event::Text(mut text)) => {
-                // TODO: validate tag name
-
-                if let Some(tag_value) = target_tag_value {
+                if let Some(tag) = target_tag {
                     // Modify the value inside the target tag.
-                    text = BytesText::new(tag_value);
+                    text = BytesText::new(&tag.value);
                 }
 
                 // Write the text content to the output XML file.
@@ -193,9 +203,18 @@ mod tests {
         let mut writer = Writer::new(Cursor::new(Vec::new()));
 
         let mut target_tags = HashMap::new();
-        target_tags.insert("HerstellerID", "99999");
-        target_tags.insert("ProduktName", "XYZ");
-        target_tags.insert("ProduktVersion", "UVW");
+        target_tags.insert(
+            "HerstellerID".as_bytes().to_vec(),
+            Tag::new("HerstellerID", "99999"),
+        );
+        target_tags.insert(
+            "ProduktName".as_bytes().to_vec(),
+            Tag::new("ProduktName", "XYZ"),
+        );
+        target_tags.insert(
+            "ProduktVersion".as_bytes().to_vec(),
+            Tag::new("ProduktVersion", "UVW"),
+        );
 
         update_tags(target_tags, &mut reader, &mut writer).unwrap();
 
