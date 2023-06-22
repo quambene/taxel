@@ -17,9 +17,6 @@ validation_response.xml
 server_response.xml
 *.pdf
 
-# Templates
-templates
-
 # Output
 output
 
