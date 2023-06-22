@@ -1,1 +1,1 @@
-pub mod xml;
+pub mod tags;

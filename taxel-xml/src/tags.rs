@@ -17,8 +17,8 @@ impl Tag {
     }
 }
 
-/// Update values for given xml tags.
-pub fn update_xml_tags<R, W>(
+/// Update values for given target tags.
+pub fn update_target_tags<R, W>(
     target_tags: HashMap<Vec<u8>, Tag>,
     reader: &mut Reader<R>,
     writer: &mut Writer<W>,
@@ -197,7 +197,7 @@ mod tests {
     }
 
     #[test]
-    fn test_xml_updater() {
+    fn test_update_target_tags() {
         let mut reader = Reader::from_str(INPUT_XML);
         reader.trim_text(true);
         let mut writer = Writer::new(Cursor::new(Vec::new()));
@@ -216,7 +216,7 @@ mod tests {
             Tag::new("ProduktVersion", "UVW"),
         );
 
-        update_xml_tags(target_tags, &mut reader, &mut writer).unwrap();
+        update_target_tags(target_tags, &mut reader, &mut writer).unwrap();
 
         let actual: Vec<u8> = writer.into_inner().into_inner();
         let expected = remove_formatting(OUTPUT_XML).unwrap();
