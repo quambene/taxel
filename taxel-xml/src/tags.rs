@@ -17,7 +17,12 @@ impl Tag {
     }
 }
 
-/// Update values for given target tags.
+/// Read target tags from ods file.
+pub fn read_target_tags() -> Result<HashMap<Vec<u8>, Tag>, anyhow::Error> {
+    todo!()
+}
+
+/// Update values in xml file for given target tags.
 pub fn update_target_tags<R, W>(
     target_tags: HashMap<Vec<u8>, Tag>,
     reader: &mut Reader<R>,
