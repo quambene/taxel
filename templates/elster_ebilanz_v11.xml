@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Elster xmlns="http://www.elster.de/elsterxml/schema/v11">
+    <TransferHeader version="11">
+        <Verfahren>ElsterBilanz</Verfahren>
+        <DatenArt>Bilanz</DatenArt>
+        <Vorgang>send-Auth</Vorgang>
+        <HerstellerID>21694</HerstellerID>
+        <Datei>
+            <Verschluesselung>CMSEncryptedData</Verschluesselung>
+            <Kompression>GZIP</Kompression>
+            <TransportSchluessel></TransportSchluessel>
+        </Datei>
+        <VersionClient>1</VersionClient>
+    </TransferHeader>
+    <DatenTeil>
+        <Nutzdatenblock>
+            <NutzdatenHeader version="11">
+                <NutzdatenTicket>0001</NutzdatenTicket>
+                <Empfaenger id="F">0000</Empfaenger>
+                <Hersteller>
+                    <ProduktName>Taxel</ProduktName>
+                    <ProduktVersion>0.1.0</ProduktVersion>
+                </Hersteller>
+            </NutzdatenHeader>
+            <Nutzdaten>
+                <ebilanz:EBilanz xmlns:ebilanz="http://rzf.fin-nrw.de/RMS/EBilanz/2016/XMLSchema"
+                    version="000001">
+                    <ebilanz:stichtag>00000000</ebilanz:stichtag>
+                </ebilanz:EBilanz>
+            </Nutzdaten>
+        </Nutzdatenblock>
+    </DatenTeil>
+</Elster>
