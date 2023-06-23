@@ -1,26 +1,8 @@
+use crate::Tag;
 use quick_xml::events::{BytesDecl, BytesText, Event};
 use quick_xml::Reader;
 use quick_xml::Writer;
 use std::{collections::HashMap, io::BufRead};
-
-pub struct Tag {
-    name: String,
-    value: String,
-}
-
-impl Tag {
-    pub fn new(name: impl Into<String>, value: impl Into<String>) -> Self {
-        Self {
-            name: name.into(),
-            value: value.into(),
-        }
-    }
-}
-
-/// Read target tags from ods file.
-pub fn read_target_tags() -> Result<HashMap<Vec<u8>, Tag>, anyhow::Error> {
-    todo!()
-}
 
 /// Update values in xml file for given target tags.
 pub fn update_target_tags<R, W>(
