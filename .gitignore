@@ -17,6 +17,9 @@ validation_response.xml
 server_response.xml
 *.pdf
 
+# csv
+.~lock.**.csv#
+
 # ods
 .~lock.**.ods#
 
