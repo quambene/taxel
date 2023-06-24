@@ -1,12 +1,12 @@
-use crate::Tag;
+use crate::{Tag, TargetTags};
 use quick_xml::events::{BytesDecl, BytesText, Event};
 use quick_xml::Reader;
 use quick_xml::Writer;
-use std::{collections::HashMap, io::BufRead};
+use std::io::BufRead;
 
 /// Update values in xml file for given target tags.
 pub fn update_target_tags<R, W>(
-    target_tags: HashMap<Vec<u8>, Tag>,
+    target_tags: TargetTags,
     reader: &mut Reader<R>,
     writer: &mut Writer<W>,
 ) -> Result<(), anyhow::Error>
@@ -24,17 +24,20 @@ where
     loop {
         match reader.read_event_into(&mut buf) {
             Ok(Event::Start(e)) => {
-                let tag_name = e.name();
+                let tag_name = String::from_utf8(e.name().as_ref().to_vec())?;
 
-                if let Some(tag_value) = target_tags.get(tag_name.as_ref()) {
+                if let Some(tag_value) = target_tags.get(&tag_name) {
                     // Found the start of target tag.
-                    target_tag = Some(tag_value);
+                    target_tag = Some(Tag::new(tag_name, tag_value.to_owned()));
                 }
 
                 writer.write_event(Event::Start(e.clone()))?;
             }
             Ok(Event::End(e)) => {
-                if target_tag.is_some_and(|tag| tag.name.as_bytes() == e.name().as_ref()) {
+                if target_tag
+                    .as_ref()
+                    .is_some_and(|tag| tag.name.as_bytes() == e.name().as_ref())
+                {
                     // Found the end tag for the target tag.
                     target_tag = None;
                 }
@@ -46,9 +49,13 @@ where
                 writer.write_event(Event::Empty(e))?;
             }
             Ok(Event::Text(mut text)) => {
-                if let Some(tag) = target_tag {
+                if let Some(tag) = &target_tag {
                     // Modify the value inside the target tag.
-                    text = BytesText::new(&tag.value);
+                    if let Some(tag_value) = &tag.value {
+                        text = BytesText::new(tag_value);
+                    } else {
+                        text = BytesText::new("")
+                    }
                 }
 
                 // Write the text content to the output xml file.
@@ -189,19 +196,10 @@ mod tests {
         reader.trim_text(true);
         let mut writer = Writer::new(Cursor::new(Vec::new()));
 
-        let mut target_tags = HashMap::new();
-        target_tags.insert(
-            "HerstellerID".as_bytes().to_vec(),
-            Tag::new("HerstellerID", "99999"),
-        );
-        target_tags.insert(
-            "ProduktName".as_bytes().to_vec(),
-            Tag::new("ProduktName", "XYZ"),
-        );
-        target_tags.insert(
-            "ProduktVersion".as_bytes().to_vec(),
-            Tag::new("ProduktVersion", "UVW"),
-        );
+        let mut target_tags = TargetTags::new();
+        target_tags.insert("HerstellerID", Some("99999"));
+        target_tags.insert("ProduktName", Some("XYZ"));
+        target_tags.insert("ProduktVersion", Some("UVW"));
 
         update_target_tags(target_tags, &mut reader, &mut writer).unwrap();
 
