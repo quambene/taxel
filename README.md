@@ -132,6 +132,12 @@ cargo test -p taxel-cli -- --test-threads=1
 
 # Test CLI for taxel in release mode
 cargo test -p taxel-cli --release -- --test-threads=1
+
+# Test taxel-xml
+cargo test -p taxel-xml
+
+# Test taxel-xml in release mode
+cargo test -p taxel --release
 ```
 
 ## Rust bindings for the ELSTER Rich Client (ERiC)
