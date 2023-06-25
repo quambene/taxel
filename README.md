@@ -79,6 +79,12 @@ _Note:_ Run `cargo install --path ./taxel-cli` again to update to the latest ver
 1. Run taxel:
 
     ``` bash
+    # Generate xml file from csv file
+    taxel generate \
+         --csv-file "my_ebilanz.csv" \
+         --template-file "templates/elster_v11_ebilanz_v6.5_test.xml" \
+         --output-file "my_bilanz.xml"
+
     # Validate xml file
     taxel validate \
         --tax-type "Bilanz" \
