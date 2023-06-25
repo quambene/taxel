@@ -1,8 +1,9 @@
 mod read_target_tags;
 mod update_target_tags;
-mod update_xbrl;
 
+pub use csv::{ReaderBuilder, Trim};
 use log::warn;
+pub use quick_xml::{Reader, Writer};
 pub use read_target_tags::read_target_tags;
 use std::collections::HashMap;
 pub use update_target_tags::update_target_tags;

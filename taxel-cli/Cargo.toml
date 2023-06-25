@@ -10,6 +10,7 @@ name = "taxel"
 
 [dependencies]
 taxel = { version = "0.1.0", path = "../taxel" }
+taxel-xml = { version = "0.1.0", path = "../taxel-xml" }
 anyhow = { workspace = true }
 clap = { version = "3.2.14", default-features = false, features = ["std", "cargo"] }
 

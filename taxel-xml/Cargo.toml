@@ -8,10 +8,6 @@ edition.workspace = true
 path = "src/lib.rs"
 name = "taxel_xml"
 
-[[bin]]
-path = "src/main.rs"
-name = "taxel-xml"
-
 [dependencies]
 anyhow = { workspace = true }
 log = "0.4.19"

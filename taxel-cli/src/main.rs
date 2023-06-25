@@ -13,6 +13,7 @@ fn main() -> Result<(), anyhow::Error> {
     }
 
     match matches.subcommand() {
+        Some((cmd::GENERATE, matches)) => cmd::generate(matches),
         Some((cmd::VALIDATE, matches)) => cmd::validate(matches),
         Some((cmd::SEND, matches)) => cmd::send(matches),
         _ => Err(anyhow!("Subcommand not found")),
@@ -27,6 +28,11 @@ pub fn app() -> App<'static> {
                 .long(arg::VERBOSE)
                 .takes_value(false)
                 .help("Shows what is going on"),
+        )
+        .subcommand(
+            SubCommand::with_name(cmd::GENERATE)
+                .args(cmd::generate_args())
+                .about("Generate xml file"),
         )
         .subcommand(
             SubCommand::with_name(cmd::VALIDATE)
