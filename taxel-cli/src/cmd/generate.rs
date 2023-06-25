@@ -23,7 +23,7 @@ pub fn generate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
         .trim(Trim::All)
         .from_path(csv_path)?;
 
-    // Read the xml file from templates
+    // Read the structure from a template file
     let template_file = File::open(template_file)?;
     let reader = BufReader::new(template_file);
 
