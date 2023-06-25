@@ -154,7 +154,7 @@ mod tests {
 
     #[test]
     fn test_validate() {
-        let xml_path = "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
+        let xml_path = "../test_data/ebilanz/taxonomy_v6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
         let xml = fs::read_to_string(xml_path).unwrap();
         let type_version = "Bilanz_6.5".to_string();
         let processing_flag = ProcessingFlag::Validate;
@@ -185,7 +185,7 @@ mod tests {
 
     #[test]
     fn test_validate_and_print() {
-        let xml_path = "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
+        let xml_path = "../test_data/ebilanz/taxonomy_v6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
         let xml = fs::read_to_string(xml_path).unwrap();
         let type_version = "Bilanz_6.5".to_string();
         let processing_flag = ProcessingFlag::Print;
@@ -218,7 +218,7 @@ mod tests {
     fn test_send() {
         let eric = Eric::new().unwrap();
 
-        let xml_path = "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
+        let xml_path = "../test_data/ebilanz/taxonomy_v6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
         let xml = fs::read_to_string(xml_path).unwrap();
         let type_version = "Bilanz_6.5".to_string();
         let certificate_path = "../test_data/test-certificate.pfx";
@@ -259,7 +259,7 @@ mod tests {
     fn test_send_and_print() {
         let eric = Eric::new().unwrap();
 
-        let xml_path = "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
+        let xml_path = "../test_data/ebilanz/taxonomy_v6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
         let xml = fs::read_to_string(xml_path).unwrap();
         let type_version = "Bilanz_6.5".to_string();
         let certificate_path = "../test_data/test-certificate.pfx";
