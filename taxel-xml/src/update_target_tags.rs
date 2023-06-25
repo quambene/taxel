@@ -200,12 +200,22 @@ mod tests {
         Ok(formatted_xml)
     }
 
-    #[test]
-    fn test_update_xml() {
-        let mut reader = Reader::from_str(ACTUAL_XML);
+    // Helper function to test updated tags
+    fn test_update_target_tags(actual_xml: &str, expected_xml: &str, target_tags: TargetTags) {
+        let mut reader = Reader::from_str(actual_xml);
         reader.trim_text(true);
         let mut writer = Writer::new(Cursor::new(Vec::new()));
 
+        update_target_tags(target_tags, &mut reader, &mut writer).unwrap();
+
+        let actual: Vec<u8> = writer.into_inner().into_inner();
+        let expected = remove_formatting(expected_xml).unwrap();
+
+        assert_eq!(String::from_utf8(actual).unwrap(), expected);
+    }
+
+    #[test]
+    fn test_update_xml() {
         let mut target_tags = TargetTags::new();
         target_tags.insert("HerstellerID", Some("99999"));
         target_tags.insert("Empfaenger", Some("9999"));
@@ -213,12 +223,7 @@ mod tests {
         target_tags.insert("ProduktVersion", Some("0.2.0"));
         target_tags.insert("ebilanz:stichtag", Some("20201231"));
 
-        update_target_tags(target_tags, &mut reader, &mut writer).unwrap();
-
-        let actual: Vec<u8> = writer.into_inner().into_inner();
-        let expected = remove_formatting(EXPECTED_XML).unwrap();
-
-        assert_eq!(String::from_utf8(actual).unwrap(), expected);
+        test_update_target_tags(ACTUAL_XML, EXPECTED_XML, target_tags);
     }
 
     #[test]
@@ -271,20 +276,11 @@ mod tests {
         </xbrli:context>
     </xbrli:xbrl>"#;
 
-        let mut reader = Reader::from_str(actual_xbrl);
-        reader.trim_text(true);
-        let mut writer = Writer::new(Cursor::new(Vec::new()));
-
         let mut target_tags = TargetTags::new();
         target_tags.insert("ProduktName", Some("Taxel"));
         target_tags.insert("xbrli:identifier", Some("9999999999999"));
         target_tags.insert("xbrli:instant", Some("2020-12-31"));
 
-        update_target_tags(target_tags, &mut reader, &mut writer).unwrap();
-
-        let actual: Vec<u8> = writer.into_inner().into_inner();
-        let expected = remove_formatting(expected_xbrl).unwrap();
-
-        assert_eq!(String::from_utf8(actual).unwrap(), expected);
+        test_update_target_tags(actual_xbrl, expected_xbrl, target_tags);
     }
 }
