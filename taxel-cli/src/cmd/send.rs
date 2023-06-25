@@ -1,3 +1,6 @@
+//! Validate xml file according to the given taxonomy and send xml file to the
+//! tax authorities.
+
 use crate::arg;
 use clap::{Arg, ArgMatches};
 use taxel::{CertificateConfig, Eric, PrintConfig, ProcessingFlag};

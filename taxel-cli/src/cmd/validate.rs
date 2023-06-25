@@ -1,3 +1,5 @@
+//! Validate xml file according to the given taxonomy.
+
 use crate::arg;
 use clap::{Arg, ArgMatches};
 use taxel::{Eric, PrintConfig, ProcessingFlag};
