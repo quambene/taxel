@@ -18,7 +18,7 @@ pub const PASSWORD: &str = "password";
 pub fn get_one<'a>(matches: &'a ArgMatches, id: &str) -> Result<&'a str, anyhow::Error> {
     match matches.get_one::<String>(id) {
         Some(el) => Ok(el),
-        None => return Err(anyhow!("Missing value for argument '{}'", id)),
+        None => Err(anyhow!("Missing value for argument '{}'", id)),
     }
 }
 

@@ -76,7 +76,7 @@ mod tests {
         let subcommand_matches = matches.subcommand_matches(cmd::SEND).unwrap();
         println!("subcommand matches: {:#?}", subcommand_matches);
 
-        let res = send(&subcommand_matches);
+        let res = send(subcommand_matches);
         println!("res: {:#?}", res);
 
         assert!(res.is_ok())
@@ -102,7 +102,7 @@ mod tests {
         let subcommand_matches = matches.subcommand_matches(cmd::SEND).unwrap();
         println!("subcommand matches: {:#?}", subcommand_matches);
 
-        let res = send(&subcommand_matches);
+        let res = send(subcommand_matches);
         println!("res: {:#?}", res);
 
         assert!(res.is_ok())

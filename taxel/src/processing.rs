@@ -70,9 +70,8 @@ pub fn process(
 
     let transfer_code = unsafe { transfer_code.as_ref() };
 
-    match transfer_code {
-        Some(code) => println!("Transfer code: {}", code),
-        None => (),
+    if let Some(code) = transfer_code {
+        println!("Transfer code: {}", code)
     }
 
     let validation_response = validation_response_buffer.read()?;

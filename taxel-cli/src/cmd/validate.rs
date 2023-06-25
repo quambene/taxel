@@ -59,7 +59,7 @@ mod tests {
         let subcommand_matches = matches.subcommand_matches(cmd::VALIDATE).unwrap();
         println!("subcommand matches: {:#?}", subcommand_matches);
 
-        let res = validate(&subcommand_matches);
+        let res = validate(subcommand_matches);
 
         println!("res: {:#?}", res);
         assert!(res.is_ok())
@@ -81,7 +81,7 @@ mod tests {
         let subcommand_matches = matches.subcommand_matches(cmd::VALIDATE).unwrap();
         println!("subcommand matches: {:#?}", subcommand_matches);
 
-        let res = validate(&subcommand_matches);
+        let res = validate(subcommand_matches);
 
         println!("res: {:#?}", res);
         assert!(res.is_ok())
