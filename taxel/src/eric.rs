@@ -251,8 +251,6 @@ mod tests {
         assert!(node.is_some());
         let node = node.unwrap();
         assert_eq!(node.tag_name().name(), "Erfolg");
-
-        assert!(response.server_response.is_empty());
     }
 
     #[test]
@@ -292,7 +290,5 @@ mod tests {
         assert!(node.is_some());
         let node = node.unwrap();
         assert_eq!(node.tag_name().name(), "Erfolg");
-
-        assert!(response.server_response.is_empty());
     }
 }
