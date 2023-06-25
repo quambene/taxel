@@ -11,7 +11,7 @@ __pycache__
 **/.venv
 
 # Eric
-ERiC-*
+eric
 eric.log
 validation_response.xml
 server_response.xml
