@@ -26,9 +26,6 @@ server_response.xml
 # Output
 output
 
-# Test data
-test_data
-
 # Environment
 **/.env
 
