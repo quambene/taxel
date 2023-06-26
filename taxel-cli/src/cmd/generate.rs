@@ -20,10 +20,9 @@ pub fn generate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let template_file = arg::get_one(matches, arg::TEMPLATE_FILE)?;
     let output_file = arg::get_maybe_one(matches, arg::OUTPUT_FILE);
     let csv_path = Path::new(csv_file);
-    let output_path = if let Some(output_file) = output_file {
-        PathBuf::from(output_file)
-    } else {
-        current_dir()?
+    let output_path = match output_file {
+        Some(output_file) => PathBuf::from(output_file),
+        None => current_dir()?,
     };
 
     // Read the csv file
