@@ -9,6 +9,7 @@ pub const XML_FILE: &str = "xml-file";
 pub const CSV_FILE: &str = "csv-file";
 pub const TEMPLATE_FILE: &str = "template-file";
 pub const OUTPUT_FILE: &str = "output-file";
+pub const LOG_DIR: &str = "log-dir";
 pub const TAX_TYPE: &str = "tax-type";
 pub const TAX_VERSION: &str = "tax-version";
 pub const PRINT: &str = "print";
@@ -56,6 +57,14 @@ pub fn output_file() -> Arg<'static> {
         .required(false)
         .takes_value(true)
         .help("The path to the generated the xml file. If no path is specified the current directory will be used as output path.")
+}
+
+pub fn log_dir() -> Arg<'static> {
+    Arg::new(LOG_DIR)
+        .long(LOG_DIR)
+        .required(false)
+        .takes_value(true)
+        .help("The directory for log output.")
 }
 
 pub fn tax_type() -> Arg<'static> {

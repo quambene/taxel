@@ -6,7 +6,7 @@ use crate::{
 };
 use anyhow::{anyhow, Context};
 use std::{
-    env::{self, current_dir},
+    env::{self},
     fs::File,
     io::Write,
     path::Path,
@@ -18,13 +18,12 @@ use taxel_util::ToCString;
 pub struct Eric;
 
 impl Eric {
-    pub fn new() -> Result<Self, anyhow::Error> {
+    pub fn new(log_path: &Path) -> Result<Self, anyhow::Error> {
         println!("Initializing eric");
 
         let plugin_path =
             env::var("PLUGIN_PATH").context("Missing environment variable 'PLUGIN_PATH'")?;
         let plugin_path = Path::new(&plugin_path);
-        let log_path = env::current_dir().context("Can't get current directory")?;
 
         println!("Setting plugin path '{}'", plugin_path.display());
         println!("Setting log path '{}'", log_path.display());
@@ -69,13 +68,11 @@ impl Eric {
         )
     }
 
-    pub fn log(&self, response: &EricResponse) -> Result<(), anyhow::Error> {
+    pub fn log(&self, log_path: &Path, response: &EricResponse) -> Result<(), anyhow::Error> {
         println!("Response code: {}", response.error_code);
 
-        let current_dir = current_dir()?;
-
-        let validation_response_path = current_dir.join("validation_response.xml");
-        let server_response_path = current_dir.join("server_response.xml");
+        let validation_response_path = log_path.join("validation_response.xml");
+        let server_response_path = log_path.join("server_response.xml");
 
         if !response.validation_response.is_empty() {
             println!(
@@ -140,11 +137,15 @@ impl Drop for Eric {
 mod tests {
     use super::*;
     use roxmltree::Document;
-    use std::fs::{self};
+    use std::{
+        env::current_dir,
+        fs::{self},
+    };
 
     #[test]
     fn test_new() {
-        let res = Eric::new();
+        let log_path = current_dir().unwrap();
+        let res = Eric::new(&log_path);
 
         println!("{:#?}", res);
         assert!(res.is_ok());
@@ -159,8 +160,9 @@ mod tests {
         let type_version = "Bilanz_6.5".to_string();
         let processing_flag = ProcessingFlag::Validate;
         let print_config = None;
+        let log_path = current_dir().unwrap();
 
-        let eric = Eric::new().unwrap();
+        let eric = Eric::new(&log_path).unwrap();
 
         let res = eric.validate(xml, type_version, processing_flag, print_config);
 
@@ -169,7 +171,7 @@ mod tests {
 
         let response = res.unwrap();
 
-        eric.log(&response).unwrap();
+        eric.log(&log_path, &response).unwrap();
 
         assert_eq!(response.error_code, ErrorCode::ERIC_OK as i32);
 
@@ -190,8 +192,9 @@ mod tests {
         let type_version = "Bilanz_6.5".to_string();
         let processing_flag = ProcessingFlag::Print;
         let print_config = PrintConfig::new("ebilanz.pdf", &processing_flag).unwrap();
+        let log_path = current_dir().unwrap();
 
-        let eric = Eric::new().unwrap();
+        let eric = Eric::new(&log_path).unwrap();
 
         let res = eric.validate(xml, type_version, processing_flag, Some(print_config));
 
@@ -200,7 +203,7 @@ mod tests {
 
         let response = res.unwrap();
 
-        eric.log(&response).unwrap();
+        eric.log(&log_path, &response).unwrap();
 
         assert_eq!(response.error_code, ErrorCode::ERIC_OK as i32);
 
@@ -216,8 +219,8 @@ mod tests {
 
     #[test]
     fn test_send() {
-        let eric = Eric::new().unwrap();
-
+        let log_path = current_dir().unwrap();
+        let eric = Eric::new(&log_path).unwrap();
         let xml_path = "../test_data/ebilanz/taxonomy_v6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
         let xml = fs::read_to_string(xml_path).unwrap();
         let type_version = "Bilanz_6.5".to_string();
@@ -241,7 +244,7 @@ mod tests {
 
         let response = res.unwrap();
 
-        eric.log(&response).unwrap();
+        eric.log(&log_path, &response).unwrap();
 
         assert_eq!(response.error_code, ErrorCode::ERIC_OK as i32);
 
@@ -255,8 +258,8 @@ mod tests {
 
     #[test]
     fn test_send_and_print() {
-        let eric = Eric::new().unwrap();
-
+        let log_path = current_dir().unwrap();
+        let eric = Eric::new(&log_path).unwrap();
         let xml_path = "../test_data/ebilanz/taxonomy_v6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
         let xml = fs::read_to_string(xml_path).unwrap();
         let type_version = "Bilanz_6.5".to_string();
@@ -280,7 +283,7 @@ mod tests {
 
         let response = res.unwrap();
 
-        eric.log(&response).unwrap();
+        eric.log(&log_path, &response).unwrap();
 
         assert_eq!(response.error_code, ErrorCode::ERIC_OK as i32);
 
