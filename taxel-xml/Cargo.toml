@@ -14,3 +14,4 @@ log = "0.4.19"
 serde = { version = "1.0.164", features = ["derive"]}
 quick-xml = "0.29.0"
 csv = "1.2.2"
+spreadsheet-ods = "0.15.0"
