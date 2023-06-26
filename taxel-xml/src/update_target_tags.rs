@@ -84,7 +84,8 @@ mod tests {
     use super::*;
     use std::io::Cursor;
 
-    const ACTUAL_XML: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
+    const ACTUAL_XML: &str = r#"
+    <?xml version="1.0" encoding="UTF-8"?>
     <Elster xmlns="http://www.elster.de/elsterxml/schema/v11">
         <TransferHeader version="11">
             <Verfahren>ElsterBilanz</Verfahren>
@@ -119,7 +120,8 @@ mod tests {
         </DatenTeil>
     </Elster>"#;
 
-    const EXPECTED_XML: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
+    const EXPECTED_XML: &str = r#"
+    <?xml version="1.0" encoding="UTF-8"?>
     <Elster xmlns="http://www.elster.de/elsterxml/schema/v11">
         <TransferHeader version="11">
             <Verfahren>ElsterBilanz</Verfahren>
@@ -228,53 +230,55 @@ mod tests {
 
     #[test]
     fn test_update_xrbl() {
-        let actual_xbrl = r#"<xbrli:xbrl xmlns:de-gaap-ci="http://www.xbrl.de/taxonomies/de-gaap-ci-2020-04-01"
-        xmlns:de-gcd="http://www.xbrl.de/taxonomies/de-gcd-2020-04-01"
-        xmlns:hgbref="http://www.xbrl.de/2008/ref" xmlns:iso4217="http://www.xbrl.org/2003/iso4217"
-        xmlns:link="http://www.xbrl.org/2003/linkbase" xmlns:ref="http://www.xbrl.org/2024/ref"
-        xmlns:xbrldi="http://xbrl.org/2006/xbrldi" xmlns:xbrli="http://www.xbrl.org/2003/instance"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xlink="http://www.w3.org/1999/xlink"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        <link:schemaRef
-            xlink:href="http://www.xbrl.de/taxonomies/de-gcd-2020-04-01/de-gcd-2020-04-01-shell.xsd"
-            xlink:type="simple" />
-        <link:schemaRef
-            xlink:href="http://www.xbrl.de/taxonomies/de-gaap-ci-2020-04-01/de-gaap-ci-2020-04-01-shell-fiscal-microbilg.xsd"
-            xlink:type="simple" />
-        <xbrli:context id="I-2020">
-            <xbrli:entity>
-                <xbrli:identifier
-                    scheme="http://www.rzf-nrw.de/Steuernummer">0000000000000</xbrli:identifier>
-            </xbrli:entity>
-            <xbrli:period>
-                <xbrli:instant>0000-00-00</xbrli:instant>
-            </xbrli:period>
-        </xbrli:context>
-    </xbrli:xbrl>"#;
+        let actual_xbrl = r#"
+            <xbrli:xbrl xmlns:de-gaap-ci="http://www.xbrl.de/taxonomies/de-gaap-ci-2020-04-01"
+                xmlns:de-gcd="http://www.xbrl.de/taxonomies/de-gcd-2020-04-01"
+                xmlns:hgbref="http://www.xbrl.de/2008/ref" xmlns:iso4217="http://www.xbrl.org/2003/iso4217"
+                xmlns:link="http://www.xbrl.org/2003/linkbase" xmlns:ref="http://www.xbrl.org/2024/ref"
+                xmlns:xbrldi="http://xbrl.org/2006/xbrldi" xmlns:xbrli="http://www.xbrl.org/2003/instance"
+                xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xlink="http://www.w3.org/1999/xlink"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <link:schemaRef
+                    xlink:href="http://www.xbrl.de/taxonomies/de-gcd-2020-04-01/de-gcd-2020-04-01-shell.xsd"
+                    xlink:type="simple" />
+                <link:schemaRef
+                    xlink:href="http://www.xbrl.de/taxonomies/de-gaap-ci-2020-04-01/de-gaap-ci-2020-04-01-shell-fiscal-microbilg.xsd"
+                    xlink:type="simple" />
+                <xbrli:context id="I-2020">
+                    <xbrli:entity>
+                        <xbrli:identifier
+                            scheme="http://www.rzf-nrw.de/Steuernummer">0000000000000</xbrli:identifier>
+                    </xbrli:entity>
+                    <xbrli:period>
+                        <xbrli:instant>0000-00-00</xbrli:instant>
+                    </xbrli:period>
+                </xbrli:context>
+            </xbrli:xbrl>"#;
 
-        let expected_xbrl = r#"<xbrli:xbrl xmlns:de-gaap-ci="http://www.xbrl.de/taxonomies/de-gaap-ci-2020-04-01"
-        xmlns:de-gcd="http://www.xbrl.de/taxonomies/de-gcd-2020-04-01"
-        xmlns:hgbref="http://www.xbrl.de/2008/ref" xmlns:iso4217="http://www.xbrl.org/2003/iso4217"
-        xmlns:link="http://www.xbrl.org/2003/linkbase" xmlns:ref="http://www.xbrl.org/2024/ref"
-        xmlns:xbrldi="http://xbrl.org/2006/xbrldi" xmlns:xbrli="http://www.xbrl.org/2003/instance"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xlink="http://www.w3.org/1999/xlink"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        <link:schemaRef
-            xlink:href="http://www.xbrl.de/taxonomies/de-gcd-2020-04-01/de-gcd-2020-04-01-shell.xsd"
-            xlink:type="simple" />
-        <link:schemaRef
-            xlink:href="http://www.xbrl.de/taxonomies/de-gaap-ci-2020-04-01/de-gaap-ci-2020-04-01-shell-fiscal-microbilg.xsd"
-            xlink:type="simple" />
-        <xbrli:context id="I-2020">
-            <xbrli:entity>
-                <xbrli:identifier
-                    scheme="http://www.rzf-nrw.de/Steuernummer">9999999999999</xbrli:identifier>
-            </xbrli:entity>
-            <xbrli:period>
-                <xbrli:instant>2020-12-31</xbrli:instant>
-            </xbrli:period>
-        </xbrli:context>
-    </xbrli:xbrl>"#;
+        let expected_xbrl = r#"
+            <xbrli:xbrl xmlns:de-gaap-ci="http://www.xbrl.de/taxonomies/de-gaap-ci-2020-04-01"
+                xmlns:de-gcd="http://www.xbrl.de/taxonomies/de-gcd-2020-04-01"
+                xmlns:hgbref="http://www.xbrl.de/2008/ref" xmlns:iso4217="http://www.xbrl.org/2003/iso4217"
+                xmlns:link="http://www.xbrl.org/2003/linkbase" xmlns:ref="http://www.xbrl.org/2024/ref"
+                xmlns:xbrldi="http://xbrl.org/2006/xbrldi" xmlns:xbrli="http://www.xbrl.org/2003/instance"
+                xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xlink="http://www.w3.org/1999/xlink"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <link:schemaRef
+                    xlink:href="http://www.xbrl.de/taxonomies/de-gcd-2020-04-01/de-gcd-2020-04-01-shell.xsd"
+                    xlink:type="simple" />
+                <link:schemaRef
+                    xlink:href="http://www.xbrl.de/taxonomies/de-gaap-ci-2020-04-01/de-gaap-ci-2020-04-01-shell-fiscal-microbilg.xsd"
+                    xlink:type="simple" />
+                <xbrli:context id="I-2020">
+                    <xbrli:entity>
+                        <xbrli:identifier
+                            scheme="http://www.rzf-nrw.de/Steuernummer">9999999999999</xbrli:identifier>
+                    </xbrli:entity>
+                    <xbrli:period>
+                        <xbrli:instant>2020-12-31</xbrli:instant>
+                    </xbrli:period>
+                </xbrli:context>
+            </xbrli:xbrl>"#;
 
         let mut target_tags = TargetTags::new();
         target_tags.insert("ProduktName", Some("Taxel"));
