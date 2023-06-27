@@ -1,5 +1,5 @@
 use crate::{Tag, TargetTags};
-use quick_xml::events::{BytesDecl, BytesText, Event};
+use quick_xml::events::{BytesText, Event};
 use quick_xml::Reader;
 use quick_xml::Writer;
 use std::io::BufRead;
@@ -16,9 +16,6 @@ where
 {
     let mut buf = Vec::new();
     let mut target_tag = None;
-
-    // Write the xml declaration to the destination file
-    writer.write_event(Event::Decl(BytesDecl::new("1.0", Some("UTF-8"), None)))?;
 
     // Process each event in the xml file
     loop {
@@ -61,6 +58,9 @@ where
                 // Write the text content to the output xml file.
                 writer.write_event(Event::Text(text))?;
             }
+            Ok(Event::Decl(tag)) => {
+                writer.write_event(Event::Decl(tag))?;
+            }
             Ok(Event::Eof) => {
                 // Reached the end of the xml file.
                 break;
@@ -82,6 +82,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::tests::remove_formatting;
     use std::io::Cursor;
 
     const ACTUAL_XML: &str = r#"
@@ -155,52 +156,6 @@ mod tests {
             </Nutzdatenblock>
         </DatenTeil>
     </Elster>"#;
-
-    /// Remove formatting from xml file.
-    fn remove_formatting(xml: &str) -> Result<String, anyhow::Error> {
-        let mut reader = Reader::from_str(xml);
-        reader.trim_text(true);
-        let mut writer = Writer::new(Cursor::new(Vec::new()));
-        let mut buf = Vec::new();
-
-        // Write the xml declaration to the destination file
-        writer.write_event(Event::Decl(BytesDecl::new("1.0", Some("UTF-8"), None)))?;
-
-        // Process each event in the xml file
-        loop {
-            match reader.read_event_into(&mut buf) {
-                Ok(Event::Start(e)) => {
-                    writer.write_event(Event::Start(e.clone()))?;
-                }
-                Ok(Event::End(e)) => {
-                    writer.write_event(Event::End(e))?;
-                }
-                Ok(Event::Empty(e)) => {
-                    writer.write_event(Event::Empty(e))?;
-                }
-                Ok(Event::Text(e)) => {
-                    writer.write_event(Event::Text(e))?;
-                }
-                Ok(Event::Eof) => {
-                    // Reached the end of the xml file
-                    break;
-                }
-                Err(e) => {
-                    // Handle error while reading the xml file
-                    eprintln!("Error: {}", e);
-                    break;
-                }
-                _ => (),
-            }
-
-            buf.clear();
-        }
-
-        let formatted_xml: Vec<u8> = writer.into_inner().into_inner();
-        let formatted_xml = String::from_utf8(formatted_xml).unwrap();
-
-        Ok(formatted_xml)
-    }
 
     // Helper function to test updated tags
     fn test_update_target_tags(actual_xml: &str, expected_xml: &str, target_tags: TargetTags) {

@@ -1,5 +1,8 @@
 mod read_target_tags;
+mod read_target_tags_ods;
 mod update_target_tags;
+mod xbrl;
+mod xml;
 
 pub use csv::{ReaderBuilder, Trim};
 use log::warn;
@@ -7,6 +10,8 @@ pub use quick_xml::{Reader, Writer};
 pub use read_target_tags::read_target_tags;
 use std::collections::HashMap;
 pub use update_target_tags::update_target_tags;
+#[cfg(test)]
+pub use xml::tests;
 
 #[derive(Debug)]
 pub struct Tag {
