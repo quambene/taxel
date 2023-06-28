@@ -1,7 +1,7 @@
 mod read_target_tags;
 mod read_target_tags_ods;
+mod remove_tag_values;
 mod update_target_tags;
-mod xbrl;
 mod xml;
 
 pub use csv::{ReaderBuilder, Trim};
