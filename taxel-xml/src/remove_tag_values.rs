@@ -52,23 +52,7 @@ where
             _ => (),
         }
 
-        // Remove tag value
-        match (&start_tag, &tag_value, &end_tag) {
-            // Handle tags of type `<tag>value</tag>`
-            (Some(tag), Some(_), Some(_)) => {
-                writer.write_event(Event::Empty(tag.clone()))?;
-                start_tag = None;
-                tag_value = None;
-                end_tag = None;
-            }
-            // Handle tags of type `<tag></tag>`
-            (Some(tag), None, Some(_)) => {
-                writer.write_event(Event::Empty(tag.clone()))?;
-                start_tag = None;
-                end_tag = None;
-            }
-            _ => (),
-        }
+        remove_tag_value(writer, &mut start_tag, &mut end_tag, &mut tag_value)?;
 
         if let Some(ref tag) = empty_tag {
             // Write start tag for tags of type `<tag1><tag2/>`
@@ -92,12 +76,36 @@ where
     Ok(())
 }
 
-// Remove tag value
-fn remove_tag_value<W>(writer: &mut Writer<W>)
+/// Remove tag value
+fn remove_tag_value<W>(
+    writer: &mut Writer<W>,
+    start_tag: &mut Option<BytesStart>,
+    end_tag: &mut Option<BytesEnd>,
+    tag_value: &mut Option<BytesText>,
+) -> Result<(), anyhow::Error>
 where
     W: std::io::Write,
 {
-    todo!()
+    // TODO: validate tag name
+
+    match (&start_tag, &tag_value, &end_tag) {
+        // Handle tags of type `<tag>value</tag>`
+        (Some(tag), Some(_), Some(_)) => {
+            writer.write_event(Event::Empty(tag.clone()))?;
+            *start_tag = None;
+            *tag_value = None;
+            *end_tag = None;
+        }
+        // Handle tags of type `<tag></tag>`
+        (Some(tag), None, Some(_)) => {
+            writer.write_event(Event::Empty(tag.clone()))?;
+            *start_tag = None;
+            *end_tag = None;
+        }
+        _ => (),
+    }
+
+    Ok(())
 }
 
 #[cfg(test)]
