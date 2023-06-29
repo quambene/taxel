@@ -2,7 +2,7 @@ use crate::{Tag, TargetTags};
 use quick_xml::events::{BytesText, Event};
 use quick_xml::Reader;
 use quick_xml::Writer;
-use std::io::BufRead;
+use std::{io::BufRead, str};
 
 /// Update values in xml file for given target tags.
 pub fn update_target_tags<R, W>(
@@ -21,7 +21,8 @@ where
     loop {
         match reader.read_event_into(&mut buf) {
             Ok(Event::Start(e)) => {
-                let tag_name = String::from_utf8(e.name().as_ref().to_vec())?;
+                let qualified_name = e.name();
+                let tag_name = str::from_utf8(qualified_name.as_ref())?;
 
                 if let Some(tag_value) = target_tags.get(&tag_name) {
                     // Found the start of target tag.
@@ -165,7 +166,7 @@ mod tests {
 
         update_target_tags(target_tags, &mut reader, &mut writer).unwrap();
 
-        let actual: Vec<u8> = writer.into_inner().into_inner();
+        let actual = writer.into_inner().into_inner();
         let expected = remove_formatting(expected_xml).unwrap();
 
         assert_eq!(String::from_utf8(actual).unwrap(), expected);

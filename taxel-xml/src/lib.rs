@@ -8,13 +8,63 @@ pub use csv::{ReaderBuilder, Trim};
 use log::warn;
 pub use quick_xml::{Reader, Writer};
 pub use read_target_tags::read_target_tags;
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt};
 pub use update_target_tags::update_target_tags;
 #[cfg(test)]
-pub use xml::tests;
+use xml::tests;
+
+const XBRL_ATTRIBUTE: &str = "xbrli:xbrl";
+const DECIMAL_ATTRIBUTE: &str = "decimals";
+
+struct Attribute<'a> {
+    key: &'a str,
+    value: &'a str,
+}
+
+const NIL_ATTRIBUTE: Attribute = Attribute {
+    key: "xsi:nil",
+    value: "true",
+};
+
+const DECIMALS_0: Attribute = Attribute {
+    key: "decimals",
+    value: "0",
+};
+
+const DECIMALS_2: Attribute = Attribute {
+    key: "decimals",
+    value: "2",
+};
+
+/// A struct representing the supported taxonomies.
+enum Taxonomy {
+    /// The Global Common Document (GCD) financial reporting taxonomy.
+    Gcd,
+    /// The Generally Accepted Accounting Principles (GAAP) - current/invested
+    /// (CI) - financial reporting taxonomy.
+    GaapCi,
+}
+
+impl fmt::Display for Taxonomy {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let taxonomy = match self {
+            Self::Gcd => "gcd",
+            Self::GaapCi => "gaap-ci",
+        };
+
+        write!(f, "{}", taxonomy)
+    }
+}
+
+enum XmlMode {
+    /// A plain xml file.
+    Plain,
+    /// An xml in the xbrl standard.
+    Xbrl,
+}
 
 #[derive(Debug)]
-pub struct Tag {
+struct Tag {
     name: String,
     value: Option<String>,
 }
