@@ -38,7 +38,7 @@ pub fn xml_file() -> Arg<'static> {
 pub fn csv_file() -> Arg<'static> {
     Arg::new(CSV_FILE)
         .long(CSV_FILE)
-        .required(true)
+        .required(false)
         .takes_value(true)
         .help("The path to the csv file used to generate the xml file.")
 }

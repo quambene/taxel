@@ -9,42 +9,49 @@ use std::{
 
 use crate::arg;
 use clap::{Arg, ArgMatches};
-use taxel_xml::{Reader, ReaderBuilder, Trim, Writer};
+use taxel_xml::{CsvReaderBuilder, Trim, XmlReader, XmlWriter};
 
 pub fn generate_args() -> [Arg<'static>; 3] {
     [arg::csv_file(), arg::template_file(), arg::output_file()]
 }
 
 pub fn generate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
-    let csv_file = arg::get_one(matches, arg::CSV_FILE)?;
+    let csv_file = arg::get_maybe_one(matches, arg::CSV_FILE);
     let template_file = arg::get_one(matches, arg::TEMPLATE_FILE)?;
     let output_file = arg::get_maybe_one(matches, arg::OUTPUT_FILE);
-    let csv_path = Path::new(csv_file);
+    let csv_path = csv_file.map(Path::new);
     let output_path = match output_file {
         Some(output_file) => PathBuf::from(output_file),
         None => current_dir()?,
     };
 
     // Read the csv file
-    let mut csv_reader = ReaderBuilder::new()
-        .delimiter(b',')
-        .has_headers(true)
-        .trim(Trim::All)
-        .from_path(csv_path)?;
+    let mut csv_reader = match csv_path {
+        Some(csv_path) => {
+            let reader = CsvReaderBuilder::new()
+                .delimiter(b',')
+                .has_headers(true)
+                .trim(Trim::All)
+                .from_path(csv_path)?;
+
+            Some(reader)
+        }
+        None => None,
+    };
 
     // Read the structure from a template file
     let template_file = File::open(template_file)?;
     let reader = BufReader::new(template_file);
 
     // Create a reader for parsing the XML file
-    let mut xml_reader = Reader::from_reader(reader);
+    let mut xml_reader = XmlReader::from_reader(reader);
     xml_reader.trim_text(true);
 
     // Create a new XML file as output
     let output_file = File::create(output_path)?;
-    let mut xml_writer = Writer::new(output_file);
+    let mut xml_writer = XmlWriter::new(output_file);
 
-    let target_tags = taxel_xml::read_target_tags(&mut csv_reader)?;
+    let target_tags = taxel_xml::read_target_tags(csv_reader.as_mut())?;
 
     taxel_xml::update_target_tags(target_tags, &mut xml_reader, &mut xml_writer)?;
 

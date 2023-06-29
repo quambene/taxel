@@ -10,16 +10,22 @@ struct Row {
     value: Option<String>,
 }
 
-pub fn read_target_tags<R>(reader: &mut Reader<R>) -> Result<TargetTags, anyhow::Error>
+/// Read target tags from a csv file.
+///
+/// If no csv file is given, use empty target tags.
+pub fn read_target_tags<R>(reader: Option<&mut Reader<R>>) -> Result<TargetTags, anyhow::Error>
 where
     R: std::io::Read,
 {
     let mut target_tags = TargetTags::new();
-    let records = reader.deserialize();
 
-    for record in records {
-        let row: Row = record?;
-        target_tags.insert(row.key, row.value);
+    if let Some(reader) = reader {
+        let records = reader.deserialize();
+
+        for record in records {
+            let row: Row = record?;
+            target_tags.insert(row.key, row.value);
+        }
     }
 
     Ok(target_tags)
@@ -47,7 +53,7 @@ mod tests {
             .trim(Trim::All)
             .from_reader(data.as_bytes());
 
-        let res = read_target_tags(&mut reader);
+        let res = read_target_tags(Some(&mut reader));
         assert!(res.is_ok(), "Can't read target tags: {}", res.unwrap_err());
 
         let target_tags = res.unwrap();

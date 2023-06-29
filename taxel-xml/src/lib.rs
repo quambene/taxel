@@ -4,9 +4,9 @@ mod remove_tag_values;
 mod update_target_tags;
 mod xml;
 
-pub use csv::{ReaderBuilder, Trim};
+pub use csv::{Reader as CsvReader, ReaderBuilder as CsvReaderBuilder, Trim};
 use log::warn;
-pub use quick_xml::{Reader, Writer};
+pub use quick_xml::{Reader as XmlReader, Writer as XmlWriter};
 pub use read_target_tags::read_target_tags;
 use std::{collections::HashMap, fmt};
 pub use update_target_tags::update_target_tags;

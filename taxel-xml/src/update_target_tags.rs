@@ -24,7 +24,7 @@ where
                 let qualified_name = e.name();
                 let tag_name = str::from_utf8(qualified_name.as_ref())?;
 
-                if let Some(tag_value) = target_tags.get(&tag_name) {
+                if let Some(tag_value) = target_tags.get(tag_name) {
                     // Found the start of target tag.
                     target_tag = Some(Tag::new(tag_name, tag_value.to_owned()));
                 }
