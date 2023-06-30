@@ -1,7 +1,7 @@
 mod read_target_tags;
 mod read_target_tags_ods;
 mod remove_tag_values;
-mod update_target_tags;
+mod update_tag_values;
 mod xml;
 
 pub use csv::{Reader as CsvReader, ReaderBuilder as CsvReaderBuilder, Trim};
@@ -9,7 +9,8 @@ use log::warn;
 pub use quick_xml::{Reader as XmlReader, Writer as XmlWriter};
 pub use read_target_tags::read_target_tags;
 use std::{collections::HashMap, fmt};
-pub use update_target_tags::update_target_tags;
+pub use update_tag_values::update_tag_values;
+
 #[cfg(test)]
 use xml::tests;
 

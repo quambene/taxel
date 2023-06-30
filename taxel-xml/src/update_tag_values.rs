@@ -4,8 +4,8 @@ use quick_xml::Reader;
 use quick_xml::Writer;
 use std::{io::BufRead, str};
 
-/// Update values in xml file for given target tags.
-pub fn update_target_tags<R, W>(
+/// Update values for given tags in an xml file.
+pub fn update_tag_values<R, W>(
     target_tags: TargetTags,
     reader: &mut Reader<R>,
     writer: &mut Writer<W>,
@@ -164,7 +164,7 @@ mod tests {
         reader.trim_text(true);
         let mut writer = Writer::new(Cursor::new(Vec::new()));
 
-        update_target_tags(target_tags, &mut reader, &mut writer).unwrap();
+        update_tag_values(target_tags, &mut reader, &mut writer).unwrap();
 
         let actual = writer.into_inner().into_inner();
         let expected = remove_formatting(expected_xml).unwrap();

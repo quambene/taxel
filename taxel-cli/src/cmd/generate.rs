@@ -53,7 +53,7 @@ pub fn generate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
 
     let target_tags = taxel_xml::read_target_tags(csv_reader.as_mut())?;
 
-    taxel_xml::update_target_tags(target_tags, &mut xml_reader, &mut xml_writer)?;
+    taxel_xml::update_tag_values(target_tags, &mut xml_reader, &mut xml_writer)?;
 
     // Flush the output XML writer and finalize the file
     xml_writer.into_inner().sync_all()?;
