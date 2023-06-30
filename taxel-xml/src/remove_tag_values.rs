@@ -6,7 +6,7 @@ use quick_xml::{
 use std::{io::BufRead, str};
 
 /// Remove values for all tags in an xml file.
-fn remove_tag_values<R, W>(
+pub fn remove_tag_values<R, W>(
     reader: &mut Reader<R>,
     writer: &mut Writer<W>,
 ) -> Result<(), anyhow::Error>

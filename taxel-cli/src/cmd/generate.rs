@@ -9,7 +9,7 @@ use std::{
 
 use crate::arg;
 use clap::{Arg, ArgMatches};
-use taxel_xml::{CsvReaderBuilder, Trim, XmlReader, XmlWriter};
+use taxel_xml::{CsvReaderBuilder, Reader, Trim, Writer};
 
 pub fn generate_args() -> [Arg<'static>; 3] {
     [arg::csv_file(), arg::template_file(), arg::output_file()]
@@ -44,15 +44,19 @@ pub fn generate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let reader = BufReader::new(template_file);
 
     // Create a reader for parsing the XML file
-    let mut xml_reader = XmlReader::from_reader(reader);
+    let mut xml_reader = Reader::from_reader(reader);
     xml_reader.trim_text(true);
 
     // Create a new XML file as output
     let output_file = File::create(output_path)?;
-    let mut xml_writer = XmlWriter::new(output_file);
+    let mut xml_writer = Writer::new(output_file);
 
     let target_tags = taxel_xml::read_target_tags(csv_reader.as_mut())?;
 
+    // Clear all tags
+    taxel_xml::remove_tag_values(&mut xml_reader, &mut xml_writer)?;
+
+    // Update all tags
     taxel_xml::update_tag_values(target_tags, &mut xml_reader, &mut xml_writer)?;
 
     // Flush the output XML writer and finalize the file
