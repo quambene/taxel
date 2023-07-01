@@ -58,6 +58,7 @@ impl fmt::Display for Taxonomy {
     }
 }
 
+#[derive(Debug, PartialEq)]
 enum XmlMode {
     /// A plain xml file.
     Plain,
