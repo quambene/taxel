@@ -1,6 +1,6 @@
 mod extract_tag_values;
-mod read_target_tags;
-mod read_target_tags_ods;
+mod read_tags;
+mod read_tags_ods;
 mod remove_tag_values;
 mod update_tag_values;
 mod write_tags;
@@ -12,7 +12,7 @@ pub use csv::{
 pub use extract_tag_values::extract_tag_values;
 use log::warn;
 pub use quick_xml::{Reader, Writer};
-pub use read_target_tags::read_target_tags;
+pub use read_tags::read_target_tags;
 pub use remove_tag_values::remove_tag_values;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fmt};
