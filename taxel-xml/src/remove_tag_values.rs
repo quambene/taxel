@@ -302,12 +302,12 @@ mod tests {
         let xml = r#"
             <root>
                 <tag1/>
-                <tag2>Value 2</tag2>
+                <tag2>value 2</tag2>
                 <tag3>
                     <tag31/>
                 </tag3>
                 <tag4/>
-                <tag5>Value 5</tag5>
+                <tag5>value 5</tag5>
                 <tag6/>
             </root>
         "#;

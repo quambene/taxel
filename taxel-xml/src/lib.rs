@@ -1,3 +1,4 @@
+mod extract_tag_values;
 mod read_target_tags;
 mod read_target_tags_ods;
 mod remove_tag_values;
@@ -5,6 +6,7 @@ mod update_tag_values;
 mod xml;
 
 pub use csv::{Reader as CsvReader, ReaderBuilder as CsvReaderBuilder, Trim};
+pub use extract_tag_values::extract_tag_values;
 use log::warn;
 pub use quick_xml::{Reader, Writer};
 pub use read_target_tags::read_target_tags;
@@ -65,8 +67,8 @@ enum XmlMode {
     Xbrl,
 }
 
-#[derive(Debug)]
-struct Tag {
+#[derive(Debug, PartialEq)]
+pub struct Tag {
     name: String,
     value: Option<String>,
 }
