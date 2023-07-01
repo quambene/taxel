@@ -32,24 +32,14 @@ where
 
                 let qualified_name = s_tag.name();
                 let tag_name = str::from_utf8(qualified_name.as_ref())?;
-                let tag = if mode == XmlMode::Xbrl
-                    && tag_name.contains(Taxonomy::GaapCi.to_string().as_str())
-                {
-                    update_attributes(&s_tag)?
-                } else if mode == XmlMode::Plain
-                    && tag_name.contains(Taxonomy::Gcd.to_string().as_str())
-                {
-                    s_tag.to_owned()
-                } else {
-                    s_tag.to_owned()
-                };
 
                 if let Some(tag_value) = target_tags.get(tag_name) {
-                    // Found the start of target tag.
+                    debug!("Found target tag: {tag_name}");
+
                     target_tag = Some(Tag::new(tag_name, tag_value.to_owned()));
                 }
 
-                writer.write_event(Event::Start(tag.clone()))?;
+                writer.write_event(Event::Start(s_tag.clone()))?;
             }
             Ok(Event::End(e_tag)) => {
                 if e_tag.name().as_ref() == XBRL_ATTRIBUTE.as_bytes() {
@@ -69,19 +59,24 @@ where
             Ok(Event::Empty(em_tag)) => {
                 let qualified_name = em_tag.name();
                 let tag_name = str::from_utf8(qualified_name.as_ref())?;
-                let tag = if mode == XmlMode::Xbrl
-                    && tag_name.contains(Taxonomy::GaapCi.to_string().as_str())
-                {
-                    update_attributes(&em_tag)?
-                } else if mode == XmlMode::Plain
-                    && tag_name.contains(Taxonomy::Gcd.to_string().as_str())
-                {
-                    em_tag.to_owned()
-                } else {
-                    em_tag.to_owned()
-                };
+
+                debug!("{tag_name}");
 
                 if let Some(tag_value) = target_tags.get(tag_name) {
+                    debug!("Found target tag: {tag_name}");
+
+                    let tag = if mode == XmlMode::Xbrl
+                        && tag_name.contains(Taxonomy::GaapCi.to_string().as_str())
+                    {
+                        update_attributes(&em_tag)?
+                    } else if mode == XmlMode::Plain
+                        && tag_name.contains(Taxonomy::Gcd.to_string().as_str())
+                    {
+                        em_tag.to_owned()
+                    } else {
+                        em_tag.to_owned()
+                    };
+
                     let text = if let Some(tag_value) = tag_value {
                         BytesText::new(tag_value)
                     } else {

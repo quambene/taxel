@@ -1,5 +1,5 @@
 use crate::{Taxonomy, XmlMode, DECIMAL_ATTRIBUTE, NIL_ATTRIBUTE, XBRL_ATTRIBUTE};
-use log::{error, info};
+use log::{error, info, trace};
 use quick_xml::{
     events::{attributes::Attribute, BytesEnd, BytesStart, BytesText, Event},
     Reader, Writer,
@@ -101,6 +101,13 @@ fn remove_tag_value<W>(
 where
     W: std::io::Write,
 {
+    if let Some(tag) = start_tag {
+        trace!(
+            "Remove value for tag: {}",
+            str::from_utf8(tag.name().as_ref())?
+        );
+    }
+
     match mode {
         XmlMode::Plain => {
             remove_xml_tag_value(writer, start_tag, end_tag, tag_value)?;
