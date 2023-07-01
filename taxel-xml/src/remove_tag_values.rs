@@ -226,8 +226,8 @@ mod tests {
     use crate::tests::remove_formatting;
     use std::io::Cursor;
 
-    fn test_remove_tag_values(actual_xml: &str, expected_xml: &str) {
-        let mut reader = Reader::from_str(actual_xml);
+    fn test_remove_tag_values(xml: &str, expected_xml: &str) {
+        let mut reader = Reader::from_str(xml);
         reader.trim_text(true);
         let mut writer = Writer::new(Cursor::new(Vec::new()));
 
@@ -241,7 +241,7 @@ mod tests {
 
     #[test]
     fn test_remove_tag_values_start_end() {
-        let actual_xml = r#"
+        let xml = r#"
             <root>
                 <tag>value</tag>
             </root>
@@ -252,12 +252,12 @@ mod tests {
             </root>
         "#;
 
-        test_remove_tag_values(actual_xml, expected_xml);
+        test_remove_tag_values(xml, expected_xml);
     }
 
     #[test]
     fn test_remove_tag_values_start_end_empty() {
-        let actual_xml = r#"
+        let xml = r#"
             <root>
                 <tag></tag>
             </root>
@@ -268,12 +268,12 @@ mod tests {
             </root>
         "#;
 
-        test_remove_tag_values(actual_xml, expected_xml);
+        test_remove_tag_values(xml, expected_xml);
     }
 
     #[test]
     fn test_remove_tag_values_empty() {
-        let actual_xml = r#"
+        let xml = r#"
             <root>
                 <tag/>
             </root>
@@ -284,12 +284,12 @@ mod tests {
             </root>
         "#;
 
-        test_remove_tag_values(actual_xml, expected_xml);
+        test_remove_tag_values(xml, expected_xml);
     }
 
     #[test]
     fn test_remove_tag_values_multiple_tags() {
-        let actual_xml = r#"
+        let xml = r#"
             <root>
                 <tag1/>
                 <tag2>Value 2</tag2>
@@ -314,12 +314,12 @@ mod tests {
             </root>
         "#;
 
-        test_remove_tag_values(actual_xml, expected_xml);
+        test_remove_tag_values(xml, expected_xml);
     }
 
     #[test]
     fn test_remove_xbrl_tag_gcd() {
-        let actual_xml = r#"
+        let xml = r#"
             <xbrli:xbrl>
                 <de-gcd:genInfo.report.audit.city contextRef="D-AKTJAHR">Berlin</de-gcd:genInfo.report.audit.city>
             </xbrli:xbrl>
@@ -330,12 +330,12 @@ mod tests {
             </xbrli:xbrl>
         "#;
 
-        test_remove_tag_values(actual_xml, expected_xml);
+        test_remove_tag_values(xml, expected_xml);
     }
 
     #[test]
     fn test_remove_xbrl_tag_gaap() {
-        let actual_xml = r#"
+        let xml = r#"
             <xbrli:xbrl>
                 <de-gaap-ci:is.netIncome.regular.operatingTC.otherCost.marketing contextRef="D-AKTJAHR" unitRef="EUR" decimals="2">550.50</de-gaap-ci:is.netIncome.regular.operatingTC.otherCost.marketing>
             </xbrli:xbrl>
@@ -346,6 +346,6 @@ mod tests {
             </xbrli:xbrl>
         "#;
 
-        test_remove_tag_values(actual_xml, expected_xml);
+        test_remove_tag_values(xml, expected_xml);
     }
 }
