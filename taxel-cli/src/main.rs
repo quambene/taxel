@@ -17,6 +17,7 @@ fn main() -> Result<(), anyhow::Error> {
     }
 
     match matches.subcommand() {
+        Some((cmd::EXTRACT, matches)) => cmd::extract(matches),
         Some((cmd::GENERATE, matches)) => cmd::generate(matches),
         Some((cmd::VALIDATE, matches)) => cmd::validate(matches),
         Some((cmd::SEND, matches)) => cmd::send(matches),
@@ -32,6 +33,11 @@ pub fn app() -> App<'static> {
                 .long(arg::VERBOSE)
                 .takes_value(false)
                 .help("Shows what is going on"),
+        )
+        .subcommand(
+            SubCommand::with_name(cmd::EXTRACT)
+                .args(cmd::extract_args())
+                .about("Extract tag values from xml file"),
         )
         .subcommand(
             SubCommand::with_name(cmd::GENERATE)

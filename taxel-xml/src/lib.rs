@@ -3,16 +3,21 @@ mod read_target_tags;
 mod read_target_tags_ods;
 mod remove_tag_values;
 mod update_tag_values;
+mod write_tags;
 mod xml;
 
-pub use csv::{Reader as CsvReader, ReaderBuilder as CsvReaderBuilder, Trim};
+pub use csv::{
+    Reader as CsvReader, ReaderBuilder as CsvReaderBuilder, Trim, WriterBuilder as CsvWriterBuilder,
+};
 pub use extract_tag_values::extract_tag_values;
 use log::warn;
 pub use quick_xml::{Reader, Writer};
 pub use read_target_tags::read_target_tags;
 pub use remove_tag_values::remove_tag_values;
+use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fmt};
 pub use update_tag_values::update_tag_values;
+pub use write_tags::write_tags;
 #[cfg(test)]
 use xml::tests;
 
@@ -67,10 +72,24 @@ enum XmlMode {
     Xbrl,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct CsvRow {
+    #[serde(rename = "ebilanz_key")]
+    key: String,
+    #[serde(rename = "ebilanz_value")]
+    value: Option<String>,
+}
+
+impl CsvRow {
+    pub fn new(key: String, value: Option<String>) -> Self {
+        Self { key, value }
+    }
+}
+
 #[derive(Debug, PartialEq)]
 pub struct Tag {
-    name: String,
-    value: Option<String>,
+    pub name: String,
+    pub value: Option<String>,
 }
 
 impl Tag {

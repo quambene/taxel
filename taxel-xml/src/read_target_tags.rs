@@ -1,15 +1,6 @@
-use crate::TargetTags;
+use crate::{CsvRow, TargetTags};
 use csv::Reader;
 use log::{debug, info};
-use serde::Deserialize;
-
-#[derive(Debug, Deserialize)]
-struct Row {
-    #[serde(rename = "ebilanz_key")]
-    key: String,
-    #[serde(rename = "ebilanz_value")]
-    value: Option<String>,
-}
 
 /// Read target tags from a csv file.
 ///
@@ -26,7 +17,7 @@ where
         let records = reader.deserialize();
 
         for record in records {
-            let row: Row = record?;
+            let row: CsvRow = record?;
             target_tags.insert(row.key, row.value);
         }
     }
