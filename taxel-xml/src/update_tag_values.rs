@@ -1,4 +1,5 @@
 use crate::{Tag, TargetTags, Taxonomy, XmlMode, DECIMALS_2, NIL_ATTRIBUTE, XBRL_ATTRIBUTE};
+use log::{debug, error, info};
 use quick_xml::{
     events::{attributes::Attribute, BytesStart, BytesText, Event},
     Reader, Writer,
@@ -15,6 +16,8 @@ where
     R: std::io::Read + BufRead,
     W: std::io::Write,
 {
+    info!("Update tag values");
+
     let mut buf = Vec::new();
     let mut target_tag = None;
     let mut mode = XmlMode::Plain;
@@ -113,9 +116,9 @@ where
                 // Reached the end of the xml file.
                 break;
             }
-            Err(e) => {
+            Err(err) => {
                 // Handle error while reading the xml file.
-                eprintln!("Error: {}", e);
+                error!("Can't parse xml file: {err}");
                 break;
             }
             _ => (),
@@ -129,6 +132,11 @@ where
 
 /// Update the attributes of a given tag.
 fn update_attributes<'a>(tag: &BytesStart<'a>) -> Result<BytesStart<'a>, anyhow::Error> {
+    debug!(
+        "Update attributes for tag {}",
+        str::from_utf8(tag.name().as_ref())?
+    );
+
     let attributes = tag.attributes();
 
     let mut updated_attributes = vec![];

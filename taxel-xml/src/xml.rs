@@ -17,6 +17,7 @@ where
 
 #[cfg(test)]
 pub mod tests {
+    use log::error;
     use quick_xml::{events::Event, Reader, Writer};
     use std::io::Cursor;
 
@@ -49,9 +50,9 @@ pub mod tests {
                     // Reached the end of the xml file
                     break;
                 }
-                Err(e) => {
+                Err(err) => {
                     // Handle error while reading the xml file
-                    eprintln!("Error: {}", e);
+                    error!("Can't parse xml file: {err}");
                     break;
                 }
                 _ => (),

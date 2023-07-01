@@ -4,12 +4,16 @@ mod cmd;
 use anyhow::anyhow;
 use clap::{crate_version, App, SubCommand};
 
+#[macro_use]
+extern crate log;
+
 fn main() -> Result<(), anyhow::Error> {
+    env_logger::init();
     let app = app();
     let matches = app.get_matches();
 
     if matches.is_present(arg::VERBOSE) {
-        println!("matches: {:#?}", matches);
+        info!("matches: {:#?}", matches);
     }
 
     match matches.subcommand() {

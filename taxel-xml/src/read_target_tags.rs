@@ -1,5 +1,6 @@
 use crate::TargetTags;
 use csv::Reader;
+use log::{debug, info};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -17,6 +18,8 @@ pub fn read_target_tags<R>(reader: Option<&mut Reader<R>>) -> Result<TargetTags,
 where
     R: std::io::Read,
 {
+    info!("Read target tags");
+
     let mut target_tags = TargetTags::new();
 
     if let Some(reader) = reader {
@@ -27,6 +30,8 @@ where
             target_tags.insert(row.key, row.value);
         }
     }
+
+    debug!("Target tags read: {target_tags:#?}");
 
     Ok(target_tags)
 }

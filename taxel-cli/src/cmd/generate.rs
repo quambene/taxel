@@ -24,6 +24,16 @@ pub fn generate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
         None => current_dir()?,
     };
 
+    debug!(
+        "Run `taxel generate` with configuration:\n{}={:?}\n{}={}\n{}={:?}",
+        arg::CSV_FILE,
+        csv_file,
+        arg::TEMPLATE_FILE,
+        template_file,
+        arg::OUTPUT_FILE,
+        output_file,
+    );
+
     // Read the csv file
     let mut csv_reader = match csv_path {
         Some(csv_path) => {

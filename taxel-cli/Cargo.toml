@@ -12,5 +12,6 @@ name = "taxel"
 taxel = { version = "0.1.0", path = "../taxel" }
 taxel-xml = { version = "0.1.0", path = "../taxel-xml" }
 anyhow = { workspace = true }
+log = { workspace = true }
+env_logger = { workspace = true }
 clap = { version = "3.2.14", default-features = false, features = ["std", "cargo"] }
-

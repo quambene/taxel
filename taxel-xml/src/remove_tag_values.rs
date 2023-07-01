@@ -1,4 +1,5 @@
 use crate::{Taxonomy, XmlMode, DECIMAL_ATTRIBUTE, NIL_ATTRIBUTE, XBRL_ATTRIBUTE};
+use log::{error, info};
 use quick_xml::{
     events::{attributes::Attribute, BytesEnd, BytesStart, BytesText, Event},
     Reader, Writer,
@@ -14,6 +15,8 @@ where
     R: std::io::Read + BufRead,
     W: std::io::Write,
 {
+    info!("Remove tag values");
+
     let mut buf = Vec::new();
     let mut start_tag: Option<BytesStart> = None;
     let mut end_tag: Option<BytesEnd> = None;
@@ -56,8 +59,8 @@ where
                 // Reached the end of the xml file.
                 break;
             }
-            Err(e) => {
-                eprintln!("Error: {}", e);
+            Err(err) => {
+                error!("Can't parse xml file: {err}");
                 break;
             }
             _ => (),
