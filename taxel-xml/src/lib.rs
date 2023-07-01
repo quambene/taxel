@@ -11,7 +11,6 @@ pub use read_target_tags::read_target_tags;
 pub use remove_tag_values::remove_tag_values;
 use std::{collections::HashMap, fmt};
 pub use update_tag_values::update_tag_values;
-
 #[cfg(test)]
 use xml::tests;
 

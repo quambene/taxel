@@ -1,14 +1,13 @@
 //! Generate XML file according to the XBRL standard from a given CSV file.
 
+use crate::arg;
+use clap::{Arg, ArgMatches};
 use std::{
     env::current_dir,
     fs::File,
     io::BufReader,
     path::{Path, PathBuf},
 };
-
-use crate::arg;
-use clap::{Arg, ArgMatches};
 use taxel_xml::{CsvReaderBuilder, Reader, Trim, Writer};
 
 pub fn generate_args() -> [Arg<'static>; 3] {

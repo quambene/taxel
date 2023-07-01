@@ -1,7 +1,8 @@
 use crate::{Tag, TargetTags, Taxonomy, XmlMode, DECIMALS_2, NIL_ATTRIBUTE, XBRL_ATTRIBUTE};
-use quick_xml::events::{attributes::Attribute, BytesStart, BytesText, Event};
-use quick_xml::Reader;
-use quick_xml::Writer;
+use quick_xml::{
+    events::{attributes::Attribute, BytesStart, BytesText, Event},
+    Reader, Writer,
+};
 use std::{io::BufRead, str};
 
 /// Update values for given tags in an xml file.
