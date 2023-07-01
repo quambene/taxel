@@ -107,7 +107,7 @@ impl TargetTags {
         let value = target_value.map(|inner| inner.into());
         let entry = self.0.insert(key.clone(), value);
 
-        if entry.is_none() {
+        if entry.is_some() {
             warn!("Duplicate key '{key}'");
         }
     }
