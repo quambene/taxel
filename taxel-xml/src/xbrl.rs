@@ -98,6 +98,8 @@ impl XbrlElement {
                 }
                 _ => (),
             }
+
+            buf.clear();
         }
 
         let root_element = root_element.ok_or(anyhow!("Missing root element"))?;
@@ -154,6 +156,8 @@ impl XbrlElement {
                 }
                 _ => (),
             }
+
+            buf.clear();
         }
     }
 
