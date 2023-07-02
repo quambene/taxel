@@ -1,8 +1,11 @@
 use crate::Taxonomy;
 use anyhow::anyhow;
 use quick_xml::{
-    events::{attributes::Attributes, BytesStart, Event},
-    Reader,
+    events::{
+        attributes::{Attribute, Attributes},
+        BytesEnd, BytesStart, BytesText, Event,
+    },
+    Reader, Writer,
 };
 use std::io::BufRead;
 use std::str;
@@ -12,7 +15,7 @@ use std::str;
 struct XbrlElement {
     name: String,
     value: Option<String>,
-    attributes: Vec<Attribute>,
+    attributes: Vec<XbrlAttribute>,
     xml_type: XmlType,
     children: Vec<XbrlElement>,
 }
@@ -36,12 +39,12 @@ impl XmlType {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-struct Attribute {
+struct XbrlAttribute {
     key: String,
     value: String,
 }
 
-impl Attribute {
+impl XbrlAttribute {
     pub fn new(key: impl Into<String>, value: impl Into<String>) -> Self {
         Self {
             key: key.into(),
@@ -55,7 +58,7 @@ impl XbrlElement {
     pub fn new(
         name: impl Into<String>,
         value: Option<String>,
-        attributes: Vec<Attribute>,
+        attributes: Vec<XbrlAttribute>,
         xml_type: XmlType,
         children: Vec<XbrlElement>,
     ) -> Self {
@@ -161,6 +164,44 @@ impl XbrlElement {
         }
     }
 
+    pub fn serialize<W>(&self, writer: &mut Writer<W>) -> Result<(), anyhow::Error>
+    where
+        W: std::io::Write,
+    {
+        let mut attributes = vec![];
+        for attribute in &self.attributes {
+            let attribute = Attribute::from((attribute.key.as_bytes(), attribute.value.as_bytes()));
+            attributes.push(attribute);
+        }
+        let start_tag = BytesStart::new(&self.name).with_attributes(attributes);
+        let end_tag = BytesEnd::new(&self.name);
+
+        match &self.value {
+            Some(value) => {
+                let tag_value = BytesText::new(value);
+
+                writer.write_event(Event::Start(start_tag))?;
+                writer.write_event(Event::Text(tag_value))?;
+                writer.write_event(Event::End(end_tag))?;
+            }
+            None => {
+                if self.children.is_empty() {
+                    writer.write_event(Event::Empty(start_tag))?;
+                } else {
+                    writer.write_event(Event::Start(start_tag))?;
+
+                    for child in &self.children {
+                        child.serialize(writer)?;
+                    }
+
+                    writer.write_event(Event::End(end_tag))?;
+                }
+            }
+        }
+
+        Ok(())
+    }
+
     fn convert_tag(tag: BytesStart) -> Result<XbrlElement, anyhow::Error> {
         let tag_name = tag.name();
         let name = str::from_utf8(tag_name.as_ref())?;
@@ -186,12 +227,12 @@ impl XbrlElement {
         }
     }
 
-    fn convert_attributes(xml_attributes: Attributes) -> Result<Vec<Attribute>, anyhow::Error> {
+    fn convert_attributes(xml_attributes: Attributes) -> Result<Vec<XbrlAttribute>, anyhow::Error> {
         let mut attributes = vec![];
 
         for attribute in xml_attributes {
             let attribute = attribute?;
-            let attribute = Attribute::new(
+            let attribute = XbrlAttribute::new(
                 str::from_utf8(attribute.key.as_ref())?,
                 str::from_utf8(attribute.value.as_ref())?,
             );
@@ -205,6 +246,95 @@ impl XbrlElement {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::io::Cursor;
+
+    #[test]
+    fn test_serialize_element_empty() {
+        let element = XbrlElement::new(
+            "root",
+            None,
+            vec![],
+            XmlType::Plain,
+            vec![XbrlElement::new(
+                "tag",
+                None,
+                vec![],
+                XmlType::Plain,
+                vec![],
+            )],
+        );
+        let mut writer = Writer::new(Cursor::new(Vec::new()));
+        element.serialize(&mut writer).unwrap();
+        let xml = writer.into_inner().into_inner();
+        let xml = str::from_utf8(&xml).unwrap();
+
+        assert_eq!(xml, r#"<root><tag/></root>"#);
+    }
+
+    #[test]
+    fn test_serialize_element_value() {
+        let element = XbrlElement::new(
+            "root",
+            None,
+            vec![],
+            XmlType::Plain,
+            vec![XbrlElement::new(
+                "tag",
+                Some(String::from("value")),
+                vec![],
+                XmlType::Plain,
+                vec![],
+            )],
+        );
+        let mut writer = Writer::new(Cursor::new(Vec::new()));
+        element.serialize(&mut writer).unwrap();
+        let xml = writer.into_inner().into_inner();
+        let xml = str::from_utf8(&xml).unwrap();
+
+        assert_eq!(xml, r#"<root><tag>value</tag></root>"#);
+    }
+
+    #[test]
+    fn test_serialize_element_multiple() {
+        let element = XbrlElement::new(
+            "root",
+            None,
+            vec![],
+            XmlType::Plain,
+            vec![
+                XbrlElement::new(
+                    "tag1",
+                    None,
+                    vec![XbrlAttribute::new("attribute_key", "attribute value")],
+                    XmlType::Plain,
+                    vec![XbrlElement::new(
+                        "child",
+                        Some("child value".to_owned()),
+                        vec![],
+                        XmlType::Plain,
+                        vec![],
+                    )],
+                ),
+                XbrlElement::new(
+                    "tag2",
+                    Some("tag value".to_owned()),
+                    vec![],
+                    XmlType::Plain,
+                    vec![],
+                ),
+                XbrlElement::new("tag3", None, vec![], XmlType::Plain, vec![]),
+            ],
+        );
+        let mut writer = Writer::new(Cursor::new(Vec::new()));
+        element.serialize(&mut writer).unwrap();
+        let xml = writer.into_inner().into_inner();
+        let xml = str::from_utf8(&xml).unwrap();
+
+        assert_eq!(
+            xml,
+            r#"<root><tag1 attribute_key="attribute value"><child>child value</child></tag1><tag2>tag value</tag2><tag3/></root>"#
+        );
+    }
 
     #[test]
     fn test_parse_element_empty() {
@@ -328,7 +458,7 @@ mod tests {
                     XbrlElement::new(
                         "tag1",
                         None,
-                        vec![Attribute::new("attribute_key", "attribute value")],
+                        vec![XbrlAttribute::new("attribute_key", "attribute value")],
                         XmlType::Plain,
                         vec![XbrlElement::new(
                             "child",
