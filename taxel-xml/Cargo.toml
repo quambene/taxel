@@ -11,6 +11,7 @@ name = "taxel_xml"
 [dependencies]
 anyhow = { workspace = true }
 log = { workspace = true }
+env_logger = { workspace = true }
 serde = { version = "1.0.164", features = ["derive"]}
 quick-xml = "0.29.0"
 csv = "1.2.2"

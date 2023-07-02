@@ -4,6 +4,7 @@ mod read_tags_ods;
 mod remove_tag_values;
 mod update_tag_values;
 mod write_tags;
+mod xbrl;
 mod xml;
 
 pub use csv::{
@@ -44,6 +45,7 @@ const DECIMALS_2: Attribute = Attribute {
     value: "2",
 };
 
+#[derive(Debug, PartialEq, Clone)]
 /// A struct representing the supported taxonomies.
 enum Taxonomy {
     /// The Global Common Document (GCD) financial reporting taxonomy.
@@ -51,6 +53,15 @@ enum Taxonomy {
     /// The Generally Accepted Accounting Principles (GAAP) - current/invested
     /// (CI) - financial reporting taxonomy.
     GaapCi,
+}
+
+impl Taxonomy {
+    fn as_str(&self) -> &str {
+        match self {
+            Self::Gcd => "gcd",
+            Self::GaapCi => "gaap-ci",
+        }
+    }
 }
 
 impl fmt::Display for Taxonomy {
