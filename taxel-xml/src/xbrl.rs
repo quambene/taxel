@@ -30,8 +30,8 @@ enum XmlType {
 impl XmlType {
     fn as_str(&self) -> &str {
         match self {
-            XmlType::Plain => "Plain",
-            XmlType::Xbrl => "Xbrl",
+            XmlType::Plain => "plain",
+            XmlType::Xbrl => "xbrl",
             XmlType::Taxonomy(Taxonomy::Gcd) => "gcd",
             XmlType::Taxonomy(Taxonomy::GaapCi) => "gaap-ci",
         }
@@ -481,6 +481,72 @@ mod tests {
             ),
             "Pretty print: {:#?}",
             parsed_element
+        );
+    }
+
+    #[test]
+    fn test_parse_element_xbrl_gcd() {
+        let xml = r#"
+            <xbrli:xbrl>
+                <de-gcd:genInfo.report.audit.city contextRef="D-AKTJAHR">Berlin</de-gcd:genInfo.report.audit.city>
+            </xbrli:xbrl>
+        "#;
+
+        let mut reader = Reader::from_str(xml);
+        reader.trim_text(true);
+
+        let parsed_element = XbrlElement::parse(&mut reader).unwrap();
+
+        assert_eq!(
+            parsed_element,
+            XbrlElement::new(
+                "xbrli:xbrl",
+                None,
+                vec![],
+                XmlType::Xbrl,
+                vec![XbrlElement::new(
+                    "de-gcd:genInfo.report.audit.city",
+                    Some(String::from("Berlin")),
+                    vec![XbrlAttribute::new("contextRef", "D-AKTJAHR")],
+                    XmlType::Taxonomy(Taxonomy::Gcd),
+                    vec![]
+                )]
+            )
+        );
+    }
+
+    #[test]
+    fn test_parse_element_xbrl_gaap() {
+        let xml = r#"
+            <xbrli:xbrl>
+                <de-gaap-ci:is.netIncome.regular.operatingTC.otherCost.marketing contextRef="D-AKTJAHR" unitRef="EUR" decimals="2">550.50</de-gaap-ci:is.netIncome.regular.operatingTC.otherCost.marketing>
+            </xbrli:xbrl>
+        "#;
+
+        let mut reader = Reader::from_str(xml);
+        reader.trim_text(true);
+
+        let parsed_element = XbrlElement::parse(&mut reader).unwrap();
+
+        assert_eq!(
+            parsed_element,
+            XbrlElement::new(
+                "xbrli:xbrl",
+                None,
+                vec![],
+                XmlType::Xbrl,
+                vec![XbrlElement::new(
+                    "de-gaap-ci:is.netIncome.regular.operatingTC.otherCost.marketing",
+                    Some(String::from("550.50")),
+                    vec![
+                        XbrlAttribute::new("contextRef", "D-AKTJAHR"),
+                        XbrlAttribute::new("unitRef", "EUR"),
+                        XbrlAttribute::new("decimals", "2")
+                    ],
+                    XmlType::Taxonomy(Taxonomy::GaapCi),
+                    vec![]
+                )]
+            )
         );
     }
 }
