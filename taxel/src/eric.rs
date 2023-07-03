@@ -186,6 +186,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(not(feature = "integration-test"), ignore)]
     fn test_validate_and_print() {
         let xml_path = "../test_data/ebilanz/taxonomy_v6.5/SteuerbilanzAutoverkaeufer_PersG.xml";
         let xml = fs::read_to_string(xml_path).unwrap();
@@ -218,6 +219,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(not(feature = "integration-test"), ignore)]
     fn test_send() {
         let log_path = current_dir().unwrap();
         let eric = Eric::new(&log_path).unwrap();
@@ -257,6 +259,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(not(feature = "integration-test"), ignore)]
     fn test_send_and_print() {
         let log_path = current_dir().unwrap();
         let eric = Eric::new(&log_path).unwrap();

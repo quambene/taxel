@@ -8,6 +8,9 @@ edition.workspace = true
 path = "src/lib.rs"
 name = "taxel"
 
+[features]
+integration-test = []
+
 [dependencies]
 taxel-bindings = { version = "0.1.0", path = "../taxel-bindings" }
 taxel-util = { version = "0.1.0", path = "../taxel-util" }

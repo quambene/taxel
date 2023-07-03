@@ -66,6 +66,7 @@ mod tests {
     use crate::{app, cmd};
 
     #[test]
+    #[cfg_attr(not(feature = "integration-test"), ignore)]
     fn test_send() {
         let args = vec![
             cmd::BIN,
@@ -90,6 +91,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(not(feature = "integration-test"), ignore)]
     fn test_send_and_print() {
         let args = vec![
             cmd::BIN,
