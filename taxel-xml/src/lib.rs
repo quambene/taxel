@@ -1,5 +1,4 @@
 mod csv;
-mod extract_tag_values;
 mod ods;
 mod xbrl;
 mod xml;
@@ -8,12 +7,12 @@ pub use crate::csv::{
     read_tags, write_tags, Reader as CsvReader, ReaderBuilder as CsvReaderBuilder, Trim,
     Writer as CsvWriter, WriterBuilder as CsvWriterBuilder,
 };
-pub use extract_tag_values::extract_tag_values;
 use log::warn;
 pub use quick_xml::{Reader, Writer};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fmt};
 pub use xbrl::XbrlElement;
+pub use xml::extract_tag_values;
 pub use xml::remove_formatting;
 
 struct Attribute<'a> {
