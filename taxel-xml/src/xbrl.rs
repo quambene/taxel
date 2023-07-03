@@ -330,9 +330,16 @@ impl XbrlElement {
                     self.attributes.remove(index);
                 }
 
-                // Add `decimals` attribute
-                self.attributes
-                    .push(XbrlAttribute::new(DECIMALS_2.key, DECIMALS_2.value))
+                // Add `decimals` attribute if not availabe.
+                if self
+                    .attributes
+                    .iter()
+                    .find(|attribute| attribute.key == DECIMALS_2.key)
+                    .is_none()
+                {
+                    self.attributes
+                        .push(XbrlAttribute::new(DECIMALS_2.key, DECIMALS_2.value))
+                }
             }
         }
 
