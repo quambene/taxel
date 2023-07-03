@@ -302,9 +302,16 @@ impl XbrlElement {
                 self.attributes.remove(index);
             }
 
-            // Add `xsi:nil` attribute
-            self.attributes
-                .push(XbrlAttribute::new(NIL_ATTRIBUTE.key, NIL_ATTRIBUTE.value))
+            // Add `xsi:nil` attribute if not availabe.
+            if self
+                .attributes
+                .iter()
+                .find(|attribute| attribute.key == NIL_ATTRIBUTE.key)
+                .is_none()
+            {
+                self.attributes
+                    .push(XbrlAttribute::new(NIL_ATTRIBUTE.key, NIL_ATTRIBUTE.value));
+            }
         }
 
         for child in &mut self.children {
@@ -593,6 +600,50 @@ mod tests {
                     XbrlAttribute::new("contextRef", "D-AKTJAHR"),
                     XbrlAttribute::new("unitRef", "EUR"),
                     XbrlAttribute::new("decimals", "2"),
+                ],
+                XmlType::Taxonomy(Taxonomy::GaapCi),
+                vec![],
+            )],
+        );
+
+        element.remove_values();
+
+        assert_eq!(
+            element,
+            XbrlElement::new(
+                "xbrli:xbrl",
+                None,
+                vec![],
+                XmlType::Xbrl,
+                vec![XbrlElement::new(
+                    "de-gaap-ci:is.netIncome.regular.operatingTC.otherCost.marketing",
+                    None,
+                    vec![
+                        XbrlAttribute::new("contextRef", "D-AKTJAHR"),
+                        XbrlAttribute::new("unitRef", "EUR"),
+                        XbrlAttribute::new("xsi:nil", "true"),
+                    ],
+                    XmlType::Taxonomy(Taxonomy::GaapCi),
+                    vec![]
+                )]
+            )
+        );
+    }
+
+    #[test]
+    fn test_remove_values_xbrl_gaap_empty() {
+        let mut element = XbrlElement::new(
+            "xbrli:xbrl",
+            None,
+            vec![],
+            XmlType::Xbrl,
+            vec![XbrlElement::new(
+                "de-gaap-ci:is.netIncome.regular.operatingTC.otherCost.marketing",
+                None,
+                vec![
+                    XbrlAttribute::new("contextRef", "D-AKTJAHR"),
+                    XbrlAttribute::new("unitRef", "EUR"),
+                    XbrlAttribute::new("xsi:nil", "true"),
                 ],
                 XmlType::Taxonomy(Taxonomy::GaapCi),
                 vec![],
