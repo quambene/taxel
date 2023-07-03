@@ -80,6 +80,11 @@ _Note:_ Run `cargo install --path ./taxel-cli` again to update to the latest ver
 1. Run taxel:
 
     ``` bash
+    # Extract values from xml file
+    taxel extract \
+        --xml-file "my_ebilanz.xml" \
+        --output-file "my_ebilanz.csv"
+
     # Generate xml file from csv file
     taxel generate \
          --csv-file "my_ebilanz.csv" \
