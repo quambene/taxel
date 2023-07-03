@@ -12,7 +12,7 @@ use std::str;
 
 /// A simple tree structure to store the xml file.
 #[derive(Debug, PartialEq)]
-struct XbrlElement {
+pub struct XbrlElement {
     name: String,
     value: Option<String>,
     attributes: Vec<XbrlAttribute>,
@@ -21,7 +21,7 @@ struct XbrlElement {
 }
 
 #[derive(Debug, PartialEq)]
-enum XmlType {
+pub enum XmlType {
     Plain,
     Xbrl,
     Taxonomy(Taxonomy),
@@ -39,7 +39,7 @@ impl XmlType {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-struct XbrlAttribute {
+pub struct XbrlAttribute {
     key: String,
     value: String,
 }
@@ -110,7 +110,7 @@ impl XbrlElement {
         Ok(root_element)
     }
 
-    /// Deserialize `XbrlElement`s recursively.
+    /// Deserialize `XbrlElement` recursively.
     fn deserialize<R>(
         reader: &mut Reader<R>,
         mut element: XbrlElement,
@@ -164,6 +164,7 @@ impl XbrlElement {
         }
     }
 
+    /// Serialize `XbrlElement` recursively.
     pub fn serialize<W>(&self, writer: &mut Writer<W>) -> Result<(), anyhow::Error>
     where
         W: std::io::Write,
@@ -242,6 +243,7 @@ impl XbrlElement {
         Ok(attributes)
     }
 
+    /// Remove all values from `XbrlElement` recursively.
     pub fn remove_values(&mut self) {
         self.value = None;
 
@@ -265,6 +267,7 @@ impl XbrlElement {
         }
     }
 
+    /// Add given values to `XbrlElement` recursively.
     pub fn add_values(&mut self, target_tags: &TargetTags) {
         if let Some(value) = target_tags.get(&self.name) {
             self.value = value.to_owned();

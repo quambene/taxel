@@ -8,7 +8,7 @@ use std::{
     io::BufReader,
     path::{Path, PathBuf},
 };
-use taxel_xml::{CsvReaderBuilder, Reader, Trim, Writer};
+use taxel_xml::{CsvReaderBuilder, Reader, Trim, Writer, XbrlElement};
 
 pub fn generate_args() -> [Arg<'static>; 3] {
     [arg::csv_file(), arg::template_file(), arg::output_file()]
@@ -62,11 +62,10 @@ pub fn generate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
 
     let target_tags = taxel_xml::read_target_tags(csv_reader.as_mut())?;
 
-    // Clear all tags
-    taxel_xml::remove_tag_values(&mut xml_reader, &mut xml_writer)?;
-
-    // Update all tags
-    taxel_xml::update_tag_values(target_tags, &mut xml_reader, &mut xml_writer)?;
+    let mut element = XbrlElement::parse(&mut xml_reader)?;
+    element.remove_values();
+    element.add_values(&target_tags);
+    element.serialize(&mut xml_writer)?;
 
     // Flush the output XML writer and finalize the file
     xml_writer.into_inner().sync_all()?;

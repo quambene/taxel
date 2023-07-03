@@ -19,6 +19,7 @@ use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fmt};
 pub use update_tag_values::update_tag_values;
 pub use write_tags::write_tags;
+pub use xbrl::XbrlElement;
 #[cfg(test)]
 use xml::tests;
 
@@ -47,7 +48,7 @@ const DECIMALS_2: Attribute = Attribute {
 
 #[derive(Debug, PartialEq, Clone)]
 /// A struct representing the supported taxonomies.
-enum Taxonomy {
+pub enum Taxonomy {
     /// The Global Common Document (GCD) financial reporting taxonomy.
     Gcd,
     /// The Generally Accepted Accounting Principles (GAAP) - current/invested
