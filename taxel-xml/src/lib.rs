@@ -1,6 +1,6 @@
 mod csv;
 mod extract_tag_values;
-mod read_tags_ods;
+mod ods;
 mod xbrl;
 mod xml;
 
