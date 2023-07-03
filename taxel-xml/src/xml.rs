@@ -131,6 +131,7 @@ pub fn remove_formatting(xml: &str) -> Result<String, anyhow::Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::Tag;
 
     fn test_extract_tag_values(xml: &str, expected_tags: Vec<Tag>) {
         let mut reader = Reader::from_str(xml);

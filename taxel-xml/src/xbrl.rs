@@ -1,4 +1,4 @@
-use crate::{TargetTags, Taxonomy, DECIMALS_2, NIL_ATTRIBUTE};
+use crate::TargetTags;
 use anyhow::anyhow;
 use quick_xml::{
     events::{
@@ -7,8 +7,8 @@ use quick_xml::{
     },
     Reader, Writer,
 };
-use std::io::BufRead;
 use std::str;
+use std::{fmt, io::BufRead};
 
 /// A simple tree structure to store the xml file.
 #[derive(Debug, PartialEq)]
@@ -39,6 +39,36 @@ impl XmlType {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+/// A struct representing the supported taxonomies.
+pub enum Taxonomy {
+    /// The Global Common Document (GCD) financial reporting taxonomy.
+    Gcd,
+    /// The Generally Accepted Accounting Principles (GAAP) - current/invested
+    /// (CI) - financial reporting taxonomy.
+    GaapCi,
+}
+
+impl Taxonomy {
+    fn as_str(&self) -> &str {
+        match self {
+            Self::Gcd => "gcd",
+            Self::GaapCi => "gaap-ci",
+        }
+    }
+}
+
+impl fmt::Display for Taxonomy {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let taxonomy = match self {
+            Self::Gcd => "gcd",
+            Self::GaapCi => "gaap-ci",
+        };
+
+        write!(f, "{}", taxonomy)
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct XbrlAttribute {
     key: String,
     value: String,
@@ -51,6 +81,21 @@ impl XbrlAttribute {
             value: value.into(),
         }
     }
+}
+
+const NIL_ATTRIBUTE: XbrlAttributeBorrowed = XbrlAttributeBorrowed {
+    key: "xsi:nil",
+    value: "true",
+};
+
+const DECIMALS_2: XbrlAttributeBorrowed = XbrlAttributeBorrowed {
+    key: "decimals",
+    value: "2",
+};
+
+struct XbrlAttributeBorrowed<'a> {
+    key: &'a str,
+    value: &'a str,
 }
 
 impl XbrlElement {

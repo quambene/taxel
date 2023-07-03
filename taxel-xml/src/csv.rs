@@ -1,6 +1,22 @@
-use crate::{CsvRow, Tag, TargetTags};
 pub use csv::{Reader, ReaderBuilder, Trim, Writer, WriterBuilder};
 use log::{debug, info};
+use serde::{Deserialize, Serialize};
+
+use crate::{Tag, TargetTags};
+
+#[derive(Debug, Serialize, Deserialize)]
+struct CsvRow {
+    #[serde(rename = "ebilanz_key")]
+    key: String,
+    #[serde(rename = "ebilanz_value")]
+    value: Option<String>,
+}
+
+impl CsvRow {
+    pub fn new(key: String, value: Option<String>) -> Self {
+        Self { key, value }
+    }
+}
 
 /// Read target tags from a csv file.
 ///
