@@ -1,4 +1,4 @@
-use crate::{Taxonomy, DECIMALS_2, NIL_ATTRIBUTE};
+use crate::{TargetTags, Taxonomy, DECIMALS_2, NIL_ATTRIBUTE};
 use anyhow::anyhow;
 use quick_xml::{
     events::{
@@ -265,29 +265,29 @@ impl XbrlElement {
         }
     }
 
-    fn remove_attributes<'a>(tag: &BytesStart<'a>) -> Result<BytesStart<'a>, anyhow::Error> {
-        let attributes = tag.attributes();
+    pub fn add_values(&mut self, target_tags: &TargetTags) {
+        if let Some(value) = target_tags.get(&self.name) {
+            self.value = value.to_owned();
 
-        let mut updated_attributes = vec![];
+            if self.xml_type == XmlType::Taxonomy(Taxonomy::GaapCi) {
+                // Remove `xsi:nil` attribute
+                if let Some(index) = self
+                    .attributes
+                    .iter()
+                    .position(|attribute| attribute.key == NIL_ATTRIBUTE.key)
+                {
+                    self.attributes.remove(index);
+                }
 
-        for attribute in attributes {
-            let attribute = attribute?;
-
-            if attribute.key.as_ref() != NIL_ATTRIBUTE.key.as_bytes() {
-                updated_attributes.push(attribute);
+                // Add `decimals` attribute
+                self.attributes
+                    .push(XbrlAttribute::new(DECIMALS_2.key, DECIMALS_2.value))
             }
         }
 
-        updated_attributes.push(Attribute::from((
-            DECIMALS_2.key.as_bytes(),
-            DECIMALS_2.value.as_bytes(),
-        )));
-
-        let mut updated_tag = tag.clone();
-        updated_tag.clear_attributes();
-        let updated_tag = updated_tag.with_attributes(updated_attributes);
-
-        Ok(updated_tag)
+        for child in &mut self.children {
+            child.add_values(target_tags);
+        }
     }
 }
 
@@ -295,6 +295,169 @@ impl XbrlElement {
 mod tests {
     use super::*;
     use std::io::Cursor;
+
+    #[test]
+    fn test_add_values() {
+        let mut element = XbrlElement::new(
+            "root",
+            None,
+            vec![],
+            XmlType::Plain,
+            vec![XbrlElement::new(
+                "tag",
+                Some(String::from("value")),
+                vec![],
+                XmlType::Plain,
+                vec![],
+            )],
+        );
+        let mut target_tags = TargetTags::new();
+        target_tags.insert("tag", Some("updated value"));
+
+        element.add_values(&target_tags);
+
+        assert_eq!(
+            element,
+            XbrlElement::new(
+                "root",
+                None,
+                vec![],
+                XmlType::Plain,
+                vec![XbrlElement::new(
+                    "tag",
+                    Some(String::from("updated value")),
+                    vec![],
+                    XmlType::Plain,
+                    vec![]
+                )]
+            )
+        );
+    }
+
+    #[test]
+    fn test_add_values_empy() {
+        let mut element = XbrlElement::new(
+            "root",
+            None,
+            vec![],
+            XmlType::Plain,
+            vec![XbrlElement::new(
+                "tag",
+                None,
+                vec![],
+                XmlType::Plain,
+                vec![],
+            )],
+        );
+        let mut target_tags = TargetTags::new();
+        target_tags.insert("tag", Some("updated value"));
+
+        element.add_values(&target_tags);
+
+        assert_eq!(
+            element,
+            XbrlElement::new(
+                "root",
+                None,
+                vec![],
+                XmlType::Plain,
+                vec![XbrlElement::new(
+                    "tag",
+                    Some(String::from("updated value")),
+                    vec![],
+                    XmlType::Plain,
+                    vec![]
+                )]
+            )
+        );
+    }
+
+    #[test]
+    fn test_add_values_xbrl_gcd() {
+        let mut element = XbrlElement::new(
+            "xbrli:xbrl",
+            None,
+            vec![],
+            XmlType::Xbrl,
+            vec![XbrlElement::new(
+                "de-gcd:genInfo.report.audit.city",
+                None,
+                vec![XbrlAttribute::new("contextRef", "D-AKTJAHR")],
+                XmlType::Taxonomy(Taxonomy::Gcd),
+                vec![],
+            )],
+        );
+        let mut target_tags = TargetTags::new();
+        target_tags.insert("de-gcd:genInfo.report.audit.city", Some("Berlin"));
+
+        element.add_values(&target_tags);
+
+        assert_eq!(
+            element,
+            XbrlElement::new(
+                "xbrli:xbrl",
+                None,
+                vec![],
+                XmlType::Xbrl,
+                vec![XbrlElement::new(
+                    "de-gcd:genInfo.report.audit.city",
+                    Some(String::from("Berlin")),
+                    vec![XbrlAttribute::new("contextRef", "D-AKTJAHR")],
+                    XmlType::Taxonomy(Taxonomy::Gcd),
+                    vec![],
+                )]
+            )
+        );
+    }
+
+    #[test]
+    fn test_add_values_xbrl_gaap() {
+        let mut element = XbrlElement::new(
+            "xbrli:xbrl",
+            None,
+            vec![],
+            XmlType::Xbrl,
+            vec![XbrlElement::new(
+                "de-gaap-ci:is.netIncome.regular.operatingTC.otherCost.marketing",
+                None,
+                vec![
+                    XbrlAttribute::new("contextRef", "D-AKTJAHR"),
+                    XbrlAttribute::new("unitRef", "EUR"),
+                    XbrlAttribute::new("xsi:nil", "true"),
+                ],
+                XmlType::Taxonomy(Taxonomy::GaapCi),
+                vec![],
+            )],
+        );
+        let mut target_tags = TargetTags::new();
+        target_tags.insert(
+            "de-gaap-ci:is.netIncome.regular.operatingTC.otherCost.marketing",
+            Some("550.50"),
+        );
+
+        element.add_values(&target_tags);
+
+        assert_eq!(
+            element,
+            XbrlElement::new(
+                "xbrli:xbrl",
+                None,
+                vec![],
+                XmlType::Xbrl,
+                vec![XbrlElement::new(
+                    "de-gaap-ci:is.netIncome.regular.operatingTC.otherCost.marketing",
+                    Some(String::from("550.50")),
+                    vec![
+                        XbrlAttribute::new("contextRef", "D-AKTJAHR"),
+                        XbrlAttribute::new("unitRef", "EUR"),
+                        XbrlAttribute::new("decimals", "2"),
+                    ],
+                    XmlType::Taxonomy(Taxonomy::GaapCi),
+                    vec![]
+                )]
+            )
+        );
+    }
 
     #[test]
     fn test_remove_values() {
