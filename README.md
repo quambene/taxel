@@ -14,6 +14,7 @@ Supported features:
 - [Requirements](#requirements)
 - [Install Taxel](#install-taxel)
 - [Usage](#usage)
+- [Testing](#testing)
 - [Rust bindings for the ELSTER Rich Client (ERiC)](#rust-bindings-for-the-elster-rich-client-eric)
   - [Generate bindings](#generate-bindings)
   - [Test bindings](#test-bindings)
