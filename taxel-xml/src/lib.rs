@@ -1,8 +1,6 @@
 mod extract_tag_values;
 mod read_tags;
 mod read_tags_ods;
-mod remove_tag_values;
-mod update_tag_values;
 mod write_tags;
 mod xbrl;
 mod xml;
@@ -14,17 +12,12 @@ pub use extract_tag_values::extract_tag_values;
 use log::warn;
 pub use quick_xml::{Reader, Writer};
 pub use read_tags::read_target_tags;
-pub use remove_tag_values::remove_tag_values;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fmt};
-pub use update_tag_values::update_tag_values;
 pub use write_tags::write_tags;
 pub use xbrl::XbrlElement;
 #[cfg(test)]
 use xml::tests;
-
-const XBRL_ATTRIBUTE: &str = "xbrli:xbrl";
-const DECIMAL_ATTRIBUTE: &str = "decimals";
 
 struct Attribute<'a> {
     key: &'a str,
@@ -34,11 +27,6 @@ struct Attribute<'a> {
 const NIL_ATTRIBUTE: Attribute = Attribute {
     key: "xsi:nil",
     value: "true",
-};
-
-const DECIMALS_0: Attribute = Attribute {
-    key: "decimals",
-    value: "0",
 };
 
 const DECIMALS_2: Attribute = Attribute {
@@ -74,14 +62,6 @@ impl fmt::Display for Taxonomy {
 
         write!(f, "{}", taxonomy)
     }
-}
-
-#[derive(Debug, PartialEq)]
-enum XmlMode {
-    /// A plain xml file.
-    Plain,
-    /// An xml in the xbrl standard.
-    Xbrl,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
