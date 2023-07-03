@@ -16,8 +16,7 @@ use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fmt};
 pub use write_tags::write_tags;
 pub use xbrl::XbrlElement;
-#[cfg(test)]
-use xml::tests;
+pub use xml::remove_formatting;
 
 struct Attribute<'a> {
     key: &'a str,
