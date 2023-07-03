@@ -7,8 +7,7 @@ use quick_xml::{
     },
     Reader, Writer,
 };
-use std::str;
-use std::{fmt, io::BufRead};
+use std::{fmt, io::BufRead, str};
 
 /// A simple tree structure to store the xml file.
 #[derive(Debug, PartialEq)]

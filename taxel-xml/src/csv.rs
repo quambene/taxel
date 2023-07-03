@@ -1,8 +1,7 @@
+use crate::{Tag, TargetTags};
 pub use csv::{Reader, ReaderBuilder, Trim, Writer, WriterBuilder};
 use log::{debug, info};
 use serde::{Deserialize, Serialize};
-
-use crate::{Tag, TargetTags};
 
 #[derive(Debug, Serialize, Deserialize)]
 struct CsvRow {

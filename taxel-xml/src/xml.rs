@@ -1,13 +1,11 @@
 use crate::Tag;
 use ::std::str;
-use log::error;
-use log::{debug, info};
+use log::{debug, error, info};
 use quick_xml::{
     events::{BytesDecl, Event},
     Reader, Writer,
 };
-use std::io::BufRead;
-use std::io::Cursor;
+use std::io::{BufRead, Cursor};
 
 /// Extract tag values from an xml file.
 pub fn extract_tag_values<R>(reader: &mut Reader<R>) -> Result<Vec<Tag>, anyhow::Error>
