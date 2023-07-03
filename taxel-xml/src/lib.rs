@@ -11,8 +11,7 @@ use log::warn;
 pub use quick_xml::{Reader, Writer};
 use std::collections::HashMap;
 pub use xbrl::XbrlElement;
-pub use xml::extract_tag_values;
-pub use xml::remove_formatting;
+pub use xml::{extract_tag_values, remove_formatting, write_declaration};
 
 #[derive(Debug, PartialEq)]
 pub struct Tag {

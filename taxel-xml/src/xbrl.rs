@@ -121,8 +121,6 @@ impl XbrlElement {
     where
         R: std::io::Read + BufRead,
     {
-        // TODO: Handle xml declaration
-
         let mut buf = Vec::new();
         let mut root_element = None;
 
@@ -278,10 +276,9 @@ impl XbrlElement {
 
         for attribute in xml_attributes {
             let attribute = attribute?;
-            let attribute = XbrlAttribute::new(
-                str::from_utf8(attribute.key.as_ref())?,
-                str::from_utf8(attribute.value.as_ref())?,
-            );
+            let attribute_key = str::from_utf8(attribute.key.as_ref())?;
+            let attribute_value = str::from_utf8(attribute.value.as_ref())?;
+            let attribute = XbrlAttribute::new(attribute_key, attribute_value);
             attributes.push(attribute);
         }
 
