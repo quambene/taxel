@@ -1,11 +1,11 @@
-use crate::{CsvRow, TargetTags};
-use csv::Reader;
+use crate::{CsvRow, Tag, TargetTags};
+pub use csv::{Reader, ReaderBuilder, Trim, Writer, WriterBuilder};
 use log::{debug, info};
 
 /// Read target tags from a csv file.
 ///
 /// If no csv file is given, use empty target tags.
-pub fn read_target_tags<R>(reader: Option<&mut Reader<R>>) -> Result<TargetTags, anyhow::Error>
+pub fn read_tags<R>(reader: Option<&mut Reader<R>>) -> Result<TargetTags, anyhow::Error>
 where
     R: std::io::Read,
 {
@@ -25,6 +25,23 @@ where
     debug!("Target tags read: {target_tags:#?}");
 
     Ok(target_tags)
+}
+
+/// Write target tags to a csv file.
+pub fn write_tags<W>(writer: &mut Writer<W>, extracted_tags: Vec<Tag>) -> Result<(), anyhow::Error>
+where
+    W: std::io::Write,
+{
+    info!("Write tags to csv file");
+
+    for tag in extracted_tags {
+        let row = CsvRow::new(tag.name, tag.value);
+        writer.serialize(row)?;
+    }
+
+    writer.flush()?;
+
+    Ok(())
 }
 
 #[cfg(test)]
@@ -49,7 +66,7 @@ mod tests {
             .trim(Trim::All)
             .from_reader(data.as_bytes());
 
-        let res = read_target_tags(Some(&mut reader));
+        let res = read_tags(Some(&mut reader));
         assert!(res.is_ok(), "Can't read target tags: {}", res.unwrap_err());
 
         let target_tags = res.unwrap();

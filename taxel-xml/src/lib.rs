@@ -1,20 +1,18 @@
+mod csv;
 mod extract_tag_values;
-mod read_tags;
 mod read_tags_ods;
-mod write_tags;
 mod xbrl;
 mod xml;
 
-pub use csv::{
-    Reader as CsvReader, ReaderBuilder as CsvReaderBuilder, Trim, WriterBuilder as CsvWriterBuilder,
+pub use crate::csv::{
+    read_tags, write_tags, Reader as CsvReader, ReaderBuilder as CsvReaderBuilder, Trim,
+    Writer as CsvWriter, WriterBuilder as CsvWriterBuilder,
 };
 pub use extract_tag_values::extract_tag_values;
 use log::warn;
 pub use quick_xml::{Reader, Writer};
-pub use read_tags::read_target_tags;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fmt};
-pub use write_tags::write_tags;
 pub use xbrl::XbrlElement;
 pub use xml::remove_formatting;
 

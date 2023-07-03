@@ -60,7 +60,7 @@ pub fn generate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let output_file = File::create(output_path)?;
     let mut xml_writer = Writer::new(output_file);
 
-    let target_tags = taxel_xml::read_target_tags(csv_reader.as_mut())?;
+    let target_tags = taxel_xml::read_tags(csv_reader.as_mut())?;
 
     update_values(target_tags, &mut xml_reader, &mut xml_writer)?;
 
