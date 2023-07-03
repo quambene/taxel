@@ -53,12 +53,13 @@ mod tests {
     use crate::{app, cmd};
 
     #[test]
+    #[cfg_attr(not(feature = "integration-test"), ignore)]
     fn test_validate() {
         let args = vec![
             cmd::BIN,
             cmd::VALIDATE,
             "--xml-file",
-            "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
+            "../test_data/ebilanz/taxonomy_v6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
         ];
 
         let app = app();
@@ -73,12 +74,13 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(not(feature = "integration-test"), ignore)]
     fn test_validate_and_print() {
         let args = vec![
             cmd::BIN,
             cmd::VALIDATE,
             "--xml-file",
-            "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
+            "../test_data/ebilanz/taxonomy_v6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
             "--print",
             "ebilanz.pdf",
         ];

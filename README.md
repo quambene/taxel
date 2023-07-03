@@ -128,17 +128,20 @@ cargo test -p taxel -- --test-threads=1
 # Run integration tests for taxel
 cargo test -p taxel --test '*' --features integration-test -- --test-threads=1
 
-# Run unit tests for taxel in release mode
-cargo test -p taxel --release -- --test-threads=1
+# Run integration tests for taxel in release mode
+cargo test -p taxel --release --test '*' --features integration-test -- --test-threads=1
 
 # Run unit tests for taxel-cli
-cargo test -p taxel-cli -- --test-threads=1
+cargo test -p taxel-cli
 
-# Run unit tests for taxel-cli in release mode
-cargo test -p taxel-cli --release -- --test-threads=1
+# Run unit tests for taxel-cli
+cargo test -p taxel-cli
 
 # Run integration tests for taxel-cli
-cargo test -p taxel-clie --test '*' --features integration-test -- --test-threads=1
+cargo test -p taxel-cli --test '*' --features integration-test -- --test-threads=1
+
+# Run integration tests for taxel-cli in release mode
+cargo test -p taxel-cli --release --test '*' --features integration-test -- --test-threads=1
 
 # Run unit tests for taxel-xml
 cargo test -p taxel-xml
