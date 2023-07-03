@@ -1,0 +1,18 @@
+[package]
+name = "taxel-xml"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+
+[lib]
+path = "src/lib.rs"
+name = "taxel_xml"
+
+[dependencies]
+anyhow = { workspace = true }
+log = { workspace = true }
+env_logger = { workspace = true }
+serde = { version = "1.0.164", features = ["derive"]}
+quick-xml = "0.29.0"
+csv = "1.2.2"
+spreadsheet-ods = "0.15.0"

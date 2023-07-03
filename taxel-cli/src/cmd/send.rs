@@ -1,8 +1,12 @@
+//! Validate xml file according to the given taxonomy and send xml file to the
+//! tax authorities.
+
 use crate::arg;
 use clap::{Arg, ArgMatches};
+use std::{env::current_dir, path::PathBuf};
 use taxel::{CertificateConfig, Eric, PrintConfig, ProcessingFlag};
 
-pub fn send_args() -> [Arg<'static>; 6] {
+pub fn send_args() -> [Arg<'static>; 7] {
     [
         arg::tax_type(),
         arg::tax_version(),
@@ -10,6 +14,7 @@ pub fn send_args() -> [Arg<'static>; 6] {
         arg::certificate_file(),
         arg::password(),
         arg::print(),
+        arg::log_dir(),
     ]
 }
 
@@ -19,10 +24,15 @@ pub fn send(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let tax_version = arg::get_one(matches, arg::TAX_VERSION)?;
     let certificate_file = arg::get_one(matches, arg::CERTIFICATE_FILE)?;
     let password = arg::get_one(matches, arg::PASSWORD)?;
+    let log_dir = arg::get_maybe_one(matches, arg::LOG_DIR);
     let type_version = format!("{}_{}", tax_type, tax_version);
     let processing_flag: ProcessingFlag;
+    let log_path = match log_dir {
+        Some(log_dir) => PathBuf::from(log_dir),
+        None => current_dir()?,
+    };
 
-    let eric = Eric::new()?;
+    let eric = Eric::new(&log_path)?;
 
     let certificate_config = CertificateConfig::new(certificate_file, password)?;
 
@@ -45,7 +55,7 @@ pub fn send(matches: &ArgMatches) -> Result<(), anyhow::Error> {
         print_config,
     )?;
 
-    eric.log(&response)?;
+    eric.log(&log_path, &response)?;
 
     Ok(())
 }
@@ -56,12 +66,13 @@ mod tests {
     use crate::{app, cmd};
 
     #[test]
+    #[cfg_attr(not(feature = "integration-test"), ignore)]
     fn test_send() {
         let args = vec![
             cmd::BIN,
             cmd::SEND,
             "--xml-file",
-            "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
+            "../test_data/ebilanz/taxonomy_v6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
             "--certificate-file",
             "../test_data/test-certificate.pfx",
             "--password",
@@ -73,19 +84,20 @@ mod tests {
         let subcommand_matches = matches.subcommand_matches(cmd::SEND).unwrap();
         println!("subcommand matches: {:#?}", subcommand_matches);
 
-        let res = send(&subcommand_matches);
+        let res = send(subcommand_matches);
         println!("res: {:#?}", res);
 
         assert!(res.is_ok())
     }
 
     #[test]
+    #[cfg_attr(not(feature = "integration-test"), ignore)]
     fn test_send_and_print() {
         let args = vec![
             cmd::BIN,
             cmd::SEND,
             "--xml-file",
-            "../test_data/Bilanz_6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
+            "../test_data/ebilanz/taxonomy_v6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
             "--certificate-file",
             "../test_data/test-certificate.pfx",
             "--password",
@@ -99,7 +111,7 @@ mod tests {
         let subcommand_matches = matches.subcommand_matches(cmd::SEND).unwrap();
         println!("subcommand matches: {:#?}", subcommand_matches);
 
-        let res = send(&subcommand_matches);
+        let res = send(subcommand_matches);
         println!("res: {:#?}", res);
 
         assert!(res.is_ok())

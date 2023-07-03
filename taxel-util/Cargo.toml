@@ -1,12 +1,12 @@
 [package]
 name = "taxel-util"
 version = "0.1.0"
-authors = ["quambene <contact.quambene@gmail.com>"]
-edition = "2021"
+authors.workspace = true
+edition.workspace = true
 
 [lib]
 path = "src/lib.rs"
 name = "taxel_util"
 
 [dependencies]
-anyhow = "1.0.58"
+anyhow = { workspace = true }
