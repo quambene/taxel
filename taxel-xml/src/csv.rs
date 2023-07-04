@@ -1,4 +1,4 @@
-use crate::{Tag, TargetTags};
+use crate::{Tag, Tags};
 pub use csv::{Reader, ReaderBuilder, Trim, Writer, WriterBuilder};
 use log::{debug, info};
 use serde::{Deserialize, Serialize};
@@ -20,13 +20,13 @@ impl CsvRow {
 /// Read target tags from a csv file.
 ///
 /// If no csv file is given, use empty target tags.
-pub fn read_tags<R>(reader: Option<&mut Reader<R>>) -> Result<TargetTags, anyhow::Error>
+pub fn read_tags<R>(reader: Option<&mut Reader<R>>) -> Result<Tags, anyhow::Error>
 where
     R: std::io::Read,
 {
     info!("Read target tags");
 
-    let mut target_tags = TargetTags::new();
+    let mut target_tags = Tags::new();
 
     if let Some(reader) = reader {
         let records = reader.deserialize();
@@ -87,7 +87,7 @@ mod tests {
         let target_tags = res.unwrap();
         assert_eq!(
             target_tags,
-            TargetTags(HashMap::from_iter(vec![
+            Tags(HashMap::from_iter(vec![
                 (String::from("Empfaenger"), Some(String::from("1111"))),
                 (
                     String::from("ebilanz:stichtag"),

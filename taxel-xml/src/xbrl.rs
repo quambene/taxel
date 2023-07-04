@@ -1,4 +1,4 @@
-use crate::TargetTags;
+use crate::Tags;
 use anyhow::anyhow;
 use quick_xml::{
     events::{
@@ -279,7 +279,7 @@ impl XbrlElement {
     }
 
     /// Add given values to `XbrlElement` recursively.
-    pub fn add_values(&mut self, target_tags: &TargetTags) {
+    pub fn add_values(&mut self, target_tags: &Tags) {
         if let Some(value) = target_tags.get(&self.name) {
             self.value = value.to_owned();
 
@@ -371,7 +371,7 @@ mod tests {
                 vec![],
             )],
         );
-        let mut target_tags = TargetTags::new();
+        let mut target_tags = Tags::new();
         target_tags.insert("tag", Some("updated value"));
 
         element.add_values(&target_tags);
@@ -409,7 +409,7 @@ mod tests {
                 vec![],
             )],
         );
-        let mut target_tags = TargetTags::new();
+        let mut target_tags = Tags::new();
         target_tags.insert("tag", Some("updated value"));
 
         element.add_values(&target_tags);
@@ -447,7 +447,7 @@ mod tests {
                 vec![],
             )],
         );
-        let mut target_tags = TargetTags::new();
+        let mut target_tags = Tags::new();
         target_tags.insert("de-gcd:genInfo.report.audit.city", Some("Berlin"));
 
         element.add_values(&target_tags);
@@ -489,7 +489,7 @@ mod tests {
                 vec![],
             )],
         );
-        let mut target_tags = TargetTags::new();
+        let mut target_tags = Tags::new();
         target_tags.insert(
             "de-gaap-ci:is.netIncome.regular.operatingTC.otherCost.marketing",
             Some("550.50"),

@@ -29,15 +29,15 @@ impl Tag {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct TargetTags(HashMap<String, Option<String>>);
+pub struct Tags(HashMap<String, Option<String>>);
 
-impl Default for TargetTags {
+impl Default for Tags {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl TargetTags {
+impl Tags {
     pub fn new() -> Self {
         Self(HashMap::new())
     }
