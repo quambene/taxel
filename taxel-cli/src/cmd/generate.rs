@@ -8,7 +8,7 @@ use std::{
     io::{BufRead, BufReader},
     path::{Path, PathBuf},
 };
-use taxel_xml::{CsvReaderBuilder, Reader, TargetTags, Trim, Writer, XbrlElement};
+use taxel_xml::{CsvReaderBuilder, Reader, Tags, Trim, Writer, XbrlElement};
 
 pub fn generate_args() -> [Arg<'static>; 3] {
     [arg::csv_file(), arg::template_file(), arg::output_file()]
@@ -72,7 +72,7 @@ pub fn generate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
 
 /// Update values for xbrl tags.
 pub fn update_values<R, W>(
-    mut target_tags: TargetTags,
+    mut target_tags: Tags,
     xml_reader: &mut Reader<R>,
     xml_writer: &mut Writer<W>,
 ) -> Result<(), anyhow::Error>
@@ -94,10 +94,10 @@ where
 mod tests {
     use super::*;
     use std::io::Cursor;
-    use taxel_xml::{remove_formatting, TargetTags};
+    use taxel_xml::{remove_formatting, Tags};
 
     // Helper function to test updated tags.
-    fn test_update_target_tags(xml: &str, expected_xml: &str, target_tags: TargetTags) {
+    fn test_update_target_tags(xml: &str, expected_xml: &str, target_tags: Tags) {
         let mut reader = Reader::from_str(xml);
         reader.trim_text(true);
         let mut writer = Writer::new(Cursor::new(Vec::new()));
@@ -183,7 +183,7 @@ mod tests {
                 </DatenTeil>
             </Elster>"#;
 
-        let mut target_tags = TargetTags::new();
+        let mut target_tags = Tags::new();
         target_tags.insert("Testmerker", Some("700000004"));
         target_tags.insert("NutzdatenTicket", Some("0001"));
         target_tags.insert("Empfaenger", Some("9999"));
@@ -235,7 +235,7 @@ mod tests {
                 </xbrli:context>
             </xbrli:xbrl>"#;
 
-        let mut target_tags = TargetTags::new();
+        let mut target_tags = Tags::new();
         target_tags.insert("xbrli:identifier", Some("9999999999999"));
         target_tags.insert("xbrli:instant", Some("2020-12-31"));
 
