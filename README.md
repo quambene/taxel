@@ -2,6 +2,11 @@
 
 Taxel provides a command line interface (CLI) and Rust bindings for the ELSTER Rich Client (ERiC).
 
+![Taxel mockup](/mockup.png)
+
+Generate XML file in the XBRL standard from a CSV file with tax and accounting
+data; validate and send XBRL document to tax authorities.
+
 Supported features:
 
 - [x] eBilanz
