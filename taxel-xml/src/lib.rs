@@ -59,4 +59,17 @@ impl TargetTags {
             warn!("Duplicate key '{key}'");
         }
     }
+
+    /// Add required target tags for processing eBilanz.
+    pub fn add_required_tags(&mut self) {
+        self.insert("Verfahren", Some("ElsterBilanz"));
+        self.insert("DatenArt", Some("Bilanz"));
+        self.insert("Vorgang", Some("send-Auth"));
+        self.insert("HerstellerID", Some("21694"));
+        self.insert("Kompression", Some("GZIP"));
+        self.insert("Verschluesselung", Some("CMSEncryptedData"));
+        self.insert("VersionClient", Some("1"));
+        self.insert("ProduktName", Some("Taxel"));
+        self.insert("ProduktVersion", Some("0.1.0"));
+    }
 }

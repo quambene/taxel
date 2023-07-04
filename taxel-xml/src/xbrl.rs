@@ -212,10 +212,12 @@ impl XbrlElement {
         W: std::io::Write,
     {
         let mut attributes = vec![];
+
         for attribute in &self.attributes {
             let attribute = Attribute::from((attribute.key.as_bytes(), attribute.value.as_bytes()));
             attributes.push(attribute);
         }
+
         let start_tag = BytesStart::new(&self.name).with_attributes(attributes);
         let end_tag = BytesEnd::new(&self.name);
 
@@ -243,45 +245,6 @@ impl XbrlElement {
         }
 
         Ok(())
-    }
-
-    fn convert_tag(tag: BytesStart) -> Result<XbrlElement, anyhow::Error> {
-        let tag_name = tag.name();
-        let name = str::from_utf8(tag_name.as_ref())?;
-        let value = None;
-        let attributes = Self::convert_attributes(tag.attributes())?;
-        let xml_type = Self::get_xml_type(name);
-        let children = vec![];
-
-        Ok(XbrlElement::new(
-            name, value, attributes, xml_type, children,
-        ))
-    }
-
-    fn get_xml_type(name: &str) -> XmlType {
-        if name.contains(XmlType::Xbrl.as_str()) {
-            XmlType::Xbrl
-        } else if name.contains(Taxonomy::Gcd.as_str()) {
-            XmlType::Taxonomy(Taxonomy::Gcd)
-        } else if name.contains(Taxonomy::GaapCi.as_str()) {
-            XmlType::Taxonomy(Taxonomy::GaapCi)
-        } else {
-            XmlType::Plain
-        }
-    }
-
-    fn convert_attributes(xml_attributes: Attributes) -> Result<Vec<XbrlAttribute>, anyhow::Error> {
-        let mut attributes = vec![];
-
-        for attribute in xml_attributes {
-            let attribute = attribute?;
-            let attribute_key = str::from_utf8(attribute.key.as_ref())?;
-            let attribute_value = str::from_utf8(attribute.value.as_ref())?;
-            let attribute = XbrlAttribute::new(attribute_key, attribute_value);
-            attributes.push(attribute);
-        }
-
-        Ok(attributes)
     }
 
     /// Remove all values from `XbrlElement` recursively.
@@ -346,6 +309,45 @@ impl XbrlElement {
         for child in &mut self.children {
             child.add_values(target_tags);
         }
+    }
+
+    fn convert_tag(tag: BytesStart) -> Result<XbrlElement, anyhow::Error> {
+        let tag_name = tag.name();
+        let name = str::from_utf8(tag_name.as_ref())?;
+        let value = None;
+        let attributes = Self::convert_attributes(tag.attributes())?;
+        let xml_type = Self::get_xml_type(name);
+        let children = vec![];
+
+        Ok(XbrlElement::new(
+            name, value, attributes, xml_type, children,
+        ))
+    }
+
+    fn get_xml_type(name: &str) -> XmlType {
+        if name.contains(XmlType::Xbrl.as_str()) {
+            XmlType::Xbrl
+        } else if name.contains(Taxonomy::Gcd.as_str()) {
+            XmlType::Taxonomy(Taxonomy::Gcd)
+        } else if name.contains(Taxonomy::GaapCi.as_str()) {
+            XmlType::Taxonomy(Taxonomy::GaapCi)
+        } else {
+            XmlType::Plain
+        }
+    }
+
+    fn convert_attributes(xml_attributes: Attributes) -> Result<Vec<XbrlAttribute>, anyhow::Error> {
+        let mut attributes = vec![];
+
+        for attribute in xml_attributes {
+            let attribute = attribute?;
+            let attribute_key = str::from_utf8(attribute.key.as_ref())?;
+            let attribute_value = str::from_utf8(attribute.value.as_ref())?;
+            let attribute = XbrlAttribute::new(attribute_key, attribute_value);
+            attributes.push(attribute);
+        }
+
+        Ok(attributes)
     }
 }
 

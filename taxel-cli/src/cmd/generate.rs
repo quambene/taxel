@@ -80,7 +80,7 @@ where
     R: std::io::Read + BufRead,
     W: std::io::Write,
 {
-    add_required_tags(&mut target_tags);
+    target_tags.add_required_tags();
     let mut element = XbrlElement::parse(xml_reader)?;
     element.remove_values();
     element.add_values(&target_tags);
@@ -88,19 +88,6 @@ where
     element.serialize(xml_writer)?;
 
     Ok(())
-}
-
-/// Add required target tags for processing eBilanz.
-fn add_required_tags<'a>(target_tags: &mut TargetTags) {
-    target_tags.insert("Verfahren", Some("ElsterBilanz"));
-    target_tags.insert("DatenArt", Some("Bilanz"));
-    target_tags.insert("Vorgang", Some("send-Auth"));
-    target_tags.insert("HerstellerID", Some("21694"));
-    target_tags.insert("Kompression", Some("GZIP"));
-    target_tags.insert("Verschluesselung", Some("CMSEncryptedData"));
-    target_tags.insert("VersionClient", Some("1"));
-    target_tags.insert("ProduktName", Some("Taxel"));
-    target_tags.insert("ProduktVersion", Some("0.1.0"));
 }
 
 #[cfg(test)]
