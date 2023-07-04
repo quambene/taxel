@@ -139,9 +139,6 @@ cargo test -p taxel --release --test '*' --features integration-test -- --test-t
 # Run unit tests for taxel-cli
 cargo test -p taxel-cli
 
-# Run unit tests for taxel-cli
-cargo test -p taxel-cli
-
 # Run integration tests for taxel-cli
 cargo test -p taxel-cli --test '*' --features integration-test -- --test-threads=1
 
