@@ -58,7 +58,8 @@ pub fn generate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
 
     // Create a new XML file as output
     let output_file = File::create(output_path)?;
-    let mut xml_writer = Writer::new(output_file);
+    // Format XML file
+    let mut xml_writer = Writer::new_with_indent(output_file, b' ', 4);
 
     let target_tags = taxel_xml::read_tags(csv_reader.as_mut())?;
 
