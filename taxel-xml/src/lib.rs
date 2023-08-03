@@ -83,6 +83,7 @@ impl Tags {
         self.insert("VersionClient", Some("1"));
         self.insert("ProduktName", Some("Taxel"));
         self.insert("ProduktVersion", Some("0.1.0"));
+        self.insert("Testmerker", Some("700000004"));
     }
 
     /// Remove unsupported tags
