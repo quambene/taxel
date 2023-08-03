@@ -81,6 +81,7 @@ where
     W: std::io::Write,
 {
     target_tags.add_required_tags();
+    target_tags.remove_unsupported_tags();
     let mut element = XbrlElement::parse(xml_reader)?;
     element.remove_values();
     element.add_values(&target_tags);

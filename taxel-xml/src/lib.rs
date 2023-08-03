@@ -60,6 +60,18 @@ impl Tags {
         }
     }
 
+    pub fn remove(&mut self, target_key: impl Into<String>) {
+        let key = target_key.into();
+        let entry = self.0.remove(&key);
+
+        if entry.is_some() {
+            warn!(
+                "Key not supported: '{key}', removing value: '{:#?}'",
+                entry.unwrap()
+            );
+        }
+    }
+
     /// Add required target tags for processing eBilanz.
     pub fn add_required_tags(&mut self) {
         self.insert("Verfahren", Some("ElsterBilanz"));
@@ -71,5 +83,22 @@ impl Tags {
         self.insert("VersionClient", Some("1"));
         self.insert("ProduktName", Some("Taxel"));
         self.insert("ProduktVersion", Some("0.1.0"));
+    }
+
+    /// Remove unsupported tags
+    /// TODO: populate content from multiple selection and dropdown fields from CSV to XBRL file
+    pub fn remove_unsupported_tags(&mut self) {
+        // dropdown fields
+        self.remove("de-gcd:genInfo.report.id.reportType.reportType.JA");
+        self.remove("de-gcd:genInfo.report.id.reportStatus.reportStatus.E");
+        self.remove("de-gcd:genInfo.report.id.revisionStatus.revisionStatus.E");
+        self.remove("de-gcd:genInfo.report.id.reportElement.reportElements.B");
+        self.remove("de-gcd:genInfo.report.id.reportElement.reportElements.GuVMicroBilG");
+        self.remove("de-gcd:genInfo.report.id.reportElement.reportElements.BVV");
+        self.remove("de-gcd:genInfo.report.id.statementType.statementType.E");
+        self.remove("de-gcd:genInfo.report.id.incomeStatementendswithBalProfit ");
+        self.remove("de-gcd:genInfo.report.id.accountingStandard.accountingStandard.AO");
+        self.remove("de-gcd:genInfo.report.id.incomeStatementFormat.incomeStatementFormat.GKV");
+        self.remove("de-gcd:genInfo.report.id.consolidationRange.consolidationRange.EA");
     }
 }
