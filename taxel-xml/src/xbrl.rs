@@ -249,6 +249,12 @@ impl XbrlElement {
 
     /// Remove all values from `XbrlElement` recursively.
     pub fn remove_values(&mut self) {
+        // Don't remove content for key 'xbrldi:explicitMember'
+        // TODO: refactor retained keys
+        if self.name == "xbrldi:explicitMember" {
+            return;
+        }
+
         self.value = None;
 
         if self.xml_type == XmlType::Taxonomy(Taxonomy::GaapCi) {
