@@ -249,9 +249,9 @@ impl XbrlElement {
 
     /// Remove all values from `XbrlElement` recursively.
     pub fn remove_values(&mut self) {
-        // Don't remove content for key 'xbrldi:explicitMember'
+        // Don't remove content for the following keys
         // TODO: refactor retained keys
-        if self.name == "xbrldi:explicitMember" {
+        if self.name == "xbrli:measure" || self.name == "xbrldi:explicitMember" {
             return;
         }
 
