@@ -289,6 +289,17 @@ impl XbrlElement {
         if let Some(value) = target_tags.get(&self.name) {
             self.value = value.to_owned();
 
+            if self.xml_type == XmlType::Taxonomy(Taxonomy::Gcd) {
+                // Remove `xsi:nil` attribute
+                if let Some(index) = self
+                    .attributes
+                    .iter()
+                    .position(|attribute| attribute.key == NIL_ATTRIBUTE.key)
+                {
+                    self.attributes.remove(index);
+                }
+            }
+
             if self.xml_type == XmlType::Taxonomy(Taxonomy::GaapCi) {
                 // Remove `xsi:nil` attribute
                 if let Some(index) = self
