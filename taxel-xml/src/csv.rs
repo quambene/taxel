@@ -33,7 +33,17 @@ where
 
         for record in records {
             let row: CsvRow = record?;
-            target_tags.insert(row.key, row.value);
+            let value = match row.value {
+                Some(value) => {
+                    if value.is_empty() {
+                        None
+                    } else {
+                        Some(value)
+                    }
+                }
+                None => None,
+            };
+            target_tags.insert(row.key, value);
         }
     }
 
