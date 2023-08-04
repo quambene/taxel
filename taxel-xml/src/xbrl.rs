@@ -251,31 +251,50 @@ impl XbrlElement {
     pub fn remove_values(&mut self) {
         // Don't remove content for the following keys
         // TODO: refactor retained keys
-        if self.name == "xbrli:measure" || self.name == "xbrldi:explicitMember" {
+        if self.name == "xbrli:measure"
+            || self.name == "xbrldi:explicitMember"
+            || self.name == "de-gaap-ci:dim_keyType"
+        {
             return;
         }
 
-        self.value = None;
+        if self.value.is_some() {
+            // Remove value
+            self.value = None;
 
-        if self.xml_type == XmlType::Taxonomy(Taxonomy::GaapCi) {
-            // Remove `decimals` attribute
-            if let Some(index) = self
-                .attributes
-                .iter()
-                .position(|attribute| attribute.key == DECIMALS_2.key)
-            {
-                self.attributes.remove(index);
+            if self.xml_type == XmlType::Taxonomy(Taxonomy::Gcd) {
+                // Add `xsi:nil` attribute if not availabe.
+                if self
+                    .attributes
+                    .iter()
+                    .find(|attribute| attribute.key == NIL_ATTRIBUTE.key)
+                    .is_none()
+                {
+                    self.attributes
+                        .push(XbrlAttribute::new(NIL_ATTRIBUTE.key, NIL_ATTRIBUTE.value));
+                }
             }
 
-            // Add `xsi:nil` attribute if not availabe.
-            if self
-                .attributes
-                .iter()
-                .find(|attribute| attribute.key == NIL_ATTRIBUTE.key)
-                .is_none()
-            {
-                self.attributes
-                    .push(XbrlAttribute::new(NIL_ATTRIBUTE.key, NIL_ATTRIBUTE.value));
+            if self.xml_type == XmlType::Taxonomy(Taxonomy::GaapCi) {
+                // Remove `decimals` attribute
+                if let Some(index) = self
+                    .attributes
+                    .iter()
+                    .position(|attribute| attribute.key == DECIMALS_2.key)
+                {
+                    self.attributes.remove(index);
+                }
+
+                // Add `xsi:nil` attribute if not availabe.
+                if self
+                    .attributes
+                    .iter()
+                    .find(|attribute| attribute.key == NIL_ATTRIBUTE.key)
+                    .is_none()
+                {
+                    self.attributes
+                        .push(XbrlAttribute::new(NIL_ATTRIBUTE.key, NIL_ATTRIBUTE.value));
+                }
             }
         }
 
