@@ -101,5 +101,7 @@ impl Tags {
         self.remove("de-gcd:genInfo.report.id.accountingStandard.accountingStandard.AO");
         self.remove("de-gcd:genInfo.report.id.incomeStatementFormat.incomeStatementFormat.GKV");
         self.remove("de-gcd:genInfo.report.id.consolidationRange.consolidationRange.EA");
+        self.remove("de-gcd:genInfo.company.id.incomeClassification.trade");
+        self.remove("de-gcd:genInfo.company.id.shareholder.legalStatus.legalStatus.KOER");
     }
 }
