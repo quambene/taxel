@@ -1,15 +1,23 @@
 [package]
 name = "taxel-cli"
-version = "0.1.0"
-authors = ["quambene <contact.quambene@gmail.com>"]
-edition = "2021"
+version = "0.2.0"
+authors.workspace = true
+edition.workspace = true
 
 [[bin]]
 path = "src/main.rs"
 name = "taxel"
 
+[features]
+integration-test = []
+
 [dependencies]
 taxel = { version = "0.1.0", path = "../taxel" }
-anyhow = "1.0.58"
+taxel-xml = { version = "0.1.0", path = "../taxel-xml" }
+anyhow = { workspace = true }
+log = { workspace = true }
+env_logger = { workspace = true }
 clap = { version = "3.2.14", default-features = false, features = ["std", "cargo"] }
 
+[dev-dependencies]
+taxel-xml = { version = "0.1.0", path = "../taxel-xml" }

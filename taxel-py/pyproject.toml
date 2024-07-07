@@ -1,0 +1,10 @@
+
+[project]
+name = "taxel-py"
+version = "0.0.1"
+authors = [
+    {name = "quambene", email = "contact.quambene@gmail.com"},
+]
+
+[tool.pytest.ini_options]
+markers = ["unit", "integration"]

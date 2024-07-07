@@ -4,4 +4,14 @@ members = [
     "taxel-bindings",
     "taxel-cli",
     "taxel-util",
+    "taxel-xml",
 ]
+
+[workspace.package]
+authors = ["quambene <contact.quambene@gmail.com>"]
+edition = "2021"
+
+[workspace.dependencies]
+anyhow = "1.0.71"
+log = "0.4.19"
+env_logger = "0.10.0"

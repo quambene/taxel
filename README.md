@@ -2,6 +2,11 @@
 
 Taxel provides a command line interface (CLI) and Rust bindings for the ELSTER Rich Client (ERiC).
 
+![Taxel mockup](/mockup.png)
+
+Generate an XML file in the XBRL standard from a CSV file with tax and accounting
+data; validate and send the XBRL document to tax authorities.
+
 Supported features:
 
 - [x] eBilanz
@@ -14,6 +19,7 @@ Supported features:
 - [Requirements](#requirements)
 - [Install Taxel](#install-taxel)
 - [Usage](#usage)
+- [Testing](#testing)
 - [Rust bindings for the ELSTER Rich Client (ERiC)](#rust-bindings-for-the-elster-rich-client-eric)
   - [Generate bindings](#generate-bindings)
   - [Test bindings](#test-bindings)
@@ -79,6 +85,17 @@ _Note:_ Run `cargo install --path ./taxel-cli` again to update to the latest ver
 1. Run taxel:
 
     ``` bash
+    # Extract values from xml file
+    taxel extract \
+        --xml-file "my_ebilanz.xml" \
+        --output-file "my_ebilanz.csv"
+
+    # Generate xml file from csv file
+    taxel generate \
+         --csv-file "my_ebilanz.csv" \
+         --template-file "templates/elster_v11_ebilanz_v6.5_test.xml" \
+         --output-file "my_bilanz.xml"
+
     # Validate xml file
     taxel validate \
         --tax-type "Bilanz" \
@@ -115,17 +132,26 @@ _Remark_: In step 2, note the difference between file name (e.g. `libericapi.so`
 ## Testing
 
 ``` bash
-# Test taxel
+# Run unit tests for taxel
 cargo test -p taxel -- --test-threads=1
 
-# Test taxel in release mode
-cargo test -p taxel --release -- --test-threads=1
+# Run integration tests for taxel
+cargo test -p taxel --test '*' --features integration-test -- --test-threads=1
 
-# Test CLI for taxel
-cargo test -p taxel-cli -- --test-threads=1
+# Run integration tests for taxel in release mode
+cargo test -p taxel --release --test '*' --features integration-test -- --test-threads=1
 
-# Test CLI for taxel in release mode
-cargo test -p taxel-cli --release -- --test-threads=1
+# Run unit tests for taxel-cli
+cargo test -p taxel-cli
+
+# Run integration tests for taxel-cli
+cargo test -p taxel-cli --test '*' --features integration-test -- --test-threads=1
+
+# Run integration tests for taxel-cli in release mode
+cargo test -p taxel-cli --release --test '*' --features integration-test -- --test-threads=1
+
+# Run unit tests for taxel-xml
+cargo test -p taxel-xml
 ```
 
 ## Rust bindings for the ELSTER Rich Client (ERiC)

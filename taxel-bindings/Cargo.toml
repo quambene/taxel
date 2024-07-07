@@ -1,8 +1,8 @@
 [package]
 name = "taxel-bindings"
 version = "0.1.0"
-authors = ["quambene <contact.quambene@gmail.com>"]
-edition = "2021"
+authors.workspace = true
+edition.workspace = true
 build = "build.rs"
 
 [lib]
@@ -11,7 +11,7 @@ name = "taxel_bindings"
 
 [dependencies]
 taxel-util = { version = "0.1.0", path = "../taxel-util" }
-anyhow = "1.0.58"
+anyhow = { workspace = true }
 
 [build-dependencies]
 bindgen = "0.60.1"
