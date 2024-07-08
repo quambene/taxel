@@ -1,0 +1,101 @@
+account_type,account_number,account_name,full_account_name
+asset,,Aktiva,Aktiva
+asset,,Anlage- u. Kapitalkonten 0,Aktiva:Anlage- u. Kapitalkonten 0
+asset,27,0027 EDV-Software,Aktiva:Anlage- u. Kapitalkonten 0:0027 EDV-Software
+asset,210,0210 Maschinen,Aktiva:Anlage- u. Kapitalkonten 0:0210 Maschinen
+asset,400,0400 Betriebsausstattung,Aktiva:Anlage- u. Kapitalkonten 0:0400 Betriebsausstattung
+asset,410,0410 Geschäftsausstattung,Aktiva:Anlage- u. Kapitalkonten 0:0410 Geschäftsausstattung
+asset,420,0420 Büroeinrichtung,Aktiva:Anlage- u. Kapitalkonten 0:0420 Büroeinrichtung
+asset,430,0430 Ladeneinrichtung,Aktiva:Anlage- u. Kapitalkonten 0:0430 Ladeneinrichtung
+asset,565,0565 Darlehen,Aktiva:Anlage- u. Kapitalkonten 0:0565 Darlehen
+asset,,Finanzkonten 1,Aktiva:Finanzkonten 1
+bank,1100,1100 Postbank,Aktiva:Finanzkonten 1:1100 Postbank
+bank,1200,1200 Bankkonto,Aktiva:Finanzkonten 1:1200 Bankkonto
+asset,1371,1371 Gewinnermittlung §4/3 nicht Ergebniswirksam,Aktiva:Finanzkonten 1:1371 Gewinnermittlung §4/3 nicht Ergebniswirksam
+receivable,1400,1400 Ford. a. Lieferungen und Leistungen,Aktiva:Finanzkonten 1:1400 Ford. a. Lieferungen und Leistungen
+asset,1571,1571 Abziehbare VSt. 7%,Aktiva:Finanzkonten 1:1571 Abziehbare VSt. 7%
+asset,1576,1576 Abziehbare VSt. 19%,Aktiva:Finanzkonten 1:1576 Abziehbare VSt. 19%
+asset,1577,1577 Abziehbare VStr. nach §13b UStG 19%,Aktiva:Finanzkonten 1:1577 Abziehbare VStr. nach §13b UStG 19%
+asset,1590,1590 Durchlaufende Posten,Aktiva:Finanzkonten 1:1590 Durchlaufende Posten
+asset,,Wareneingangs- u. Bestandskonten 3,Aktiva:Wareneingangs- u. Bestandskonten 3
+asset,3120,"3120 Leistungen §13b UStG 19% Vorsteuer, 19% Umsatzsteuer","Aktiva:Wareneingangs- u. Bestandskonten 3:3120 Leistungen §13b UStG 19% Vorsteuer, 19% Umsatzsteuer"
+asset,3400,3400 Wareneingang VSt. 19%,Aktiva:Wareneingangs- u. Bestandskonten 3:3400 Wareneingang VSt. 19%
+liability,,Passiva,Passiva
+liability,,Umsatzsteuer,Passiva:Umsatzsteuer
+liability,1771,1771 Umsatzsteuer 7%,Passiva:Umsatzsteuer:1771 Umsatzsteuer 7%
+liability,1776,1776 Umsatzsteuer 19%,Passiva:Umsatzsteuer:1776 Umsatzsteuer 19%
+liability,1780,1780 Umsatzsteuer-Vorauszahlung,Passiva:Umsatzsteuer:1780 Umsatzsteuer-Vorauszahlung
+liability,1781,1781 Umsatzsteuer-Vorauszahlung 1/11,Passiva:Umsatzsteuer:1781 Umsatzsteuer-Vorauszahlung 1/11
+liability,1787,1787 Umsatzsteuer § 13b UStG 19%,Passiva:Umsatzsteuer:1787 Umsatzsteuer § 13b UStG 19%
+liability,1790,1790 Umsatzsteuer Vorjahr,Passiva:Umsatzsteuer:1790 Umsatzsteuer Vorjahr
+liability,1791,1791 Umsatzsteuer frühere Jahre,Passiva:Umsatzsteuer:1791 Umsatzsteuer frühere Jahre
+liability,,Verbindlichkeiten,Passiva:Verbindlichkeiten
+payable,1600,1600 Verblk. aus Lieferungen u. Leistungen,Passiva:Verbindlichkeiten:1600 Verblk. aus Lieferungen u. Leistungen
+income,,Erlöse u. Erträge 2/8,Erlöse u. Erträge 2/8
+income,,Erlöskonten 8,Erlöse u. Erträge 2/8:Erlöskonten 8
+income,8300,8300 Erlöse USt. 7%,Erlöse u. Erträge 2/8:Erlöskonten 8:8300 Erlöse USt. 7%
+income,8400,8400 Erlöse USt. 19%,Erlöse u. Erträge 2/8:Erlöskonten 8:8400 Erlöse USt. 19%
+income,,Ertragskonten 2,Erlöse u. Erträge 2/8:Ertragskonten 2
+income,2500,2500 Außerordentliche Erträge,Erlöse u. Erträge 2/8:Ertragskonten 2:2500 Außerordentliche Erträge
+income,2650,2650 sonstige Zinsen und ähnliche Erträge,Erlöse u. Erträge 2/8:Ertragskonten 2:2650 sonstige Zinsen und ähnliche Erträge
+income,2700,2700 Sonstige Erträge,Erlöse u. Erträge 2/8:Ertragskonten 2:2700 Sonstige Erträge
+expense,,Aufwendungen 2/4,Aufwendungen 2/4
+expense,,Abschreibungen,Aufwendungen 2/4:Abschreibungen
+expense,4855,4855 Sofortabschreibung GWG,Aufwendungen 2/4:Abschreibungen:4855 Sofortabschreibung GWG
+expense,,Kfz-Kosten,Aufwendungen 2/4:Kfz-Kosten
+expense,4510,4510 Kfz-Steuer,Aufwendungen 2/4:Kfz-Kosten:4510 Kfz-Steuer
+expense,4520,4520 Kfz-Versicherungen,Aufwendungen 2/4:Kfz-Kosten:4520 Kfz-Versicherungen
+expense,4530,4530 laufende Kfz-Betriebskosten,Aufwendungen 2/4:Kfz-Kosten:4530 laufende Kfz-Betriebskosten
+expense,4540,4540 Kfz-Reparaturen,Aufwendungen 2/4:Kfz-Kosten:4540 Kfz-Reparaturen
+expense,4570,4570 Fremdfahrzeuge,Aufwendungen 2/4:Kfz-Kosten:4570 Fremdfahrzeuge
+expense,4580,4580 sonstige Kfz-Kosten,Aufwendungen 2/4:Kfz-Kosten:4580 sonstige Kfz-Kosten
+expense,,Personalkosten,Aufwendungen 2/4:Personalkosten
+expense,4120,4120 Gehälter,Aufwendungen 2/4:Personalkosten:4120 Gehälter
+expense,4130,4130 gesetzliche soziale Aufwendungen,Aufwendungen 2/4:Personalkosten:4130 gesetzliche soziale Aufwendungen
+expense,4165,4165 Aufwendungen für Altersvorsorge,Aufwendungen 2/4:Personalkosten:4165 Aufwendungen für Altersvorsorge
+expense,4170,4170 Vermögenswirksame Leistungen,Aufwendungen 2/4:Personalkosten:4170 Vermögenswirksame Leistungen
+expense,4190,4190 Aushilfslöhne,Aufwendungen 2/4:Personalkosten:4190 Aushilfslöhne
+expense,,Raumkosten,Aufwendungen 2/4:Raumkosten
+expense,4210,4210 Miete und Nebenkosten,Aufwendungen 2/4:Raumkosten:4210 Miete und Nebenkosten
+expense,4240,"4240 Gas, Wasser, Strom (Verwaltung, Vertrieb)","Aufwendungen 2/4:Raumkosten:4240 Gas, Wasser, Strom (Verwaltung, Vertrieb)"
+expense,4250,4250 Reinigung,Aufwendungen 2/4:Raumkosten:4250 Reinigung
+expense,,Reparatur/Instandhaltung,Aufwendungen 2/4:Reparatur/Instandhaltung
+expense,4805,4805 Reparatur u. Instandh. von Anlagen/Maschinen u. Betriebs- u. Geschäftsausst.,Aufwendungen 2/4:Reparatur/Instandhaltung:4805 Reparatur u. Instandh. von Anlagen/Maschinen u. Betriebs- u. Geschäftsausst.
+expense,,verschiedene Kosten,Aufwendungen 2/4:verschiedene Kosten
+expense,4910,4910 Porto,Aufwendungen 2/4:verschiedene Kosten:4910 Porto
+expense,4920,4920 Telekom,Aufwendungen 2/4:verschiedene Kosten:4920 Telekom
+expense,4921,4921 Mobilfunk D2,Aufwendungen 2/4:verschiedene Kosten:4921 Mobilfunk D2
+expense,4922,4922 Internet,Aufwendungen 2/4:verschiedene Kosten:4922 Internet
+expense,4930,4930 Bürobedarf,Aufwendungen 2/4:verschiedene Kosten:4930 Bürobedarf
+expense,4940,"4940 Zeitschriften, Bücher","Aufwendungen 2/4:verschiedene Kosten:4940 Zeitschriften, Bücher"
+expense,4945,4945 Fortbildungskosten,Aufwendungen 2/4:verschiedene Kosten:4945 Fortbildungskosten
+expense,4955,4955 Buchführungskosten,Aufwendungen 2/4:verschiedene Kosten:4955 Buchführungskosten
+expense,4957,4957 Abschluß- u. Prüfungskosten,Aufwendungen 2/4:verschiedene Kosten:4957 Abschluß- u. Prüfungskosten
+expense,4970,4970 Nebenkosten des Geldverkehrs,Aufwendungen 2/4:verschiedene Kosten:4970 Nebenkosten des Geldverkehrs
+expense,4985,4985 Werkzeuge und Kleingeräte,Aufwendungen 2/4:verschiedene Kosten:4985 Werkzeuge und Kleingeräte
+expense,,Versicherungsbeiträge,Aufwendungen 2/4:Versicherungsbeiträge
+expense,4360,4360 Versicherungen,Aufwendungen 2/4:Versicherungsbeiträge:4360 Versicherungen
+expense,4380,4380 Beiträge,Aufwendungen 2/4:Versicherungsbeiträge:4380 Beiträge
+expense,4390,4390 sonstige Ausgaben,Aufwendungen 2/4:Versicherungsbeiträge:4390 sonstige Ausgaben
+expense,4396,4396 steuerlich abzugsfähige Verspätungszuschläge und Zwangsgelder,Aufwendungen 2/4:Versicherungsbeiträge:4396 steuerlich abzugsfähige Verspätungszuschläge und Zwangsgelder
+expense,,Werbe-/Reisekosten,Aufwendungen 2/4:Werbe-/Reisekosten
+expense,4610,4610 Werbekosten,Aufwendungen 2/4:Werbe-/Reisekosten:4610 Werbekosten
+expense,4653,4653 Aufmerksamkeiten,Aufwendungen 2/4:Werbe-/Reisekosten:4653 Aufmerksamkeiten
+expense,4665,"4665 nicht abzugsfähige Betriebsausg. aus Werbe-, Repräs.- u. Reisekosten","Aufwendungen 2/4:Werbe-/Reisekosten:4665 nicht abzugsfähige Betriebsausg. aus Werbe-, Repräs.- u. Reisekosten"
+expense,4670,4670 Reisekosten Unternehmer,Aufwendungen 2/4:Werbe-/Reisekosten:4670 Reisekosten Unternehmer
+expense,,Zinsaufwendungen,Aufwendungen 2/4:Zinsaufwendungen
+expense,2110,2110 Zinsaufwendungen für kurzfristige Verbindlichkeiten,Aufwendungen 2/4:Zinsaufwendungen:2110 Zinsaufwendungen für kurzfristige Verbindlichkeiten
+expense,2121,2121 Zinsaufwendungen für KFZ Finanzierung,Aufwendungen 2/4:Zinsaufwendungen:2121 Zinsaufwendungen für KFZ Finanzierung
+equity,,Anfangsbestand 9,Anfangsbestand 9
+equity,,Saldenvortragskonten,Anfangsbestand 9:Saldenvortragskonten
+equity,9000,9000 Saldenvortrag Sachkonten,Anfangsbestand 9:Saldenvortragskonten:9000 Saldenvortrag Sachkonten
+equity,9008,9008 Saldenvorträge Debitoren,Anfangsbestand 9:Saldenvortragskonten:9008 Saldenvorträge Debitoren
+equity,9009,9009 Saldenvorträge Kreditoren,Anfangsbestand 9:Saldenvortragskonten:9009 Saldenvorträge Kreditoren
+equity,,Privatkonten 1,Privatkonten 1
+equity,,Privatentnahmen/-einlagen,Privatkonten 1:Privatentnahmen/-einlagen
+equity,1800,1800 Privatentnahme allgemein,Privatkonten 1:Privatentnahmen/-einlagen:1800 Privatentnahme allgemein
+equity,1810,1810 Privatsteuern,Privatkonten 1:Privatentnahmen/-einlagen:1810 Privatsteuern
+equity,1820,1820 Sonderausgaben beschränkt abzugsfähig,Privatkonten 1:Privatentnahmen/-einlagen:1820 Sonderausgaben beschränkt abzugsfähig
+equity,1830,1830 Sonderausgaben unbeschränkt abzugsfähig,Privatkonten 1:Privatentnahmen/-einlagen:1830 Sonderausgaben unbeschränkt abzugsfähig
+equity,1850,1850 Außergewöhnliche Belastungen,Privatkonten 1:Privatentnahmen/-einlagen:1850 Außergewöhnliche Belastungen
+equity,1890,1890 Privateinlagen,Privatkonten 1:Privatentnahmen/-einlagen:1890 Privateinlagen
