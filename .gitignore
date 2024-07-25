@@ -19,7 +19,8 @@ server_response.xml
 *.pdf
 
 # schema
-schema/*
+schema/elster
+schema/ebilanz
 
 # csv
 .~lock.**.csv#
