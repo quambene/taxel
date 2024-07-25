@@ -1,0 +1,8 @@
+{
+    "name": "John Doe",
+    "age": 30,
+    "car": {
+        "color": "blue",
+        "cylinder": 4
+    }
+}
