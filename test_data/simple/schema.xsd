@@ -11,6 +11,14 @@
                             <xs:element name="color" type="xs:string" />
                             <xs:element name="cylinder" type="xs:int" />
                         </xs:sequence>
+                        <xs:attribute name="version" use="required">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:integer">
+                                    <xs:minInclusive value="1"/>
+                                    <xs:maxInclusive value="2"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:attribute>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
