@@ -1,0 +1,13 @@
+{
+    "ebilanz:EBilanz": {
+        "ebilanz:stichtag": 20231231,
+        "xbrli:xbrl": {
+            "xbrli:identifier": "0000000000000",
+            "xbrli:instant": 20231231,
+            "xbrli:startDate": 20230101,
+            "xbrli:endDate": 20231231,
+            "xbrli:measure": "iso4217:EUR"
+        },
+        "@version": 1
+    }
+}

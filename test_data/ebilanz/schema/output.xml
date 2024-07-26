@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:EBilanz xmlns:ns0="http://rzf.fin-nrw.de/RMS/EBilanz/2016/XMLSchema" xmlns:ns1="http://www.xbrl.org/2003/instance" version="1">
+    <ns0:stichtag>20231231</ns0:stichtag>
+    <ns1:xbrl>
+        <ns1:identifier>0000000000000</ns1:identifier>
+        <ns1:instant>20231231</ns1:instant>
+        <ns1:startDate>20230101</ns1:startDate>
+        <ns1:endDate>20231231</ns1:endDate>
+        <ns1:measure>iso4217:EUR</ns1:measure>
+    </ns1:xbrl>
+</ns0:EBilanz>
