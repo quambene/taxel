@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:Elster xmlns:ns0="http://www.elster.de/elsterxml/schema/v11">
+    <ns0:TransferHeader version="11">
+        <ns0:Verfahren>ElsterBilanz</ns0:Verfahren>
+        <ns0:DatenArt>Bilanz</ns0:DatenArt>
+        <ns0:Vorgang>send-Auth</ns0:Vorgang>
+        <ns0:HerstellerID>00000</ns0:HerstellerID>
+        <ns0:DatenLieferant>My name, address, and email</ns0:DatenLieferant>
+        <ns0:Datei>
+            <ns0:Verschluesselung>CMSEncryptedData</ns0:Verschluesselung>
+            <ns0:Kompression>GZIP</ns0:Kompression>
+        </ns0:Datei>
+        <ns0:VersionClient>1</ns0:VersionClient>
+    </ns0:TransferHeader>
+    <ns0:DatenTeil>
+        <ns0:Nutzdatenblock>
+            <ns0:NutzdatenHeader version="11">
+                <ns0:NutzdatenTicket>0001</ns0:NutzdatenTicket>
+                <ns0:Empfaenger id="F">1000</ns0:Empfaenger>
+                <ns0:Hersteller>
+                    <ns0:ProduktName>Taxel</ns0:ProduktName>
+                    <ns0:ProduktVersion>0.1.0</ns0:ProduktVersion>
+                </ns0:Hersteller>
+            </ns0:NutzdatenHeader>
+            <ns0:Nutzdaten />
+        </ns0:Nutzdatenblock>
+    </ns0:DatenTeil>
+</ns0:Elster>

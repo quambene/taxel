@@ -74,11 +74,28 @@ def test_generate_xml_simple():
 
 
 @pytest.mark.unit
-def test_generate_ebilanz():
-    schema_path = '../test_data/ebilanz/schema/ebilanz_000002.xsd'
-    input_path = '../test_data/ebilanz/schema/input.json'
-    output_path = '../test_data/ebilanz/schema/output.xml'
+def test_generate_xml_ebilanz():
+    schema_path = '../test_data/schema/ebilanz_000002.xsd'
+    input_path = '../test_data/ebilanz/input.json'
+    output_path = '../test_data/ebilanz/output.xml'
     target_namespace = 'ebilanz'
+
+    xml = generate_xml(schema_path, input_path, target_namespace, namespaces)
+    root = xml.getroot()
+    actual_xml = ET.tostring(root, encoding='utf-8', xml_declaration=True)
+
+    with open(output_path, 'r', encoding='utf-8') as file:
+        expected_xml = file.read()
+
+    assert actual_xml.decode("utf-8") == expected_xml
+
+
+@pytest.mark.unit
+def test_generate_xml_elster():
+    schema_path = '../test_data/schema/elster11_bisNH_extern.xsd'
+    input_path = '../test_data/elster/input.json'
+    output_path = '../test_data/elster/output.xml'
+    target_namespace = 'elster'
 
     xml = generate_xml(schema_path, input_path, target_namespace, namespaces)
     root = xml.getroot()
