@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <ns0:EBilanz xmlns:ns0="http://rzf.fin-nrw.de/RMS/EBilanz/2016/XMLSchema" xmlns:ns1="http://www.xbrl.org/2003/instance" xmlns:ns2="http://www.xbrl.org/2003/linkbase" xmlns:ns3="http://www.w3.org/1999/xlink" version="1">
     <ns0:stichtag>20231231</ns0:stichtag>
     <ns1:xbrl>

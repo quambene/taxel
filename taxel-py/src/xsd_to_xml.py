@@ -65,12 +65,12 @@ def test_generate_xml_simple():
 
     xml = generate_xml(schema_path, input_path, None, None)
     root = xml.getroot()
-    actual_xml = ET.tostring(root, encoding='utf-8', xml_declaration=True)
+    actual_xml = ET.tostring(root, encoding="UTF-8", xml_declaration=True)
 
-    with open(output_path, 'r', encoding='utf-8') as file:
+    with open(output_path, 'r', encoding="UTF-8") as file:
         expected_xml = file.read()
 
-    assert actual_xml.decode("utf-8") == expected_xml
+    assert actual_xml.decode("UTF-8") == expected_xml
 
 
 @pytest.mark.unit
@@ -82,12 +82,12 @@ def test_generate_xml_ebilanz():
 
     xml = generate_xml(schema_path, input_path, target_namespace, namespaces)
     root = xml.getroot()
-    actual_xml = ET.tostring(root, encoding='utf-8', xml_declaration=True)
+    actual_xml = ET.tostring(root, encoding="UTF-8", xml_declaration=True)
 
-    with open(output_path, 'r', encoding='utf-8') as file:
+    with open(output_path, 'r', encoding="UTF-8") as file:
         expected_xml = file.read()
 
-    assert actual_xml.decode("utf-8") == expected_xml
+    assert actual_xml.decode("UTF-8") == expected_xml
 
 
 @pytest.mark.unit
@@ -99,9 +99,9 @@ def test_generate_xml_elster():
 
     xml = generate_xml(schema_path, input_path, target_namespace, namespaces)
     root = xml.getroot()
-    actual_xml = ET.tostring(root, encoding='utf-8', xml_declaration=True)
+    actual_xml = ET.tostring(root, encoding="UTF-8", xml_declaration=True)
 
-    with open(output_path, 'r', encoding='utf-8') as file:
+    with open(output_path, 'r', encoding="UTF-8") as file:
         expected_xml = file.read()
 
     assert actual_xml.decode("utf-8") == expected_xml

@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <ns0:Elster xmlns:ns0="http://www.elster.de/elsterxml/schema/v11">
     <ns0:TransferHeader version="11">
         <ns0:Verfahren>ElsterBilanz</ns0:Verfahren>
