@@ -1,0 +1,2959 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  Version: 2024.3.0.0 Erstelldatum: 2024-05-02 -->
+<xs:schema xmlns:elsterheaderbasis="http://www.elster.de/elsterxml/schema/headerbasis/v3" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.elster.de/elsterxml/schema/headerbasis/v3" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1">
+	<xs:include schemaLocation="./headerbasis_datentypen.xsd"/>
+	<!-- Definition globaler simple Types________________________________________________________-->
+	<xs:simpleType name="DatenArtSType">
+		<xs:annotation>
+			<xs:documentation xml:lang="DE">Die Zuordnung der Datenarten zu den Verfahren ist in der
+				Liste "Verfahren - Datenarten - Vorgang" beschrieben.
+				Dort sind auch die zugelassenen XML-Vorgänge aufgeführt.
+				Der erlaubte Zeichensatz für Datenart ist: [a-zA-Z0-9] {1,25}
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="elsterheaderbasis:BaseStringSType">
+			<xs:enumeration value="ElsterConnectTest"/>
+			<xs:enumeration value="SendungsquittungECSE">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterEGVP</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ProtFZ1Mitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMVProtokoll</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AenderungBankverbindungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AenderungAdresseRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="UStAKfzEinzel">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterAnmeldung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="StundungAntrag">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ZF3Mitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ProtZF3Mitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMVProtokoll</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FZ1Mitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NEKMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WIdNrVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LWK">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MindestStUnternehmenEU">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterAnmeldung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SADVFPruefumgebung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SADVFPruefumgebungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SADVFRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ProtFESMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMVProtokoll</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AenderungslisteHF">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterLohn2</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ESt34bMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ESt34bNachweis">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OZGMUESt">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterGeCoASYN</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ZERAntwortITZBund">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMVProtokoll</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Strafanzeige">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OZGMUEStResponse">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterGeCoASYN</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KDialogInternePost">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKDialog</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Strafakteneinsichtsantrag">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ZERAntwortBLKMV">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GrTraegerMindestStRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterGINSTER</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GrTraegerMindestStMeldung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterGINSTER</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FehlerBereitstellungGSZ">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellungRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AbholProtokollGSZ">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellungRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Grundsteuerhebesatz">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="HUSTAntragStbefreiungBE">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PostfachVertreterAnlage">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PostfachVertreterListe">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PostfachVertreterWiderruf">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MVZMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MVOMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ISAAKAufteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PostfachBestaetigung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterDatenabholung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GESAVdRequest">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKStoKS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GESAVdResponse">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKStoKS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GESAGdRequest">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKStoKS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GESAGdResponse">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKStoKS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AueOnlineWfVorgang">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKStoKS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AntrFreistellungBeschQuit">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterElfeEibe</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Strafakteneinsicht">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IBANMeldungBuergerRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IBANMeldungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IBANAuskunftRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IBANMeldungBuerger">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IBANMeldung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IBANAuskunft">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AntrFreistellungBeschRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterElfeEibe</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AntrFreistellungBesch">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterElfeEibe</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DaHLieELSTERDUEbEL">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterDuebel</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DaHLieELSTERDUEbELRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterDuebel</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ProBeELSTERDUEbEL">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterDuebel</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Neuzuordnung146aRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterGinsterKomet</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Neuzuordnung146a">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterGinsterKomet</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="RABE">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVirenscan</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EBilanzRueckmeldung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="RabeBelegResponse">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterRabe</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="RabeExtDatenhaltungCheck">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterRabe</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="RabeExtDatenhaltungPflege">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterRabe</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SendungsquittungEEB">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterEGVP</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="RabeBelegRequest">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterRabe</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="HUSTAbmeldungHB">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="HUSTAbmeldungHH">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="HUSTAntraegeHH">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="HUSTAbmeldungBE">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="HUSTRegisterBE">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterFT</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ETRRechteListe">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterTransferAsynchron</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AktualisierungLanguste">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterLanguste</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AbholProtokollOZG">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterDIVAOZG</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FehlerBereitstellungOZG">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterDIVAOZG</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LoeschungDBOZG">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterDIVAOZG</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ProtokollBereitstellungOZG">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterDIVAOZG</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DAMEEBilanzStat">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterDAME</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Aufzeichnung146a">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DatenlieferungLangusteNBA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVirenscan</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ProtNTJMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMVProtokoll</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NTJMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaStundungZinsVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaStundungVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaStundungMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaErlassVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaErlassMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaAdvZinsVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaAdvVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaAdvMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ForschungszulageStat">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterLKStoDVE</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EPAntwort">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GrundsteuerStat">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterLKStoDVE</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BSBQuittung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BSBDatenExportRMS">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKaFE</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DIVASpielbankabgabe">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DIVAInvStG51Feststellung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OnlinePokerStA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterAnmeldung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OVMVRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VirtuelleAutomatenStA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterAnmeldung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GEWAbmeldung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KiStASperrvermerkRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KiStAZulassungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaBescheidErbSt">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaBescheidSchenkSt">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EPKurzmitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GewStZerlegungGemeinde">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaSonstigerVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaSonstigeMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EinspruchNachtrag">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EinspruchRuecknahme">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OZGDruckResponse">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterGeCoASYN</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KiStZahlungenErstattungen">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterFT</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="HUSTAnmeldungHH">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterErkaerung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OZGStatusaenderung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterPortal</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PlatIne">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKDialog</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DIVAVirtuelleAutomatenStB">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DIVAOnlinePokerStB">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VAGMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OGHMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="XPIMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BSBMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ProtXPIMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMVProtokoll</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GESARequest">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKStoKS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GESAResponse">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKStoKS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FESMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KTTAnzeigeHH">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KTTAnmeldungHH">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterAnmeldung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VGNAnzeigeHH">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VGNAnmeldungHH">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterAnmeldung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VGNAnmeldungHB">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterAnmeldung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WTBAnmeldungHB">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterAnmeldung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="UENSTAnzeigeBE">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="UENSTAnmeldungBE">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterAnmeldung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VGNAnzeigeBE">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VGNAnmeldungBE">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterAnmeldung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="HUSTAnmeldungHB">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterErklaerung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="HUSTAnmeldungBE">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterErklaerung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OZGDruck">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterGeCoASYN</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AntragUStVerguetung4a">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Gewinnermittlung13aEStG">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterErklaerung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="InvStG51Feststellung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterErklaerung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FehlerBereitstellungGrSt">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellungRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AltZertAenderung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AltZertAnbieterwechsel">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AltZertAntrag">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AltZertDatenaenderung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AltZertVerzicht">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KapEStEntlastungEStG">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KapEStEntlastungKStG">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KapEStFreiMeldung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PostUDL">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="StAbEntlastung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VERSAntragStNr">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaBescheidGewSt">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaBescheidUSt">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BAA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BAAKM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterFT</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaBescheidKSt">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaBescheidFEIN">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Erbschaftsteuer">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterErklaerung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Schenkungsteuer">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterErklaerung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FLHMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FSAKAuskunft">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FSAKAuskunftRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KassenangelegenheitenVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KStOptVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SteueroasenabwehrVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NezoPostfachRechteW">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NezoPostfachRechteG">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NezoPostfachRechteL">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NezoPostfachRechte">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AltZertVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KapEStEntlastungVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+				<xs:enumeration value="PostUDLVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+				<xs:enumeration value="StAb50aVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="StAbEntlastungVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AltZertAenderungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AltZertAnbieterwechselRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AltZertAntragRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AltZertDatenaenderungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AltZertVerzichtRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KapEStEntlastungEStGRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KapEStEntlastungKStGRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KapEStFreiMeldungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PostUDLRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="StAbEntlastungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VERSAntragStNrRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OZGKrossAbfrage">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterGeCoSYN</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OZGMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AntrVerbindlicheZusage">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VerbindlicheZusage">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OZGBescheid">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OZGAntwort">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OZGGinsterAbfrage">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterGeCoSYN</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FsEVerein">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterFSE</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PostfachAnfrage">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterDatenabholung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PostfachStatus">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterDatenabholung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EinlagenrueckgewaehrRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IdNrMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IdNrMitteilungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BZStRuecknahmeWiderspRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EinlagenrueckgewaehrVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FSAKZulassungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Einlagenrueckgewaehr">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BZStRuecknahmeWidersp">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FSAKZulassung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LStHVDivaAdresseRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRMOrg</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KKVMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GDBMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GMBAX">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GMBVX">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Gewerbemeldung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NachrichtZumGerichtECSE">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterEGVP</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WIdNrSuche">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterGINSTER</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LStHVDivaAdresseBRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRMOrg</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LStHVDivaAdresse">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AnhangRueckmeldung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FortfuehrungNBARM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterLanguste</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FortfuehrungNBA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterLanguste</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BUKRD">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterDatenversand</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaEinwilligungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaWiderruf">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaEinwilligungAnlage">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaEinwilligungUpdate">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaEinwilligungAntrag">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaEinwilligungCodeEMail">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterEMail</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaEinwilligungCodeBrief">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IdentabgleichArt5">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterZfaZivit</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IdentabgleichArt5RM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterZfaZivit</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LotteriesteuerMehrfach">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterAnmeldung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DIVALotteriesteuerMehr">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DIVATotalisator">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DIVASportwettensteuer">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DIVABuchmachersteuer">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DIVALotteriesteuerEinmal">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Buchmachersteuer">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterAnmeldung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Sportwettensteuer">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterAnmeldung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Totalisatorsteuer">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterAnmeldung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AnzeigeEinerLotterie">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterAnmeldung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LotteriesteuerEinmalig">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterAnmeldung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaEinwilligungID">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BRMDivaHinweis">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ZugangsNrIdNr">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaErgebnisliste">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaWiderrufBRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaEinwilligungFreisch">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaEinwilligungAnlageBRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaEinwilligungUpdateBRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KStAntragOptionPersG">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DivaBescheidESt">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GSGAbfrage">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKDialog</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WIdNrAendReq">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterGINSTER</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WIdNrAendBundReq">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterGINSTER</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WIdNrAendRes">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterGINSTER</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="WIdNrAendBundRes">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterGINSTER</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GlueckspielF">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GlueckspielA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MitteilungAbholung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterDatenabholung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GrundsteuerHH">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterErklaerung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GrundsteuerNI">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterErklaerung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NezoVorhabenAntrag">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NezoVorhabenAntragL">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NezoVorhabenAntragG">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NezoVorhabenAntragW">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NezoMitarbeiterAntrag">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NezoMitarbeiterAntragL">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NezoMitarbeiterAntragG">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NezoMitarbeiterAntragW">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BerechtigungL">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NezoSPAntrag">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterSelfServicePortal</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NezoSPAntragL">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterSelfServicePortal</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NezoSPAntragG">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterSelfServicePortal</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NezoSPAntragW">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterSelfServicePortal</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ErhebungAzV50a">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterALIEN</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GrunddatenAzV50a">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterALIEN</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LohnersatzMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VNoVMVLoeschung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVollmachtDB oder Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VerbindlicheAuskunftInfoF">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OSSEURegistrierungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OSSEUAenderungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OSSEUAbmeldungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OSSEUErklaerungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OSSNonEURegistrierung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OSSNonEUAenderung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OSSNonEUAbmeldung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OSSNonEUErklaerung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OSSNonEURegistrierungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OSSNonEUAenderungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OSSNonEUAbmeldungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OSSNonEUErklaerungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OSSEURegistrierung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OSSEUAenderung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OSSEUAbmeldung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OSSEUErklaerung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AenderungLangusteRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterLanguste</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AenderungLanguste">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterLanguste</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AnfrageLanguste">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterLanguste</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EPStBescheidAbholung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterDatenabholung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EPStMitteilungAbholung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterDatenabholung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AntrVerbindlicheAuskunft">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VerbindlicheAuskunft">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GrundsteuerHE">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterErklaerung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ErwerbeQ">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVIES</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ErwerbeJ">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVIES</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PositivlisteJ">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVIES</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PositivlisteM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVIES</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VerbindlicheAuskunftInfoA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GMBX">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AnfrageCoronaSoforthilfe">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterFT</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LandAnfrageCoronaHilfe">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterDAME</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LandAntwortCoronaHilfe">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMVZentraleAuswertung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AntwortCoronaSoforthilfe">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="CovidNovHilfeBescheid">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterFT</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BZSt2">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="34a"/>
+			<xs:enumeration value="50a"/>
+			<xs:enumeration value="AAZD"/>
+			<xs:enumeration value="AbholungErinnerungEMail"/>
+			<xs:enumeration value="AktivierungscodeRegVOR">
+				<xs:annotation>
+					<xs:documentation>ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AktivierungscodeRegBZSt">
+				<xs:annotation>
+					<xs:documentation>ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AktivierungscodeZErnBZSt">
+				<xs:annotation>
+					<xs:documentation>ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Fristverlaengerung"/>
+			<xs:enumeration value="AnpassungVorauszahlung"/>
+			<xs:enumeration value="AnstossTestnachricht">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterEGVP</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AktivierungscodeRegIdNr">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AktivierungscodeRegStNr">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AktivierungscodeRegReVer">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AktivierungscodeZErnIdNr">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AktivierungscodeZErnStNr">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AktivierungscodeZErnReVer">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AbrufcodeBrief">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FreischaltcodeBrief">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AenderungAdresse"/>
+			<xs:enumeration value="AenderungBankverbindung"/>
+			<xs:enumeration value="Belegnachreichung"/>
+			<xs:enumeration value="SachlicheBilligkeitsgruende"/>
+			<xs:enumeration value="PersoenlicheBilligkeitsgruende"/>
+			<xs:enumeration value="Erlass"/>
+			<xs:enumeration value="Vollstreckungsaufschub"/>
+			<xs:enumeration value="SonstigeNachrichten"/>
+			<xs:enumeration value="AbrufcodeAntrag"/>
+			<xs:enumeration value="AbrufcodeEMail"/>
+			<xs:enumeration value="AbrufcodeStorno"/>
+			<xs:enumeration value="AenderungslisteDUe"/>
+			<xs:enumeration value="AenderungslisteElstam"/>
+			<xs:enumeration value="AenderungslisteHinweis"/>
+			<xs:enumeration value="AenderungslisteStatus"/>
+			<xs:enumeration value="AIFA"/>
+			<xs:enumeration value="AktenAbgabe"/>
+			<xs:enumeration value="AktenAbgabeInfo"/>
+			<xs:enumeration value="ALB"/>
+			<xs:enumeration value="ANAuskunft"/>
+			<xs:enumeration value="ANAuskunftElstam"/>
+			<xs:enumeration value="ANAuskunftRequest"/>
+			<xs:enumeration value="AnfrMeldedatenIdNr"/>
+			<xs:enumeration value="AnfrMeldedatenPerson"/>
+			<xs:enumeration value="ASPZ"/>
+			<xs:enumeration value="ASPZR"/>
+			<xs:enumeration value="AuslaendischeLebensversicherung"/>
+			<xs:enumeration value="AVFG"/>
+			<xs:enumeration value="AVZF"/>
+			<xs:enumeration value="AVZFR"/>
+			<xs:enumeration value="AWST"/>
+			<xs:enumeration value="AWSTR"/>
+			<xs:enumeration value="IAAP">
+				<xs:annotation>
+					<xs:documentation>Verfahren: OpenZoll</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IEA">
+				<xs:annotation>
+					<xs:documentation>Verfahren: OpenZoll</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IOSSRegistrierung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern- - IOSS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IOSSAenderung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern- - IOSS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IOSSAbmeldung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern- - IOSS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IOSSErklaerung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern- - IOSS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IOSSRegistrierungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern- - IOSS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IOSSAenderungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern- - IOSS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IOSSAbmeldungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern- - IOSS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IOSSErklaerungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern- - IOSS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BBANK"/>
+			<xs:enumeration value="BescheidnachrichtAnEOP"/>
+			<xs:enumeration value="BetPG"/>
+			<xs:enumeration value="Bilanz"/>
+			<xs:enumeration value="BLZ"/>
+			<xs:enumeration value="BUCH"/>
+			<xs:enumeration value="BUKON"/>
+			<xs:enumeration value="BUKOR"/>
+			<xs:enumeration value="BUKWZ"/>
+			<xs:enumeration value="BZStDiverse"/>
+			<xs:enumeration value="BZStDiverseRM"/>
+			<xs:enumeration value="CRS">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="CRSRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DAAL"/>
+			<xs:enumeration value="DaBu216"/>
+			<xs:enumeration value="DEICH"/>
+			<xs:enumeration value="DIVABescheid">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterDiva</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ProtokollBereitstellung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterDiva</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FehlerBereitstellung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterDiva</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AbholProtokoll">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterDiva</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LoeschungDB">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterDiva</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AntwortBescheidStatus">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterDiva</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DUeAbmelden"/>
+			<xs:enumeration value="DUeAnmelden"/>
+			<xs:enumeration value="DUeUmmelden"/>
+			<xs:enumeration value="EARLDatenExportDAME"/>
+			<xs:enumeration value="EARLDatenExportRMS"/>
+			<xs:enumeration value="ECOM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ECOMRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EGVPMail">
+				<xs:annotation>
+					<xs:documentation>ElsterEGVP</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EGVPNachricht">
+				<xs:annotation>
+					<xs:documentation>ElsterEGVP</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EPBescheid">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EPMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterEPBescheidDaten">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterDatenabholung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterEPMitteilungDaten">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterDatenabholung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Empfangsbekenntnis">
+				<xs:annotation>
+					<xs:documentation>ElsterEGVP</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SendungsquittungEGVP">
+				<xs:annotation>
+					<xs:documentation>ElsterEGVP</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Einspruch"/>
+			<xs:enumeration value="EKIST">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern, Datenart: EKIST Vorgang: send-Auth, Datenart: EKISTRM Vorgang: send-NoSig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EKISTRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern, Datenart: EKIST Vorgang: send-Auth, Datenart: EKISTRM Vorgang: send-NoSig</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EKoFreischaltung"/>
+			<xs:enumeration value="ELStAMDueEOP">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterDatenuebernahmeEOP</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterDivDaten"/>
+			<xs:enumeration value="ElsterDIVADaten"/>
+			<xs:enumeration value="ElsterErklaerungDaten"/>
+			<xs:enumeration value="ElsterFTDaten"/>
+			<xs:enumeration value="ElsterKMVDaten"/>
+			<xs:enumeration value="ElsterLohnDaten"/>
+			<xs:enumeration value="ElsterLohn2ANDaten"/>
+			<xs:enumeration value="ElsterLohn2Daten"/>
+			<xs:enumeration value="ElsterLohnInternVersand"/>
+			<xs:enumeration value="ElsterVaStDaten"/>
+			<xs:enumeration value="ELOProtokoll">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EMAK"/>
+			<xs:enumeration value="EMAKFRM"/>
+			<xs:enumeration value="USTVEUFRM"/>
+			<xs:enumeration value="EMAKF"/>
+			<xs:enumeration value="ErbStBStat"/>
+			<xs:enumeration value="ErbStBStatRM"/>
+			<xs:enumeration value="ErgMeldedatenIdNr"/>
+			<xs:enumeration value="ErgMeldedatenPerson"/>
+			<xs:enumeration value="ESB"/>
+			<xs:enumeration value="ESSGS"/>
+			<xs:enumeration value="ESSRM"/>
+			<xs:enumeration value="ESt"/>
+			<xs:enumeration value="EStbeschraenkt"/>
+			<xs:enumeration value="EStBITVBescheid">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterPortal</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EStBITVBescheidAnf">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterDIVA</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EStDueEOP"/>
+			<xs:enumeration value="UStDueEOP"/>
+			<xs:enumeration value="EUERDueEOP"/>
+			<xs:enumeration value="34aDueEOP"/>
+			<xs:enumeration value="GewStDueEOP"/>
+			<xs:enumeration value="GewStZDueEOP"/>
+			<xs:enumeration value="Gewerbesteuerbescheid">
+				<xs:annotation>
+					<xs:documentation>Verfahren:ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ZMDODueEOP"/>
+			<xs:enumeration value="LStADueEOP"/>
+			<xs:enumeration value="LStBDueEOP"/>
+			<xs:enumeration value="SpezRechtListeGINSTER">
+				<xs:annotation>
+					<xs:documentation>Verfahren:ElsterBRM SpezRechtListeGINSTER: Vollmachtsinformationen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="UStVADueEOP"/>
+			<xs:enumeration value="ESTBS"/>
+			<xs:enumeration value="EStBStat"/>
+			<xs:enumeration value="EStBStatRM"/>
+			<xs:enumeration value="ESTGS"/>
+			<xs:enumeration value="ESTGX"/>
+			<xs:enumeration value="EStGStat"/>
+			<xs:enumeration value="EStGStatRM"/>
+			<xs:enumeration value="ESTRM"/>
+			<xs:enumeration value="ESt4BMitteilung"/>
+			<xs:enumeration value="ETRVerfAntragEreignis">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterTransferAsynchron Datenart: ETRVerfAntragEreignis</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ETRVerfAntrag">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterTransferSynchron, ELSTER-Transfer-Verfahrensantrag. Für die Zuteilung der Berechtigung zu einem gewählten Verfahren. Resultiert bei Erfolg in einem offenen Antrag.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ETRVerfAntragGenehmigung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterTransferSynchron, Genehmigen offener ETR-Verfahrensanträge. Referenziert einen zuvor gestellten ELSTER-Transfer-Verfahrensantrag. Resultiert bei Erfolg in genehmigtem Auftrag.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ETRVerfAntragStorno">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterTransferSynchron, Stornieren genehmigter bzw. Ablehnen offener ETR Verfahrensanträge. Referenziert einen zuvor gestellten ETR-Verfahrensantrag. Resultiert bei Erfolg in abgelehntem Auftrag.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ETRVerfAntragListe">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterTransferSynchron, Anzeigen der Anträge. Zeigt anhand der übergebenen Suchkriterien (Nutzer, AntragsStatus, AntragsDatum, Von, Bis) eine Liste von Anträgen an.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EUER"/>
+			<xs:enumeration value="EUERStatRM"/>
+			<xs:enumeration value="EUn"/>
+			<xs:enumeration value="EURS"/>
+			<xs:enumeration value="EUZIR"/>
+			<xs:enumeration value="F15K"/>
+			<xs:enumeration value="F15L"/>
+			<xs:enumeration value="FAMKA"/>
+			<xs:enumeration value="FAMKARM"/>
+			<xs:enumeration value="FATCA"/>
+			<xs:enumeration value="FATCARM"/>
+			<xs:enumeration value="FDSuche"/>
+			<xs:enumeration value="FZLMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FehlermeldungAnGericht">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterEGVP</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NachrichtZumGericht">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterEGVP</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FEIGS"/>
+			<xs:enumeration value="FEIN"/>
+			<xs:enumeration value="FEINB"/>
+			<xs:enumeration value="FISCH"/>
+			<xs:enumeration value="FreischaltcodeEMail"/>
+			<xs:enumeration value="FreistellungKapitalertraegeBV"/>
+			<xs:enumeration value="FSADE"/>
+			<xs:enumeration value="FSADV"/>
+			<xs:enumeration value="FSAK"/>
+			<xs:enumeration value="FSLOG"/>
+			<xs:enumeration value="GDA"/>
+			<xs:enumeration value="GELF"/>
+			<xs:enumeration value="GEWAB"/>
+			<xs:enumeration value="GEWAN"/>
+			<xs:enumeration value="GEWBA"/>
+			<xs:enumeration value="GEWBS"/>
+			<xs:enumeration value="GEWGI"/>
+			<xs:enumeration value="GEWGS"/>
+			<xs:enumeration value="GEWHN"/>
+			<xs:enumeration value="GEWMB"/>
+			<xs:enumeration value="GewSt"/>
+			<xs:enumeration value="GewStBStat"/>
+			<xs:enumeration value="GewStBStatRM"/>
+			<xs:enumeration value="GewStGStat"/>
+			<xs:enumeration value="GewStGStatRM"/>
+			<xs:enumeration value="GewStZ"/>
+			<xs:enumeration value="GEWTP"/>
+			<xs:enumeration value="GEWUM"/>
+			<xs:enumeration value="GEWUL"/>
+			<xs:enumeration value="GEWXX"/>
+			<xs:enumeration value="GiBeKuAnfrageSyn">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterGecoSyn</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GiBeKuAnfrage">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterKStoKS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GiBeKuAntwort">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterKStoKS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VMErgebnisListeVNSicht">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LStHVVMAnlage">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM und Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LStHVVMUpdate">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM oder Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VMoVMVFreischaltung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM oder Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VollmachtDetails">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VollfAAnlage">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM oder Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AbrufvollmachtAnlage">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM oder ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VMoVMVStBAnlage">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM oder Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VollfAUpdate">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM oder Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AbrufvollmachtUpdate">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM oder Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VMoVMVStBUpdate">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VNoVMVRegistrierung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VNoVMVUpdate">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRM oder Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BRMVMHinweis">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LStHVVMID">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VMoVMVAntragVMC">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LStHVVMRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LStHVOrgUpdate">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRMOrg</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VNoVMVUpdateRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRMOrg</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VNoVMVUpdateFA">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBRMOrg</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VMWiderruf">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VollfACodeBrief">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AbrufvollmachtcodeBrief">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VMoVMVStBCodeBrief">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AktivierungscodeUpgrStNr">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AktivierungscodeUpgrIdNr">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AktivierungscodeNLOMGStNr">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterBrief</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GINSTERLieferung"/>
+			<xs:enumeration value="GINSTERLieferungAbel"/>
+			<xs:enumeration value="GINSTERLieferungDuebel"/>
+			<xs:enumeration value="GrenzfiskalRMSExportFamKa">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterInKA</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Grundsteuerwert">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterErklaerung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GrundsteuerBY">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterErklaerung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GrundsteuerBW">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterErklaerung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GrundrenteAnfrageKMV">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMVZentral</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GrundrenteAntwortKMV">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMVZentral</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GrundrenteAnfrageLand">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterDAME</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GrundrenteAntwortDRV">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterDRVBund</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="InKAFATCA"/>
+			<xs:enumeration value="InKAEIE"/>
+			<xs:enumeration value="InKAEDF"/>
+			<xs:enumeration value="InKAELP"/>
+			<xs:enumeration value="InKAEIP"/>
+			<xs:enumeration value="InKAEPN"/>
+			<xs:enumeration value="ProtInKAFATCA"/>
+			<xs:enumeration value="ProtInKAEIE"/>
+			<xs:enumeration value="ProtInKAEDF"/>
+			<xs:enumeration value="ProtInKAELP"/>
+			<xs:enumeration value="ProtInKAEIP"/>
+			<xs:enumeration value="ProtInKAEPN"/>
+			<xs:enumeration value="ZObELBestaetigungAbel"/>
+			<xs:enumeration value="ZObELBestaetigungDuebel"/>
+			<xs:enumeration value="GMB"/>
+			<xs:enumeration value="GMBAE"/>
+			<xs:enumeration value="GMBV"/>
+			<xs:enumeration value="GRSTE"/>
+			<xs:enumeration value="GSB"/>
+			<xs:enumeration value="GWPH1"/>
+			<xs:enumeration value="HHRE"/>
+			<xs:enumeration value="HWKD"/>
+			<xs:enumeration value="HWKR"/>
+			<xs:enumeration value="IdentabgleichArt1"/>
+			<xs:enumeration value="IdentabgleichArt2"/>
+			<xs:enumeration value="IdentabgleichArt3"/>
+			<xs:enumeration value="IdentabgleichArt4"/>
+			<xs:enumeration value="IdentabgleichArt1RM"/>
+			<xs:enumeration value="IdentabgleichArt2RM"/>
+			<xs:enumeration value="IdentabgleichArt3RM"/>
+			<xs:enumeration value="IdentabgleichArt4RM"/>
+			<xs:enumeration value="IdentabgleichKindRM"/>
+			<xs:enumeration value="IdentabgleichKind"/>
+			<xs:enumeration value="IdNrRechercheKMVTyp1"/>
+			<xs:enumeration value="IdNrRechercheKMVTyp1RM"/>
+			<xs:enumeration value="IdNrRechercheLANGUSTETyp1">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterLanguste</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IdNrRechercheLANGUSTETyp1RM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterLanguste</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="IdentAbgleichKMVTyp2"/>
+			<xs:enumeration value="IdentAbgleichKMVTyp2RM"/>
+			<xs:enumeration value="IdentAbgleichKMVTyp3"/>
+			<xs:enumeration value="IdentAbgleichKMVTyp3RM"/>
+			<xs:enumeration value="IdentAbgleichKMVTyp4"/>
+			<xs:enumeration value="IdentAbgleichKMVTyp4RM"/>
+			<xs:enumeration value="IdNrRechercheELohnTyp1"/>
+			<xs:enumeration value="IdNrRechercheELohnTyp1RM"/>
+			<xs:enumeration value="IdentAbgleichELohnTyp2"/>
+			<xs:enumeration value="IdentAbgleichELohnTyp2RM"/>
+			<xs:enumeration value="IdentAbgleichELohnTyp3"/>
+			<xs:enumeration value="IdentAbgleichELohnTyp3RM"/>
+			<xs:enumeration value="IdentAbgleichELohnTyp4"/>
+			<xs:enumeration value="IdentAbgleichELohnTyp4RM"/>
+			<xs:enumeration value="IDNrSuche"/>
+			<xs:enumeration value="IDSERV"/>
+			<xs:enumeration value="IDSERVRM"/>
+			<xs:enumeration value="VergabeAenderungIFAS"/>
+			<xs:enumeration value="InfoBestEingang"/>
+			<xs:enumeration value="InfoBestStatus">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterPortal;</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="InvStG56Abs5"/>
+			<xs:enumeration value="KanzleiAnlage"/>
+			<xs:enumeration value="KanzleiUpdate"/>
+			<xs:enumeration value="KanzleiLoeschen"/>
+			<xs:enumeration value="KapEStA"/>
+			<xs:enumeration value="KapEStDivAuswertung"/>
+			<xs:enumeration value="KapEStDivAufkommen"/>
+			<xs:enumeration value="KapEStDivBuchungen"/>
+			<xs:enumeration value="KapEStDivNachweis"/>
+			<xs:enumeration value="KapEStDivZahlungsaustausch"/>
+			<xs:enumeration value="KapEStInvStG"/>
+			<xs:enumeration value="KapG"/>
+			<xs:enumeration value="KapGAus">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ELsterFSE</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KAPID"/>
+			<xs:enumeration value="KAPIF"/>
+			<xs:enumeration value="KAPIP"/>
+			<xs:enumeration value="KATEW"/>
+			<xs:enumeration value="KBL"/>
+			<xs:enumeration value="KEVIZZAX"/>
+			<xs:enumeration value="KEVIZZBG"/>
+			<xs:enumeration value="KEVIZZF0"/>
+			<xs:enumeration value="KEVIZZF1"/>
+			<xs:enumeration value="KEVIZZGX"/>
+			<xs:enumeration value="KEVIZZJX"/>
+			<xs:enumeration value="KEVIZZK0"/>
+			<xs:enumeration value="KEVIZZKX"/>
+			<xs:enumeration value="KEVIZZMX"/>
+			<xs:enumeration value="KEVIZZN1"/>
+			<xs:enumeration value="KEVIZZN2"/>
+			<xs:enumeration value="KEVIZZNX"/>
+			<xs:enumeration value="KEVIZZRM"/>
+			<xs:enumeration value="KEVIZZRX"/>
+			<xs:enumeration value="KEVIZZSX"/>
+			<xs:enumeration value="KEVIZZUX"/>
+			<xs:enumeration value="KEVIZZWX"/>
+			<xs:enumeration value="KEVIZZZX"/>
+			<xs:enumeration value="KISTA"/>
+			<xs:enumeration value="KiStASperrvermerk">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ELsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KiStAZulassung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ELsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KISTARM"/>
+			<xs:enumeration value="KISTM"/>
+			<xs:enumeration value="KMFreistellungsauftrag"/>
+			<xs:enumeration value="KMVProtokoll"/>
+			<xs:enumeration value="KMVExportRBM">
+				<xs:annotation>
+					<xs:documentation>KMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KOF"/>
+			<xs:enumeration value="KOFH"/>
+			<xs:enumeration value="KOFZ"/>
+			<xs:enumeration value="KOFL"/>
+			<xs:enumeration value="Kontoabfrage"/>
+			<xs:enumeration value="KontoEreignis"/>
+			<xs:enumeration value="Kontoinformation"/>
+			<xs:enumeration value="KPAD"/>
+			<xs:enumeration value="KPAF"/>
+			<xs:enumeration value="KPAP"/>
+			<xs:enumeration value="KPBU"/>
+			<xs:enumeration value="KPDAK"/>
+			<xs:enumeration value="KPDAW"/>
+			<xs:enumeration value="KPDNV"/>
+			<xs:enumeration value="KPKAU"/>
+			<xs:enumeration value="KPKAW"/>
+			<xs:enumeration value="KPKAZ"/>
+			<xs:enumeration value="KPKRM"/>
+			<xs:enumeration value="KPZA"/>
+			<xs:enumeration value="KPZAD"/>
+			<xs:enumeration value="KPZE"/>
+			<xs:enumeration value="KPZL"/>
+			<xs:enumeration value="KrankenPflegeVersicherung"/>
+			<xs:enumeration value="KSt"/>
+			<xs:enumeration value="KSTBS"/>
+			<xs:enumeration value="KStBStat"/>
+			<xs:enumeration value="KStBStatRM"/>
+			<xs:enumeration value="KSTGS"/>
+			<xs:enumeration value="KStGStat"/>
+			<xs:enumeration value="KStGStatRM"/>
+			<xs:enumeration value="KStZ"/>
+			<xs:enumeration value="KV"/>
+			<xs:enumeration value="KVABG"/>
+			<xs:enumeration value="LLIST"/>
+			<xs:enumeration value="Lohnersatzleistung"/>
+			<xs:enumeration value="IdentAbgleichLANGUSTETyp2"/>
+			<xs:enumeration value="IdentAbgleichLANGUSTETyp2RM"/>
+			<xs:enumeration value="IdNrRechercheLANGUSTETyp3"/>
+			<xs:enumeration value="IdNrRechercheLANGUSTETyp3RM"/>
+			<xs:enumeration value="AntragsbriefFreischaltCode"/>
+			<xs:enumeration value="RegistrierungReVerSt"/>
+			<xs:enumeration value="ZFALohnersatzAnf">
+				<xs:annotation>
+					<xs:documentation>Verfahren (max. 25 Zeichen): ElsterKMVZentraleAuswertung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ZFALohnersatzRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterDRVBund</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LStA"/>
+			<xs:enumeration value="LStB"/>
+			<xs:enumeration value="LStZerlegungDaten"/>
+			<xs:enumeration value="LStBAuswertungDaten">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterDAME</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DAMEErgebnis">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterDAME</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LStHVAntragAnnahme">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBRMOrg</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LStHVQualiCode">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBRMOrg</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LStHVListeAccounts">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBRMOrg</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LStHVMitarbeiterAntrag">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBRMOrg</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="QualifizierungLStHV">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBRMOrg</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="QualifizierungVVEMail">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBRMOrg</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LStHVAntragAblehnung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBRMOrg</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LStHVLoeschAccountListe">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBRMOrg</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LStHVQualiAntragVV">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBRMOrg</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LStHVQualiAntragBStL">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBRMOrg</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LStHVListeBSt">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBRMOrg</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterVollmachtDaten">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterDatenabholung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ELANRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern;</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration> 
+			<xs:enumeration value="M1SS"/>
+			<xs:enumeration value="M1SSRM"/>
+			<xs:enumeration value="MAVIdent"/>
+			<xs:enumeration value="MAVIdentRM"/>
+			<xs:enumeration value="MELK"/>
+			<xs:enumeration value="MeldungFehlerFachlich">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterEGVP</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MFSB"/>
+			<xs:enumeration value="MitteilungAbrufCode"/>
+			<xs:enumeration value="NichtSteuerlicheNachricht">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterKontakt</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="C19Mitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="COBRADAC6Mitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="COBRAISGMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="COBRAOEMitteilung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="COBRADAC6MitteilungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="COBRAISGMitteilungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="COBRAOEMitteilungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FTTAntrStNrRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FTTAntrStNr">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ForschungZulAntrag">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterNachricht</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NLIST"/>
+			<xs:enumeration value="NVBFreistellungsauftrag"/>
+			<xs:enumeration value="PersG"/>
+			<xs:enumeration value="PersGBStat"/>
+			<xs:enumeration value="PersGBStatRM"/>
+			<xs:enumeration value="PortalPostfachnachrichten"/>
+			<xs:enumeration value="POSLJ"/>
+			<xs:enumeration value="POSLM"/>
+			<xs:enumeration value="ProtAuslaendischeLebensversicherung"/>
+			<xs:enumeration value="ProtErgMeldedatenIdNr"/>
+			<xs:enumeration value="ProtErgMeldedatenPerson"/>
+			<xs:enumeration value="ProtESt4BMitteilung"/>
+			<xs:enumeration value="ProtEUZinsmitteilung"/>
+			<xs:enumeration value="ProtInKACRS"/>
+			<xs:enumeration value="InKACRS"/>
+			<xs:enumeration value="ProtKrankenPflegeVersicherung"/>
+			<xs:enumeration value="ProtKMFreistellungsauftrag"/>
+			<xs:enumeration value="ProtRBM"/>
+			<xs:enumeration value="ProtNVBFreistellungsauftrag"/>
+			<xs:enumeration value="ProtRiesterVersicherung"/>
+			<xs:enumeration value="ProtRuerupVersicherung"/>
+			<xs:enumeration value="ProtZuschVorsorgeaufwand"/>
+			<xs:enumeration value="RBM"/>
+			<xs:enumeration value="RDAL"/>
+			<xs:enumeration value="RegistrierungReVerStEMail"/>
+			<xs:enumeration value="RegInfo"/>
+			<xs:enumeration value="RegInfoAusschluss"/>
+			<xs:enumeration value="RetInfo"/>
+			<xs:enumeration value="RegRequestedInfo"/>
+			<xs:enumeration value="RetRequestedInfo"/>
+			<xs:enumeration value="RegAkzeptanz"/>
+			<xs:enumeration value="RegAkzEinwendung"/>
+			<xs:enumeration value="RegAblehnung"/>
+			<xs:enumeration value="RegAnfrage"/>
+			<xs:enumeration value="RFSB"/>
+			<xs:enumeration value="RiesterVersicherung"/>
+			<xs:enumeration value="RME"/>
+			<xs:enumeration value="RuerupVersicherung"/>
+			<xs:enumeration value="SADVF"/>
+			<xs:enumeration value="SEPA"/>
+			<xs:enumeration value="SondEStStat"/>
+			<xs:enumeration value="SondEStStatRM"/>
+			<xs:enumeration value="SperrvermerkKirchensteuer"/>
+			<xs:enumeration value="ProtSperrvermerkKirchensteuer"/>
+			<xs:enumeration value="SpezRechtAntrag"/>
+			<xs:enumeration value="SpezRechtFreischaltung"/>
+			<xs:enumeration value="SpezRechtGenehmigung"/>
+			<xs:enumeration value="SpezRechtListe"/>
+			<xs:enumeration value="SpezRechtStorno"/>
+			<xs:enumeration value="SpezRechtTeilnahme"/>
+			<xs:enumeration value="STBKE"/>
+			<xs:enumeration value="Statusabfrage">
+				<xs:annotation>
+					<xs:documentation>Intern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="StAb50a"/>
+			<xs:enumeration value="StAbS50a">
+				<xs:annotation>
+					<xs:documentation>Übermittlung: Wie bisher bei der Anmeldung § 50a EStG der Jahre 2010 bis 2013 im EOP</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="STE"/>
+			<xs:enumeration value="STK"/>
+			<xs:enumeration value="SteuernummernInfo"/>
+			<xs:enumeration value="SteuernummernSuche"/>
+			<xs:enumeration value="SV"/>
+			<xs:enumeration value="TEST"/>
+			<xs:enumeration value="TEST7"/>
+			<xs:enumeration value="TOT"/>
+			<xs:enumeration value="UnentgeltlicheDepotuebertragung"/>
+			<xs:enumeration value="USB"/>
+			<xs:enumeration value="USt"/>
+			<xs:enumeration value="UStBStat"/>
+			<xs:enumeration value="UStBStatRM"/>
+			<xs:enumeration value="USTGS"/>
+			<xs:enumeration value="USTRM"/>
+			<xs:enumeration value="UStVA"/>
+			<xs:enumeration value="UStVABStat"/>
+			<xs:enumeration value="UStVABStatRM"/>
+			<xs:enumeration value="UStVEU"/>
+			<xs:enumeration value="UStVEUF"/>
+			<xs:enumeration value="UStVEURM"/>
+			<xs:enumeration value="USTFINA"/>
+			<xs:enumeration value="USTFINARM"/>
+			<xs:enumeration value="UVVGS"/>
+			<xs:enumeration value="VCSYN"/>
+			<xs:enumeration value="VgsyncWfVorgang">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterKStoKS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VgsyncQuittung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterKStoKS</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VaStBeleg"/>
+			<xs:enumeration value="VaStGinsterListe"/>
+			<xs:enumeration value="VaStInfo"/>
+			<xs:enumeration value="VaStNachforderung"/>
+			<xs:enumeration value="VaStTeilnehmer"/>
+			<xs:enumeration value="VaStFspNachforderung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVaSt</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VaStFspQuittung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVaSt</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VaStFspTeilnehmer">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVaSt</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VaStFspBeleg">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterVaSt</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VaStQuittung"/>
+			<xs:enumeration value="VerfuegungsmitteilungASPZ"/>
+			<xs:enumeration value="VermoegenswirksameLeistung">
+				<xs:annotation>
+					<xs:documentation>Verfahren ElsterKMV</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VERS"/>
+			<xs:enumeration value="VOBU"/>
+			<xs:enumeration value="VOEA"/>
+			<xs:enumeration value="VOERS"/>
+			<xs:enumeration value="VVAEB"/>
+			<xs:enumeration value="VWDVG"/>
+			<xs:enumeration value="WIDA"/>
+			<xs:enumeration value="WIDR"/>
+			<xs:enumeration value="WeDaReErgebnis"/>
+			<xs:enumeration value="WPMB"/>
+			<xs:enumeration value="WPMBR"/>
+			<xs:enumeration value="WPML"/>
+			<xs:enumeration value="WPMLR"/>
+			<xs:enumeration value="ZMAlt"/>
+			<xs:enumeration value="ZMDO"/>
+			<xs:enumeration value="ZMEWJ"/>
+			<xs:enumeration value=" "/>
+			<xs:enumeration value="ZObELBestaetigung"/>
+			<xs:enumeration value="Zuwendungsbestaetigung"/>
+			<xs:enumeration value="ZV21a3"/>
+			<xs:enumeration value="USEGA"/>
+			<xs:enumeration value="VIFAA"/>
+			<xs:enumeration value="IDNRA"/>
+			<xs:enumeration value="USEGR"/>
+			<xs:enumeration value="VIFAR"/>
+			<xs:enumeration value="IDNRR"/>
+			<xs:enumeration value="PayInfo"/>
+			<xs:enumeration value="PayReminder"/>
+			<xs:enumeration value="Erstattung"/>
+			<xs:enumeration value="ErklaerungAnfrage"/>
+			<xs:enumeration value="Mahnung"/>
+			<xs:enumeration value="ZMDORM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VERSRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VVAEBRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="StAb50aRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FTTMeldungRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FTTMeldung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BOPQuittung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BZStWidersp">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BZStBelege">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BZStOZGInfo">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BZStWiderspRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BZStBelegeRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BZStOZGInfoRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FTTMeldungVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ELeVWiederaufnahmeEhe">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterLavendel</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ELeVSteuerklassenwechsel">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterLavendel</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ELeVGetrenntlebend">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterLavendel</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ELeVErmaessigung">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterLavendel</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ELeVAntragELStAM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterLavendel</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FSAKRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="EMAKRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MELKRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BRMVDBRueckmeldungAnlief">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VDBBRMVollmachtAnlageLief">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VDBBRMVollmachtUpdateLief">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VDBBRMRueckmeldungLief">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VollmachtStornoLief">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="StnrInfo">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterGinsterVDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="StnrSuch">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterGinsterVDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="StatusVdbL">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterGinsterVDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Pruef">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterGinsterVDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="StatusVdbZ">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterGinsterVDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="StatusInvStGRM">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="StatusInvStG">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterExtern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="StatusInvStGVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="UStVEUVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VERSVA">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DIVADatenBZSt">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterDatenabholung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KDBVollmacht">
+				<xs:annotation>
+					<xs:documentation>ElsterGinsterVDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="USLORequest">
+				<xs:annotation>
+					<xs:documentation>ElsterKDialog</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="USLOResponse">
+				<xs:annotation>
+					<xs:documentation>ElsterKDialog</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="USLOInfoBund">
+				<xs:annotation>
+					<xs:documentation>ElsterKDialog</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VDBVollmacht">
+				<xs:annotation>
+					<xs:documentation>ElsterGinsterVDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VDBVollmachtRM">
+				<xs:annotation>
+					<xs:documentation>ElsterGinsterVDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="KDBVollmachtRM">
+				<xs:annotation>
+					<xs:documentation>ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VDBKDBRueckmeldungLief">
+				<xs:annotation>
+					<xs:documentation>ElsterBereitstellung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BRMVollmachtStorno">
+				<xs:annotation>
+					<xs:documentation>ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="VollmachtStornoAnlief">
+				<xs:annotation>
+					<xs:documentation>ElsterVollmachtDB</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ZuschVorsorgeaufwand">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ZertifikatsMonitoring">
+				<xs:annotation>
+					<xs:documentation>ElsterEmail</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ProtInKADAC6">
+				<xs:annotation>
+					<xs:documentation>ElsterKMVProtokoll</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="InKADAC6">
+				<xs:annotation>
+					<xs:documentation>ElsterKMVProtokoll</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

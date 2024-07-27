@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!--Version 1 -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:elster="http://www.elster.de/elsterxml/schema/v11" targetNamespace="http://www.elster.de/elsterxml/schema/v11" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1">
+	<xs:include schemaLocation="./th000011_extern.xsd">
+		<xs:annotation>
+			<xs:documentation xml:lang="DE">TransferHeader-Schema mit der Version 11</xs:documentation>
+		</xs:annotation>
+	</xs:include>
+	<xs:include schemaLocation="./ndh000011.xsd">
+		<xs:annotation>
+			<xs:documentation xml:lang="DE">NutzdatenHeader-Schema mit der Version 11</xs:documentation>
+		</xs:annotation>
+	</xs:include>
+	<!-- RootElement = Elster _______________________________________________________________-->
+	<xs:element name="Elster">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="elster:TransferHeader"/>
+				<xs:element name="DatenTeil" type="elster:DatenTeilCType">
+					<xs:annotation>
+						<xs:documentation xml:lang="DE">Das Element DatenTeil enthaelt einen oder bei Sammellieferungen mehrere Nutzdatenbloecke.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<!-- D -->
+	<xs:complexType name="DatenTeilCType">
+		<xs:sequence>
+			<xs:element name="Nutzdatenblock" type="elster:NutzdatenblockCType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- N -->
+	<xs:complexType name="NutzdatenblockCType">
+		<xs:annotation>
+			<xs:documentation xml:lang="DE">Der Nutzdatenblock enthaelt jeweils ein Element "NutzdatenHeader" und ein Element "Nutzdaten"</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element ref="elster:NutzdatenHeader"/>
+			<xs:element name="Nutzdaten" type="elster:NutzdatenCType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="NutzdatenCType">
+		<xs:sequence>
+			<xs:element ref="elster:NutzdatenDaten"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="NutzdatenDaten" type="xs:anyType" abstract="true"/>
+</xs:schema>

@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  Version: 2024.3.0.0 Erstelldatum: 2024-05-02 -->
+<xs:schema xmlns:elsterheaderbasis="http://www.elster.de/elsterxml/schema/headerbasis/v3" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.elster.de/elsterxml/schema/headerbasis/v3" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1">
+	<xs:include schemaLocation="./headerbasis_datentypen.xsd"/>
+	<xs:simpleType name="VerfahrenSType">
+		<xs:annotation>
+			<xs:documentation xml:lang="DE">Der erlaubte Zeichensatz für Verfahren ist: [a-zA-Z0-9] {1,25}
+			Auflistung der gültigen Verfahren:</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="elsterheaderbasis:BaseStringSType">
+			<xs:enumeration value="ElsterConnectTest">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterDuebel">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterElfeEibe">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterGinsterKomet">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterRabe">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterVirenscan">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterKaFE">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterGeCoASYN">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterBereitstellungRM">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterSelfServicePortal">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterDIVAOZG">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterVIES">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterAnmeldung">
+				<xs:annotation>
+					<xs:documentation>Verfahren zur Übermittlung von Anmeldesteuern (Lohnsteuer-Anmeldung und Umsatzsteuer-Voranmeldung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterALIEN">
+				<xs:annotation>
+					<xs:documentation>Verfahren A-bzugsverfahren, LI-zenzen, EN-tlastung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterAuswertung">
+				<xs:annotation>
+					<xs:documentation>Auswertungen (internes Verfahren)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterBereitstellung">
+				<xs:annotation>
+					<xs:documentation>Bereitstellung von Daten zur Abholung (internes Verfahren)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterLavendel">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterInKA">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>			 
+			<xs:enumeration value="ElsterBilanz">
+				<xs:annotation>
+					<xs:documentation>Verfahren fuer Bilanz</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterBRM">
+				<xs:annotation>
+					<xs:documentation>Berechtigungsmanagement (internes Verfahren)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterBRMOrg">
+				<xs:annotation>
+					<xs:documentation>Berechtigungsmanagement (internes Verfahren)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterBrief">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterDatenuebernahmeEOP">
+				<xs:annotation>
+					<xs:documentation>Internes Verfahren</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterDVEtoLKS">
+				<xs:annotation>
+					<xs:documentation>Datenlieferungen vom Statistischen Bundesamt  DESTATIS (internes Verfahren)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterDAME">
+				<xs:annotation>
+					<xs:documentation>Verfahren DAME</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterDatenabholung">
+				<xs:annotation>
+					<xs:documentation>Abholen von Daten (Bsp. Bescheiddaten)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterDatenversand">
+				<xs:annotation>
+					<xs:documentation>Versand von Daten (internes Verfahren)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterDIVA">
+				<xs:annotation>
+					<xs:documentation>ElsterDIVA</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterDRVBund">
+				<xs:annotation>
+					<xs:documentation>ElsterDRVBund</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterEARL">
+				<xs:annotation>
+					<xs:documentation>Datenübertragung für EARL</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterEGVP">
+				<xs:annotation>
+					<xs:documentation>Gerichts- und Verwaltungspostfach</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterElfe">
+				<xs:annotation>
+					<xs:documentation>ElsterElfe	Internes Verfahren</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterEMail">
+				<xs:annotation>
+					<xs:documentation>Email Anstoß (internes Verfahren)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterErklaerung">
+				<xs:annotation>
+					<xs:documentation>Uebermittlung von Steuererklaerungen z.B. Einkommensteuer, Umsatzsteuer (Jahreserklaerung) und Gewerbesteuer</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterExtern">
+				<xs:annotation>
+					<xs:documentation>Alle Externen Verfahren (internes Verfahren)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterFSE">
+				<xs:annotation>
+					<xs:documentation>Verfahren fuer den Fragebogen zur steuerlichen Erfassung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterFT">
+				<xs:annotation>
+					<xs:documentation>Datenlieferungen über ElsterFT</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterGeCoSYN">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterIDRecherche">
+				<xs:annotation>
+					<xs:documentation>ID Nummern Recherche (internes Verfahren)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterKapESt">
+				<xs:annotation>
+					<xs:documentation>Verfahren Kapitalertragssteuer-Anmeldung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterKMV">
+				<xs:annotation>
+					<xs:documentation>Kontrollmitteilungsverfahren</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterKDialog">
+				<xs:annotation>
+					<xs:documentation>ElsterKDialog</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterKMVZentraleAuswertung">
+				<xs:annotation>
+					<xs:documentation>Kontrollmitteilungsverfahren</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterKMVIdNr">
+				<xs:annotation>
+					<xs:documentation>Kontrollmitteilungsverfahren</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterKMVProtokoll">
+				<xs:annotation>
+					<xs:documentation>Lieferung von Protokollen von KMV (internes Verfahren)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterKontakt">
+				<xs:annotation>
+					<xs:documentation> Das Kontaktformular wird im öffentlichen Bereich von Mein ELSTER angeboten. Über das Kontaktformular kann der Nutzer zwei Arten von Nachrichten übermitteln: steuerliche und nicht-steuerliche Nachrichten.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterKontoabfrage">
+				<xs:annotation>
+					<xs:documentation>Steuerkontenabfrage insbes. fuer Steuerberater bzw. ueber Portal (Online) Abfragen, Anmeldung etc. für Steuerkonto</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterKontoablage">
+				<xs:annotation>
+					<xs:documentation>Datenlieferung zu Rechten zur Kontoabfrage</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterKStoKS">
+				<xs:annotation>
+					<xs:documentation>Datenlieferung von Kopfstelle zu Kopfstelle (Internes Verfahren)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterLanguste">
+				<xs:annotation>
+					<xs:documentation>Internes Verfahren</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterLohn">
+				<xs:annotation>
+					<xs:documentation>Uebermittlung von Lohnsteuerbescheinigungen bzw. Lohnersatzleistungen (Lohnsteuerbescheinigung, Protokoll zur Bescheinigung)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterLohn2">
+				<xs:annotation>
+					<xs:documentation>ElsterLohn2</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterLohnIntern">
+				<xs:annotation>
+					<xs:documentation>Internes Verfahren</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterLohnProtokoll">
+				<xs:annotation>
+					<xs:documentation>Lieferung von Protokollen (internes Verfahren)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterLKStoDVE">
+				<xs:annotation>
+					<xs:documentation xml:lang="DE">Datenlieferungen zum Statistischen Bundesamt  DESTATIS (internes Verfahren)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterLKStoZF">
+				<xs:annotation>
+					<xs:documentation>Verfahren zum Austausch von Daten von den Landeskopfstellen zum ZFA</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterLStZerlegung">
+				<xs:annotation>
+					<xs:documentation>Internes Verfahren</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterLStZerlegungProtokoll">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterMOSS">
+				<xs:annotation>
+					<xs:documentation>Mini-One-Stop-Shop</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterNachricht">
+				<xs:annotation>
+					<xs:documentation>Unformatierte Nachrichten (Bsp. Einspruch)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterPortal">
+				<xs:annotation>
+					<xs:documentation>ElsterOnline-Portal Daten (internes Verfahren)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterSignatur">
+				<xs:annotation>
+					<xs:documentation>Verfahren zum Themengebiet Authentifizierung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterSignaturNachricht">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterSuch">
+				<xs:annotation>
+					<xs:documentation>Internes Verfahren</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterSuchExtern">
+				<xs:annotation>
+					<xs:documentation>Internes Verfahren</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterTransferAsynchron">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterTransferAsynchron Datenart: ETRVerfAntragEreignis</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterTransferSynchron">
+				<xs:annotation>
+					<xs:documentation>Verfahren: ElsterTransferAsynchron</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterVaSt">
+				<xs:annotation>
+					<xs:documentation>Verfahren zum Erlangen von Belegen um die Steuererklärung vorauszufüllen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterVollmachtDB">
+				<xs:annotation>
+					<xs:documentation>Datenlieferungen zu Vollmachten/Kontingentierung</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterGinsterVDB">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterZANS">
+				<xs:annotation>
+					<xs:documentation>Arbeitnehmersparzulage (ANSpZ)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterZebra">
+				<xs:annotation>
+					<xs:documentation>ElsterZebra</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterZFtoLKS">
+				<xs:annotation>
+					<xs:documentation>Verfahren zum Austausch von Daten vom ZFA zu den Landeskopfstellen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterZfaZivit">
+				<xs:annotation>
+					<xs:documentation>Verfahren zum Austausch von Daten vom ZFA zu ZIVIT</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterZObEL">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ElsterGINSTER">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="OpenZoll">
+				<xs:annotation>
+					<xs:documentation/>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
