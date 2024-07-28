@@ -39,7 +39,24 @@
                 "@id": "EUR",
                 "xbrli:measure": "EUR"
             },
-            "de-gcd:genInfo.report.period.fiscalYearBegin": "2023-01-01"
+            "de-gcd:genInfo.report.period.fiscalYearBegin": {
+                "@contextRef": "context2",
+                "$": "2023-01-01"
+            },
+            "de-gcd:genInfo.report.period.fiscalYearEnd": {
+                "@contextRef": "context2",
+                "$": "2023-12-31"
+            },
+            "de-gcd:genInfo.company.id.location.street": {
+                "@contextRef": "context2",
+                "$": "My street"
+            },
+            "de-gcd:genInfo.company.id.legalStatus": {
+                "de-gcd:genInfo.company.id.legalStatus.legalStatus.UG": {
+                    "@contextRef": "context2",
+                    "$": "My company"
+                }
+            }
         },
         "@version": 1
     }
