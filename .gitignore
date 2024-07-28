@@ -22,16 +22,8 @@ server_response.xml
 schema/*
 
 # test data
-test_data/ebilanz/schema/ebilanz_000002.xsd
-test_data/ebilanz/schema/ebilanz_elster_000001.xsd
-test_data/ebilanz/schema/elster11_bisNH_extern.xsd
-test_data/ebilanz/schema/headerbasis_datenarten.xsd
-test_data/ebilanz/schema/headerbasis_datentypen.xsd
-test_data/ebilanz/schema/headerbasis_verfahren.xsd
-test_data/ebilanz/schema/headerbasis000003.xsd
-test_data/ebilanz/schema/headerelemente.xsd
-test_data/ebilanz/schema/ndh000011.xsd
-test_data/ebilanz/schema/th000011_extern.xsd
+test_data/schema/elster/*
+test_data/schema/ebilanz/*
 
 # csv
 .~lock.**.csv#
