@@ -172,6 +172,7 @@ def test_validate_xml_ebilanz():
     validate_xml(schema, xml)
 
 
+# TODO: check iso4217:EUR for xbrli:measure
 @pytest.mark.unit
 def test_generate_xml_ebilanz():
     schema_path = '../test_data/schema/ebilanz/ebilanz_000002.xsd'

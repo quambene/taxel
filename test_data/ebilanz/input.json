@@ -41,7 +41,7 @@
             ],
             "xbrli:unit": {
                 "@id": "EUR",
-                "xbrli:measure": "iso4217:EUR"
+                "xbrli:measure": "EUR"
             }
         },
         "@version": 1

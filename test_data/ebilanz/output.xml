@@ -22,7 +22,7 @@
             </ns1:period>
         </ns1:context>
         <ns1:unit id="EUR">
-            <ns1:measure>iso4217:EUR</ns1:measure>
+            <ns1:measure>EUR</ns1:measure>
         </ns1:unit>
     </ns1:xbrl>
 </ns0:EBilanz>
