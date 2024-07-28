@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns1="http://www.example.org/schema"
+    targetNamespace="http://www.example.org/schema"
+    elementFormDefault="qualified">
+    <xs:element name="abstractItem" abstract="true" />
+    <xs:element name="concreteItem" substitutionGroup="ns1:abstractItem"
+        type="xs:string" />
+    <xs:element name="root">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="ns1:abstractItem" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

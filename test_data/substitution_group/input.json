@@ -1,0 +1,5 @@
+{
+    "ns1:root": {
+        "ns1:concreteItem": "This is a concrete item"
+    }
+}
