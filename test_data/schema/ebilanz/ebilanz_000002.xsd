@@ -8,9 +8,9 @@
 		targetNamespace="http://rzf.fin-nrw.de/RMS/EBilanz/2016/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<!-- Importe -->
 	<!-- Import des Rahmenschemas von ELSTER: -->
-	<xs:import namespace="http://www.elster.de/elsterxml/schema/v11" schemaLocation="ebilanz_elster_000001.xsd"/>
+	<xs:import namespace="http://www.elster.de/elsterxml/schema/v11" schemaLocation="./ebilanz_elster_000001.xsd"/>
 	<!-- Import XBRL Instance -->
-	<xs:import namespace="http://www.xbrl.org/2003/instance" schemaLocation="xbrl-instance-2003-12-31.xsd"/>
+	<xs:import namespace="http://www.xbrl.org/2003/instance" schemaLocation="../xbrl-instance-2003-12-31.xsd"/>
 	<!-- Ende Importe -->
 	<!-- Substitution f�r die abstrakten Nutzdaten -->
 	<xs:element name="EBilanz" type="ebilanz:EBilanzCType" substitutionGroup="elster:NutzdatenDaten"/>
