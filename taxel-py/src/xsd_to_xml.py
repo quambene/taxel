@@ -118,6 +118,13 @@ def test_generate_xml_substitution_group():
     target_namespace = 'ns1'
 
     schema = load_schema(schema_path)
+
+    substitution_groups = schema.substitution_groups.as_dict()
+    print(substitution_groups)
+    actual_name = list(substitution_groups['abstractItem'])[0].name
+    expected_name = r'{http://www.example.org/schema}concreteItem'
+    assert actual_name == expected_name
+
     data = load_data(input_path)
     xml = generate_xml(schema, data, target_namespace, None)
     root = xml.getroot()
