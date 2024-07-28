@@ -1,0 +1,1920 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--(c) XBRL Deutschland e.V. - see http://www.xbrl.de-->
+
+
+<linkbase xmlns="http://www.xbrl.org/2003/linkbase"
+          xmlns:hgbref="http://www.xbrl.de/taxonomies/de-ref-2010-02-19"
+          xmlns:link="http://www.xbrl.org/2003/linkbase"
+          xmlns:ref="http://www.xbrl.org/2006/ref"
+          xmlns:xbrli="http://www.xbrl.org/2003/instance"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.xbrl.org/2006/ref http://www.xbrl.org/2006/ref-2006-02-27.xsd http://www.xbrl.de/taxonomies/de-ref-2010-02-19 hgbref-2022-05-02.xsd http://www.xbrl.org/2003/linkbase http://www.xbrl.org/2003/xbrl-linkbase-2003-12-31.xsd">
+   <referenceLink xlink:type="extended" xlink:role="http://www.xbrl.org/2003/role/link">
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.id.reportType.reportType.JA"
+           xlink:label="de-gcd_genInfo.report.id.reportType.reportType.JA"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.reportType.reportType.JA"
+                    xlink:to="reference_de-gcd_genInfo.report.id.reportType.reportType.JA_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.reportType.reportType.JA_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.reportType.reportType.JA_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>336</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.reportType.reportType.JA"
+                    xlink:to="reference_de-gcd_genInfo.report.id.reportType.reportType.JA_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.reportType.reportType.JA_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.reportType.reportType.JA_2">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>340a</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.reportType.reportType.JA"
+                    xlink:to="reference_de-gcd_genInfo.report.id.reportType.reportType.JA_3"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.reportType.reportType.JA_3"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.reportType.reportType.JA_3">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>341a</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.reportType.reportType.JA"
+                    xlink:to="reference_de-gcd_genInfo.report.id.reportType.reportType.JA_4"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.reportType.reportType.JA_4"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.reportType.reportType.JA_4">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.reportType.reportType.JA"
+                    xlink:to="reference_de-gcd_genInfo.report.id.reportType.reportType.JA_5"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.reportType.reportType.JA_5"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.reportType.reportType.JA_5">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>242</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.reportType.reportType.JA"
+                    xlink:to="reference_de-gcd_genInfo.report.id.reportType.reportType.JA_6"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.reportType.reportType.JA_6"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.reportType.reportType.JA_6">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264a</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.id.reportElement.reportElements.BAH"
+           xlink:label="de-gcd_genInfo.report.id.reportElement.reportElements.BAH"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.reportElement.reportElements.BAH"
+                    xlink:to="reference_de-gcd_genInfo.report.id.reportElement.reportElements.BAH_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.reportElement.reportElements.BAH_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.reportElement.reportElements.BAH_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>284</ref:Paragraph>
+         <ref:Subparagraph>3</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.id.reportElement.reportElements.BAV"
+           xlink:label="de-gcd_genInfo.report.id.reportElement.reportElements.BAV"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.reportElement.reportElements.BAV"
+                    xlink:to="reference_de-gcd_genInfo.report.id.reportElement.reportElements.BAV_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.reportElement.reportElements.BAV_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.reportElement.reportElements.BAV_1">
+         <ref:Name>RechKredV</ref:Name>
+         <ref:Paragraph>34</ref:Paragraph>
+         <ref:Subparagraph>3</ref:Subparagraph>
+         <ref:Clause>2</ref:Clause>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.reportElement.reportElements.BAV"
+                    xlink:to="reference_de-gcd_genInfo.report.id.reportElement.reportElements.BAV_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.reportElement.reportElements.BAV_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.reportElement.reportElements.BAV_2">
+         <ref:Name>RechKredV</ref:Name>
+         <ref:Paragraph>34</ref:Paragraph>
+         <ref:Subparagraph>3</ref:Subparagraph>
+         <ref:Clause>1</ref:Clause>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.reportElement.reportElements.BAV"
+                    xlink:to="reference_de-gcd_genInfo.report.id.reportElement.reportElements.BAV_3"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.reportElement.reportElements.BAV_3"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.reportElement.reportElements.BAV_3">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>284</ref:Paragraph>
+         <ref:Subparagraph>3</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.id.reportElement.allocation.genInfo"
+           xlink:label="de-gcd_genInfo.report.id.reportElement.allocation.genInfo"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.reportElement.allocation.genInfo"
+                    xlink:to="reference_de-gcd_genInfo.report.id.reportElement.allocation.genInfo_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.reportElement.allocation.genInfo_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.reportElement.allocation.genInfo_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264</ref:Paragraph>
+         <ref:Subparagraph>1a</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.id.reportElement.allocation.genInfo.toBalance"
+           xlink:label="de-gcd_genInfo.report.id.reportElement.allocation.genInfo.toBalance"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.reportElement.allocation.genInfo.toBalance"
+                    xlink:to="reference_de-gcd_genInfo.report.id.reportElement.allocation.genInfo.toBalance_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.reportElement.allocation.genInfo.toBalance_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.reportElement.allocation.genInfo.toBalance_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264</ref:Paragraph>
+         <ref:Subparagraph>1a</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.id.reportElement.allocation.genInfo.inNotes"
+           xlink:label="de-gcd_genInfo.report.id.reportElement.allocation.genInfo.inNotes"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.reportElement.allocation.genInfo.inNotes"
+                    xlink:to="reference_de-gcd_genInfo.report.id.reportElement.allocation.genInfo.inNotes_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.reportElement.allocation.genInfo.inNotes_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.reportElement.allocation.genInfo.inNotes_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264</ref:Paragraph>
+         <ref:Subparagraph>1a</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.id.reportElement.allocation.genInfo.OtherPlace"
+           xlink:label="de-gcd_genInfo.report.id.reportElement.allocation.genInfo.OtherPlace"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.reportElement.allocation.genInfo.OtherPlace"
+                    xlink:to="reference_de-gcd_genInfo.report.id.reportElement.allocation.genInfo.OtherPlace_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.reportElement.allocation.genInfo.OtherPlace_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.reportElement.allocation.genInfo.OtherPlace_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264</ref:Paragraph>
+         <ref:Subparagraph>1a</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.id.statementType.statementType.E"
+           xlink:label="de-gcd_genInfo.report.id.statementType.statementType.E"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.statementType.statementType.E"
+                    xlink:to="reference_de-gcd_genInfo.report.id.statementType.statementType.E_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.statementType.statementType.E_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.statementType.statementType.E_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>340a</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.statementType.statementType.E"
+                    xlink:to="reference_de-gcd_genInfo.report.id.statementType.statementType.E_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.statementType.statementType.E_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.statementType.statementType.E_2">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>336</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.statementType.statementType.E"
+                    xlink:to="reference_de-gcd_genInfo.report.id.statementType.statementType.E_3"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.statementType.statementType.E_3"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.statementType.statementType.E_3">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264a</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.statementType.statementType.E"
+                    xlink:to="reference_de-gcd_genInfo.report.id.statementType.statementType.E_4"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.statementType.statementType.E_4"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.statementType.statementType.E_4">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>341a</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.statementType.statementType.E"
+                    xlink:to="reference_de-gcd_genInfo.report.id.statementType.statementType.E_5"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.statementType.statementType.E_5"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.statementType.statementType.E_5">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.statementType.statementType.E"
+                    xlink:to="reference_de-gcd_genInfo.report.id.statementType.statementType.E_6"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.statementType.statementType.E_6"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.statementType.statementType.E_6">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>242</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.id.statementType.statementType.EB"
+           xlink:label="de-gcd_genInfo.report.id.statementType.statementType.EB"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.statementType.statementType.EB"
+                    xlink:to="reference_de-gcd_genInfo.report.id.statementType.statementType.EB_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.statementType.statementType.EB_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.statementType.statementType.EB_1">
+         <ref:Name>EStDV</ref:Name>
+         <ref:Paragraph>60</ref:Paragraph>
+         <ref:Clause>1</ref:Clause>
+         <ref:Subparagraph>1</ref:Subparagraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.statementType.statementType.EB"
+                    xlink:to="reference_de-gcd_genInfo.report.id.statementType.statementType.EB_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.statementType.statementType.EB_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.statementType.statementType.EB_2">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>242</ref:Paragraph>
+         <ref:Subparagraph>1</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.id.statementType.statementType.LAB"
+           xlink:label="de-gcd_genInfo.report.id.statementType.statementType.LAB"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.statementType.statementType.LAB"
+                    xlink:to="reference_de-gcd_genInfo.report.id.statementType.statementType.LAB_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.statementType.statementType.LAB_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.statementType.statementType.LAB_1">
+         <ref:Name>KStG</ref:Name>
+         <ref:Paragraph>11</ref:Paragraph>
+         <ref:Subparagraph>4</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.id.statementType.statementType.LEB"
+           xlink:label="de-gcd_genInfo.report.id.statementType.statementType.LEB"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.statementType.statementType.LEB"
+                    xlink:to="reference_de-gcd_genInfo.report.id.statementType.statementType.LEB_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.statementType.statementType.LEB_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.statementType.statementType.LEB_1">
+         <ref:Name>GmbHG</ref:Name>
+         <ref:Paragraph>71</ref:Paragraph>
+         <ref:Subparagraph>1</ref:Subparagraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.statementType.statementType.LEB"
+                    xlink:to="reference_de-gcd_genInfo.report.id.statementType.statementType.LEB_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.statementType.statementType.LEB_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.statementType.statementType.LEB_2">
+         <ref:Name>AktG</ref:Name>
+         <ref:Paragraph>270</ref:Paragraph>
+         <ref:Subparagraph>1</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.id.statementType.statementType.LZB"
+           xlink:label="de-gcd_genInfo.report.id.statementType.statementType.LZB"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.statementType.statementType.LZB"
+                    xlink:to="reference_de-gcd_genInfo.report.id.statementType.statementType.LZB_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.statementType.statementType.LZB_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.statementType.statementType.LZB_1">
+         <ref:Name>KStG</ref:Name>
+         <ref:Paragraph>11</ref:Paragraph>
+         <ref:Subparagraph>1</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.id.statementType.statementType.LSB"
+           xlink:label="de-gcd_genInfo.report.id.statementType.statementType.LSB"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.statementType.statementType.LSB"
+                    xlink:to="reference_de-gcd_genInfo.report.id.statementType.statementType.LSB_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.statementType.statementType.LSB_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.statementType.statementType.LSB_1">
+         <ref:Name>KStG</ref:Name>
+         <ref:Paragraph>11</ref:Paragraph>
+         <ref:Subparagraph>3</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.id.statementType.statementType.AB"
+           xlink:label="de-gcd_genInfo.report.id.statementType.statementType.AB"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.id.statementType.statementType.AB"
+                    xlink:to="reference_de-gcd_genInfo.report.id.statementType.statementType.AB_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.id.statementType.statementType.AB_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.id.statementType.statementType.AB_1">
+         <ref:Name>EStG</ref:Name>
+         <ref:Paragraph>16</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateText2017"
+           xlink:label="de-gcd_genInfo.report.audit.certificateText2017"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateText2017"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateText2017_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateText2017_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateText2017_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateText.heading"
+           xlink:label="de-gcd_genInfo.report.audit.certificateText.heading"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateText.heading"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateText.heading_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateText.heading_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateText.heading_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateText.heading.BV"
+           xlink:label="de-gcd_genInfo.report.audit.certificateText.heading.BV"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateText.heading.BV"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateText.heading.BV_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateText.heading.BV_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateText.heading.BV_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateText.heading.BVA"
+           xlink:label="de-gcd_genInfo.report.audit.certificateText.heading.BVA"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateText.heading.BVA"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateText.heading.BVA_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateText.heading.BVA_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateText.heading.BVA_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateText.heading.BVKA"
+           xlink:label="de-gcd_genInfo.report.audit.certificateText.heading.BVKA"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateText.heading.BVKA"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateText.heading.BVKA_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateText.heading.BVKA_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateText.heading.BVKA_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateText.heading.VV"
+           xlink:label="de-gcd_genInfo.report.audit.certificateText.heading.VV"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateText.heading.VV"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateText.heading.VV_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateText.heading.VV_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateText.heading.VV_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateText.heading.VVA"
+           xlink:label="de-gcd_genInfo.report.audit.certificateText.heading.VVA"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateText.heading.VVA"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateText.heading.VVA_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateText.heading.VVA_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateText.heading.VVA_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateText.heading.VVKA"
+           xlink:label="de-gcd_genInfo.report.audit.certificateText.heading.VVKA"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateText.heading.VVKA"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateText.heading.VVKA_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateText.heading.VVKA_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateText.heading.VVKA_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateText.heading.BT"
+           xlink:label="de-gcd_genInfo.report.audit.certificateText.heading.BT"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateText.heading.BT"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateText.heading.BT_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateText.heading.BT_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateText.heading.BT_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateText"
+           xlink:label="de-gcd_genInfo.report.audit.certificateText"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateText"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateText_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateText_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateText_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateText.pre"
+           xlink:label="de-gcd_genInfo.report.audit.certificateText.pre"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateText.pre"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateText.pre_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateText.pre_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateText.pre_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateText.desc"
+           xlink:label="de-gcd_genInfo.report.audit.certificateText.desc"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateText.desc"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateText.desc_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateText.desc_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateText.desc_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateText.opin"
+           xlink:label="de-gcd_genInfo.report.audit.certificateText.opin"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateText.opin"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateText.opin_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateText.opin_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateText.opin_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateText.comm"
+           xlink:label="de-gcd_genInfo.report.audit.certificateText.comm"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateText.comm"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateText.comm_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateText.comm_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateText.comm_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateText.hardcoment"
+           xlink:label="de-gcd_genInfo.report.audit.certificateText.hardcoment"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateText.hardcoment"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateText.hardcoment_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateText.hardcoment_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateText.hardcoment_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateOpinion"
+           xlink:label="de-gcd_genInfo.report.audit.certificateOpinion"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateOpinion"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateOpinion_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateOpinion_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateOpinion_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateOpinion.certificate.BVU"
+           xlink:label="de-gcd_genInfo.report.audit.certificateOpinion.certificate.BVU"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateOpinion.certificate.BVU"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateOpinion.certificate.BVU_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateOpinion.certificate.BVU_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateOpinion.certificate.BVU_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateOpinion.certificate.BVV"
+           xlink:label="de-gcd_genInfo.report.audit.certificateOpinion.certificate.BVV"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateOpinion.certificate.BVV"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateOpinion.certificate.BVV_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateOpinion.certificate.BVV_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateOpinion.certificate.BVV_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateOpinion.certificate.BVE"
+           xlink:label="de-gcd_genInfo.report.audit.certificateOpinion.certificate.BVE"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateOpinion.certificate.BVE"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateOpinion.certificate.BVE_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateOpinion.certificate.BVE_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateOpinion.certificate.BVE_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateOpinion.certificate.VS"
+           xlink:label="de-gcd_genInfo.report.audit.certificateOpinion.certificate.VS"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateOpinion.certificate.VS"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateOpinion.certificate.VS_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateOpinion.certificate.VS_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateOpinion.certificate.VS_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certificateOpinion.certificate.DU"
+           xlink:label="de-gcd_genInfo.report.audit.certificateOpinion.certificate.DU"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certificateOpinion.certificate.DU"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certificateOpinion.certificate.DU_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certificateOpinion.certificate.DU_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certificateOpinion.certificate.DU_1">
+         <hgbref:ValidThrough>2017-12-31</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certText2018.auditorCompany"
+           xlink:label="de-gcd_genInfo.report.audit.certText2018.auditorCompany"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certText2018.auditorCompany"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certText2018.auditorCompany_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certText2018.auditorCompany_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certText2018.auditorCompany_1">
+         <ref:Name>WPO</ref:Name>
+         <ref:Paragraph>31</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.certText2018.ProfessionalTitle"
+           xlink:label="de-gcd_genInfo.report.audit.certText2018.ProfessionalTitle"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.certText2018.ProfessionalTitle"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.certText2018.ProfessionalTitle_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.certText2018.ProfessionalTitle_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.certText2018.ProfessionalTitle_1">
+         <ref:Name>WPO</ref:Name>
+         <ref:Paragraph>18</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.auditor.company"
+           xlink:label="de-gcd_genInfo.report.audit.auditor.company"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.auditor.company"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.auditor.company_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.auditor.company_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.auditor.company_1">
+         <ref:Name>WPO</ref:Name>
+         <ref:Paragraph>31</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.report.audit.auditor.type"
+           xlink:label="de-gcd_genInfo.report.audit.auditor.type"/>
+      <referenceArc xlink:from="de-gcd_genInfo.report.audit.auditor.type"
+                    xlink:to="reference_de-gcd_genInfo.report.audit.auditor.type_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.report.audit.auditor.type_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.report.audit.auditor.type_1">
+         <ref:Name>WPO</ref:Name>
+         <ref:Paragraph>18</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.legalStatus.legalStatus.PA"
+           xlink:label="de-gcd_genInfo.company.id.legalStatus.legalStatus.PA"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.legalStatus.legalStatus.PA"
+                    xlink:to="reference_de-gcd_genInfo.company.id.legalStatus.legalStatus.PA_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.legalStatus.legalStatus.PA_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.legalStatus.legalStatus.PA_1">
+         <hgbref:ValidThrough>2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.legalStatus.legalStatus.BgewPG"
+           xlink:label="de-gcd_genInfo.company.id.legalStatus.legalStatus.BgewPG"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.legalStatus.legalStatus.BgewPG"
+                    xlink:to="reference_de-gcd_genInfo.company.id.legalStatus.legalStatus.BgewPG_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.legalStatus.legalStatus.BgewPG_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.legalStatus.legalStatus.BgewPG_1">
+         <hgbref:ValidThrough>2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.legalStatus.legalStatus.soNP"
+           xlink:label="de-gcd_genInfo.company.id.legalStatus.legalStatus.soNP"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.legalStatus.legalStatus.soNP"
+                    xlink:to="reference_de-gcd_genInfo.company.id.legalStatus.legalStatus.soNP_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.legalStatus.legalStatus.soNP_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.legalStatus.legalStatus.soNP_1">
+         <hgbref:ValidThrough>2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.legalStatus.legalStatus.SG"
+           xlink:label="de-gcd_genInfo.company.id.legalStatus.legalStatus.SG"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.legalStatus.legalStatus.SG"
+                    xlink:to="reference_de-gcd_genInfo.company.id.legalStatus.legalStatus.SG_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.legalStatus.legalStatus.SG_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.legalStatus.legalStatus.SG_1">
+         <ref:Name>HGB a.F.</ref:Name>
+         <ref:Paragraph>489</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.legalStatus.legalStatus.SG"
+                    xlink:to="reference_de-gcd_genInfo.company.id.legalStatus.legalStatus.SG_1_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.legalStatus.legalStatus.SG_1_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.legalStatus.legalStatus.SG_1_2">
+         <hgbref:ValidThrough>2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.legalStatus.legalStatus.ZB"
+           xlink:label="de-gcd_genInfo.company.id.legalStatus.legalStatus.ZB"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.legalStatus.legalStatus.ZB"
+                    xlink:to="reference_de-gcd_genInfo.company.id.legalStatus.legalStatus.ZB_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.legalStatus.legalStatus.ZB_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.legalStatus.legalStatus.ZB_1">
+         <hgbref:ValidThrough>2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.legalStatus.legalstatus.PartGmbH"
+           xlink:label="de-gcd_genInfo.company.id.legalStatus.legalstatus.PartGmbH"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.legalStatus.legalstatus.PartGmbH"
+                    xlink:to="reference_de-gcd_genInfo.company.id.legalStatus.legalstatus.PartGmbH_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.legalStatus.legalstatus.PartGmbH_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.legalStatus.legalstatus.PartGmbH_1">
+         <ref:Name>PartGG</ref:Name>
+         <ref:Paragraph>8</ref:Paragraph>
+         <ref:Subparagraph>3</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.legalStatus.formerStatus.PA"
+           xlink:label="de-gcd_genInfo.company.id.legalStatus.formerStatus.PA"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.legalStatus.formerStatus.PA"
+                    xlink:to="reference_de-gcd_genInfo.company.id.legalStatus.formerStatus.PA_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.legalStatus.formerStatus.PA_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.legalStatus.formerStatus.PA_1">
+         <hgbref:ValidThrough>2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.legalStatus.formerStatus.PartGmbH"
+           xlink:label="de-gcd_genInfo.company.id.legalStatus.formerStatus.PartGmbH"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.legalStatus.formerStatus.PartGmbH"
+                    xlink:to="reference_de-gcd_genInfo.company.id.legalStatus.formerStatus.PartGmbH_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.legalStatus.formerStatus.PartGmbH_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.legalStatus.formerStatus.PartGmbH_1">
+         <ref:Name>PartGG</ref:Name>
+         <ref:Paragraph>8</ref:Paragraph>
+         <ref:Subparagraph>3</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.legalStatus.formerStatus.BgewPG"
+           xlink:label="de-gcd_genInfo.company.id.legalStatus.formerStatus.BgewPG"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.legalStatus.formerStatus.BgewPG"
+                    xlink:to="reference_de-gcd_genInfo.company.id.legalStatus.formerStatus.BgewPG_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.legalStatus.formerStatus.BgewPG_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.legalStatus.formerStatus.BgewPG_1">
+         <hgbref:ValidThrough>2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.legalStatus.formerStatus.soNP"
+           xlink:label="de-gcd_genInfo.company.id.legalStatus.formerStatus.soNP"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.legalStatus.formerStatus.soNP"
+                    xlink:to="reference_de-gcd_genInfo.company.id.legalStatus.formerStatus.soNP_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.legalStatus.formerStatus.soNP_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.legalStatus.formerStatus.soNP_1">
+         <hgbref:ValidThrough>2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.legalStatus.formerStatus.SG"
+           xlink:label="de-gcd_genInfo.company.id.legalStatus.formerStatus.SG"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.legalStatus.formerStatus.SG"
+                    xlink:to="reference_de-gcd_genInfo.company.id.legalStatus.formerStatus.SG_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.legalStatus.formerStatus.SG_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.legalStatus.formerStatus.SG_1">
+         <hgbref:ValidThrough>2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.legalStatus.formerStatus.ZB"
+           xlink:label="de-gcd_genInfo.company.id.legalStatus.formerStatus.ZB"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.legalStatus.formerStatus.ZB"
+                    xlink:to="reference_de-gcd_genInfo.company.id.legalStatus.formerStatus.ZB_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.legalStatus.formerStatus.ZB_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.legalStatus.formerStatus.ZB_1">
+         <hgbref:ValidThrough>2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.sizeClass.sizeClass.GK"
+           xlink:label="de-gcd_genInfo.company.id.sizeClass.sizeClass.GK"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.sizeClass.sizeClass.GK"
+                    xlink:to="reference_de-gcd_genInfo.company.id.sizeClass.sizeClass.GK_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.sizeClass.sizeClass.GK_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.sizeClass.sizeClass.GK_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>267</ref:Paragraph>
+         <ref:Subparagraph>3</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.sizeClass.sizeClass.MK"
+           xlink:label="de-gcd_genInfo.company.id.sizeClass.sizeClass.MK"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.sizeClass.sizeClass.MK"
+                    xlink:to="reference_de-gcd_genInfo.company.id.sizeClass.sizeClass.MK_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.sizeClass.sizeClass.MK_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.sizeClass.sizeClass.MK_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>267</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.sizeClass.sizeClass.KK"
+           xlink:label="de-gcd_genInfo.company.id.sizeClass.sizeClass.KK"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.sizeClass.sizeClass.KK"
+                    xlink:to="reference_de-gcd_genInfo.company.id.sizeClass.sizeClass.KK_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.sizeClass.sizeClass.KK_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.sizeClass.sizeClass.KK_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>267</ref:Paragraph>
+         <ref:Subparagraph>1</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.sizeClass.sizeClass.KstK"
+           xlink:label="de-gcd_genInfo.company.id.sizeClass.sizeClass.KstK"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.sizeClass.sizeClass.KstK"
+                    xlink:to="reference_de-gcd_genInfo.company.id.sizeClass.sizeClass.KstK_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.sizeClass.sizeClass.KstK_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.sizeClass.sizeClass.KstK_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>267a</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.sizeClass.sizeClass.PublGss1and11"
+           xlink:label="de-gcd_genInfo.company.id.sizeClass.sizeClass.PublGss1and11"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.sizeClass.sizeClass.PublGss1and11"
+                    xlink:to="reference_de-gcd_genInfo.company.id.sizeClass.sizeClass.PublGss1and11_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.sizeClass.sizeClass.PublGss1and11_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.sizeClass.sizeClass.PublGss1and11_1">
+         <ref:Name>PublG</ref:Name>
+         <ref:Paragraph>11</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.sizeClass.sizeClass.PublGss1and11"
+                    xlink:to="reference_de-gcd_genInfo.company.id.sizeClass.sizeClass.PublGss1and11_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.sizeClass.sizeClass.PublGss1and11_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.sizeClass.sizeClass.PublGss1and11_2">
+         <ref:Name>PublG</ref:Name>
+         <ref:Paragraph>1</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.reportedSizeClassBs.G"
+           xlink:label="de-gcd_genInfo.company.id.reportedSizeClassBs.G"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.reportedSizeClassBs.G"
+                    xlink:to="reference_de-gcd_genInfo.company.id.reportedSizeClassBs.G_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.reportedSizeClassBs.G_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.reportedSizeClassBs.G_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>266</ref:Paragraph>
+         <ref:Subparagraph>1</ref:Subparagraph>
+         <ref:Clause>1</ref:Clause>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.reportedSizeClassBs.M"
+           xlink:label="de-gcd_genInfo.company.id.reportedSizeClassBs.M"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.reportedSizeClassBs.M"
+                    xlink:to="reference_de-gcd_genInfo.company.id.reportedSizeClassBs.M_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.reportedSizeClassBs.M_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.reportedSizeClassBs.M_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>327</ref:Paragraph>
+         <ref:Number>1</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.reportedSizeClassBs.K"
+           xlink:label="de-gcd_genInfo.company.id.reportedSizeClassBs.K"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.reportedSizeClassBs.K"
+                    xlink:to="reference_de-gcd_genInfo.company.id.reportedSizeClassBs.K_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.reportedSizeClassBs.K_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.reportedSizeClassBs.K_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>266</ref:Paragraph>
+         <ref:Subparagraph>1</ref:Subparagraph>
+         <ref:Clause>2</ref:Clause>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.reportedSizeClassBs.Kst"
+           xlink:label="de-gcd_genInfo.company.id.reportedSizeClassBs.Kst"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.reportedSizeClassBs.Kst"
+                    xlink:to="reference_de-gcd_genInfo.company.id.reportedSizeClassBs.Kst_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.reportedSizeClassBs.Kst_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.reportedSizeClassBs.Kst_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>266</ref:Paragraph>
+         <ref:Subparagraph>1</ref:Subparagraph>
+         <ref:Clause>3</ref:Clause>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.reportedSizeClassBs.PublGss1and11"
+           xlink:label="de-gcd_genInfo.company.id.reportedSizeClassBs.PublGss1and11"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.reportedSizeClassBs.PublGss1and11"
+                    xlink:to="reference_de-gcd_genInfo.company.id.reportedSizeClassBs.PublGss1and11_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.reportedSizeClassBs.PublGss1and11_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.reportedSizeClassBs.PublGss1and11_1">
+         <ref:Name>PublG</ref:Name>
+         <ref:Paragraph>1</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.reportedSizeClassIs.G"
+           xlink:label="de-gcd_genInfo.company.id.reportedSizeClassIs.G"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.reportedSizeClassIs.G"
+                    xlink:to="reference_de-gcd_genInfo.company.id.reportedSizeClassIs.G_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.reportedSizeClassIs.G_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.reportedSizeClassIs.G_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>275</ref:Paragraph>
+         <ref:Subparagraph>1</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.reportedSizeClassIs.M"
+           xlink:label="de-gcd_genInfo.company.id.reportedSizeClassIs.M"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.reportedSizeClassIs.M"
+                    xlink:to="reference_de-gcd_genInfo.company.id.reportedSizeClassIs.M_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.reportedSizeClassIs.M_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.reportedSizeClassIs.M_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>276</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.reportedSizeClassIs.Kst"
+           xlink:label="de-gcd_genInfo.company.id.reportedSizeClassIs.Kst"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.reportedSizeClassIs.Kst"
+                    xlink:to="reference_de-gcd_genInfo.company.id.reportedSizeClassIs.Kst_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.reportedSizeClassIs.Kst_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.reportedSizeClassIs.Kst_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>275</ref:Paragraph>
+         <ref:Subparagraph>5</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.reportedSizeClassIs.PublGss1and11"
+           xlink:label="de-gcd_genInfo.company.id.reportedSizeClassIs.PublGss1and11"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.reportedSizeClassIs.PublGss1and11"
+                    xlink:to="reference_de-gcd_genInfo.company.id.reportedSizeClassIs.PublGss1and11_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.reportedSizeClassIs.PublGss1and11_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.reportedSizeClassIs.PublGss1and11_1">
+         <ref:Name>PublG</ref:Name>
+         <ref:Paragraph>1</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.disclosureCriterion.merits.exemption"
+           xlink:label="de-gcd_genInfo.company.disclosureCriterion.merits.exemption"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.disclosureCriterion.merits.exemption"
+                    xlink:to="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption_1">
+         <ref:Name>PublG</ref:Name>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.disclosureCriterion.merits.exemption"
+                    xlink:to="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption_2">
+         <ref:Name>HGB</ref:Name>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs264_3"
+           xlink:label="de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs264_3"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs264_3"
+                    xlink:to="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs264_3_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs264_3_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs264_3_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264</ref:Paragraph>
+         <ref:Subparagraph>3</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.disclosureCriterion.merits.exemption.PublGs5_6"
+           xlink:label="de-gcd_genInfo.company.disclosureCriterion.merits.exemption.PublGs5_6"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.disclosureCriterion.merits.exemption.PublGs5_6"
+                    xlink:to="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.PublGs5_6_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.PublGs5_6_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.PublGs5_6_1">
+         <ref:Name>PublG</ref:Name>
+         <ref:Paragraph>5</ref:Paragraph>
+         <ref:Subparagraph>6</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs264b"
+           xlink:label="de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs264b"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs264b"
+                    xlink:to="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs264b_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs264b_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs264b_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264b</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs293"
+           xlink:label="de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs293"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs293"
+                    xlink:to="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs293_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs293_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs293_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>293</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs290_5"
+           xlink:label="de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs290_5"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs290_5"
+                    xlink:to="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs290_5_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs290_5_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs290_5_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>290</ref:Paragraph>
+         <ref:Subparagraph>5</ref:Subparagraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs290_5"
+                    xlink:to="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs290_5_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs290_5_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs290_5_2">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>296</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs291_EU_EWR"
+           xlink:label="de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs291_EU_EWR"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs291_EU_EWR"
+                    xlink:to="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs291_EU_EWR_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs291_EU_EWR_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs291_EU_EWR_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>291</ref:Paragraph>
+         <ref:Subparagraph>1</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs315a_IFRS"
+           xlink:label="de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs315a_IFRS"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs315a_IFRS"
+                    xlink:to="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs315a_IFRS_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs315a_IFRS_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs315a_IFRS_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>315a</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs315a_IFRS"
+                    xlink:to="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs315a_IFRS_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs315a_IFRS_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.disclosureCriterion.merits.exemption.HGBs315a_IFRS_2">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>291</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.disclosureCriterion.merits.mandantoryBranchOfficesBankInsurance"
+           xlink:label="de-gcd_genInfo.company.disclosureCriterion.merits.mandantoryBranchOfficesBankInsurance"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.disclosureCriterion.merits.mandantoryBranchOfficesBankInsurance"
+                    xlink:to="reference_de-gcd_genInfo.company.disclosureCriterion.merits.mandantoryBranchOfficesBankInsurance_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.disclosureCriterion.merits.mandantoryBranchOfficesBankInsurance_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.disclosureCriterion.merits.mandantoryBranchOfficesBankInsurance_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>325a</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.disclosureCriterion.merits.mandantoryBranchOfficesBankInsurance"
+                    xlink:to="reference_de-gcd_genInfo.company.disclosureCriterion.merits.mandantoryBranchOfficesBankInsurance_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.disclosureCriterion.merits.mandantoryBranchOfficesBankInsurance_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.disclosureCriterion.merits.mandantoryBranchOfficesBankInsurance_2">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>340l</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+         <ref:Clause>4</ref:Clause>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.disclosureCriterion.scope.CapitalMarketOrientationHGBs264d"
+           xlink:label="de-gcd_genInfo.company.disclosureCriterion.scope.CapitalMarketOrientationHGBs264d"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.disclosureCriterion.scope.CapitalMarketOrientationHGBs264d"
+                    xlink:to="reference_de-gcd_genInfo.company.disclosureCriterion.scope.CapitalMarketOrientationHGBs264d_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.disclosureCriterion.scope.CapitalMarketOrientationHGBs264d_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.disclosureCriterion.scope.CapitalMarketOrientationHGBs264d_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264d</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.disclosureCriterion.scope.CapitalMarketOrientationHGBs264d"
+                    xlink:to="reference_de-gcd_genInfo.company.disclosureCriterion.scope.CapitalMarketOrientationHGBs264d_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.disclosureCriterion.scope.CapitalMarketOrientationHGBs264d_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.disclosureCriterion.scope.CapitalMarketOrientationHGBs264d_2">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>267</ref:Paragraph>
+         <ref:Subparagraph>3</ref:Subparagraph>
+         <ref:Clause>2</ref:Clause>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.disclosureCriterion.scope.CapitalMarketOrientationHGBs264d"
+                    xlink:to="reference_de-gcd_genInfo.company.disclosureCriterion.scope.CapitalMarketOrientationHGBs264d_3"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.disclosureCriterion.scope.CapitalMarketOrientationHGBs264d_3"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.disclosureCriterion.scope.CapitalMarketOrientationHGBs264d_3">
+         <ref:Name>WpHG</ref:Name>
+         <ref:Paragraph>2</ref:Paragraph>
+         <ref:Subparagraph>5</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.location"
+           xlink:label="de-gcd_genInfo.company.id.location"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.location"
+                    xlink:to="reference_de-gcd_genInfo.company.id.location_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.location_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.location_1">
+         <ref:Name>GmbHG</ref:Name>
+         <ref:Paragraph>4a</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.location"
+                    xlink:to="reference_de-gcd_genInfo.company.id.location_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.location_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.location_2">
+         <ref:Name>GenG</ref:Name>
+         <ref:Paragraph>6</ref:Paragraph>
+         <ref:Number>1</ref:Number>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.location"
+                    xlink:to="reference_de-gcd_genInfo.company.id.location_3"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.location_3"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.location_3">
+         <ref:Name>AktG</ref:Name>
+         <ref:Paragraph>5</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.formerLocation"
+           xlink:label="de-gcd_genInfo.company.id.formerLocation"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.formerLocation"
+                    xlink:to="reference_de-gcd_genInfo.company.id.formerLocation_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.formerLocation_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.formerLocation_1">
+         <ref:Name>GenG</ref:Name>
+         <ref:Paragraph>6</ref:Paragraph>
+         <ref:Number>1</ref:Number>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.formerLocation"
+                    xlink:to="reference_de-gcd_genInfo.company.id.formerLocation_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.formerLocation_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.formerLocation_2">
+         <ref:Name>AktG</ref:Name>
+         <ref:Paragraph>5</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.formerLocation"
+                    xlink:to="reference_de-gcd_genInfo.company.id.formerLocation_3"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.formerLocation_3"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.formerLocation_3">
+         <ref:Name>GmbHG</ref:Name>
+         <ref:Paragraph>4a</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.adress"
+           xlink:label="de-gcd_genInfo.company.id.adress"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.adress"
+                    xlink:to="reference_de-gcd_genInfo.company.id.adress_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.adress_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.adress_1">
+         <ref:Name>AktG</ref:Name>
+         <ref:Paragraph>37</ref:Paragraph>
+         <ref:Subparagraph>3</ref:Subparagraph>
+         <ref:Number>1</ref:Number>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.adress"
+                    xlink:to="reference_de-gcd_genInfo.company.id.adress_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.adress_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.adress_2">
+         <ref:Name>GmbHG</ref:Name>
+         <ref:Paragraph>8</ref:Paragraph>
+         <ref:Subparagraph>4</ref:Subparagraph>
+         <ref:Number>1</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.VATchar.TaxCollection.SmallBusiness"
+           xlink:label="de-gcd_genInfo.company.id.VATchar.TaxCollection.SmallBusiness"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.VATchar.TaxCollection.SmallBusiness"
+                    xlink:to="reference_de-gcd_genInfo.company.id.VATchar.TaxCollection.SmallBusiness_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.VATchar.TaxCollection.SmallBusiness_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.VATchar.TaxCollection.SmallBusiness_1">
+         <ref:Name>UStG</ref:Name>
+         <ref:Paragraph>19</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.VATchar.TaxCalculation.ImputedTax"
+           xlink:label="de-gcd_genInfo.company.id.VATchar.TaxCalculation.ImputedTax"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.VATchar.TaxCalculation.ImputedTax"
+                    xlink:to="reference_de-gcd_genInfo.company.id.VATchar.TaxCalculation.ImputedTax_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.VATchar.TaxCalculation.ImputedTax_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.VATchar.TaxCalculation.ImputedTax_1">
+         <ref:Name>UStG</ref:Name>
+         <ref:Paragraph>16</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.VATchar.TaxCalculation.ActualTax"
+           xlink:label="de-gcd_genInfo.company.id.VATchar.TaxCalculation.ActualTax"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.VATchar.TaxCalculation.ActualTax"
+                    xlink:to="reference_de-gcd_genInfo.company.id.VATchar.TaxCalculation.ActualTax_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.VATchar.TaxCalculation.ActualTax_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.VATchar.TaxCalculation.ActualTax_1">
+         <ref:Name>UStG</ref:Name>
+         <ref:Paragraph>20</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.VATchar.TaxRate.AverageTax"
+           xlink:label="de-gcd_genInfo.company.id.VATchar.TaxRate.AverageTax"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.VATchar.TaxRate.AverageTax"
+                    xlink:to="reference_de-gcd_genInfo.company.id.VATchar.TaxRate.AverageTax_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.VATchar.TaxRate.AverageTax_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.VATchar.TaxRate.AverageTax_1">
+         <ref:Name>UStG</ref:Name>
+         <ref:Paragraph>23</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.VATchar.TaxRate.AverageTaxAgriculutureForest"
+           xlink:label="de-gcd_genInfo.company.id.VATchar.TaxRate.AverageTaxAgriculutureForest"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.VATchar.TaxRate.AverageTaxAgriculutureForest"
+                    xlink:to="reference_de-gcd_genInfo.company.id.VATchar.TaxRate.AverageTaxAgriculutureForest_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.VATchar.TaxRate.AverageTaxAgriculutureForest_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.VATchar.TaxRate.AverageTaxAgriculutureForest_1">
+         <ref:Name>UStG</ref:Name>
+         <ref:Paragraph>24</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.VATchar.VATtaxPeriod"
+           xlink:label="de-gcd_genInfo.company.id.VATchar.VATtaxPeriod"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.VATchar.VATtaxPeriod"
+                    xlink:to="reference_de-gcd_genInfo.company.id.VATchar.VATtaxPeriod_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.VATchar.VATtaxPeriod_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.VATchar.VATtaxPeriod_1">
+         <ref:Name>UStG</ref:Name>
+         <ref:Paragraph>18</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.VATchar.PermanentExtentionOfTime"
+           xlink:label="de-gcd_genInfo.company.id.VATchar.PermanentExtentionOfTime"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.VATchar.PermanentExtentionOfTime"
+                    xlink:to="reference_de-gcd_genInfo.company.id.VATchar.PermanentExtentionOfTime_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.VATchar.PermanentExtentionOfTime_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.VATchar.PermanentExtentionOfTime_1">
+         <ref:Name>UStG</ref:Name>
+         <ref:Paragraph>18</ref:Paragraph>
+         <ref:Subparagraph>6</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.incomeClassification"
+           xlink:label="de-gcd_genInfo.company.id.incomeClassification"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.incomeClassification"
+                    xlink:to="reference_de-gcd_genInfo.company.id.incomeClassification_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.incomeClassification_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.incomeClassification_1">
+         <ref:Name>EStG</ref:Name>
+         <ref:Paragraph>4a</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+         <ref:Number>1</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.incomeClassification.forestryAndAgriculture"
+           xlink:label="de-gcd_genInfo.company.id.incomeClassification.forestryAndAgriculture"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.incomeClassification.forestryAndAgriculture"
+                    xlink:to="reference_de-gcd_genInfo.company.id.incomeClassification.forestryAndAgriculture_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.incomeClassification.forestryAndAgriculture_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.incomeClassification.forestryAndAgriculture_1">
+         <ref:Name>EStG</ref:Name>
+         <ref:Paragraph>13</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.incomeClassification.trade"
+           xlink:label="de-gcd_genInfo.company.id.incomeClassification.trade"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.incomeClassification.trade"
+                    xlink:to="reference_de-gcd_genInfo.company.id.incomeClassification.trade_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.incomeClassification.trade_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.incomeClassification.trade_1">
+         <ref:Name>EStG</ref:Name>
+         <ref:Paragraph>15</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.incomeClassification.selfEmployment"
+           xlink:label="de-gcd_genInfo.company.id.incomeClassification.selfEmployment"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.incomeClassification.selfEmployment"
+                    xlink:to="reference_de-gcd_genInfo.company.id.incomeClassification.selfEmployment_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.incomeClassification.selfEmployment_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.incomeClassification.selfEmployment_1">
+         <ref:Name>EStG</ref:Name>
+         <ref:Paragraph>18</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.parent"
+           xlink:label="de-gcd_genInfo.company.id.parent"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.parent"
+                    xlink:to="reference_de-gcd_genInfo.company.id.parent_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.parent_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.parent_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>290</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.parent.legalStatus.ZB"
+           xlink:label="de-gcd_genInfo.company.id.parent.legalStatus.ZB"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.parent.legalStatus.ZB"
+                    xlink:to="reference_de-gcd_genInfo.company.id.parent.legalStatus.ZB_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.parent.legalStatus.ZB_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.parent.legalStatus.ZB_1">
+         <hgbref:ValidThrough>2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.parent.legalStatus.PG"
+           xlink:label="de-gcd_genInfo.company.id.parent.legalStatus.PG"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.parent.legalStatus.PG"
+                    xlink:to="reference_de-gcd_genInfo.company.id.parent.legalStatus.PG_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.parent.legalStatus.PG_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.parent.legalStatus.PG_1">
+         <ref:Name>PartGG</ref:Name>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.parent.legalStatus.PG"
+                    xlink:to="reference_de-gcd_genInfo.company.id.parent.legalStatus.PG_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.parent.legalStatus.PG_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.parent.legalStatus.PG_2">
+         <ref:Name>EStG</ref:Name>
+         <ref:Paragraph>18</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.parent.legalStatus.PartGmbB"
+           xlink:label="de-gcd_genInfo.company.id.parent.legalStatus.PartGmbB"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.parent.legalStatus.PartGmbB"
+                    xlink:to="reference_de-gcd_genInfo.company.id.parent.legalStatus.PartGmbB_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.parent.legalStatus.PartGmbB_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.parent.legalStatus.PartGmbB_1">
+         <ref:Name>PartGG</ref:Name>
+         <ref:Paragraph>8</ref:Paragraph>
+         <ref:Subparagraph>3</ref:Subparagraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.parent.legalStatus.PartGmbB"
+                    xlink:to="reference_de-gcd_genInfo.company.id.parent.legalStatus.PartGmbB_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.parent.legalStatus.PartGmbB_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.parent.legalStatus.PartGmbB_2">
+         <ref:Name>StBerG</ref:Name>
+         <ref:Paragraph>67a</ref:Paragraph>
+         <ref:Subparagraph>1</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.ZB"
+           xlink:label="de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.ZB"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.ZB"
+                    xlink:to="reference_de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.ZB_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.ZB_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.ZB_1">
+         <hgbref:ValidThrough>2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PG"
+           xlink:label="de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PG"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PG"
+                    xlink:to="reference_de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PG_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PG_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PG_1">
+         <ref:Name>PartGG</ref:Name>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PG"
+                    xlink:to="reference_de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PG_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PG_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PG_2">
+         <ref:Name>EStG</ref:Name>
+         <ref:Paragraph>18</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PartGmbB"
+           xlink:label="de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PartGmbB"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PartGmbB"
+                    xlink:to="reference_de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PartGmbB_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PartGmbB_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PartGmbB_1">
+         <ref:Name>StBerG</ref:Name>
+         <ref:Paragraph>67a</ref:Paragraph>
+         <ref:Subparagraph>1</ref:Subparagraph>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PartGmbB"
+                    xlink:to="reference_de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PartGmbB_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PartGmbB_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.parent.legalStatus.formerStatus.PartGmbB_2">
+         <ref:Name>PartGG</ref:Name>
+         <ref:Paragraph>8</ref:Paragraph>
+         <ref:Subparagraph>3</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.domesticBranchOfForeignCompany.HGB"
+           xlink:label="de-gcd_genInfo.company.id.domesticBranchOfForeignCompany.HGB"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.domesticBranchOfForeignCompany.HGB"
+                    xlink:to="reference_de-gcd_genInfo.company.id.domesticBranchOfForeignCompany.HGB_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.domesticBranchOfForeignCompany.HGB_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.domesticBranchOfForeignCompany.HGB_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>13d</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.domesticBranchOfForeignCompany.other"
+           xlink:label="de-gcd_genInfo.company.id.domesticBranchOfForeignCompany.other"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.domesticBranchOfForeignCompany.other"
+                    xlink:to="reference_de-gcd_genInfo.company.id.domesticBranchOfForeignCompany.other_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.domesticBranchOfForeignCompany.other_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.domesticBranchOfForeignCompany.other_1">
+         <ref:Name>DBA</ref:Name>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.domesticBranchOfForeignCompany.other"
+                    xlink:to="reference_de-gcd_genInfo.company.id.domesticBranchOfForeignCompany.other_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.domesticBranchOfForeignCompany.other_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.domesticBranchOfForeignCompany.other_2">
+         <ref:Name>AO</ref:Name>
+         <ref:Paragraph>12</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gcd-2022-05-02.xsd#de-gcd_genInfo.company.id.contactAddress"
+           xlink:label="de-gcd_genInfo.company.id.contactAddress"/>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.contactAddress"
+                    xlink:to="reference_de-gcd_genInfo.company.id.contactAddress_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.contactAddress_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.contactAddress_1">
+         <ref:Name>AktG</ref:Name>
+         <ref:Paragraph>37</ref:Paragraph>
+         <ref:Subparagraph>3</ref:Subparagraph>
+         <ref:Number>1</ref:Number>
+      </reference>
+      <referenceArc xlink:from="de-gcd_genInfo.company.id.contactAddress"
+                    xlink:to="reference_de-gcd_genInfo.company.id.contactAddress_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gcd_genInfo.company.id.contactAddress_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gcd_genInfo.company.id.contactAddress_2">
+         <ref:Name>GmbHG</ref:Name>
+         <ref:Paragraph>8</ref:Paragraph>
+         <ref:Subparagraph>4</ref:Subparagraph>
+         <ref:Number>1</ref:Number>
+      </reference>
+   </referenceLink>
+</linkbase>
