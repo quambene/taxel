@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--(c) XBRL Deutschland e.V. - see http://www.xbrl.de-->
+
+
+<xs:schema xmlns:de-hgbrole="http://www.xbrl.de/taxonomies/hgbrole-2022-05-02"
+           xmlns:link="http://www.xbrl.org/2003/linkbase"
+           xmlns:xbrli="http://www.xbrl.org/2003/instance"
+           xmlns:xlink="http://www.w3.org/1999/xlink"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           targetNamespace="http://www.xbrl.de/taxonomies/hgbrole-2022-05-02">
+  <xs:annotation>
+      <xs:appinfo>
+         <link:roleType id="role_terse60Label" roleURI="http://www.xbrl.de/roles/labels/terse60Label">
+            <link:definition>auf 60 Zeichen begrenzter Kurzbezeichner</link:definition>
+            <link:usedOn>link:label</link:usedOn>
+         </link:roleType>
+      </xs:appinfo>
+  </xs:annotation>
+</xs:schema>

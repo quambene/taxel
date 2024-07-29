@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--(c) XBRL Deutschland e.V. - see http://www.xbrl.de-->
+
+
+<xs:schema xmlns:hgbref="http://www.xbrl.de/taxonomies/de-ref-2010-02-19"
+           xmlns:link="http://www.xbrl.org/2003/linkbase"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           attributeFormDefault="unqualified"
+           elementFormDefault="qualified"
+           targetNamespace="http://www.xbrl.de/taxonomies/de-ref-2010-02-19">
+  <xs:import namespace="http://www.xbrl.org/2003/linkbase"
+              schemaLocation="http://www.xbrl.org/2003/xbrl-linkbase-2003-12-31.xsd"/>
+  <xs:import namespace="http://www.xbrl.org/2006/ref"
+              schemaLocation="http://www.xbrl.org/2006/ref-2006-02-27.xsd"/>
+  <xs:element name="ValidSince" id="ref_ValidSince" substitutionGroup="link:part"
+               type="xs:date">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Seit wann findet der Standard Anwendung?</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="ValidThrough" id="ref_ValidThrough" substitutionGroup="link:part"
+               type="xs:date">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Bis wann war der Standard gültig?</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="fiscalRequirement" id="ref_fiscalRequirement"
+               substitutionGroup="link:part">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Steuerliche Mindestanforderung</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+         <xs:restriction base="xs:string">
+            <xs:enumeration value="Mussfeld"/>
+            <xs:enumeration value="Mussfeld, Kontennachweis erwünscht"/>
+            <xs:enumeration value="Rechnerisch notwendig, soweit vorhanden"/>
+            <xs:enumeration value="Summenmussfeld"/>
+            
+            
+         </xs:restriction>
+      </xs:simpleType>
+  </xs:element>
+  <xs:element name="fiscalValidSince" id="ref_fiscalValidSince" substitutionGroup="link:part"
+               type="xs:date">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Mussfeld für WJ mit Beginn nach</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="fiscalValidThrough" id="ref_fiscalValidThrough"
+               substitutionGroup="link:part"
+               type="xs:date">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Mussfeld für WJ mit Beginn vor</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="notPermittedFor" id="ref_notPermittedFor" substitutionGroup="link:part">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Position ist unzulässig für bestimmte Berichtsarten</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+         <xs:restriction base="xs:string">
+            <xs:enumeration value="steuerlich"/>
+            <xs:enumeration value="Einreichung an Finanzverwaltung"/>
+            <xs:enumeration value="handelsrechtlich"/>
+         </xs:restriction>
+      </xs:simpleType>
+  </xs:element>
+  <xs:element name="onlyPermittedForSoBil_ErgBil" id="ref_onlyPermittedForSoBil_ErgBil"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Position ist nur zulässig für Sonder-/Ergänzungsbilanzen</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="tradeAccountingNotPermittedFor" id="tradeAccountingNotPermittedFor"
+               substitutionGroup="link:part">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Position ist unzulässig für bestimmte Berichtsarten</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+         <xs:restriction base="xs:string">
+            <xs:enumeration value="handelsrechtlich"/>
+            <xs:enumeration value="handelsrechtlicher Einzelabschluss"/>
+            <xs:enumeration value="handelsrechtlicher Konzernabschluss"/>
+         </xs:restriction>
+      </xs:simpleType>
+  </xs:element>
+    <xs:element name="relevanceDiFin" id="ref_relevanceDiFin" substitutionGroup="link:part"
+               type="xs:boolean">
+  </xs:element>
+  <xs:element name="legalFormEU" id="ref_legalFormEU" substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Rechtsform für steuerliche Mindestanforderungen</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="legalFormKSt" id="ref_legalFormKSt" substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Rechtsformen für steuerliche Mindestanforderungen</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="legalFormPG" id="ref_legalFormPG" substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Rechtsformen für steuerliche Mindestanforderungen</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="typeOperatingResult" id="ref_typeOperatingResult"
+               substitutionGroup="link:part">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Steuerliche Mindestanforderung</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+         <xs:restriction base="xs:string">
+            <xs:enumeration value="GKV"/>
+            <xs:enumeration value="neutral"/>
+            <xs:enumeration value="UKV"/>
+         </xs:restriction>
+      </xs:simpleType>
+  </xs:element>
+  <xs:element name="kindOfFinancialInstitutionBauspar"
+               id="ref_kindOfFinancialInstitutionBauspar"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">RechKredV: Bauspar</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfFinancialInstitutionFinanzdienstl"
+               id="ref_kindOfFinancialInstitutionFinanzdienstl"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">RechKredV: Finanzdienstl (nicht Skontrof)</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfFinancialInstitutiongenossZentrB"
+               id="ref_kindOfFinancialInstitutiongenossZentrB"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">RechKredV: genossZentrB</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfFinancialInstitutionGirozentralen"
+               id="ref_kindOfFinancialInstitutionGirozentralen"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">RechKredV: Girozentralen</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfFinancialInstitutionKapitalanlagegesellschaften"
+               id="ref_kindOfFinancialInstitutionKapitalanlagegesellschaften"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">RechKredV: Kapitalanlagegesellschaften</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfFinancialInstitutionKreditgenossensch"
+               id="ref_kindOfFinancialInstitutionKreditgenossensch"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">RechKredV: Kreditgenossensch</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfFinancialInstitutionKreditgenossenschWarengeschaeft"
+               id="ref_kindOfFinancialInstitutionKreditgenossenschWarengeschaeft"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">RechKredV: Kreditgenossensch mit Warengeschäft</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfFinancialInstitutionPfandBG"
+               id="ref_kindOfFinancialInstitutionPfandBG"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">RechKredV: PfandBG</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfFinancialInstitutionPfandbriefbanken"
+               id="ref_kindOfFinancialInstitutionPfandbriefbanken"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">RechKredV: Pfandbriefbanken</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfFinancialInstitutionPfandbriefbankenOERA"
+               id="ref_kindOfFinancialInstitutionPfandbriefbankenOERA"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">RechKredV: Pfandbriefbanken &amp; ö.R. Anstalten</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfFinancialInstitutionSchiffshypB"
+               id="ref_kindOfFinancialInstitutionSchiffshypB"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">RechKredV: SchiffshypB</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfFinancialInstitutionSkontrofuehrer"
+               id="ref_kindOfFinancialInstitutionSkontrofuehrer"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">RechKredV: Skontroführer</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfFinancialInstitutionSparkassen"
+               id="ref_kindOfFinancialInstitutionSparkassen"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">RechKredV: Sparkassen</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfFinancialInstitutionUniversalinstitute"
+               id="ref_kindOfFinancialInstitutionUniversalinstitute"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">RechKredV: Universalinstitute</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="legalFormSEAG" id="ref_legalFormSEAG" substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">SE / AG</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="legalFormVVaG" id="ref_legalFormVVaG" substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">VVaG</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="legalFormOerV" id="ref_legalFormOerV" substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Öffentlich-rechtliche Versicherungsunternehmen</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="legalFormBNaU" id="ref_legalFormBNaU" substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Betriebsstätten/Niederlassungen ausländischer Unternehmen</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfBusinessSUV" id="ref_kindOfBusinessSUV"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Schaden-/Unfallversicherung (ggf. inkl. Rückversicherung)</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfBusinessRV" id="ref_kindOfBusinessRV" substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Rückversicherung</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfBusinessLKV" id="ref_kindOfBusinessLKV"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Lebens-/Krankenversicherung (ggf. inkl. Rückversicherung)</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfBusinessPSK" id="ref_kindOfBusinessPSK"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Pensions-/Sterbekasse</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfBusinessLUV" id="ref_kindOfBusinessLUV"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Lebensversicherung mit selbst abgeschlossenem Unfallversicherungsgeschäft</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfBusinessSUK" id="ref_kindOfBusinessSUK"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Schaden-/Unfallversicherung mit selbst abgeschlossenem Krankenversicherungsgeschäft
+        nach Art der Lebensversicherung in größerem Umfang</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="kindOfBusinessPF" id="ref_kindOfBusinessPF" substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Pensionsfonds</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="PBV" id="ref_PBV" substitutionGroup="link:part" type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Ergänzungstaxonomie Branche PBV</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="KHBV" id="ref_KHBV" substitutionGroup="link:part" type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Ergänzungstaxonomie Branche KHBV</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="EBV" id="ref_EBV" substitutionGroup="link:part" type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Ergänzungstaxonomie Branche EBV</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="WUV" id="ref_WUV" substitutionGroup="link:part" type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Ergänzungstaxonomie Branche WUV</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="VUV" id="ref_VUV" substitutionGroup="link:part" type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Ergänzungstaxonomie Branche VUV</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="LUF" id="ref_LUF" substitutionGroup="link:part" type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Ergänzungstaxonomie Branche LUF</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="keineBranche" id="ref_keineBranche" substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">keine Ergänzungsbranche</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+  <xs:element name="disabledCalcMinClassification" id="ref_disabledCalcMinClassification"
+               substitutionGroup="link:part"
+               type="xs:boolean">
+      <xs:annotation>
+         <xs:documentation xml:lang="de">Kennzeichnung von Posten unterhalb derer bei HGB-Mindestgliederung nicht gerecht werden darf</xs:documentation>
+      </xs:annotation>
+  </xs:element>
+</xs:schema>

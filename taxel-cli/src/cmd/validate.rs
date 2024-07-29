@@ -59,7 +59,7 @@ mod tests {
             cmd::BIN,
             cmd::VALIDATE,
             "--xml-file",
-            "../test_data/ebilanz/taxonomy_v6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
+            "../test_data/taxonomy/v6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
         ];
 
         let app = app();
@@ -80,7 +80,7 @@ mod tests {
             cmd::BIN,
             cmd::VALIDATE,
             "--xml-file",
-            "../test_data/ebilanz/taxonomy_v6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
+            "../test_data/taxonomy/v6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
             "--print",
             "ebilanz.pdf",
         ];

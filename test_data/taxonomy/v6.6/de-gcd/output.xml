@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ns0:EBilanz xmlns:ns0="http://rzf.fin-nrw.de/RMS/EBilanz/2016/XMLSchema" xmlns:ns1="http://www.xbrl.org/2003/instance" xmlns:ns2="http://www.xbrl.org/2003/linkbase" xmlns:ns3="http://www.w3.org/1999/xlink" xmlns:ns4="http://www.xbrl.de/taxonomies/de-gcd-2022-05-02" version="1">
+    <ns0:stichtag>20231231</ns0:stichtag>
+    <ns1:xbrl>
+        <ns2:schemaRef ns3:type="simple" ns3:href="../../../schema/taxonomy/v6.6/de-gcd-2022-05-02/de-gcd-2022-05-02-shell.xsd" />
+        <ns1:context id="context1">
+            <ns1:entity>
+                <ns1:identifier scheme="http://www.rzf-nrw.de/Steuernummer">0000000000000</ns1:identifier>
+            </ns1:entity>
+            <ns1:period>
+                <ns1:instant>2023-12-31</ns1:instant>
+            </ns1:period>
+        </ns1:context>
+        <ns1:context id="context2">
+            <ns1:entity>
+                <ns1:identifier scheme="http://www.rzf-nrw.de/Steuernummer">0000000000000</ns1:identifier>
+            </ns1:entity>
+            <ns1:period>
+                <ns1:startDate>2023-01-01</ns1:startDate>
+                <ns1:endDate>2023-12-31</ns1:endDate>
+            </ns1:period>
+        </ns1:context>
+        <ns1:unit id="EUR">
+            <ns1:measure>EUR</ns1:measure>
+        </ns1:unit>
+        <ns4:genInfo.report.period.fiscalYearBegin contextRef="context2">2023-01-01</ns4:genInfo.report.period.fiscalYearBegin>
+        <ns4:genInfo.report.period.fiscalYearEnd contextRef="context2">2023-12-31</ns4:genInfo.report.period.fiscalYearEnd>
+        <ns4:genInfo.company.id.location.street contextRef="context2">My street</ns4:genInfo.company.id.location.street>
+        <ns4:genInfo.company.id.legalStatus>
+            <ns4:genInfo.company.id.legalStatus.legalStatus.UG contextRef="context2">My company</ns4:genInfo.company.id.legalStatus.legalStatus.UG>
+        </ns4:genInfo.company.id.legalStatus>
+    </ns1:xbrl>
+</ns0:EBilanz>

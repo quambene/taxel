@@ -1,0 +1,34 @@
+{
+    "elster:Elster": {
+        "elster:TransferHeader": {
+            "@version": "11",
+            "elster:Verfahren": "ElsterBilanz",
+            "elster:DatenArt": "Bilanz",
+            "elster:Vorgang": "send-Auth",
+            "elster:HerstellerID": "00000",
+            "elster:DatenLieferant": "My name, address, and email",
+            "elster:Datei": {
+                "elster:Verschluesselung": "CMSEncryptedData",
+                "elster:Kompression": "GZIP"
+            },
+            "elster:VersionClient": "1"
+        },
+        "elster:DatenTeil": {
+            "elster:Nutzdatenblock": {
+                "elster:NutzdatenHeader": {
+                    "@version": "11",
+                    "elster:NutzdatenTicket": "0001",
+                    "elster:Empfaenger": {
+                        "@id": "F",
+                        "$": "1000"
+                    },
+                    "elster:Hersteller": {
+                        "elster:ProduktName": "Taxel",
+                        "elster:ProduktVersion": "0.1.0"
+                    }
+                },
+                "elster:Nutzdaten": {}
+            }
+        }
+    }
+}

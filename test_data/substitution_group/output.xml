@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ns0:root xmlns:ns0="http://www.example.org/schema1" xmlns:ns1="http://www.example.org/schema2">
+    <ns1:concreteItem>This is a concrete item</ns1:concreteItem>
+</ns0:root>

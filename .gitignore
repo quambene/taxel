@@ -1,5 +1,5 @@
 # taxel-py
-taxel-py/ebilanz
+taxel-py/src/ebilanz
 
 # Rust
 /target
@@ -9,6 +9,7 @@ Cargo.lock
 __pycache__
 .mypy_cache
 **/.venv
+**/poetry.lock
 
 # Eric
 eric
@@ -16,6 +17,13 @@ eric.log
 validation_response.xml
 server_response.xml
 *.pdf
+
+# schema
+schema/*
+
+# test data
+test_data/schema/elster/*
+test_data/schema/ebilanz/*
 
 # csv
 .~lock.**.csv#

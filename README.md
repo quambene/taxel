@@ -152,6 +152,10 @@ cargo test -p taxel-cli --release --test '*' --features integration-test -- --te
 
 # Run unit tests for taxel-xml
 cargo test -p taxel-xml
+
+# Run unit tests for taxel-py
+cd taxel-py
+pytest -v -m unit
 ```
 
 ## Rust bindings for the ELSTER Rich Client (ERiC)

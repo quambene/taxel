@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns1="http://www.example.org/schema1"
+    xmlns:ns2="http://www.example.org/schema2"
+    targetNamespace="http://www.example.org/schema2"
+    elementFormDefault="qualified">
+    <xs:import namespace="http://www.example.org/schema1"
+    schemaLocation="schema1.xsd" />
+    <xs:element name="concreteItem" substitutionGroup="ns1:abstractItem"
+        type="xs:string" />
+</xs:schema>

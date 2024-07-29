@@ -1,0 +1,63 @@
+{
+    "ebilanz:EBilanz": {
+        "ebilanz:stichtag": 20231231,
+        "xbrli:xbrl": {
+            "link:schemaRef": [
+                {
+                    "@xlink:type": "simple",
+                    "@xlink:href": "../../../schema/taxonomy/v6.6/de-gcd-2022-05-02/de-gcd-2022-05-02-shell.xsd"
+                }
+            ],
+            "xbrli:context": [
+                {
+                    "@id": "context1",
+                    "xbrli:entity": {
+                        "xbrli:identifier": {
+                            "@scheme": "http://www.rzf-nrw.de/Steuernummer",
+                            "$": "0000000000000"
+                        }
+                    },
+                    "xbrli:period": {
+                        "xbrli:instant": "2023-12-31"
+                    }
+                },
+                {
+                    "@id": "context2",
+                    "xbrli:entity": {
+                        "xbrli:identifier": {
+                            "@scheme": "http://www.rzf-nrw.de/Steuernummer",
+                            "$": "0000000000000"
+                        }
+                    },
+                    "xbrli:period": {
+                        "xbrli:startDate": "2023-01-01",
+                        "xbrli:endDate": "2023-12-31"
+                    }
+                }
+            ],
+            "xbrli:unit": {
+                "@id": "EUR",
+                "xbrli:measure": "EUR"
+            },
+            "de-gcd:genInfo.report.period.fiscalYearBegin": {
+                "@contextRef": "context2",
+                "$": "2023-01-01"
+            },
+            "de-gcd:genInfo.report.period.fiscalYearEnd": {
+                "@contextRef": "context2",
+                "$": "2023-12-31"
+            },
+            "de-gcd:genInfo.company.id.location.street": {
+                "@contextRef": "context2",
+                "$": "My street"
+            },
+            "de-gcd:genInfo.company.id.legalStatus": {
+                "de-gcd:genInfo.company.id.legalStatus.legalStatus.UG": {
+                    "@contextRef": "context2",
+                    "$": "My company"
+                }
+            }
+        },
+        "@version": 1
+    }
+}

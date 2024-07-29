@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<person>
+    <name>John Doe</name>
+    <age>30</age>
+    <car version="1">
+        <color>blue</color>
+        <cylinder>4</cylinder>
+    </car>
+</person>
