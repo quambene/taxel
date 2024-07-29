@@ -122,7 +122,7 @@ mod tests {
                     <DatenArt>Bilanz</DatenArt>
                     <Vorgang>send-Auth</Vorgang>
                     <Testmerker>700000004</Testmerker>
-                    <HerstellerID>21694</HerstellerID>
+                    <HerstellerID>00000</HerstellerID>
                     <Datei>
                         <Verschluesselung>CMSEncryptedData</Verschluesselung>
                         <Kompression>GZIP</Kompression>
@@ -158,7 +158,7 @@ mod tests {
                     <DatenArt>Bilanz</DatenArt>
                     <Vorgang>send-Auth</Vorgang>
                     <Testmerker>700000004</Testmerker>
-                    <HerstellerID>21694</HerstellerID>
+                    <HerstellerID>00000</HerstellerID>
                     <Datei>
                         <Verschluesselung>CMSEncryptedData</Verschluesselung>
                         <Kompression>GZIP</Kompression>

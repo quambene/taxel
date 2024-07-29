@@ -77,7 +77,7 @@ impl Tags {
         self.insert("Verfahren", Some("ElsterBilanz"));
         self.insert("DatenArt", Some("Bilanz"));
         self.insert("Vorgang", Some("send-Auth"));
-        self.insert("HerstellerID", Some("21694"));
+        self.insert("HerstellerID", Some("00000"));
         self.insert("Kompression", Some("GZIP"));
         self.insert("Verschluesselung", Some("CMSEncryptedData"));
         self.insert("VersionClient", Some("1"));
