@@ -108,7 +108,7 @@ impl XbrlElement {
     ) -> Self {
         Self {
             name: name.into(),
-            value: value.map(|value| value.into()),
+            value,
             attributes,
             xml_type,
             children,
@@ -264,11 +264,10 @@ impl XbrlElement {
 
             if self.xml_type == XmlType::Taxonomy(Taxonomy::Gcd) {
                 // Add `xsi:nil` attribute if not availabe.
-                if self
+                if !self
                     .attributes
                     .iter()
-                    .find(|attribute| attribute.key == NIL_ATTRIBUTE.key)
-                    .is_none()
+                    .any(|attribute| attribute.key == NIL_ATTRIBUTE.key)
                 {
                     self.attributes
                         .push(XbrlAttribute::new(NIL_ATTRIBUTE.key, NIL_ATTRIBUTE.value));
@@ -286,11 +285,10 @@ impl XbrlElement {
                 }
 
                 // Add `xsi:nil` attribute if not availabe.
-                if self
+                if !self
                     .attributes
                     .iter()
-                    .find(|attribute| attribute.key == NIL_ATTRIBUTE.key)
-                    .is_none()
+                    .any(|attribute| attribute.key == NIL_ATTRIBUTE.key)
                 {
                     self.attributes
                         .push(XbrlAttribute::new(NIL_ATTRIBUTE.key, NIL_ATTRIBUTE.value));
@@ -305,41 +303,38 @@ impl XbrlElement {
 
     /// Add given values to `XbrlElement` recursively.
     pub fn add_values(&mut self, target_tags: &Tags) {
-        if let Some(value) = target_tags.get(&self.name) {
-            if let Some(value) = value {
-                self.value = Some(value.to_owned());
+        if let Some(Some(value)) = target_tags.get(&self.name) {
+            self.value = Some(value.to_owned());
 
-                if self.xml_type == XmlType::Taxonomy(Taxonomy::Gcd) {
-                    // Remove `xsi:nil` attribute
-                    if let Some(index) = self
-                        .attributes
-                        .iter()
-                        .position(|attribute| attribute.key == NIL_ATTRIBUTE.key)
-                    {
-                        self.attributes.remove(index);
-                    }
+            if self.xml_type == XmlType::Taxonomy(Taxonomy::Gcd) {
+                // Remove `xsi:nil` attribute
+                if let Some(index) = self
+                    .attributes
+                    .iter()
+                    .position(|attribute| attribute.key == NIL_ATTRIBUTE.key)
+                {
+                    self.attributes.remove(index);
+                }
+            }
+
+            if self.xml_type == XmlType::Taxonomy(Taxonomy::GaapCi) {
+                // Remove `xsi:nil` attribute
+                if let Some(index) = self
+                    .attributes
+                    .iter()
+                    .position(|attribute| attribute.key == NIL_ATTRIBUTE.key)
+                {
+                    self.attributes.remove(index);
                 }
 
-                if self.xml_type == XmlType::Taxonomy(Taxonomy::GaapCi) {
-                    // Remove `xsi:nil` attribute
-                    if let Some(index) = self
-                        .attributes
-                        .iter()
-                        .position(|attribute| attribute.key == NIL_ATTRIBUTE.key)
-                    {
-                        self.attributes.remove(index);
-                    }
-
-                    // Add `decimals` attribute if not availabe.
-                    if self
-                        .attributes
-                        .iter()
-                        .find(|attribute| attribute.key == DECIMALS_2.key)
-                        .is_none()
-                    {
-                        self.attributes
-                            .push(XbrlAttribute::new(DECIMALS_2.key, DECIMALS_2.value))
-                    }
+                // Add `decimals` attribute if not availabe.
+                if !self
+                    .attributes
+                    .iter()
+                    .any(|attribute| attribute.key == DECIMALS_2.key)
+                {
+                    self.attributes
+                        .push(XbrlAttribute::new(DECIMALS_2.key, DECIMALS_2.value))
                 }
             }
         }
