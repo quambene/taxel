@@ -433,7 +433,7 @@ mod tests {
     }
 
     #[test]
-    fn test_add_values_empy() {
+    fn test_add_values_empty() {
         let mut element = XbrlElement::new(
             "root",
             None,
