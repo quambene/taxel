@@ -8,7 +8,6 @@ import xml.etree.ElementTree as ET
 def load_schema(schema_path: str) -> XMLSchema10:
     """Load and deserialize schema from xsd file"""
 
-    # Load and parse the XSD file
     schema = XMLSchema10(schema_path, loglevel=20, validation='strict')
 
     return schema
