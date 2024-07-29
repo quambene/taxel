@@ -1,6 +1,5 @@
 from typing import Any, Dict
 import pytest
-from lxml import etree
 from xmlschema import XMLSchema10, XMLSchemaValidationError
 import json
 import xml.etree.ElementTree as ET
@@ -9,7 +8,6 @@ import xml.etree.ElementTree as ET
 def load_schema(schema_path: str) -> XMLSchema10:
     """Load and deserialize schema from xsd file"""
 
-    # Load and parse the XSD file
     schema = XMLSchema10(schema_path, loglevel=20, validation='strict')
 
     return schema
@@ -59,10 +57,8 @@ def generate_xml(schema: XMLSchema10, data: Any, target_namespace: str | None, n
 
 def validate_xml(schema: XMLSchema10, xml_tree: ET.ElementTree):
     print("Validate xml agains schema")
-    print("Schema: ", schema)
     print("Target namespace: ", schema.target_namespace)
     print("Default namespace: ", schema.default_namespace)
-    print("Substitution groups: ", schema.substitution_groups)
 
     schema.validate(xml_tree)
 

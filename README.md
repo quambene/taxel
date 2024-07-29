@@ -1,5 +1,8 @@
 # Taxel
 
+[![build status](https://github.com/quambene/taxel/actions/workflows/rust-ci.yml/badge.svg)](https://github.com/quambene/taxel/actions/workflows/rust-ci.yml)
+[![dependency status](https://deps.rs/repo/github/quambene/taxel/status.svg)](https://deps.rs/repo/github/quambene/taxel)
+
 Taxel provides a command line interface (CLI) and Rust bindings for the ELSTER Rich Client (ERiC).
 
 ![Taxel mockup](/mockup.png)
@@ -151,7 +154,7 @@ cargo test -p taxel-cli --test '*' --features integration-test -- --test-threads
 cargo test -p taxel-cli --release --test '*' --features integration-test -- --test-threads=1
 
 # Run unit tests for taxel-xml
-cargo test -p taxel-xml
+cargo test --lib -p taxel-xml
 
 # Run unit tests for taxel-py
 cd taxel-py

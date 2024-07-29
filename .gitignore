@@ -3,7 +3,6 @@ taxel-py/src/ebilanz
 
 # Rust
 /target
-Cargo.lock
 
 # Python
 __pycache__
