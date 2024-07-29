@@ -1,7 +1,7 @@
 
 [project]
 name = "taxel-py"
-version = "0.0.1"
+version = "0.2.0"
 authors = [
     {name = "quambene", email = "contact.quambene@gmail.com"},
 ]
@@ -18,7 +18,7 @@ addopts = [
 
 [tool.poetry]
 name = "taxel-py"
-version = "0.0.1"
+version = "0.2.0"
 description = "Convert xsd to xml"
 authors = ["quambene <contact.quambene@gmail.com>"]
 package-mode = false
