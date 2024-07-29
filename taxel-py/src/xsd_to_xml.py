@@ -34,11 +34,8 @@ def load_xml(xml_path: str):
 
 def generate_xml(schema: XMLSchema10, data: Any, target_namespace: str | None, namespaces: dict[str, str] | None) -> ET.ElementTree:
     print("Generate xml from schema")
-    print("Schema: ", schema)
     print("Target namespace: ", schema.target_namespace)
     print("Default namespace: ", schema.default_namespace)
-    print("Substitution groups: ", schema.substitution_groups.target_dict)
-    print("Groups: ", schema.groups.target_dict)
 
     if target_namespace is not None and namespaces is None:
         namespaces = {target_namespace: schema.target_namespace}
@@ -50,7 +47,7 @@ def generate_xml(schema: XMLSchema10, data: Any, target_namespace: str | None, n
             data, validation='strict')
     else:
         xml_data = schema.encode(
-            data, validation='strict', preserve_root=True, unordered=True, namespaces=namespaces)
+            data, validation='strict', preserve_root=True, namespaces=namespaces)
 
     if isinstance(xml_data, ET.Element):
         xml_tree = ET.ElementTree(xml_data)
@@ -102,7 +99,7 @@ def test_generate_xml_simple():
 
 @pytest.mark.unit
 def test_validate_xml_substitution_group():
-    schema_path = '../test_data/substitution_group/schema.xsd'
+    schema_path = '../test_data/substitution_group/schema1.xsd'
     output_path = '../test_data/substitution_group/output.xml'
 
     schema = XMLSchema10(schema_path, loglevel=20, validation='strict')
@@ -112,21 +109,25 @@ def test_validate_xml_substitution_group():
 
 @pytest.mark.unit
 def test_generate_xml_substitution_group():
-    schema_path = '../test_data/substitution_group/schema.xsd'
+    schema_path = '../test_data/substitution_group/schema1.xsd'
     input_path = '../test_data/substitution_group/input.json'
     output_path = '../test_data/substitution_group/output.xml'
     target_namespace = 'ns1'
+    namespaces = {
+        "ns2": "http://www.example.org/schema2"
+    }
 
     schema = load_schema(schema_path)
 
     substitution_groups = schema.substitution_groups.as_dict()
-    print(substitution_groups)
-    actual_name = list(substitution_groups['abstractItem'])[0].name
-    expected_name = r'{http://www.example.org/schema}concreteItem'
+    print("substitution groups: ", substitution_groups)
+    actual_name = list(
+        substitution_groups[r'abstractItem'])[0].name
+    expected_name = r'{http://www.example.org/schema2}concreteItem'
     assert actual_name == expected_name
 
     data = load_data(input_path)
-    xml = generate_xml(schema, data, target_namespace, None)
+    xml = generate_xml(schema, data, target_namespace, namespaces)
     root = xml.getroot()
     actual_xml = ET.tostring(root, encoding="UTF-8", xml_declaration=True)
 
@@ -179,7 +180,7 @@ def test_validate_xml_ebilanz():
     validate_xml(schema, xml)
 
 
-# TODO: check iso4217:EUR for xbrli:measure
+# TODO: Check iso4217:EUR for xbrli:measure
 @pytest.mark.unit
 def test_generate_xml_ebilanz():
     schema_path = '../test_data/schema/ebilanz/ebilanz_000002.xsd'
@@ -236,26 +237,22 @@ def test_generate_xml_ebilanz_gcd():
         "hgbref": "http://www.xbrl.de/taxonomies/de-ref-2010-02-19",
         "de-hgbrole": "http://www.xbrl.de/taxonomies/hgbrole-2022-05-02",
         # taxonomy v6.6 for Global Common Document (GCD)
-        # "gcd-shell": "http://www.xbrl.de/taxonomies/de-gcd-2022-05-02/shell",
-        # "de-gcd": "http://www.xbrl.de/taxonomies/de-gcd-2022-05-02",
+        "gcd-shell": "http://www.xbrl.de/taxonomies/de-gcd-2022-05-02/shell",
+        "de-gcd": "http://www.xbrl.de/taxonomies/de-gcd-2022-05-02",
         # taxonomy v6.6 for Generally Accepted Accounting Principles (GAAP)
-        # "de-gaap-ci": "http://www.xbrl.de/taxonomies/de-gaap-ci-2022-05-02"
+        "de-gaap-ci": "http://www.xbrl.de/taxonomies/de-gaap-ci-2022-05-02"
     }
 
     schema = XMLSchema10(schema_path, loglevel=20, validation='strict')
 
-    schema.import_schema("http://www.xbrl.de/taxonomies/de-gcd-2022-05-02/shell",
-                         "../test_data/schema/taxonomy/v6.6/de-gcd-2022-05-02/de-gcd-2022-05-02-shell.xsd")
-    # schema.import_schema("http://www.xbrl.de/taxonomies/de-gcd-2022-05-02",
-    #                      "./test_data/schema/taxonomy/v6.6/de-gcd-2022-05-02/de-gcd-2022-05-02.xsd")
+    # TODO: Fix import of "de-gcd-2022-05-02-shell.xsd" in "xbrl-instance-2003-12-31.xsd"
+    # schema.import_schema("http://www.xbrl.de/taxonomies/de-gcd-2022-05-02/shell",
+    #                      "../test_data/schema/taxonomy/v6.6/de-gcd-2022-05-02/de-gcd-2022-05-02-shell.xsd")
 
     data = load_data(input_path)
     xml = generate_xml(schema, data, target_namespace, namespaces)
     root = xml.getroot()
     actual_xml = ET.tostring(root, encoding="UTF-8", xml_declaration=True)
-
-    with open(output_path, 'wb') as file:
-        xml.write(file, encoding='UTF-8', xml_declaration=True)
 
     with open(output_path, 'r', encoding="UTF-8") as file:
         expected_xml = file.read()
