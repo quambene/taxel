@@ -68,7 +68,9 @@ jobs:
         run: pip install poetry
         working-directory: taxel-py
       - name: Install dependencies
-        run: poetry install --with dev --no-interaction --no-ansi
+        run: |
+          poetry lock
+          poetry install --with dev --no-interaction --no-ansi
         working-directory: taxel-py
       - name: Run tests
         run: pytest -v -m unit
