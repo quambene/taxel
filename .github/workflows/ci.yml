@@ -73,5 +73,5 @@ jobs:
           poetry install --with dev --no-interaction --no-ansi
         working-directory: taxel-py
       - name: Run tests
-        run: pytest -v -m unit
+        run: poetry run pytest -v -m unit
         working-directory: taxel-py
