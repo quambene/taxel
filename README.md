@@ -142,7 +142,7 @@ cargo test -p taxel --test '*' --features integration-test -- --test-threads=1
 cargo test -p taxel --release --test '*' --features integration-test -- --test-threads=1
 
 # Run unit tests for taxel-cli
-cargo test -p taxel-cli
+cargo test --lib -p taxel-cli
 
 # Run integration tests for taxel-cli
 cargo test -p taxel-cli --test '*' --features integration-test -- --test-threads=1
@@ -151,7 +151,7 @@ cargo test -p taxel-cli --test '*' --features integration-test -- --test-threads
 cargo test -p taxel-cli --release --test '*' --features integration-test -- --test-threads=1
 
 # Run unit tests for taxel-xml
-cargo test -p taxel-xml
+cargo test --lib -p taxel-xml
 
 # Run unit tests for taxel-py
 cd taxel-py
