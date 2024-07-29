@@ -4,6 +4,7 @@
 
 - added
   - taxel-py: Generate xml from xsd schema
+  - Add CI
 - changed
 - removed
 
