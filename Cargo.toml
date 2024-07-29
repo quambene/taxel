@@ -6,6 +6,7 @@ members = [
     "taxel-util",
     "taxel-xml",
 ]
+resolver = "2"
 
 [workspace.package]
 authors = ["quambene <contact.quambene@gmail.com>"]
