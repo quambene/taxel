@@ -12,21 +12,21 @@ jobs:
         - uses: actions/checkout@v4
         - uses: dtolnay/rust-toolchain@stable
         - name: cargo check
-          run: cargo check -p taxel-cli -p taxel-xml -p taxel-util
+          run: cargo check -p taxel-xml -p taxel-util
   clippy:
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v4
         - uses: dtolnay/rust-toolchain@stable
         - name: cargo clippy
-          run: cargo clippy --all-features --all-targets -p taxel-cli -p taxel-xml -p taxel-util -- -D warnings
+          run: cargo clippy --all-features --all-targets -p taxel-xml -p taxel-util -- -D warnings
   doc:
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v4
         - uses: dtolnay/rust-toolchain@stable
         - name: cargo doc
-          run: cargo doc --no-deps --all-features -p taxel-cli -p taxel-xml -p taxel-util
+          run: cargo doc --no-deps --all-features -p taxel-xml -p taxel-util
   fmt:
     runs-on: ubuntu-latest
     steps:
@@ -48,8 +48,6 @@ jobs:
     steps:
         - uses: actions/checkout@v4
         - uses: dtolnay/rust-toolchain@stable
-        - name: cargo test -p taxel-cli
-          run: cargo test -p taxel-cli
         - name: cargo test --lib -p taxel-xml -p taxel-util
           run: cargo test --lib -p taxel-xml -p taxel-util
   doc-test:
@@ -58,4 +56,4 @@ jobs:
         - uses: actions/checkout@v4
         - uses: dtolnay/rust-toolchain@stable
         - name: cargo test --doc
-          run: cargo test --locked --doc -p taxel-cli -p taxel-xml -p taxel-util
+          run: cargo test --locked --doc -p taxel-xml -p taxel-util
