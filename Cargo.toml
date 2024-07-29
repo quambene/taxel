@@ -8,10 +8,6 @@ members = [
 ]
 resolver = "2"
 
-exclude = [
-    "taxel-bindings/src/ericapi.rs"
-]
-
 [workspace.package]
 authors = ["quambene <contact.quambene@gmail.com>"]
 edition = "2021"
