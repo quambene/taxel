@@ -621,7 +621,10 @@ mod tests {
                 vec![XbrlElement::new(
                     "de-gcd:genInfo.report.audit.city",
                     None,
-                    vec![XbrlAttribute::new("contextRef", "D-AKTJAHR")],
+                    vec![
+                        XbrlAttribute::new("contextRef", "D-AKTJAHR"),
+                        XbrlAttribute::new("xsi:nil", "true"),
+                    ],
                     XmlType::Taxonomy(Taxonomy::Gcd),
                     vec![]
                 )]
