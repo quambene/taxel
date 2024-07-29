@@ -17,4 +17,4 @@ taxel-util = { version = "0.1.0", path = "../taxel-util" }
 anyhow = { workspace = true }
 
 [dev-dependencies]
-roxmltree = "0.14.1"
+roxmltree = { workspace = true }

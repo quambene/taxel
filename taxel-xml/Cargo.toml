@@ -12,7 +12,7 @@ name = "taxel_xml"
 anyhow = { workspace = true }
 log = { workspace = true }
 env_logger = { workspace = true }
-serde = { version = "1.0.164", features = ["derive"]}
-quick-xml = "0.29.0"
-csv = "1.2.2"
-spreadsheet-ods = "0.15.0"
+serde = { workspace = true, features = ["derive"] }
+quick-xml = { workspace = true }
+csv = { workspace = true }
+spreadsheet-ods = { workspace = true }
