@@ -1,0 +1,1831 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--(c) XBRL Deutschland e.V. - see http://www.xbrl.de-->
+
+
+<linkbase xmlns="http://www.xbrl.org/2003/linkbase"
+          xmlns:hgbref="http://www.xbrl.de/taxonomies/de-ref-2010-02-19"
+          xmlns:ref="http://www.xbrl.org/2006/ref"
+          xmlns:xbrli="http://www.xbrl.org/2003/instance"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.xbrl.org/2006/ref http://www.xbrl.org/2006/ref-2006-02-27.xsd http://www.xbrl.de/taxonomies/de-ref-2010-02-19 ../de-gcd-2022-05-02/hgbref-2022-05-02.xsd">
+   <referenceLink xlink:type="extended" xlink:role="http://www.xbrl.org/2003/role/link">
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_minority.equity"
+           xlink:label="de-gaap-ci_dim_minority.equity"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_minority.equity"
+                    xlink:to="reference_de-gaap-ci_dim_minority.equity_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_dim_minority.equity_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_minority.equity_1">
+         <ref:Name>DRS</ref:Name>
+         <ref:Number>7</ref:Number>
+         <ref:Note>7; 19</ref:Note>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_minority.otherGroupResult"
+           xlink:label="de-gaap-ci_dim_minority.otherGroupResult"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_minority.otherGroupResult"
+                    xlink:to="reference_de-gaap-ci_dim_minority.otherGroupResult_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_dim_minority.otherGroupResult_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_minority.otherGroupResult_1">
+         <ref:Name>DRS</ref:Name>
+         <ref:Number>7</ref:Number>
+         <ref:Note>7; 19</ref:Note>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_minority.otherGroupResult.currTransl"
+           xlink:label="de-gaap-ci_dim_minority.otherGroupResult.currTransl"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_minority.otherGroupResult.currTransl"
+                    xlink:to="reference_de-gaap-ci_dim_minority.otherGroupResult.currTransl_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_dim_minority.otherGroupResult.currTransl_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_minority.otherGroupResult.currTransl_1">
+         <ref:Name>DRS</ref:Name>
+         <ref:Number>7</ref:Number>
+         <ref:Note>19</ref:Note>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_minority.otherGroupResult.other"
+           xlink:label="de-gaap-ci_dim_minority.otherGroupResult.other"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_minority.otherGroupResult.other"
+                    xlink:to="reference_de-gaap-ci_dim_minority.otherGroupResult.other_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_dim_minority.otherGroupResult.other_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_minority.otherGroupResult.other_1">
+         <ref:Name>DRS</ref:Name>
+         <ref:Number>7</ref:Number>
+         <ref:Note>19</ref:Note>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_minority"
+           xlink:label="de-gaap-ci_dim_minority"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_minority"
+                    xlink:to="reference_de-gaap-ci_dim_minority_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_dim_minority_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_minority_1">
+         <ref:Name>DRS</ref:Name>
+         <ref:Number>7</ref:Number>
+         <ref:Note>7; 19</ref:Note>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.eqChDRS22K"
+           xlink:label="de-gaap-ci_table.eqChDRS22K"/>
+      <referenceArc xlink:from="de-gaap-ci_table.eqChDRS22K"
+                    xlink:to="reference_de-gaap-ci_table.eqChDRS22K_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_table.eqChDRS22K_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.eqChDRS22K_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>Anlage 1</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_table.eqChDRS22K"
+                    xlink:to="reference_de-gaap-ci_table.eqChDRS22K_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_table.eqChDRS22K_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.eqChDRS22K_2">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>10</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_table.eqChDRS22K"
+                    xlink:to="reference_de-gaap-ci_table.eqChDRS22K_3"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_table.eqChDRS22K_3"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.eqChDRS22K_3">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>297</ref:Paragraph>
+         <ref:Subparagraph>1</ref:Subparagraph>
+         <ref:Clause>2</ref:Clause>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_allDRS22K.parent"
+           xlink:label="de-gaap-ci_dim_allDRS22K.parent"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_allDRS22K.parent"
+                    xlink:to="reference_de-gaap-ci_dim_allDRS22K.parent_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_dim_allDRS22K.parent_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_allDRS22K.parent_1">
+         <hgbref:tradeAccountingNotPermittedFor>handelsrechtlicher Einzelabschluss</hgbref:tradeAccountingNotPermittedFor>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_parentDRS22K.accGroupStatement.shares.subscribed.sharesRegular"
+           xlink:label="de-gaap-ci_dim_parentDRS22K.accGroupStatement.shares.subscribed.sharesRegular"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_parentDRS22K.accGroupStatement.shares.subscribed.sharesRegular"
+                    xlink:to="reference_de-gaap-ci_dim_parentDRS22K.accGroupStatement.shares.subscribed.sharesRegular_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_dim_parentDRS22K.accGroupStatement.shares.subscribed.sharesRegular_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_parentDRS22K.accGroupStatement.shares.subscribed.sharesRegular_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>27</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_parentDRS22K.accGroupStatement.shares.subscribed.sharesPremium"
+           xlink:label="de-gaap-ci_dim_parentDRS22K.accGroupStatement.shares.subscribed.sharesPremium"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_parentDRS22K.accGroupStatement.shares.subscribed.sharesPremium"
+                    xlink:to="reference_de-gaap-ci_dim_parentDRS22K.accGroupStatement.shares.subscribed.sharesPremium_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_dim_parentDRS22K.accGroupStatement.shares.subscribed.sharesPremium_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_parentDRS22K.accGroupStatement.shares.subscribed.sharesPremium_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>27</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_parentDRS22K.accGroupStatement.shares.unpaidContribution"
+           xlink:label="de-gaap-ci_dim_parentDRS22K.accGroupStatement.shares.unpaidContribution"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_parentDRS22K.accGroupStatement.shares.unpaidContribution"
+                    xlink:to="reference_de-gaap-ci_dim_parentDRS22K.accGroupStatement.shares.unpaidContribution_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_dim_parentDRS22K.accGroupStatement.shares.unpaidContribution_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_parentDRS22K.accGroupStatement.shares.unpaidContribution_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>28</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_parentDRS22K.accGroupStatement.reserves.capRes.272_2case1_3"
+           xlink:label="de-gaap-ci_dim_parentDRS22K.accGroupStatement.reserves.capRes.272_2case1_3"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_parentDRS22K.accGroupStatement.reserves.capRes.272_2case1_3"
+                    xlink:to="reference_de-gaap-ci_dim_parentDRS22K.accGroupStatement.reserves.capRes.272_2case1_3_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_dim_parentDRS22K.accGroupStatement.reserves.capRes.272_2case1_3_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_parentDRS22K.accGroupStatement.reserves.capRes.272_2case1_3_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>54</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_parentDRS22K.accGroupStatement.reserves.capRes.272_2case4"
+           xlink:label="de-gaap-ci_dim_parentDRS22K.accGroupStatement.reserves.capRes.272_2case4"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_parentDRS22K.accGroupStatement.reserves.capRes.272_2case4"
+                    xlink:to="reference_de-gaap-ci_dim_parentDRS22K.accGroupStatement.reserves.capRes.272_2case4_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_dim_parentDRS22K.accGroupStatement.reserves.capRes.272_2case4_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_parentDRS22K.accGroupStatement.reserves.capRes.272_2case4_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>54</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_parentDRS22K.accGroupStatement.currTranslDiff"
+           xlink:label="de-gaap-ci_dim_parentDRS22K.accGroupStatement.currTranslDiff"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_parentDRS22K.accGroupStatement.currTranslDiff"
+                    xlink:to="reference_de-gaap-ci_dim_parentDRS22K.accGroupStatement.currTranslDiff_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_dim_parentDRS22K.accGroupStatement.currTranslDiff_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_parentDRS22K.accGroupStatement.currTranslDiff_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>34</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_minorityDRS22K"
+           xlink:label="de-gaap-ci_dim_minorityDRS22K"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_minorityDRS22K"
+                    xlink:to="reference_de-gaap-ci_dim_minorityDRS22K_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_dim_minorityDRS22K_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_minorityDRS22K_1">
+         <hgbref:tradeAccountingNotPermittedFor>handelsrechtlicher Einzelabschluss</hgbref:tradeAccountingNotPermittedFor>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_dim_minorityDRS22K"
+                    xlink:to="reference_de-gaap-ci_dim_minorityDRS22K_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_dim_minorityDRS22K_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_minorityDRS22K_2">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>13</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_dim_minorityDRS22K"
+                    xlink:to="reference_de-gaap-ci_dim_minorityDRS22K_3"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_dim_minorityDRS22K_3"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_minorityDRS22K_3">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>14</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_minorityDRS22K.bevorCurrTranslOtherGroupResult"
+           xlink:label="de-gaap-ci_dim_minorityDRS22K.bevorCurrTranslOtherGroupResult"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_minorityDRS22K.bevorCurrTranslOtherGroupResult"
+                    xlink:to="reference_de-gaap-ci_dim_minorityDRS22K.bevorCurrTranslOtherGroupResult_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_dim_minorityDRS22K.bevorCurrTranslOtherGroupResult_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_minorityDRS22K.bevorCurrTranslOtherGroupResult_1">
+         <hgbref:tradeAccountingNotPermittedFor>handelsrechtlicher Einzelabschluss</hgbref:tradeAccountingNotPermittedFor>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_minorityDRS22K.currTransl"
+           xlink:label="de-gaap-ci_dim_minorityDRS22K.currTransl"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_minorityDRS22K.currTransl"
+                    xlink:to="reference_de-gaap-ci_dim_minorityDRS22K.currTransl_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_dim_minorityDRS22K.currTransl_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_minorityDRS22K.currTransl_1">
+         <hgbref:tradeAccountingNotPermittedFor>handelsrechtlicher Einzelabschluss</hgbref:tradeAccountingNotPermittedFor>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_minorityDRS22K.otherGroupResult"
+           xlink:label="de-gaap-ci_dim_minorityDRS22K.otherGroupResult"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_minorityDRS22K.otherGroupResult"
+                    xlink:to="reference_de-gaap-ci_dim_minorityDRS22K.otherGroupResult_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_dim_minorityDRS22K.otherGroupResult_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_minorityDRS22K.otherGroupResult_1">
+         <hgbref:tradeAccountingNotPermittedFor>handelsrechtlicher Einzelabschluss</hgbref:tradeAccountingNotPermittedFor>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCh.group_otherChangesDRS22K.comment"
+           xlink:label="de-gaap-ci_eqCh.group_otherChangesDRS22K.comment"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCh.group_otherChangesDRS22K.comment"
+                    xlink:to="reference_de-gaap-ci_eqCh.group_otherChangesDRS22K.comment_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCh.group_otherChangesDRS22K.comment_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCh.group_otherChangesDRS22K.comment_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>57</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCh.group_changeConsolDRS22K"
+           xlink:label="de-gaap-ci_eqCh.group_changeConsolDRS22K"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCh.group_changeConsolDRS22K"
+                    xlink:to="reference_de-gaap-ci_eqCh.group_changeConsolDRS22K_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCh.group_changeConsolDRS22K_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCh.group_changeConsolDRS22K_1">
+         <hgbref:tradeAccountingNotPermittedFor>handelsrechtlicher Einzelabschluss</hgbref:tradeAccountingNotPermittedFor>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.eqDRS22P"
+           xlink:label="de-gaap-ci_table.eqDRS22P"/>
+      <referenceArc xlink:from="de-gaap-ci_table.eqDRS22P"
+                    xlink:to="reference_de-gaap-ci_table.eqDRS22P_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_table.eqDRS22P_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.eqDRS22P_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>297</ref:Paragraph>
+         <ref:Subparagraph>1</ref:Subparagraph>
+         <ref:Clause>2</ref:Clause>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_table.eqDRS22P"
+                    xlink:to="reference_de-gaap-ci_table.eqDRS22P_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_table.eqDRS22P_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.eqDRS22P_2">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>Anlage 2</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_table.eqDRS22P"
+                    xlink:to="reference_de-gaap-ci_table.eqDRS22P_3"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_table.eqDRS22P_3"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.eqDRS22P_3">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>10</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_allDRS22P.parent"
+           xlink:label="de-gaap-ci_dim_allDRS22P.parent"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_allDRS22P.parent"
+                    xlink:to="reference_de-gaap-ci_dim_allDRS22P.parent_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_dim_allDRS22P.parent_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_allDRS22P.parent_1">
+         <hgbref:tradeAccountingNotPermittedFor>handelsrechtlicher Einzelabschluss</hgbref:tradeAccountingNotPermittedFor>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_parentDRS22P.accGroupStatement.shares"
+           xlink:label="de-gaap-ci_dim_parentDRS22P.accGroupStatement.shares"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_parentDRS22P.accGroupStatement.shares"
+                    xlink:to="reference_de-gaap-ci_dim_parentDRS22P.accGroupStatement.shares_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_dim_parentDRS22P.accGroupStatement.shares_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_parentDRS22P.accGroupStatement.shares_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>23</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_minorityDRS22P"
+           xlink:label="de-gaap-ci_dim_minorityDRS22P"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_minorityDRS22P"
+                    xlink:to="reference_de-gaap-ci_dim_minorityDRS22P_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_dim_minorityDRS22P_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_minorityDRS22P_1">
+         <hgbref:tradeAccountingNotPermittedFor>handelsrechtlicher Einzelabschluss</hgbref:tradeAccountingNotPermittedFor>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_dim_minorityDRS22P"
+                    xlink:to="reference_de-gaap-ci_dim_minorityDRS22P_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_dim_minorityDRS22P_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_minorityDRS22P_2">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>13</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_dim_minorityDRS22P"
+                    xlink:to="reference_de-gaap-ci_dim_minorityDRS22P_3"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_dim_minorityDRS22P_3"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_minorityDRS22P_3">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>14</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_minorityDRS22P.bevorCurrTranslOtherGroupResult"
+           xlink:label="de-gaap-ci_dim_minorityDRS22P.bevorCurrTranslOtherGroupResult"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_minorityDRS22P.bevorCurrTranslOtherGroupResult"
+                    xlink:to="reference_de-gaap-ci_dim_minorityDRS22P.bevorCurrTranslOtherGroupResult_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_dim_minorityDRS22P.bevorCurrTranslOtherGroupResult_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_minorityDRS22P.bevorCurrTranslOtherGroupResult_1">
+         <hgbref:tradeAccountingNotPermittedFor>handelsrechtlicher Einzelabschluss</hgbref:tradeAccountingNotPermittedFor>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_minorityDRS22P.currTransl"
+           xlink:label="de-gaap-ci_dim_minorityDRS22P.currTransl"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_minorityDRS22P.currTransl"
+                    xlink:to="reference_de-gaap-ci_dim_minorityDRS22P.currTransl_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_dim_minorityDRS22P.currTransl_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_minorityDRS22P.currTransl_1">
+         <hgbref:tradeAccountingNotPermittedFor>handelsrechtlicher Einzelabschluss</hgbref:tradeAccountingNotPermittedFor>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_minorityDRS22P.otherGroupResult"
+           xlink:label="de-gaap-ci_dim_minorityDRS22P.otherGroupResult"/>
+      <referenceArc xlink:from="de-gaap-ci_dim_minorityDRS22P.otherGroupResult"
+                    xlink:to="reference_de-gaap-ci_dim_minorityDRS22P.otherGroupResult_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_dim_minorityDRS22P.otherGroupResult_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_dim_minorityDRS22P.otherGroupResult_1">
+         <hgbref:tradeAccountingNotPermittedFor>handelsrechtlicher Einzelabschluss</hgbref:tradeAccountingNotPermittedFor>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCh.group_beginningDRS22P"
+           xlink:label="de-gaap-ci_eqCh.group_beginningDRS22P"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCh.group_beginningDRS22P"
+                    xlink:to="reference_de-gaap-ci_eqCh.group_beginningDRS22P_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCh.group_beginningDRS22P_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCh.group_beginningDRS22P_1">
+         <ref:Name>DRS 22</ref:Name>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCh.group_.increaseDecreaseSharesDRS22P"
+           xlink:label="de-gaap-ci_eqCh.group_.increaseDecreaseSharesDRS22P"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCh.group_.increaseDecreaseSharesDRS22P"
+                    xlink:to="reference_de-gaap-ci_eqCh.group_.increaseDecreaseSharesDRS22P_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCh.group_.increaseDecreaseSharesDRS22P_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCh.group_.increaseDecreaseSharesDRS22P_1">
+         <ref:Name>DRS 22</ref:Name>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCh.group_recPaidUnpaidContributionDRS22P"
+           xlink:label="de-gaap-ci_eqCh.group_recPaidUnpaidContributionDRS22P"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCh.group_recPaidUnpaidContributionDRS22P"
+                    xlink:to="reference_de-gaap-ci_eqCh.group_recPaidUnpaidContributionDRS22P_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCh.group_recPaidUnpaidContributionDRS22P_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCh.group_recPaidUnpaidContributionDRS22P_1">
+         <ref:Name>DRS 22</ref:Name>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCh.group_additionPartnersAccountLiabDRS22P"
+           xlink:label="de-gaap-ci_eqCh.group_additionPartnersAccountLiabDRS22P"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCh.group_additionPartnersAccountLiabDRS22P"
+                    xlink:to="reference_de-gaap-ci_eqCh.group_additionPartnersAccountLiabDRS22P_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCh.group_additionPartnersAccountLiabDRS22P_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCh.group_additionPartnersAccountLiabDRS22P_1">
+         <ref:Name>DRS 22</ref:Name>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCh.group_additionReleaseReservesDRS22P"
+           xlink:label="de-gaap-ci_eqCh.group_additionReleaseReservesDRS22P"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCh.group_additionReleaseReservesDRS22P"
+                    xlink:to="reference_de-gaap-ci_eqCh.group_additionReleaseReservesDRS22P_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCh.group_additionReleaseReservesDRS22P_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCh.group_additionReleaseReservesDRS22P_1">
+         <ref:Name>DRS 22</ref:Name>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCh.group_currTranslDRS22P"
+           xlink:label="de-gaap-ci_eqCh.group_currTranslDRS22P"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCh.group_currTranslDRS22P"
+                    xlink:to="reference_de-gaap-ci_eqCh.group_currTranslDRS22P_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCh.group_currTranslDRS22P_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCh.group_currTranslDRS22P_1">
+         <ref:Name>DRS 22</ref:Name>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCh.group_otherChangesDRS22P"
+           xlink:label="de-gaap-ci_eqCh.group_otherChangesDRS22P"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCh.group_otherChangesDRS22P"
+                    xlink:to="reference_de-gaap-ci_eqCh.group_otherChangesDRS22P_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCh.group_otherChangesDRS22P_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCh.group_otherChangesDRS22P_1">
+         <ref:Name>DRS 22</ref:Name>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCh.group_otherChangesDRS22P.comment"
+           xlink:label="de-gaap-ci_eqCh.group_otherChangesDRS22P.comment"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCh.group_otherChangesDRS22P.comment"
+                    xlink:to="reference_de-gaap-ci_eqCh.group_otherChangesDRS22P.comment_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCh.group_otherChangesDRS22P.comment_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCh.group_otherChangesDRS22P.comment_1">
+         <ref:Name>DRS 22</ref:Name>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCh.group_netIncomeDRS22P"
+           xlink:label="de-gaap-ci_eqCh.group_netIncomeDRS22P"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCh.group_netIncomeDRS22P"
+                    xlink:to="reference_de-gaap-ci_eqCh.group_netIncomeDRS22P_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCh.group_netIncomeDRS22P_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCh.group_netIncomeDRS22P_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>57</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCH.notesDRS22"
+           xlink:label="de-gaap-ci_eqCH.notesDRS22"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCH.notesDRS22"
+                    xlink:to="reference_de-gaap-ci_eqCH.notesDRS22_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_eqCH.notesDRS22_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCH.notesDRS22_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>61</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_eqCH.notesDRS22"
+                    xlink:to="reference_de-gaap-ci_eqCH.notesDRS22_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_eqCH.notesDRS22_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCH.notesDRS22_2">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>60</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCH.notesDRS22.capRes"
+           xlink:label="de-gaap-ci_eqCH.notesDRS22.capRes"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCH.notesDRS22.capRes"
+                    xlink:to="reference_de-gaap-ci_eqCH.notesDRS22.capRes_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCH.notesDRS22.capRes_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCH.notesDRS22.capRes_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>60</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCH.notesDRS22.capRes.a"
+           xlink:label="de-gaap-ci_eqCH.notesDRS22.capRes.a"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCH.notesDRS22.capRes.a"
+                    xlink:to="reference_de-gaap-ci_eqCH.notesDRS22.capRes.a_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCH.notesDRS22.capRes.a_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCH.notesDRS22.capRes.a_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>60</ref:Paragraph>
+         <ref:Number>a)</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCH.notesDRS22.capRes.b"
+           xlink:label="de-gaap-ci_eqCH.notesDRS22.capRes.b"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCH.notesDRS22.capRes.b"
+                    xlink:to="reference_de-gaap-ci_eqCH.notesDRS22.capRes.b_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCH.notesDRS22.capRes.b_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCH.notesDRS22.capRes.b_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>60</ref:Paragraph>
+         <ref:Number>b)</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCH.notesDRS22.capRes.c"
+           xlink:label="de-gaap-ci_eqCH.notesDRS22.capRes.c"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCH.notesDRS22.capRes.c"
+                    xlink:to="reference_de-gaap-ci_eqCH.notesDRS22.capRes.c_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCH.notesDRS22.capRes.c_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCH.notesDRS22.capRes.c_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>60</ref:Paragraph>
+         <ref:Number>c)</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCH.notesDRS22.revenueRes"
+           xlink:label="de-gaap-ci_eqCH.notesDRS22.revenueRes"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCH.notesDRS22.revenueRes"
+                    xlink:to="reference_de-gaap-ci_eqCH.notesDRS22.revenueRes_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCH.notesDRS22.revenueRes_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCH.notesDRS22.revenueRes_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>60</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCH.notesDRS22.revenueRes.a"
+           xlink:label="de-gaap-ci_eqCH.notesDRS22.revenueRes.a"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCH.notesDRS22.revenueRes.a"
+                    xlink:to="reference_de-gaap-ci_eqCH.notesDRS22.revenueRes.a_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCH.notesDRS22.revenueRes.a_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCH.notesDRS22.revenueRes.a_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>60</ref:Paragraph>
+         <ref:Number>a)</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCH.notesDRS22.revenueRes.b"
+           xlink:label="de-gaap-ci_eqCH.notesDRS22.revenueRes.b"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCH.notesDRS22.revenueRes.b"
+                    xlink:to="reference_de-gaap-ci_eqCH.notesDRS22.revenueRes.b_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCH.notesDRS22.revenueRes.b_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCH.notesDRS22.revenueRes.b_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>60</ref:Paragraph>
+         <ref:Number>b)</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCH.notesDRS22.revenueRes.c"
+           xlink:label="de-gaap-ci_eqCH.notesDRS22.revenueRes.c"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCH.notesDRS22.revenueRes.c"
+                    xlink:to="reference_de-gaap-ci_eqCH.notesDRS22.revenueRes.c_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCH.notesDRS22.revenueRes.c_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCH.notesDRS22.revenueRes.c_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>60</ref:Paragraph>
+         <ref:Number>c)</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear"
+           xlink:label="de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear"
+                    xlink:to="reference_de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>60</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear.a"
+           xlink:label="de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear.a"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear.a"
+                    xlink:to="reference_de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear.a_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear.a_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear.a_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>60</ref:Paragraph>
+         <ref:Number>a)</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear.b"
+           xlink:label="de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear.b"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear.b"
+                    xlink:to="reference_de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear.b_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear.b_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear.b_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>60</ref:Paragraph>
+         <ref:Number>b)</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear.c"
+           xlink:label="de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear.c"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear.c"
+                    xlink:to="reference_de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear.c_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear.c_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCH.notesDRS22.retainedEarningsPrevYear.c_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>60</ref:Paragraph>
+         <ref:Number>c)</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCH.notesDRS22.netIncome"
+           xlink:label="de-gaap-ci_eqCH.notesDRS22.netIncome"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCH.notesDRS22.netIncome"
+                    xlink:to="reference_de-gaap-ci_eqCH.notesDRS22.netIncome_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCH.notesDRS22.netIncome_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCH.notesDRS22.netIncome_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>60</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCH.notesDRS22.netIncome.a"
+           xlink:label="de-gaap-ci_eqCH.notesDRS22.netIncome.a"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCH.notesDRS22.netIncome.a"
+                    xlink:to="reference_de-gaap-ci_eqCH.notesDRS22.netIncome.a_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCH.notesDRS22.netIncome.a_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCH.notesDRS22.netIncome.a_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>60</ref:Paragraph>
+         <ref:Number>a)</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCH.notesDRS22.netIncome.b"
+           xlink:label="de-gaap-ci_eqCH.notesDRS22.netIncome.b"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCH.notesDRS22.netIncome.b"
+                    xlink:to="reference_de-gaap-ci_eqCH.notesDRS22.netIncome.b_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCH.notesDRS22.netIncome.b_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCH.notesDRS22.netIncome.b_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>60</ref:Paragraph>
+         <ref:Number>b)</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_eqCH.notesDRS22.netIncome.c"
+           xlink:label="de-gaap-ci_eqCH.notesDRS22.netIncome.c"/>
+      <referenceArc xlink:from="de-gaap-ci_eqCH.notesDRS22.netIncome.c"
+                    xlink:to="reference_de-gaap-ci_eqCH.notesDRS22.netIncome.c_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_eqCH.notesDRS22.netIncome.c_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_eqCH.notesDRS22.netIncome.c_1">
+         <ref:Name>DRS 22</ref:Name>
+         <ref:Paragraph>60</ref:Paragraph>
+         <ref:Number>c)</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_gross"
+           xlink:label="de-gaap-ci_gross"/>
+      <referenceArc xlink:from="de-gaap-ci_gross" xlink:to="reference_de-gaap-ci_gross_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_gross_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_gross_1">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>136</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_gross.diff.currDiff"
+           xlink:label="de-gaap-ci_gross.diff.currDiff"/>
+      <referenceArc xlink:from="de-gaap-ci_gross.diff.currDiff"
+                    xlink:to="reference_de-gaap-ci_gross.diff.currDiff_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_gross.diff.currDiff_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_gross.diff.currDiff_1">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>137</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_gross.addition"
+           xlink:label="de-gaap-ci_gross.addition"/>
+      <referenceArc xlink:from="de-gaap-ci_gross.addition"
+                    xlink:to="reference_de-gaap-ci_gross.addition_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_gross.addition_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_gross.addition_1">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>136</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_gross.addition.interest"
+           xlink:label="de-gaap-ci_gross.addition.interest"/>
+      <referenceArc xlink:from="de-gaap-ci_gross.addition.interest"
+                    xlink:to="reference_de-gaap-ci_gross.addition.interest_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_gross.addition.interest_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_gross.addition.interest_1">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>136</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_gross.addition.interest"
+                    xlink:to="reference_de-gaap-ci_gross.addition.interest_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_gross.addition.interest_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_gross.addition.interest_2">
+         <hgbref:ValidSince>2016-01-01</hgbref:ValidSince>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_gross.addition.interest"
+                    xlink:to="reference_de-gaap-ci_gross.addition.interest_3"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_gross.addition.interest_3"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_gross.addition.interest_3">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>284</ref:Paragraph>
+         <ref:Subparagraph>3</ref:Subparagraph>
+         <ref:Clause>4</ref:Clause>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_gross.addition.firstConsolidation"
+           xlink:label="de-gaap-ci_gross.addition.firstConsolidation"/>
+      <referenceArc xlink:from="de-gaap-ci_gross.addition.firstConsolidation"
+                    xlink:to="reference_de-gaap-ci_gross.addition.firstConsolidation_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_gross.addition.firstConsolidation_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_gross.addition.firstConsolidation_1">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>137</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_gross.addition.firstConsolidation"
+                    xlink:to="reference_de-gaap-ci_gross.addition.firstConsolidation_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_gross.addition.firstConsolidation_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_gross.addition.firstConsolidation_2">
+         <hgbref:tradeAccountingNotPermittedFor>handelsrechtlicher Einzelabschluss</hgbref:tradeAccountingNotPermittedFor>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_gross.addition_short.interest"
+           xlink:label="de-gaap-ci_gross.addition_short.interest"/>
+      <referenceArc xlink:from="de-gaap-ci_gross.addition_short.interest"
+                    xlink:to="reference_de-gaap-ci_gross.addition_short.interest_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_gross.addition_short.interest_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_gross.addition_short.interest_1">
+         <hgbref:ValidSince>2016-01-01</hgbref:ValidSince>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_gross.addition_short.interest"
+                    xlink:to="reference_de-gaap-ci_gross.addition_short.interest_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_gross.addition_short.interest_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_gross.addition_short.interest_2">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>136</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_gross.addition_short.interest"
+                    xlink:to="reference_de-gaap-ci_gross.addition_short.interest_3"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_gross.addition_short.interest_3"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_gross.addition_short.interest_3">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>284</ref:Paragraph>
+         <ref:Subparagraph>3</ref:Subparagraph>
+         <ref:Clause>4</ref:Clause>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_gross.addition_short.firstConsolidation"
+           xlink:label="de-gaap-ci_gross.addition_short.firstConsolidation"/>
+      <referenceArc xlink:from="de-gaap-ci_gross.addition_short.firstConsolidation"
+                    xlink:to="reference_de-gaap-ci_gross.addition_short.firstConsolidation_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_gross.addition_short.firstConsolidation_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_gross.addition_short.firstConsolidation_1">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>137</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_gross.addition_short.firstConsolidation"
+                    xlink:to="reference_de-gaap-ci_gross.addition_short.firstConsolidation_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_gross.addition_short.firstConsolidation_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_gross.addition_short.firstConsolidation_2">
+         <hgbref:tradeAccountingNotPermittedFor>handelsrechtlicher Einzelabschluss</hgbref:tradeAccountingNotPermittedFor>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_gross.release"
+           xlink:label="de-gaap-ci_gross.release"/>
+      <referenceArc xlink:from="de-gaap-ci_gross.release"
+                    xlink:to="reference_de-gaap-ci_gross.release_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_gross.release_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_gross.release_1">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>136</ref:Paragraph>
+         <ref:Number>c</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_gross.movements"
+           xlink:label="de-gaap-ci_gross.movements"/>
+      <referenceArc xlink:from="de-gaap-ci_gross.movements"
+                    xlink:to="reference_de-gaap-ci_gross.movements_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_gross.movements_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_gross.movements_1">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>136</ref:Paragraph>
+         <ref:Number>d</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_gross.currChanges"
+           xlink:label="de-gaap-ci_gross.currChanges"/>
+      <referenceArc xlink:from="de-gaap-ci_gross.currChanges"
+                    xlink:to="reference_de-gaap-ci_gross.currChanges_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_gross.currChanges_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_gross.currChanges_1">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>137</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_revaluation"
+           xlink:label="de-gaap-ci_revaluation"/>
+      <referenceArc xlink:from="de-gaap-ci_revaluation"
+                    xlink:to="reference_de-gaap-ci_revaluation_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_revaluation_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_revaluation_1">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>136</ref:Paragraph>
+         <ref:Number>e</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr"
+           xlink:label="de-gaap-ci_accDepr"/>
+      <referenceArc xlink:from="de-gaap-ci_accDepr" xlink:to="reference_de-gaap-ci_accDepr_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_accDepr_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_accDepr_1">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>136</ref:Paragraph>
+         <ref:Number>f</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.beginning"
+           xlink:label="de-gaap-ci_accDepr.beginning"/>
+      <referenceArc xlink:from="de-gaap-ci_accDepr.beginning"
+                    xlink:to="reference_de-gaap-ci_accDepr.beginning_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_accDepr.beginning_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_accDepr.beginning_1">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>136</ref:Paragraph>
+         <ref:Number>f</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.diff.currDiff"
+           xlink:label="de-gaap-ci_accDepr.diff.currDiff"/>
+      <referenceArc xlink:from="de-gaap-ci_accDepr.diff.currDiff"
+                    xlink:to="reference_de-gaap-ci_accDepr.diff.currDiff_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_accDepr.diff.currDiff_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_accDepr.diff.currDiff_1">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>137</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.addition"
+           xlink:label="de-gaap-ci_accDepr.addition"/>
+      <referenceArc xlink:from="de-gaap-ci_accDepr.addition"
+                    xlink:to="reference_de-gaap-ci_accDepr.addition_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_accDepr.addition_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_accDepr.addition_1">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>136</ref:Paragraph>
+         <ref:Number>h</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.release"
+           xlink:label="de-gaap-ci_accDepr.release"/>
+      <referenceArc xlink:from="de-gaap-ci_accDepr.release"
+                    xlink:to="reference_de-gaap-ci_accDepr.release_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_accDepr.release_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_accDepr.release_1">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>136</ref:Paragraph>
+         <ref:Number>h</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.movements"
+           xlink:label="de-gaap-ci_accDepr.movements"/>
+      <referenceArc xlink:from="de-gaap-ci_accDepr.movements"
+                    xlink:to="reference_de-gaap-ci_accDepr.movements_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_accDepr.movements_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_accDepr.movements_1">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>136</ref:Paragraph>
+         <ref:Number>h</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.currChanges"
+           xlink:label="de-gaap-ci_accDepr.currChanges"/>
+      <referenceArc xlink:from="de-gaap-ci_accDepr.currChanges"
+                    xlink:to="reference_de-gaap-ci_accDepr.currChanges_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_accDepr.currChanges_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_accDepr.currChanges_1">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>137</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.DeprPeriod"
+           xlink:label="de-gaap-ci_accDepr.DeprPeriod"/>
+      <referenceArc xlink:from="de-gaap-ci_accDepr.DeprPeriod"
+                    xlink:to="reference_de-gaap-ci_accDepr.DeprPeriod_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_accDepr.DeprPeriod_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_accDepr.DeprPeriod_1">
+         <ref:Name>DRS 24</ref:Name>
+         <ref:Paragraph>136</ref:Paragraph>
+         <ref:Number>g</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.DeprPeriod.EStG7g_2"
+           xlink:label="de-gaap-ci_accDepr.DeprPeriod.EStG7g_2"/>
+      <referenceArc xlink:from="de-gaap-ci_accDepr.DeprPeriod.EStG7g_2"
+                    xlink:to="reference_de-gaap-ci_accDepr.DeprPeriod.EStG7g_2_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_accDepr.DeprPeriod.EStG7g_2_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_accDepr.DeprPeriod.EStG7g_2_1">
+         <ref:Name>EStG</ref:Name>
+         <ref:Paragraph>7g</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+         <ref:Clause>4</ref:Clause>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.DeprPeriod.EStG6b_3"
+           xlink:label="de-gaap-ci_accDepr.DeprPeriod.EStG6b_3"/>
+      <referenceArc xlink:from="de-gaap-ci_accDepr.DeprPeriod.EStG6b_3"
+                    xlink:to="reference_de-gaap-ci_accDepr.DeprPeriod.EStG6b_3_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_accDepr.DeprPeriod.EStG6b_3_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_accDepr.DeprPeriod.EStG6b_3_1">
+         <ref:Name>EStG</ref:Name>
+         <ref:Paragraph>6b</ref:Paragraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.liab"
+           xlink:label="de-gaap-ci_table.liab"/>
+      <referenceArc xlink:from="de-gaap-ci_table.liab" xlink:to="reference_de-gaap-ci_table.liab_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource" xlink:label="reference_de-gaap-ci_table.liab_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.liab_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>285</ref:Paragraph>
+         <ref:Number>1</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_liab_primaryItem.total.collateralised"
+           xlink:label="de-gaap-ci_liab_primaryItem.total.collateralised"/>
+      <referenceArc xlink:from="de-gaap-ci_liab_primaryItem.total.collateralised"
+                    xlink:to="reference_de-gaap-ci_liab_primaryItem.total.collateralised_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_liab_primaryItem.total.collateralised_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_liab_primaryItem.total.collateralised_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>285</ref:Paragraph>
+         <ref:Subparagraph>1b</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_liab_primaryItem.total.upTo1year"
+           xlink:label="de-gaap-ci_liab_primaryItem.total.upTo1year"/>
+      <referenceArc xlink:from="de-gaap-ci_liab_primaryItem.total.upTo1year"
+                    xlink:to="reference_de-gaap-ci_liab_primaryItem.total.upTo1year_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_liab_primaryItem.total.upTo1year_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_liab_primaryItem.total.upTo1year_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>285</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_liab_primaryItem.total.above1year"
+           xlink:label="de-gaap-ci_liab_primaryItem.total.above1year"/>
+      <referenceArc xlink:from="de-gaap-ci_liab_primaryItem.total.above1year"
+                    xlink:to="reference_de-gaap-ci_liab_primaryItem.total.above1year_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_liab_primaryItem.total.above1year_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_liab_primaryItem.total.above1year_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>285</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_liab_primaryItem.total.above1year.upTo5years"
+           xlink:label="de-gaap-ci_liab_primaryItem.total.above1year.upTo5years"/>
+      <referenceArc xlink:from="de-gaap-ci_liab_primaryItem.total.above1year.upTo5years"
+                    xlink:to="reference_de-gaap-ci_liab_primaryItem.total.above1year.upTo5years_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_liab_primaryItem.total.above1year.upTo5years_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_liab_primaryItem.total.above1year.upTo5years_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>285</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_liab_primaryItem.total.above1year.above5years"
+           xlink:label="de-gaap-ci_liab_primaryItem.total.above1year.above5years"/>
+      <referenceArc xlink:from="de-gaap-ci_liab_primaryItem.total.above1year.above5years"
+                    xlink:to="reference_de-gaap-ci_liab_primaryItem.total.above1year.above5years_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_liab_primaryItem.total.above1year.above5years_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_liab_primaryItem.total.above1year.above5years_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>285</ref:Paragraph>
+         <ref:Subparagraph>1a</ref:Subparagraph>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_liab_primaryItem.total.above1year.above5years"
+                    xlink:to="reference_de-gaap-ci_liab_primaryItem.total.above1year.above5years_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_liab_primaryItem.total.above1year.above5years_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_liab_primaryItem.total.above1year.above5years_2">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>285</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.DaEK"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.DaEK"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.DaEK"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.DaEK_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.DaEK_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.DaEK_1">
+         <hgbref:ValidThrough xmlns:link="http://www.xbrl.org/2003/linkbase">2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.nVgV"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.nVgV"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.nVgV"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.nVgV_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.nVgV_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.nVgV_1">
+         <hgbref:ValidThrough xmlns:link="http://www.xbrl.org/2003/linkbase">2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.nVgV"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.nVgV_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.nVgV_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.nVgV_2">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264c</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+         <ref:Clause>5</ref:Clause>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.nVgE"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.nVgE"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.nVgE"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.nVgE_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.nVgE_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.nVgE_1">
+         <hgbref:ValidThrough xmlns:link="http://www.xbrl.org/2003/linkbase">2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.netIncomeLoss"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.netIncomeLoss"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.netIncomeLoss"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.netIncomeLoss_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.netIncomeLoss_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.netIncomeLoss_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264c</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.retainedProfitLoss"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.retainedProfitLoss"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.retainedProfitLoss"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.retainedProfitLoss_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.retainedProfitLoss_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.retainedProfitLoss_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264c</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.profitLoss"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.profitLoss"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.profitLoss"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.profitLoss_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.profitLoss_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.profitLoss_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264c</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.subordimatedCapital"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.subordimatedCapital"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.subordimatedCapital"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.subordimatedCapital_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.subordimatedCapital_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.subordimatedCapital_1">
+         <hgbref:ValidThrough>2020-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.subordinatedCapitalDeficitItem"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.subordinatedCapitalDeficitItem"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.subordinatedCapitalDeficitItem"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.subordinatedCapitalDeficitItem_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.subordinatedCapitalDeficitItem_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.subordinatedCapitalDeficitItem_1">
+         <hgbref:ValidThrough>2020-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.KK"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.KK"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.KK"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.KK_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.KK_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.KK_1">
+         <hgbref:ValidThrough xmlns:link="http://www.xbrl.org/2003/linkbase">2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.DaEK"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.DaEK"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.DaEK"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.DaEK_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.DaEK_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.DaEK_1">
+         <hgbref:ValidThrough xmlns:link="http://www.xbrl.org/2003/linkbase">2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.netIncomeLoss"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.netIncomeLoss"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.netIncomeLoss"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.netIncomeLoss_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.netIncomeLoss_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.netIncomeLoss_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264c</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.retainedProfitLoss"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.retainedProfitLoss"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.retainedProfitLoss"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.retainedProfitLoss_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.retainedProfitLoss_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.retainedProfitLoss_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264c</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.profitLoss"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.profitLoss"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.profitLoss"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.profitLoss_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.profitLoss_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.profitLoss_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264c</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.subordimatedCapital"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.subordimatedCapital"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.subordimatedCapital"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.subordimatedCapital_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.subordimatedCapital_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.subordimatedCapital_1">
+         <hgbref:ValidThrough>2020-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.subordinatedCapitalDeficitItem"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.subordinatedCapitalDeficitItem"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.subordinatedCapitalDeficitItem"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.subordinatedCapitalDeficitItem_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.subordinatedCapitalDeficitItem_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.subordinatedCapitalDeficitItem_1">
+         <hgbref:ValidThrough>2020-12-30</hgbref:ValidThrough>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgV"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgV"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgV"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgV_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgV_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgV_1">
+         <hgbref:ValidThrough xmlns:link="http://www.xbrl.org/2003/linkbase">2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgV"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgV_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgV_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgV_2">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264c</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+         <ref:Clause>6 u. 7</ref:Clause>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgE"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgE"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgE"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgE_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgE_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgE_1">
+         <hgbref:ValidThrough xmlns:link="http://www.xbrl.org/2003/linkbase">2022-12-30</hgbref:ValidThrough>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgE"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgE_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgE_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfEquityAccounts.limitedPartners.nVgE_2">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264c</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+         <ref:Clause>6 u. 7</ref:Clause>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.unlimitedPartners.aEE"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.unlimitedPartners.aEE"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.unlimitedPartners.aEE"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.unlimitedPartners.aEE_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.unlimitedPartners.aEE_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.unlimitedPartners.aEE_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264a</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.unlimitedPartners.aEE"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.unlimitedPartners.aEE_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.unlimitedPartners.aEE_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.unlimitedPartners.aEE_2">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>272</ref:Paragraph>
+         <ref:Subparagraph>1</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264c</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+         <ref:Clause>6 u. 7</ref:Clause>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners.FO"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners.FO"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners.FO"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners.FO_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners.FO_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners.FO_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264c</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+         <ref:Number>6 u. 7</ref:Number>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners.aEE"
+           xlink:label="de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners.aEE"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners.aEE"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners.aEE_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners.aEE_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners.aEE_1">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>264a</ref:Paragraph>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners.aEE"
+                    xlink:to="reference_de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners.aEE_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners.aEE_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.allKindsOfDebtCapitalAccounts.limitedPartners.aEE_2">
+         <ref:Name>HGB</ref:Name>
+         <ref:Paragraph>272</ref:Paragraph>
+         <ref:Subparagraph>1</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.deposits"
+           xlink:label="de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.deposits"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.deposits"
+                    xlink:to="reference_de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.deposits_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.deposits_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.deposits_1">
+         <ref:Name>EStG</ref:Name>
+         <ref:Paragraph>4</ref:Paragraph>
+         <ref:Subparagraph>1</ref:Subparagraph>
+         <ref:Clause>7</ref:Clause>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.deposits"
+                    xlink:to="reference_de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.deposits_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.deposits_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.deposits_2">
+         <ref:Name>EStR</ref:Name>
+         <ref:Paragraph>4.3</ref:Paragraph>
+         <ref:Subparagraph>1</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.withdrawals"
+           xlink:label="de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.withdrawals"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.withdrawals"
+                    xlink:to="reference_de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.withdrawals_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.withdrawals_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.withdrawals_1">
+         <ref:Name>EStR</ref:Name>
+         <ref:Paragraph>4.3</ref:Paragraph>
+         <ref:Subparagraph>2</ref:Subparagraph>
+      </reference>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.capAdjust6bRes"
+           xlink:label="de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.capAdjust6bRes"/>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.capAdjust6bRes"
+                    xlink:to="reference_de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.capAdjust6bRes_1"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.capAdjust6bRes_1"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.capAdjust6bRes_1">
+         <ref:Name>EStG</ref:Name>
+         <ref:Paragraph>6b.2</ref:Paragraph>
+         <ref:Subparagraph>6 u. 7</ref:Subparagraph>
+      </reference>
+      <referenceArc xlink:from="de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.capAdjust6bRes"
+                    xlink:to="reference_de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.capAdjust6bRes_2"
+                    order="1.0"
+                    xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-reference"
+                    xlink:type="arc"/>
+      <reference xlink:type="resource"
+                 xlink:label="reference_de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.capAdjust6bRes_2"
+                 xlink:role="http://www.xbrl.org/2003/role/reference"
+                 id="reference_de-gaap-ci_table.kke.sumEquityAccounts.sumYearEnd.capAdjust6bRes_2">
+         <ref:Name>EStG</ref:Name>
+         <ref:Paragraph>6b</ref:Paragraph>
+      </reference>
+   </referenceLink>
+</linkbase>

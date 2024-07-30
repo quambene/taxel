@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--(c) XBRL Deutschland e.V. - see http://www.xbrl.de-->
+
+
+<xs:schema xmlns:de-gaap-ci="http://www.xbrl.de/taxonomies/de-gaap-ci-2022-05-02"
+           xmlns:gaap-shell-fiscal-microbilg="http://www.xbrl.de/taxonomies/de-gaap-ci-2022-05-02/shell-fiscal-microbilg"
+           xmlns:link="http://www.xbrl.org/2003/linkbase"
+           xmlns:xbrli="http://www.xbrl.org/2003/instance"
+           xmlns:xlink="http://www.w3.org/1999/xlink"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           targetNamespace="http://www.xbrl.de/taxonomies/de-gaap-ci-2022-05-02/shell-fiscal-microbilg">
+  <xs:annotation>
+      <xs:appinfo>
+         <link:linkbaseRef xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase"
+                           xlink:href="de-gaap-ci-2022-05-02-presentation-determinationOfTaxableIncomeSpecialCases-gen.xml"
+                           xlink:role="http://www.xbrl.org/2003/role/presentationLinkbaseRef"
+                           xlink:type="simple"/>
+         <link:linkbaseRef xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase"
+                           xlink:href="de-gaap-ci-2022-05-02-dimensions-definition-detOfTaxableIncomeSpecialCasesBalSheet-gen.xml"
+                           xlink:role="http://www.xbrl.org/2003/role/definitionLinkbaseRef"
+                           xlink:type="simple"/>
+         <link:linkbaseRef xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase"
+                           xlink:href="de-gaap-ci-2022-05-02-dimensions-definition-detOfTaxableIncomeSpecialCasesIncomeStm-gen.xml"
+                           xlink:role="http://www.xbrl.org/2003/role/definitionLinkbaseRef"
+                           xlink:type="simple"/>
+         <link:linkbaseRef xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase"
+                           xlink:href="de-gaap-ci-2022-05-02-label-fiscal-de.xml"
+                           xlink:role="http://www.xbrl.org/2003/role/labelLinkbaseRef"
+                           xlink:type="simple"/>
+         <link:linkbaseRef xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase"
+                           xlink:href="de-gaap-ci-2022-05-02-label-fiscal-en.xml"
+                           xlink:role="http://www.xbrl.org/2003/role/labelLinkbaseRef"
+                           xlink:type="simple"/>
+         <link:linkbaseRef xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase"
+                           xlink:href="de-gaap-ci-2022-05-02-label-fiscal-terse60-de.xml"
+                           xlink:role="http://www.xbrl.org/2003/role/labelLinkbaseRef"
+                           xlink:title="Label Links, all"
+                           xlink:type="simple"/>
+         <link:linkbaseRef xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase"
+                           xlink:href="de-gaap-ci-2022-05-02-dimensions-label-fiscal-terse60-de.xml"
+                           xlink:role="http://www.xbrl.org/2003/role/labelLinkbaseRef"
+                           xlink:type="simple"/>
+      </xs:appinfo>
+  </xs:annotation>
+  <xs:import namespace="http://www.xbrl.de/taxonomies/de-gaap-ci-2022-05-02/shell-microbilg"
+              schemaLocation="de-gaap-ci-2022-05-02-shell-microbilg.xsd"/>
+</xs:schema>

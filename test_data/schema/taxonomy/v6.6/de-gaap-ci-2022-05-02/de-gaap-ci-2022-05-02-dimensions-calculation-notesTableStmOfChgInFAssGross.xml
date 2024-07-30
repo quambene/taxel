@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--(c) XBRL Deutschland e.V. - see http://www.xbrl.de-->
+
+
+<linkbase xmlns="http://www.xbrl.org/2003/linkbase"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.xbrl.org/2003/linkbase http://www.xbrl.org/2003/xbrl-linkbase-2003-12-31.xsd">
+   <roleRef xmlns:xbrldt="http://xbrl.org/2005/xbrldt"
+            xmlns:xbrli="http://www.xbrl.org/2003/instance"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            roleURI="http://www.xbrl.de/taxonomies/de-gaap-ci/role/notes"
+            xlink:href="de-gaap-ci-2022-05-02.xsd#role_notes"
+            xlink:type="simple"/>
+   <calculationLink xmlns:xlink="http://www.w3.org/1999/xlink"
+                    xlink:role="http://www.xbrl.de/taxonomies/de-gaap-ci/role/notes"
+                    xlink:type="extended">
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_all"
+           xlink:label="de-gaap-ci_all"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_gross"
+           xlink:label="de-gaap-ci_gross"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_grossCost.beginning"
+           xlink:label="de-gaap-ci_grossCost.beginning"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_gross.diff"
+           xlink:label="de-gaap-ci_gross.diff"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_gross.diff.currDiff"
+           xlink:label="de-gaap-ci_gross.diff.currDiff"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_gross.diff.otherDiff"
+           xlink:label="de-gaap-ci_gross.diff.otherDiff"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_gross.addition"
+           xlink:label="de-gaap-ci_gross.addition"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_gross.release"
+           xlink:label="de-gaap-ci_gross.release"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_gross.movements"
+           xlink:label="de-gaap-ci_gross.movements"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_gross.currChanges"
+           xlink:label="de-gaap-ci_gross.currChanges"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr"
+           xlink:label="de-gaap-ci_accDepr"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.beginning"
+           xlink:label="de-gaap-ci_accDepr.beginning"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.diff"
+           xlink:label="de-gaap-ci_accDepr.diff"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.diff.currDiff"
+           xlink:label="de-gaap-ci_accDepr.diff.currDiff"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.diff.otherDiff"
+           xlink:label="de-gaap-ci_accDepr.diff.otherDiff"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.DeprPeriod"
+           xlink:label="de-gaap-ci_accDepr.DeprPeriod"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.DeprPeriod.regular"
+           xlink:label="de-gaap-ci_accDepr.DeprPeriod.regular"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.DeprPeriod.extraordinary"
+           xlink:label="de-gaap-ci_accDepr.DeprPeriod.extraordinary"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.DeprPeriod.impairment"
+           xlink:label="de-gaap-ci_accDepr.DeprPeriod.impairment"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.DeprPeriod.EStG7g_2"
+           xlink:label="de-gaap-ci_accDepr.DeprPeriod.EStG7g_2"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.DeprPeriod.misc"
+           xlink:label="de-gaap-ci_accDepr.DeprPeriod.misc"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.DeprPeriod.EStG6b_3"
+           xlink:label="de-gaap-ci_accDepr.DeprPeriod.EStG6b_3"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.addition"
+           xlink:label="de-gaap-ci_accDepr.addition"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.release"
+           xlink:label="de-gaap-ci_accDepr.release"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.movements"
+           xlink:label="de-gaap-ci_accDepr.movements"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_accDepr.currChanges"
+           xlink:label="de-gaap-ci_accDepr.currChanges"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_revaluation"
+           xlink:label="de-gaap-ci_revaluation"/>
+      <calculationArc xlink:from="de-gaap-ci_all" xlink:to="de-gaap-ci_gross" weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_gross" xlink:to="de-gaap-ci_grossCost.beginning"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_gross" xlink:to="de-gaap-ci_gross.diff" order="2"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_gross.diff" xlink:to="de-gaap-ci_gross.diff.currDiff"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_gross.diff" xlink:to="de-gaap-ci_gross.diff.otherDiff"
+                      order="2"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_gross" xlink:to="de-gaap-ci_gross.addition" order="3"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_gross" xlink:to="de-gaap-ci_gross.release" order="4"
+                      weight="-1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_gross" xlink:to="de-gaap-ci_gross.movements" order="5"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_gross" xlink:to="de-gaap-ci_gross.currChanges" order="6"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_all" xlink:to="de-gaap-ci_accDepr" order="2" weight="-1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_accDepr" xlink:to="de-gaap-ci_accDepr.beginning"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_accDepr" xlink:to="de-gaap-ci_accDepr.diff" order="2"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_accDepr.diff"
+                      xlink:to="de-gaap-ci_accDepr.diff.currDiff"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_accDepr.diff"
+                      xlink:to="de-gaap-ci_accDepr.diff.otherDiff"
+                      order="2"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_accDepr" xlink:to="de-gaap-ci_accDepr.DeprPeriod"
+                      order="3"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_accDepr.DeprPeriod"
+                      xlink:to="de-gaap-ci_accDepr.DeprPeriod.regular"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_accDepr.DeprPeriod"
+                      xlink:to="de-gaap-ci_accDepr.DeprPeriod.extraordinary"
+                      order="2"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_accDepr.DeprPeriod"
+                      xlink:to="de-gaap-ci_accDepr.DeprPeriod.impairment"
+                      order="3"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_accDepr.DeprPeriod"
+                      xlink:to="de-gaap-ci_accDepr.DeprPeriod.EStG7g_2"
+                      order="4"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_accDepr.DeprPeriod"
+                      xlink:to="de-gaap-ci_accDepr.DeprPeriod.misc"
+                      order="5"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_accDepr.DeprPeriod"
+                      xlink:to="de-gaap-ci_accDepr.DeprPeriod.EStG6b_3"
+                      order="4.5"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_accDepr" xlink:to="de-gaap-ci_accDepr.addition"
+                      order="4"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_accDepr" xlink:to="de-gaap-ci_accDepr.release" order="5"
+                      weight="-1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_accDepr" xlink:to="de-gaap-ci_accDepr.movements"
+                      order="6"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_accDepr" xlink:to="de-gaap-ci_accDepr.currChanges"
+                      order="7"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+      <calculationArc xlink:from="de-gaap-ci_all" xlink:to="de-gaap-ci_revaluation" order="3"
+                      weight="1"
+                      xlink:arcrole="http://www.xbrl.org/2003/arcrole/summation-item"
+                      xlink:type="arc"/>
+   </calculationLink>
+</linkbase>

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--(c) XBRL Deutschland e.V. - see http://www.xbrl.de-->
+
+
+<linkbase xmlns="http://www.xbrl.org/2003/linkbase"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.xbrl.org/2003/linkbase http://www.xbrl.org/2003/xbrl-linkbase-2003-12-31.xsd">
+   <roleRef xmlns:xlink="http://www.w3.org/1999/xlink"
+            roleURI="http://www.xbrl.de/taxonomies/de-gaap-ci/role/determinationOfTaxableIncomeBusinessPartnership"
+            xlink:href="de-gaap-ci-2022-05-02.xsd#role_determinationOfTaxableIncomeBusinessPartnership"
+            xlink:type="simple"/>
+   <presentationLink xmlns:xlink="http://www.w3.org/1999/xlink"
+                     xlink:role="http://www.xbrl.de/taxonomies/de-gaap-ci/role/determinationOfTaxableIncomeBusinessPartnership"
+                     xlink:type="extended">
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.netmethod"
+           xlink:label="de-gaap-ci_fplgm.netmethod"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.net"
+           xlink:label="de-gaap-ci_fplgm.net"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.correctionsEStG3_40EStG3c_2KStG8b"
+           xlink:label="de-gaap-ci_fplgm.correctionsEStG3_40EStG3c_2KStG8b"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.add"
+           xlink:label="de-gaap-ci_fplgm.add"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.add.taxExempt"
+           xlink:label="de-gaap-ci_fplgm.add.taxExempt"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.add.taxFreeProfitsTakeoverUmwStG4_7sent2"
+           xlink:label="de-gaap-ci_fplgm.add.taxFreeProfitsTakeoverUmwStG4_7sent2"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b"
+           xlink:label="de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b.sub1_2"
+           xlink:label="de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b.sub1_2"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b.takeoverUmwStG4_7sent2"
+           xlink:label="de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b.takeoverUmwStG4_7sent2"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b.less5ptSub3_5"
+           xlink:label="de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b.less5ptSub3_5"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b.addNonDeductKStG8b_10"
+           xlink:label="de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b.addNonDeductKStG8b_10"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b.plusKStG8b_3sent8"
+           xlink:label="de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b.plusKStG8b_3sent8"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.add.InvStG"
+           xlink:label="de-gaap-ci_fplgm.add.InvStG"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.deduct"
+           xlink:label="de-gaap-ci_fplgm.deduct"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.deduct.EStGs3c"
+           xlink:label="de-gaap-ci_fplgm.deduct.EStGs3c"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.deduct.KStG8b_3sent3etSeq"
+           xlink:label="de-gaap-ci_fplgm.deduct.KStG8b_3sent3etSeq"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.deduct.UmwStGs4_6"
+           xlink:label="de-gaap-ci_fplgm.deduct.UmwStGs4_6"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.deduct.InvStG"
+           xlink:label="de-gaap-ci_fplgm.deduct.InvStG"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_fplgm.InvStG"
+           xlink:label="de-gaap-ci_fplgm.InvStG"/>
+      <presentationArc xlink:from="de-gaap-ci_fplgm.netmethod" xlink:to="de-gaap-ci_fplgm.net"
+                       order="1"
+                       xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child"
+                       xlink:type="arc"/>
+      <presentationArc xlink:from="de-gaap-ci_fplgm.netmethod"
+                       xlink:to="de-gaap-ci_fplgm.correctionsEStG3_40EStG3c_2KStG8b"
+                       order="4"
+                       xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child"
+                       xlink:type="arc"/>
+      <presentationArc xlink:from="de-gaap-ci_fplgm.netmethod" xlink:to="de-gaap-ci_fplgm.add"
+                       order="2.5"
+                       xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child"
+                       xlink:type="arc"/>
+      <presentationArc xlink:from="de-gaap-ci_fplgm.add" xlink:to="de-gaap-ci_fplgm.add.taxExempt"
+                       order="1"
+                       xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child"
+                       xlink:type="arc"/>
+      <presentationArc xlink:from="de-gaap-ci_fplgm.add"
+                       xlink:to="de-gaap-ci_fplgm.add.taxFreeProfitsTakeoverUmwStG4_7sent2"
+                       order="2"
+                       xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child"
+                       xlink:type="arc"/>
+      <presentationArc xlink:from="de-gaap-ci_fplgm.add"
+                       xlink:to="de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b"
+                       order="3"
+                       xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child"
+                       xlink:type="arc"/>
+      <presentationArc xlink:from="de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b"
+                       xlink:to="de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b.sub1_2"
+                       order="1"
+                       xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child"
+                       xlink:type="arc"/>
+      <presentationArc xlink:from="de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b"
+                       xlink:to="de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b.takeoverUmwStG4_7sent2"
+                       order="2"
+                       xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child"
+                       xlink:type="arc"/>
+      <presentationArc xlink:from="de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b"
+                       xlink:to="de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b.less5ptSub3_5"
+                       order="3"
+                       xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child"
+                       xlink:type="arc"/>
+      <presentationArc xlink:from="de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b"
+                       xlink:to="de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b.addNonDeductKStG8b_10"
+                       order="4"
+                       xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child"
+                       xlink:type="arc"/>
+      <presentationArc xlink:from="de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b"
+                       xlink:to="de-gaap-ci_fplgm.add.taxFreeProfitsKStG8b.plusKStG8b_3sent8"
+                       order="2.5"
+                       xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child"
+                       xlink:type="arc"/>
+      <presentationArc xlink:from="de-gaap-ci_fplgm.add" xlink:to="de-gaap-ci_fplgm.add.InvStG"
+                       order="3.5"
+                       xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child"
+                       xlink:type="arc"/>
+      <presentationArc xlink:from="de-gaap-ci_fplgm.netmethod" xlink:to="de-gaap-ci_fplgm.deduct"
+                       order="3.5"
+                       xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child"
+                       xlink:type="arc"/>
+      <presentationArc xlink:from="de-gaap-ci_fplgm.deduct" xlink:to="de-gaap-ci_fplgm.deduct.EStGs3c"
+                       order="1"
+                       xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child"
+                       xlink:type="arc"/>
+      <presentationArc xlink:from="de-gaap-ci_fplgm.deduct"
+                       xlink:to="de-gaap-ci_fplgm.deduct.KStG8b_3sent3etSeq"
+                       order="2"
+                       xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child"
+                       xlink:type="arc"/>
+      <presentationArc xlink:from="de-gaap-ci_fplgm.deduct"
+                       xlink:to="de-gaap-ci_fplgm.deduct.UmwStGs4_6"
+                       order="3"
+                       xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child"
+                       xlink:type="arc"/>
+      <presentationArc xlink:from="de-gaap-ci_fplgm.deduct" xlink:to="de-gaap-ci_fplgm.deduct.InvStG"
+                       order="4"
+                       xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child"
+                       xlink:type="arc"/>
+      <presentationArc xlink:from="de-gaap-ci_fplgm.netmethod" xlink:to="de-gaap-ci_fplgm.InvStG"
+                       order="5"
+                       xlink:arcrole="http://www.xbrl.org/2003/arcrole/parent-child"
+                       xlink:type="arc"/>
+   </presentationLink>
+</linkbase>

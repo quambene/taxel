@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--(c) XBRL Deutschland e.V. - see http://www.xbrl.de-->
+
+
+<link:linkbase xmlns:bf="http://xbrl.org/2008/filter/boolean"
+               xmlns:cf="http://xbrl.org/2008/filter/concept"
+               xmlns:de-gaap-ci="http://www.xbrl.de/taxonomies/de-gaap-ci-2022-05-02"
+               xmlns:df="http://xbrl.org/2008/filter/dimension"
+               xmlns:fn="http://www.w3.org/2005/xpath-functions"
+               xmlns:formula="http://xbrl.org/2008/formula"
+               xmlns:gen="http://xbrl.org/2008/generic"
+               xmlns:gf="http://xbrl.org/2008/filter/general"
+               xmlns:label="http://xbrl.org/2008/label"
+               xmlns:link="http://www.xbrl.org/2003/linkbase"
+               xmlns:mf="http://xbrl.org/2008/filter/match"
+               xmlns:num="http://www.xbrl.org/dtr/type/numeric"
+               xmlns:pf="http://xbrl.org/2008/filter/period"
+               xmlns:reference="http://xbrl.org/2008/reference"
+               xmlns:rf="http://xbrl.org/2008/filter/relative"
+               xmlns:sf="http://xbrl.org/2008/filter/segment-scenario"
+               xmlns:table="http://xbrl.org/2014/table"
+               xmlns:uf="http://xbrl.org/2008/filter/unit"
+               xmlns:validation="http://xbrl.org/2008/validation"
+               xmlns:variable="http://xbrl.org/2008/variable"
+               xmlns:vf="http://xbrl.org/2008/filter/value"
+               xmlns:xbrli="http://www.xbrl.org/2003/instance"
+               xmlns:xfi="http://www.xbrl.org/2008/function/instance"
+               xmlns:xlink="http://www.w3.org/1999/xlink"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://www.xbrl.org/2003/linkbase http://www.xbrl.org/2003/xbrl-linkbase-2003-12-31.xsd http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd http://xbrl.org/2008/formula http://www.xbrl.org/2008/formula.xsd http://xbrl.org/2008/label http://www.xbrl.org/2008/generic-label.xsd http://xbrl.org/2008/reference http://www.xbrl.org/2008/generic-reference.xsd http://xbrl.org/2014/table http://www.xbrl.org/2014/table.xsd">
+  <link:roleRef roleURI="http://www.xbrl.de/taxonomies/de-gaap-ci/role/determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities"
+                 xlink:href="de-gaap-ci-2022-05-02.xsd#role_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities"
+                 xlink:type="simple"/>
+  <link:roleRef roleURI="http://www.xbrl.org/2008/role/label"
+                 xlink:href="http://www.xbrl.org/2008/generic-label.xsd#standard-label"
+                 xlink:type="simple"/>
+  <link:arcroleRef arcroleURI="http://xbrl.org/arcrole/2008/element-label"
+                    xlink:href="http://www.xbrl.org/2008/generic-label.xsd#element-label"
+                    xlink:type="simple"/>
+  <link:arcroleRef arcroleURI="http://xbrl.org/arcrole/2014/table-breakdown"
+                    xlink:href="http://www.xbrl.org/2014/table.xsd#table-breakdown"
+                    xlink:type="simple"/>
+  <link:arcroleRef arcroleURI="http://xbrl.org/arcrole/2014/breakdown-tree"
+                    xlink:href="http://www.xbrl.org/2014/table.xsd#breakdown-tree"
+                    xlink:type="simple"/>
+  <gen:link xlink:role="http://www.xbrl.de/taxonomies/de-gaap-ci/role/determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities"
+             xlink:type="extended">
+      <table:table id="table_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities"
+                   parentChildOrder="parent-first"
+                   xlink:label="label_table_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities"
+                   xlink:type="resource"/>
+      <label:label xlink:label="label_table_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities_label_1"
+                   xlink:role="http://www.xbrl.org/2008/role/label"
+                   xlink:type="resource"
+                   xml:lang="de">Tabelle Gewinn- und Verlustrechnung für wirtschaftlichen Geschäftsbetrieb / Betrieb gewerblicher Art</label:label>
+      <gen:arc xlink:arcrole="http://xbrl.org/arcrole/2008/element-label"
+               xlink:from="label_table_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities"
+               xlink:to="label_table_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities_label_1"
+               xlink:type="arc"/>
+      <label:label xlink:label="label_table_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities_label_2"
+                   xlink:role="http://www.xbrl.org/2008/role/label"
+                   xlink:type="resource"
+                   xml:lang="en">Table income statement of commercial businesses of (otherwise) tax exempt charities / services of a body governed by public law with commercial character (utilities)</label:label>
+      <gen:arc xlink:arcrole="http://xbrl.org/arcrole/2008/element-label"
+               xlink:from="label_table_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities"
+               xlink:to="label_table_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities_label_2"
+               xlink:type="arc"/>
+      <table:breakdown id="breakdown_table.DeterminationOfTaxableIncomeSpecForProfitOrganisationsAndUtilitiesIncomeStatement"
+                       xlink:label="label_breakdown_table.DeterminationOfTaxableIncomeSpecForProfitOrganisationsAndUtilitiesIncomeStatement"
+                       xlink:type="resource"/>
+      <table:tableBreakdownArc axis="x" order="3.0"
+                               xlink:arcrole="http://xbrl.org/arcrole/2014/table-breakdown"
+                               xlink:from="label_table_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities"
+                               xlink:to="label_breakdown_table.DeterminationOfTaxableIncomeSpecForProfitOrganisationsAndUtilitiesIncomeStatement"
+                               xlink:type="arc"/>
+      <table:conceptRelationshipNode id="primary_table.DeterminationOfTaxableIncomeSpecForProfitOrganisationsAndUtilitiesIncomeStatement"
+                                     parentChildOrder="parent-first"
+                                     xlink:label="label_primary_table.DeterminationOfTaxableIncomeSpecForProfitOrganisationsAndUtilitiesIncomeStatement"
+                                     xlink:type="resource">
+         <table:relationshipSource>de-gaap-ci:DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.valueOfItem</table:relationshipSource>
+         <table:linkrole>http://www.xbrl.de/taxonomies/de-gaap-ci/role/determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities</table:linkrole>
+         <table:arcrole>http://xbrl.org/int/dim/arcrole/domain-member</table:arcrole>
+         <table:linkname>link:definitionLink</table:linkname>
+      </table:conceptRelationshipNode>
+      <table:breakdownTreeArc order="1.0" xlink:arcrole="http://xbrl.org/arcrole/2014/breakdown-tree"
+                              xlink:from="label_breakdown_table.DeterminationOfTaxableIncomeSpecForProfitOrganisationsAndUtilitiesIncomeStatement"
+                              xlink:to="label_primary_table.DeterminationOfTaxableIncomeSpecForProfitOrganisationsAndUtilitiesIncomeStatement"
+                              xlink:type="arc"/>
+      <table:breakdown id="breakdown_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table.item"
+                       parentChildOrder="children-first"
+                       xlink:label="label_breakdown_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table.item"
+                       xlink:type="resource"/>
+      <table:tableBreakdownArc axis="y" order="4.0"
+                               xlink:arcrole="http://xbrl.org/arcrole/2014/table-breakdown"
+                               xlink:from="label_table_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities"
+                               xlink:to="label_breakdown_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table.item"
+                               xlink:type="arc"/>
+      <table:dimensionRelationshipNode id="dimension_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table.item"
+                                       xlink:label="label_dimension_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table.item"
+                                       xlink:type="resource">
+         <table:linkrole>http://www.xbrl.de/taxonomies/de-gaap-ci/role/determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities</table:linkrole>
+         <table:dimension>de-gaap-ci:DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table.item</table:dimension>
+      </table:dimensionRelationshipNode>
+      <table:breakdownTreeArc order="1.0" xlink:arcrole="http://xbrl.org/arcrole/2014/breakdown-tree"
+                              xlink:from="label_breakdown_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table.item"
+                              xlink:to="label_dimension_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table.item"
+                              xlink:type="arc"/>
+      <table:breakdown id="breakdown_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities_dim_BgAKey"
+                       xlink:label="label_breakdown_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities_dim_BgAKey"
+                       xlink:type="resource"/>
+      <table:tableBreakdownArc axis="z" order="5.0"
+                               xlink:arcrole="http://xbrl.org/arcrole/2014/table-breakdown"
+                               xlink:from="label_table_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities"
+                               xlink:to="label_breakdown_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities_dim_BgAKey"
+                               xlink:type="arc"/>
+      <table:aspectNode id="dimension_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities_dim_BgAKey"
+                        xlink:label="label_dimension_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities_dim_BgAKey"
+                        xlink:type="resource">
+         <table:dimensionAspect includeUnreportedValue="false">de-gaap-ci:dim_BgAKey</table:dimensionAspect>
+      </table:aspectNode>
+      <table:breakdownTreeArc order="1.0" xlink:arcrole="http://xbrl.org/arcrole/2014/breakdown-tree"
+                              xlink:from="label_breakdown_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities_dim_BgAKey"
+                              xlink:to="label_dimension_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities_dim_BgAKey"
+                              xlink:type="arc"/>
+      <table:breakdown id="breakdown_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table_period"
+                       xlink:label="label_breakdown_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table_period"
+                       xlink:type="resource"/>
+      <table:tableBreakdownArc axis="z" order="6.0"
+                               xlink:arcrole="http://xbrl.org/arcrole/2014/table-breakdown"
+                               xlink:from="label_table_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities"
+                               xlink:to="label_breakdown_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table_period"
+                               xlink:type="arc"/>
+      <table:aspectNode id="aspect_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table_period"
+                        xlink:label="label_aspect_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table_period"
+                        xlink:type="resource">
+         <table:periodAspect/>
+      </table:aspectNode>
+      <table:breakdownTreeArc order="1.0" xlink:arcrole="http://xbrl.org/arcrole/2014/breakdown-tree"
+                              xlink:from="label_breakdown_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table_period"
+                              xlink:to="label_aspect_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table_period"
+                              xlink:type="arc"/>
+      <table:breakdown id="breakdown_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table_entityIdentifier"
+                       xlink:label="label_breakdown_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table_entityIdentifier"
+                       xlink:type="resource"/>
+      <table:tableBreakdownArc axis="z" order="7.0"
+                               xlink:arcrole="http://xbrl.org/arcrole/2014/table-breakdown"
+                               xlink:from="label_table_determinationOfTaxableIncomeSpecialCasesTableIncomeStatementForProfitOrganisationsAndUtilities"
+                               xlink:to="label_breakdown_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table_entityIdentifier"
+                               xlink:type="arc"/>
+      <table:aspectNode id="aspect_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table_entityIdentifier"
+                        xlink:label="label_aspect_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table_entityIdentifier"
+                        xlink:type="resource">
+         <table:entityIdentifierAspect/>
+      </table:aspectNode>
+      <table:breakdownTreeArc order="1.0" xlink:arcrole="http://xbrl.org/arcrole/2014/breakdown-tree"
+                              xlink:from="label_breakdown_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table_entityIdentifier"
+                              xlink:to="label_aspect_DeterminationOfTaxableIncomeSpec.forProfitOrganisationsAndUtilities.IncomeStatement.table_entityIdentifier"
+                              xlink:type="arc"/>
+  </gen:link>
+</link:linkbase>
