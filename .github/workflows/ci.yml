@@ -1,0 +1,77 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: cargo check
+        run: cargo check -p taxel-xml -p taxel-util
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: cargo clippy
+        run: cargo clippy --all-features --all-targets -p taxel-xml -p taxel-util -- -D warnings
+  doc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: cargo doc
+        run: cargo doc --no-deps --all-features -p taxel-xml -p taxel-util
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: cargo fmt --check
+        run: cargo fmt --check
+  fmt-nightly:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+      - name: cargo +nightly fmt --check
+        run: cargo +nightly fmt --check
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: cargo test --lib -p taxel-xml -p taxel-util
+        run: cargo test --lib -p taxel-xml -p taxel-util
+  doc-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: cargo test --doc
+        run: cargo test --locked --doc -p taxel-xml -p taxel-util
+  test-py:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install Poetry
+        run: pip install poetry
+        working-directory: taxel-py
+      - name: Install dependencies
+        run: |
+          poetry lock
+          poetry install --with dev --no-interaction --no-ansi
+        working-directory: taxel-py
+      - name: Run tests
+        run: poetry run pytest -v -m unit
+        working-directory: taxel-py
