@@ -254,3 +254,52 @@ def test_generate_xml_ebilanz_gcd():
         expected_xml = file.read()
 
     assert actual_xml.decode("UTF-8") == expected_xml
+
+
+@pytest.mark.unit
+def test_validate_xml_ebilanz_gaap_ci():
+    schema_path = '../test_data/schema/ebilanz/ebilanz_000002.xsd'
+    output_path = "../test_data/taxonomy/v6.6/de-gaap-ci/output.xml"
+
+    schema = XMLSchema10(schema_path, loglevel=20, validation='strict')
+    xml = load_xml(output_path)
+    validate_xml(schema, xml)
+
+
+@pytest.mark.unit
+def test_generate_xml_ebilanz_gaap_ci():
+    schema_path = '../test_data/schema/ebilanz/ebilanz_000002.xsd'
+    input_path = "../test_data/taxonomy/v6.6/de-gaap-ci/input.json"
+    output_path = "../test_data/taxonomy/v6.6/de-gaap-ci/output.xml"
+    target_namespace = "ebilanz"
+    namespaces = {
+        "xs": "http://www.w3.org/2001/XMLSchema",
+        "xsi": "http://www.w3.org/2001/XMLSchema-instance",
+        "xlink": "http://www.w3.org/1999/xlink",
+        "xhtml": "http://www.w3.org/1999/xhtml",
+        "xbrli": "http://www.xbrl.org/2003/instance",
+        "xbrldt": "http://xbrl.org/2005/xbrldt",
+        "xbrldi": "http://xbrl.org/2006/xbrldi",
+        "link": "http://www.xbrl.org/2003/linkbase",
+        "iso4217": "http://www.xbrl.org/2003/iso4217",
+        "hgbref": "http://www.xbrl.de/taxonomies/de-ref-2010-02-19",
+        "de-hgbrole": "http://www.xbrl.de/taxonomies/hgbrole-2022-05-02",
+        # taxonomy v6.6 for Global Common Document (GCD)
+        "gcd-shell": "http://www.xbrl.de/taxonomies/de-gcd-2022-05-02/shell",
+        "de-gcd": "http://www.xbrl.de/taxonomies/de-gcd-2022-05-02",
+        # taxonomy v6.6 for Generally Accepted Accounting Principles (GAAP)
+        "gaap-shell-microbilg": "http://www.xbrl.de/taxonomies/de-gaap-ci-2022-05-02/shell-microbilg",
+        "de-gaap-ci": "http://www.xbrl.de/taxonomies/de-gaap-ci-2022-05-02"
+    }
+
+    schema = XMLSchema10(schema_path, loglevel=20, validation='strict')
+
+    data = load_data(input_path)
+    xml = generate_xml(schema, data, target_namespace, namespaces)
+    root = xml.getroot()
+    actual_xml = ET.tostring(root, encoding="UTF-8", xml_declaration=True)
+
+    with open(output_path, 'r', encoding="UTF-8") as file:
+        expected_xml = file.read()
+
+    assert actual_xml.decode("UTF-8") == expected_xml

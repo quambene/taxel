@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--(c) XBRL Deutschland e.V. - see http://www.xbrl.de-->
+
+
+<linkbase xmlns="http://www.xbrl.org/2003/linkbase"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.xbrl.org/2003/linkbase http://www.xbrl.org/2003/xbrl-linkbase-2003-12-31.xsd">
+   <roleRef xmlns:xbrldt="http://xbrl.org/2005/xbrldt"
+            xmlns:xbrli="http://www.xbrl.org/2003/instance"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            roleURI="http://www.xbrl.de/taxonomies/de-gaap-ci/role/notesTableAnalysisOfReceivables"
+            xlink:href="de-gaap-ci-2022-05-02.xsd#role_notesTableAnalysisOfReceivables"
+            xlink:type="simple"/>
+   <arcroleRef xmlns:xbrldt="http://xbrl.org/2005/xbrldt"
+               xmlns:xbrli="http://www.xbrl.org/2003/instance"
+               xmlns:xlink="http://www.w3.org/1999/xlink"
+               arcroleURI="http://xbrl.org/int/dim/arcrole/all"
+               xlink:href="http://www.xbrl.org/2005/xbrldt-2005.xsd#all"
+               xlink:type="simple"/>
+   <arcroleRef xmlns:xbrldt="http://xbrl.org/2005/xbrldt"
+               xmlns:xbrli="http://www.xbrl.org/2003/instance"
+               xmlns:xlink="http://www.w3.org/1999/xlink"
+               arcroleURI="http://xbrl.org/int/dim/arcrole/dimension-domain"
+               xlink:href="http://www.xbrl.org/2005/xbrldt-2005.xsd#dimension-domain"
+               xlink:type="simple"/>
+   <arcroleRef xmlns:xbrldt="http://xbrl.org/2005/xbrldt"
+               xmlns:xbrli="http://www.xbrl.org/2003/instance"
+               xmlns:xlink="http://www.w3.org/1999/xlink"
+               arcroleURI="http://xbrl.org/int/dim/arcrole/domain-member"
+               xlink:href="http://www.xbrl.org/2005/xbrldt-2005.xsd#domain-member"
+               xlink:type="simple"/>
+   <arcroleRef xmlns:xbrldt="http://xbrl.org/2005/xbrldt"
+               xmlns:xbrli="http://www.xbrl.org/2003/instance"
+               xmlns:xlink="http://www.w3.org/1999/xlink"
+               arcroleURI="http://xbrl.org/int/dim/arcrole/hypercube-dimension"
+               xlink:href="http://www.xbrl.org/2005/xbrldt-2005.xsd#hypercube-dimension"
+               xlink:type="simple"/>
+   <arcroleRef xmlns:xbrldt="http://xbrl.org/2005/xbrldt"
+               xmlns:xbrli="http://www.xbrl.org/2003/instance"
+               xmlns:xlink="http://www.w3.org/1999/xlink"
+               arcroleURI="http://xbrl.org/int/dim/arcrole/dimension-default"
+               xlink:href="http://www.xbrl.org/2005/xbrldt-2005.xsd#dimension-default"
+               xlink:type="simple"/>
+   <definitionLink xmlns:xlink="http://www.w3.org/1999/xlink"
+                   xlink:role="http://www.xbrl.de/taxonomies/de-gaap-ci/role/notesTableAnalysisOfReceivables"
+                   xlink:type="extended">
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_table.receiv"
+           xlink:label="de-gaap-ci_table.receiv"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_tab_receiv"
+           xlink:label="de-gaap-ci_tab_receiv"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_dim_receiv"
+           xlink:label="de-gaap-ci_dim_receiv"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02.xsd#de-gaap-ci_bs.ass.currAss.receiv"
+           xlink:label="de-gaap-ci_bs.ass.currAss.receiv"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_receiv_primaryItem"
+           xlink:label="de-gaap-ci_receiv_primaryItem"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_receiv_primaryItem.total"
+           xlink:label="de-gaap-ci_receiv_primaryItem.total"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_receiv_primaryItem.total.upTo1year"
+           xlink:label="de-gaap-ci_receiv_primaryItem.total.upTo1year"/>
+      <loc xlink:type="locator"
+           xlink:href="de-gaap-ci-2022-05-02-dimensions.xsd#de-gaap-ci_receiv_primaryItem.total.above1year"
+           xlink:label="de-gaap-ci_receiv_primaryItem.total.above1year"/>
+      <definitionArc xmlns:xbrldt="http://xbrl.org/2005/xbrldt" xlink:from="de-gaap-ci_table.receiv"
+                     xlink:to="de-gaap-ci_tab_receiv"
+                     xbrldt:contextElement="scenario"
+                     xlink:arcrole="http://xbrl.org/int/dim/arcrole/all"
+                     xlink:type="arc"/>
+      <definitionArc xlink:from="de-gaap-ci_tab_receiv" xlink:to="de-gaap-ci_dim_receiv"
+                     xlink:arcrole="http://xbrl.org/int/dim/arcrole/hypercube-dimension"
+                     xlink:type="arc"/>
+      <definitionArc xlink:from="de-gaap-ci_dim_receiv" xlink:to="de-gaap-ci_bs.ass.currAss.receiv"
+                     xlink:arcrole="http://xbrl.org/int/dim/arcrole/dimension-domain"
+                     xlink:type="arc"/>
+      <definitionArc xlink:from="de-gaap-ci_table.receiv" xlink:to="de-gaap-ci_receiv_primaryItem"
+                     order="2"
+                     xlink:arcrole="http://xbrl.org/int/dim/arcrole/domain-member"
+                     xlink:type="arc"/>
+      <definitionArc xlink:from="de-gaap-ci_receiv_primaryItem"
+                     xlink:to="de-gaap-ci_receiv_primaryItem.total"
+                     xlink:arcrole="http://xbrl.org/int/dim/arcrole/domain-member"
+                     xlink:type="arc"/>
+      <definitionArc xlink:from="de-gaap-ci_receiv_primaryItem.total"
+                     xlink:to="de-gaap-ci_receiv_primaryItem.total.upTo1year"
+                     xlink:arcrole="http://xbrl.org/int/dim/arcrole/domain-member"
+                     xlink:type="arc"/>
+      <definitionArc xlink:from="de-gaap-ci_receiv_primaryItem.total"
+                     xlink:to="de-gaap-ci_receiv_primaryItem.total.above1year"
+                     order="2"
+                     xlink:arcrole="http://xbrl.org/int/dim/arcrole/domain-member"
+                     xlink:type="arc"/>
+   </definitionLink>
+</linkbase>
