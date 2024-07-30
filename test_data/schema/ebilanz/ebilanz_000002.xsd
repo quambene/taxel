@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!-- (c) ELSTER - see https://www.elster.de -->
+<!-- Schema f�r E-Bilanz mit ElsterBasis-Version 11 -->
+<xs:schema
+		xmlns:ebilanz="http://rzf.fin-nrw.de/RMS/EBilanz/2016/XMLSchema"
+		xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		xmlns:xbrli="http://www.xbrl.org/2003/instance"
+		xmlns:elster="http://www.elster.de/elsterxml/schema/v11"
+		targetNamespace="http://rzf.fin-nrw.de/RMS/EBilanz/2016/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<!-- Importe -->
+	<!-- Import des Rahmenschemas von ELSTER: -->
+	<xs:import namespace="http://www.elster.de/elsterxml/schema/v11" schemaLocation="./ebilanz_elster_000001.xsd"/>
+	<!-- Import XBRL Instance -->
+	<xs:import namespace="http://www.xbrl.org/2003/instance" schemaLocation="../xbrl-instance-2003-12-31.xsd"/>
+	<!-- Ende Importe -->
+	<!-- Substitution f�r die abstrakten Nutzdaten -->
+	<xs:element name="EBilanz" type="ebilanz:EBilanzCType" substitutionGroup="elster:NutzdatenDaten"/>
+	<!-- Datentyp f�r EBilanz -->
+	<xs:complexType name="EBilanzCType">
+		<xs:sequence>
+			<xs:element name="stichtag">
+				<xs:annotation>
+					<xs:documentation>Datum im Format YYYYMMTT</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:int">
+						<xs:maxInclusive value="99999999"/>
+						<xs:minInclusive value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element ref="xbrli:xbrl"/>
+		</xs:sequence>
+		<xs:attribute name="version" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:minInclusive value="1"/>
+					<xs:maxInclusive value="2"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+</xs:schema>

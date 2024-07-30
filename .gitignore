@@ -20,10 +20,6 @@ server_response.xml
 # schema
 schema/*
 
-# test data
-test_data/schema/elster/*
-test_data/schema/ebilanz/*
-
 # csv
 .~lock.**.csv#
 
