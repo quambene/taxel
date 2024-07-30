@@ -1,6 +1,6 @@
 # Taxel
 
-[![build status](https://github.com/quambene/taxel/actions/workflows/rust-ci.yml/badge.svg)](https://github.com/quambene/taxel/actions/workflows/rust-ci.yml)
+[![build status](https://github.com/quambene/taxel/actions/workflows/ci.yml/badge.svg)](https://github.com/quambene/taxel/actions/workflows/ci.yml)
 [![dependency status](https://deps.rs/repo/github/quambene/taxel/status.svg)](https://deps.rs/repo/github/quambene/taxel)
 
 Taxel provides a command line interface (CLI) and Rust bindings for the ELSTER Rich Client (ERiC).
