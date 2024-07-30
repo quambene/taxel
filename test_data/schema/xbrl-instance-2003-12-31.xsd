@@ -29,6 +29,7 @@ http://www.xbrl.org/2003/2008-07-02/xbrl-instance-2003-12-31.xsd
 
   <import namespace="http://www.xbrl.org/2003/linkbase" schemaLocation="xbrl-linkbase-2003-12-31.xsd"/>
   <import namespace="http://www.xbrl.de/taxonomies/de-gcd-2022-05-02/shell" schemaLocation="./taxonomy/v6.6/de-gcd-2022-05-02/de-gcd-2022-05-02-shell.xsd"/>
+  <import namespace="http://www.xbrl.de/taxonomies/de-gaap-ci-2022-05-02/shell-fiscal-microbilg" schemaLocation="./taxonomy/v6.6/de-gaap-ci-2022-05-02/de-gaap-ci-2022-05-02-shell-fiscal-microbilg.xsd"/>
 
   <annotation>
     <documentation>
