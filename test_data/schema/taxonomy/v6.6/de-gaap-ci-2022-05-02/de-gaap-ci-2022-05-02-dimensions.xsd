@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--(c) XBRL Deutschland e.V. - see http://www.xbrl.de-->
+<!-- MODIFIED VERSION -->
 
 
 <xs:schema xmlns:de-gaap-ci="http://www.xbrl.de/taxonomies/de-gaap-ci-2022-05-02"
@@ -40,8 +41,10 @@
   </xs:annotation>
   <xs:import namespace="http://www.xbrl.org/2003/instance"
               schemaLocation="http://www.xbrl.org/2003/xbrl-instance-2003-12-31.xsd"/>
+  <!-- MODIFIED -->              
   <xs:import namespace="http://xbrl.org/2005/xbrldt"
-              schemaLocation="http://www.xbrl.org/2005/xbrldt-2005.xsd"/>
+              schemaLocation="../../../xbrldt-2005.xsd"/>
+  <!-- MODIFIED -->
   <xs:import namespace="http://www.xbrl.de/taxonomies/hgbrole-2022-05-02"
               schemaLocation="../de-gcd-2022-05-02/hgbrole-2022-05-02.xsd"/>
   <xs:element name="dim_minority.equity" abstract="true" id="de-gaap-ci_dim_minority.equity"
