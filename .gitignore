@@ -17,9 +17,6 @@ validation_response.xml
 server_response.xml
 *.pdf
 
-# schema
-schema/*
-
 # csv
 .~lock.**.csv#
 
