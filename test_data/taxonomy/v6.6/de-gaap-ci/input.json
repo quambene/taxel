@@ -1,0 +1,51 @@
+{
+    "ebilanz:EBilanz": {
+        "ebilanz:stichtag": 20231231,
+        "xbrli:xbrl": {
+            "link:schemaRef": [
+                {
+                    "@xlink:type": "simple",
+                    "@xlink:href": "../../../schema/taxonomy/v6.6/de-gaap-ci-2022-05-02/de-gaap-ci-2022-05-02-shell-fiscal-microbilg.xsd"
+                }
+            ],
+            "xbrli:context": [
+                {
+                    "@id": "context1",
+                    "xbrli:entity": {
+                        "xbrli:identifier": {
+                            "@scheme": "http://www.rzf-nrw.de/Steuernummer",
+                            "$": "0000000000000"
+                        }
+                    },
+                    "xbrli:period": {
+                        "xbrli:instant": "2023-12-31"
+                    }
+                },
+                {
+                    "@id": "context2",
+                    "xbrli:entity": {
+                        "xbrli:identifier": {
+                            "@scheme": "http://www.rzf-nrw.de/Steuernummer",
+                            "$": "0000000000000"
+                        }
+                    },
+                    "xbrli:period": {
+                        "xbrli:startDate": "2023-01-01",
+                        "xbrli:endDate": "2023-12-31"
+                    }
+                }
+            ],
+            "xbrli:unit": {
+                "@id": "EUR",
+                "xbrli:measure": "EUR"
+            },
+            "de-gaap-ci:bs.ass": {
+                "@contextRef": "context2",
+                "@unitRef": "EUR",
+                "@decimals": 2,
+                "$": 0.00
+            }
+        },
+        "@version": 1
+    }
+}
