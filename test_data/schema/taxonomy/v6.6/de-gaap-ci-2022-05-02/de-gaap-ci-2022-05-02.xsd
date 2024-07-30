@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--(c) XBRL Deutschland e.V. - see http://www.xbrl.de-->
+<!-- MODIFIED VERSION -->
 
 
 <xs:schema xmlns:de-gaap-ci="http://www.xbrl.de/taxonomies/de-gaap-ci-2022-05-02"
@@ -240,8 +241,10 @@
   </xs:annotation>
   <xs:import namespace="http://www.xbrl.de/taxonomies/hgbrole-2022-05-02"
               schemaLocation="../de-gcd-2022-05-02/hgbrole-2022-05-02.xsd"/>
+  <!-- MODIFIED -->            
   <xs:import namespace="http://www.xbrl.org/2003/instance"
-              schemaLocation="http://www.xbrl.org/2003/xbrl-instance-2003-12-31.xsd"/>
+              schemaLocation="../../../xbrl-instance-2003-12-31.xsd"/>
+  <!-- MODIFIED --> 
   <xs:include schemaLocation="de-gaap-ci-2022-05-02-dimensions.xsd"/>
   <xs:element name="bs.ass" id="de-gaap-ci_bs.ass" nillable="true"
                substitutionGroup="xbrli:item"
