@@ -84,7 +84,8 @@ pub fn tax_version() -> Arg<'static> {
         .takes_value(true)
         .default_value("6.5")
         .possible_values([
-            "5.0", "5.1", "5.2", "5.3", "5.4", "6.0", "6.1", "6.2", "6.3", "6.4", "6.5",
+            "5.0", "5.1", "5.2", "5.3", "5.4", "6.0", "6.1", "6.2", "6.3", "6.4", "6.5", "6.6",
+            "6.7", "6.8",
         ])
         .help("The tax version of the xml file.")
 }
