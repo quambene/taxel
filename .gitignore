@@ -23,8 +23,8 @@ server_response.xml
 # ods
 .~lock.**.ods#
 
-# Output
-output
+# Temp
+tmp
 
 # Environment
 **/.env
