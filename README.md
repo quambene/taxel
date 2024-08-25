@@ -82,15 +82,6 @@ taxel send \
 ## Testing
 
 ``` bash
-# Run unit tests for taxel
-cargo test -p taxel -- --test-threads=1
-
-# Run integration tests for taxel
-cargo test -p taxel --test '*' --features integration-test -- --test-threads=1
-
-# Run integration tests for taxel in release mode
-cargo test -p taxel --release --test '*' --features integration-test -- --test-threads=1
-
 # Run unit tests for taxel-cli
 cargo test -p taxel-cli
 
