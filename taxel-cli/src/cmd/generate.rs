@@ -2,6 +2,7 @@
 
 use crate::arg;
 use clap::{Arg, ArgMatches};
+use log::debug;
 use std::{
     env::current_dir,
     fs::File,
