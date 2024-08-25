@@ -13,8 +13,6 @@ pub const LOG_DIR: &str = "log-dir";
 pub const TAX_TYPE: &str = "tax-type";
 pub const TAX_VERSION: &str = "tax-version";
 pub const PRINT: &str = "print";
-pub const CERTIFICATE_FILE: &str = "certificate-file";
-pub const PASSWORD: &str = "password";
 
 pub fn get_one<'a>(matches: &'a ArgMatches, id: &str) -> Result<&'a str, anyhow::Error> {
     match matches.get_one::<String>(id) {
@@ -96,20 +94,4 @@ pub fn print() -> Arg<'static> {
         .required(false)
         .takes_value(true)
         .help("Print the transmission confirmation as pdf file.")
-}
-
-pub fn certificate_file() -> Arg<'static> {
-    Arg::new(CERTIFICATE_FILE)
-        .long(CERTIFICATE_FILE)
-        .required(true)
-        .takes_value(true)
-        .help("The certificate (*.pfx) for encrypting and decrypting tax data.")
-}
-
-pub fn password() -> Arg<'static> {
-    Arg::new(PASSWORD)
-        .long(PASSWORD)
-        .required(true)
-        .takes_value(true)
-        .help("The password for using the certificate (*.pfx).")
 }

@@ -7,6 +7,7 @@
   - Add CI
 - changed
 - removed
+  - Remove Rust bindings and SDK for Eric
 
 ## v0.1.0 (2022-06-11)
 

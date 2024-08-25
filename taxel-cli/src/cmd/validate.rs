@@ -1,9 +1,14 @@
 //! Validate xml file according to the given taxonomy.
 
+use super::utils;
 use crate::arg;
 use clap::{Arg, ArgMatches};
-use std::{env::current_dir, path::PathBuf};
-use taxel::{Eric, PrintConfig, ProcessingFlag};
+use eric_sdk::Eric;
+use std::{
+    env::current_dir,
+    fs,
+    path::{Path, PathBuf},
+};
 
 pub fn validate_args() -> [Arg<'static>; 5] {
     [
@@ -20,29 +25,24 @@ pub fn validate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let tax_type = arg::get_one(matches, arg::TAX_TYPE)?;
     let tax_version = arg::get_one(matches, arg::TAX_VERSION)?;
     let log_dir = arg::get_maybe_one(matches, arg::LOG_DIR);
-    let type_version = format!("{}_{}", tax_type, tax_version);
-    let processing_flag: ProcessingFlag;
     let log_path = match log_dir {
         Some(log_dir) => PathBuf::from(log_dir),
         None => current_dir()?,
     };
-
     let print_config = if matches.contains_id(arg::PRINT) {
-        processing_flag = ProcessingFlag::Print;
         let pdf_name = arg::get_one(matches, arg::PRINT)?;
-        Some(PrintConfig::new(pdf_name, &processing_flag)?)
+        Some(pdf_name)
     } else {
-        processing_flag = ProcessingFlag::Validate;
         None
     };
-
-    let xml = taxel::read(xml_file)?;
+    let xml_path = Path::new(xml_file);
+    let xml = fs::read_to_string(xml_path)?;
 
     let eric = Eric::new(&log_path)?;
 
-    let response = eric.validate(xml, type_version, processing_flag, print_config)?;
+    let response = eric.validate(xml, tax_type, tax_version, print_config)?;
 
-    eric.log(&log_path, &response)?;
+    utils::log_response(&log_path, &response)?;
 
     Ok(())
 }

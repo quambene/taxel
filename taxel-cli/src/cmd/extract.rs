@@ -2,6 +2,7 @@
 
 use crate::arg::{self, OUTPUT_FILE, XML_FILE};
 use clap::{Arg, ArgMatches};
+use log::debug;
 use std::{env::current_dir, fs::File, io::BufReader, path::PathBuf};
 use taxel_xml::{CsvWriterBuilder, Reader};
 
