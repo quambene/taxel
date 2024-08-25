@@ -23,6 +23,9 @@ server_response.xml
 # ods
 .~lock.**.ods#
 
+# Temp
+tmp
+
 # Output
 output
 
