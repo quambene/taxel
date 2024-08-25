@@ -1,7 +1,5 @@
 [workspace]
 members = [
-    "taxel",
-    "taxel-bindings",
     "taxel-cli",
     "taxel-util",
     "taxel-xml",
