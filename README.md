@@ -1,7 +1,6 @@
 # Taxel
 
 [![build status](https://github.com/quambene/taxel/actions/workflows/ci.yml/badge.svg)](https://github.com/quambene/taxel/actions/workflows/ci.yml)
-[![dependency status](https://deps.rs/repo/github/quambene/taxel/status.svg)](https://deps.rs/repo/github/quambene/taxel)
 
 Taxel provides a command line interface (CLI) to generate the electronic balance
 sheet (eBilanz) in the XBRL format.
@@ -71,16 +70,12 @@ taxel send \
     --tax-type "Bilanz" \
     --tax-version 6.4 \
     --xml-file "my_tax_data.xml" \
-    --certificate-file "my_elster_certificate.pfx" \
-    --password "my_password"
 
 # Send xml file to tax authorities and print confirmation as pdf file
 taxel send \
     --tax-type "Bilanz" \
     --tax-version 6.4 \
     --xml-file "my_tax_data.xml" \
-    --certificate-file "my_elster_certificate.pfx" \
-    --password "my_password" \
     --print "my_eBilanz.pdf"
 ```
 
