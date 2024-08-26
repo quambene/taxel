@@ -16,6 +16,8 @@ eric.log
 validation_response.xml
 server_response.xml
 *.pdf
+test_data/schema/ebilanz
+test_data/schema/elster
 
 # csv
 .~lock.**.csv#
