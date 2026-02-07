@@ -2,7 +2,7 @@
 members = [
     "taxel-cli",
     "taxel-util",
-    "taxel-xml",
+    "taxel",
 ]
 resolver = "2"
 

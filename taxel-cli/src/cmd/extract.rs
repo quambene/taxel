@@ -4,7 +4,7 @@ use crate::arg::{self, OUTPUT_FILE, XML_FILE};
 use clap::{Arg, ArgMatches};
 use log::debug;
 use std::{env::current_dir, fs::File, io::BufReader, path::PathBuf};
-use taxel_xml::{CsvWriterBuilder, Reader};
+use taxel::{CsvWriterBuilder, Reader};
 
 pub fn xml_file() -> Arg<'static> {
     Arg::new(XML_FILE)
@@ -50,14 +50,14 @@ pub fn extract(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let mut xml_reader = Reader::from_reader(reader);
     xml_reader.trim_text(true);
 
-    let extracted_tags = taxel_xml::extract_tag_values(&mut xml_reader)?;
+    let extracted_tags = taxel::extract_tag_values(&mut xml_reader)?;
 
     let mut csv_writer = CsvWriterBuilder::new()
         .delimiter(b',')
         .has_headers(true)
         .from_path(output_path)?;
 
-    taxel_xml::write_tags(&mut csv_writer, extracted_tags)?;
+    taxel::write_tags(&mut csv_writer, extracted_tags)?;
 
     Ok(())
 }

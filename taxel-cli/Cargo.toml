@@ -13,11 +13,11 @@ integration-test = []
 
 [dependencies]
 eric-sdk = "0.4.0"
-taxel-xml = { version = "0.1.0", path = "../taxel-xml" }
+taxel = { version = "0.1.0", path = "../taxel" }
 anyhow = { workspace = true }
 log = { workspace = true }
 env_logger = { workspace = true }
 clap = { workspace = true, default-features = false, features = ["std", "cargo"] }
 
 [dev-dependencies]
-taxel-xml = { version = "0.1.0", path = "../taxel-xml" }
+taxel = { version = "0.1.0", path = "../taxel" }
