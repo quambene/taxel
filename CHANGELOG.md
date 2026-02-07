@@ -6,6 +6,7 @@
   - taxel-py: Generate xml from xsd schema
   - Add CI
 - changed
+  - Update Rust to 1.93
 - removed
   - Remove Rust bindings and SDK for Eric
 
