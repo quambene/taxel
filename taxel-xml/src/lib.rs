@@ -64,11 +64,8 @@ impl Tags {
         let key = target_key.into();
         let entry = self.0.remove(&key);
 
-        if entry.is_some() {
-            warn!(
-                "Key not supported: '{key}', removing value: '{:#?}'",
-                entry.unwrap()
-            );
+        if let Some(entry) = entry {
+            warn!("Key not supported: '{key}', removing value: '{entry:#?}'",);
         }
     }
 
