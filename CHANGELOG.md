@@ -5,6 +5,7 @@
 - added
   - taxel-py: Generate xml from xsd schema
   - Add CI
+  - taxel-gui: Display xml
 - changed
   - Update Rust to 1.93
 - removed
