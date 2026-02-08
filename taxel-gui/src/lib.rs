@@ -1,8 +1,4 @@
 use anyhow::Result;
-use eframe::{
-    egui::{CentralPanel, Context, Grid, ScrollArea},
-    App, Frame,
-};
 use quick_xml::events::BytesStart;
 use quick_xml::events::Event;
 use quick_xml::Reader;
@@ -18,44 +14,6 @@ pub struct TableRow {
 #[derive(Debug, Default)]
 pub struct XbrlTable {
     pub rows: Vec<TableRow>,
-}
-
-pub struct XbrlApp {
-    table: XbrlTable,
-}
-
-impl XbrlApp {
-    pub fn new(table: XbrlTable) -> XbrlApp {
-        Self { table }
-    }
-}
-
-impl App for XbrlApp {
-    fn update(&mut self, ctx: &Context, _: &mut Frame) {
-        CentralPanel::default().show(ctx, |ui| {
-            ScrollArea::vertical()
-                .auto_shrink([false; 2])
-                .show(ui, |ui| {
-                    ui.heading("eBilanz");
-
-                    Grid::new("xbrl_table").striped(true).show(ui, |ui| {
-                        ui.label("Key");
-                        ui.label("Context");
-                        ui.label("Unit");
-                        ui.label("Value");
-                        ui.end_row();
-
-                        for row in &mut self.table.rows {
-                            ui.label(&row.concept);
-                            ui.label(&row.context);
-                            ui.label(row.unit.as_deref().unwrap_or("-"));
-                            ui.text_edit_singleline(&mut row.value);
-                            ui.end_row();
-                        }
-                    });
-                });
-        });
-    }
 }
 
 /// Read XBRL in table format.
