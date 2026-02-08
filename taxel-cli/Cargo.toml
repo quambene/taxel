@@ -12,7 +12,7 @@ name = "taxel"
 integration-test = []
 
 [dependencies]
-eric-sdk = "0.4.0"
+eric-sdk = { workspace = true }
 taxel = { version = "0.1.0", path = "../taxel" }
 anyhow = { workspace = true }
 log = { workspace = true }
