@@ -5,8 +5,10 @@ use quick_xml::Reader;
 
 #[derive(Debug, Clone)]
 pub struct TableRow {
-    pub concept: String, // de-gaap-ci:Assets
-    pub context: String, // Context ID
+    pub concept: String,
+    // Human-readable label
+    pub label: Option<String>,
+    pub context: String,
     pub unit: Option<String>,
     pub value: String,
 }
@@ -78,6 +80,7 @@ fn parse_xbrl_fact(
         if let Event::Text(t) = reader.read_event()? {
             table.rows.push(TableRow {
                 concept,
+                label: None,
                 context: ctx,
                 unit,
                 value: t.unescape()?.to_string(),
