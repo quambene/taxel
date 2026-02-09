@@ -1,7 +1,7 @@
 use anyhow::Context as AnyhowContext;
 use dioxus_devtools::subsecond;
 use eframe::{
-    egui::{CentralPanel, Context, Grid, ScrollArea, Visuals},
+    egui::{self, CentralPanel, Context, Grid, ScrollArea, Visuals},
     App, Frame,
 };
 use log::debug;
@@ -68,11 +68,23 @@ impl App for XbrlApp {
                             ui.label("Value");
                             ui.end_row();
 
-                            for row in &mut self.table.rows {
+                            for row in &mut self.table.rows.iter_mut() {
                                 ui.label(&row.concept);
                                 ui.label(&row.context);
                                 ui.label(row.unit.as_deref().unwrap_or("-"));
-                                ui.text_edit_singleline(&mut row.value);
+
+                                egui::Frame::new().inner_margin(egui::Margin::ZERO).show(
+                                    ui,
+                                    |ui| {
+                                        ui.allocate_ui_with_layout(
+                                            egui::vec2(600.0, ui.spacing().interact_size.y),
+                                            egui::Layout::left_to_right(egui::Align::Min), // top-aligned
+                                            |ui| {
+                                                ui.add(egui::TextEdit::singleline(&mut row.value));
+                                            },
+                                        );
+                                    },
+                                );
                                 ui.end_row();
                             }
                         });
