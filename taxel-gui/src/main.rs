@@ -1,27 +1,15 @@
-use anyhow::Context as AnyhowContext;
 use dioxus_devtools::subsecond;
 use eframe::{
-    egui::{self, CentralPanel, Context, Grid, ScrollArea, Visuals},
+    egui::{self, CentralPanel, Color32, Context, Grid, ScrollArea, Ui, Visuals},
     App, Frame,
 };
 use log::debug;
-use std::{env, fs, path::PathBuf};
-use taxel_gui::{read_xbrl, XbrlTable};
+use rfd::FileDialog;
+use std::{fs, path::PathBuf};
+use taxel_gui::{read_xbrl, TableRow, XbrlTable};
 
 fn main() -> Result<(), anyhow::Error> {
     dioxus_devtools::connect_subsecond();
-
-    let workspace_dir = env::var("CARGO_MANIFEST_DIR").context("CARGO_MANIFEST_DIR not set")?;
-    let xml_path = PathBuf::from(&workspace_dir)
-        .join("../test_data/taxonomy/v6.5/HandelsbilanzLandwirt_GmbH.xml");
-
-    debug!("Read xml file: {}", xml_path.display());
-
-    let xml = fs::read_to_string(&xml_path)?;
-
-    debug!("Parse xml file: {}", xml_path.display());
-
-    let table = read_xbrl(&xml)?;
 
     let options = eframe::NativeOptions::default();
 
@@ -32,7 +20,7 @@ fn main() -> Result<(), anyhow::Error> {
         options,
         Box::new(|ctx| {
             ctx.egui_ctx.set_visuals(Visuals::light());
-            Ok(Box::new(XbrlApp::new(table)))
+            Ok(Box::new(XbrlApp::new(None, None)))
         }),
     )
     .map_err(|e| anyhow::anyhow!(e.to_string()))?;
@@ -41,12 +29,61 @@ fn main() -> Result<(), anyhow::Error> {
 }
 
 pub struct XbrlApp {
-    table: XbrlTable,
+    table: Option<XbrlTable>,
+    error_message: Option<String>,
 }
 
 impl XbrlApp {
-    pub fn new(table: XbrlTable) -> XbrlApp {
-        Self { table }
+    pub fn new(table: Option<XbrlTable>, error_message: Option<String>) -> XbrlApp {
+        Self {
+            table,
+            error_message,
+        }
+    }
+
+    fn import_button(&mut self, ui: &mut Ui) {
+        if ui.button("📁 Import XML").clicked() {
+            if let Some(path) = FileDialog::new()
+                .add_filter("XML", &["xml"])
+                .add_filter("All", &["*"])
+                .pick_file()
+            {
+                self.load_xml(&path);
+            }
+        }
+
+        ui.separator();
+
+        // Display error if present
+        if let Some(err) = &self.error_message {
+            ui.colored_label(Color32::RED, format!("{err}"));
+            if ui.button("Dismiss").clicked() {
+                self.error_message = None;
+            }
+        }
+    }
+
+    fn load_xml(&mut self, path: &PathBuf) {
+        debug!("Read xml file: {}", path.display());
+
+        match fs::read_to_string(path) {
+            Ok(xml) => {
+                debug!("Parse xml file: {}", path.display());
+
+                match read_xbrl(&xml) {
+                    Ok(table) => {
+                        self.table = Some(table);
+                        self.error_message = None;
+                    }
+                    Err(err) => {
+                        self.error_message = Some(format!("Failed to parse XML: {err}",));
+                    }
+                }
+            }
+            Err(err) => {
+                self.error_message = Some(format!("Failed to read file: {err}"));
+            }
+        }
     }
 }
 
@@ -56,40 +93,47 @@ impl App for XbrlApp {
     fn update(&mut self, ctx: &Context, _: &mut Frame) {
         subsecond::call(|| {
             CentralPanel::default().show(ctx, |ui| {
+                self.import_button(ui);
+
                 ScrollArea::vertical()
                     .auto_shrink([false; 2])
                     .show(ui, |ui| {
                         ui.heading("eBilanz");
 
-                        Grid::new("xbrl_table").striped(true).show(ui, |ui| {
-                            ui.label("Key");
-                            ui.label("Context");
-                            ui.label("Unit");
-                            ui.label("Value");
-                            ui.end_row();
-
-                            for row in &mut self.table.rows.iter_mut() {
-                                ui.label(&row.concept);
-                                ui.label(&row.context);
-                                ui.label(row.unit.as_deref().unwrap_or("-"));
-
-                                egui::Frame::new().inner_margin(egui::Margin::ZERO).show(
-                                    ui,
-                                    |ui| {
-                                        ui.allocate_ui_with_layout(
-                                            egui::vec2(600.0, ui.spacing().interact_size.y),
-                                            egui::Layout::left_to_right(egui::Align::Min), // top-aligned
-                                            |ui| {
-                                                ui.add(egui::TextEdit::singleline(&mut row.value));
-                                            },
-                                        );
-                                    },
-                                );
-                                ui.end_row();
-                            }
-                        });
+                        if let Some(table) = &mut self.table {
+                            draw_xbrl_table(&mut table.rows, ui);
+                        }
                     });
             })
         });
     }
+}
+
+fn draw_xbrl_table(rows: &mut [TableRow], ui: &mut Ui) {
+    Grid::new("xbrl_table").show(ui, |ui| {
+        ui.label("Key");
+        ui.label("Context");
+        ui.label("Unit");
+        ui.label("Value");
+        ui.end_row();
+
+        for row in rows {
+            ui.label(&row.concept);
+            ui.label(&row.context);
+            ui.label(row.unit.as_deref().unwrap_or("-"));
+
+            egui::Frame::new()
+                .inner_margin(egui::Margin::ZERO)
+                .show(ui, |ui| {
+                    ui.allocate_ui_with_layout(
+                        egui::vec2(600.0, ui.spacing().interact_size.y),
+                        egui::Layout::left_to_right(egui::Align::Min),
+                        |ui| {
+                            ui.add(egui::TextEdit::singleline(&mut row.value));
+                        },
+                    );
+                });
+            ui.end_row();
+        }
+    });
 }

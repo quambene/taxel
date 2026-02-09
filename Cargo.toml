@@ -24,4 +24,6 @@ spreadsheet-ods = "0.22.0"
 roxmltree = "0.14.1"
 clap = { version = "3.2.14", default-features = false, features = ["std", "cargo"] }
 eframe = "0.33.3"
+# egui_extras = "0.33.3"
+rfd = "0.17.2"
 dioxus-devtools = "0.7.3"

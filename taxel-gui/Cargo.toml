@@ -17,4 +17,5 @@ anyhow = { workspace = true }
 log = { workspace = true }
 quick-xml = { workspace = true }
 eframe = { workspace = true }
+rfd = { workspace = true }
 dioxus-devtools = { workspace = true }
