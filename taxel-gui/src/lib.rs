@@ -1,7 +1,8 @@
 use anyhow::Result;
-use quick_xml::events::BytesStart;
-use quick_xml::events::Event;
-use quick_xml::Reader;
+use quick_xml::{
+    events::{BytesStart, Event},
+    Reader,
+};
 
 #[derive(Debug, Clone)]
 pub struct TableRow {
