@@ -18,6 +18,7 @@ pub struct XbrlTable {
     pub rows: Vec<TableRow>,
 }
 
+// TODO: replace by XBRL parser
 /// Read XBRL in table format.
 pub fn read_xbrl(xml: &str) -> Result<XbrlTable> {
     let mut reader = Reader::from_str(xml);
