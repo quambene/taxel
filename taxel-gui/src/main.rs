@@ -9,6 +9,7 @@ use std::{fs, path::PathBuf};
 use taxel_gui::{read_xbrl, TableRow, XbrlTable};
 
 fn main() -> Result<(), anyhow::Error> {
+    // TODO: remove hot reloading support for release builds
     dioxus_devtools::connect_subsecond();
 
     let options = eframe::NativeOptions::default();
@@ -91,6 +92,7 @@ impl XbrlApp {
 // <https://github.com/DioxusLabs/dioxus/issues/4160>).
 impl App for XbrlApp {
     fn update(&mut self, ctx: &Context, _: &mut Frame) {
+        // TODO: remove hot reloading support for release builds
         subsecond::call(|| {
             CentralPanel::default().show(ctx, |ui| {
                 self.import_button(ui);
