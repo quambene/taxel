@@ -8,11 +8,7 @@ edition.workspace = true
 path = "src/main.rs"
 name = "taxel-gui"
 
-[features]
-integration-test = []
-
 [dependencies]
-taxel = { version = "0.1.0", path = "../taxel" }
 anyhow = { workspace = true }
 log = { workspace = true }
 quick-xml = { workspace = true }
