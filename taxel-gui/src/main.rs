@@ -43,7 +43,7 @@ impl XbrlApp {
     }
 
     fn import_button(&mut self, ui: &mut Ui) {
-        if ui.button("📁 Import XML").clicked() {
+        if ui.button("Import XML").clicked() {
             if let Some(path) = FileDialog::new()
                 .add_filter("XML", &["xml"])
                 .add_filter("All", &["*"])
@@ -88,7 +88,7 @@ impl XbrlApp {
     }
 }
 
-// Note: dioxus hot reloading support requires the app at root level (see
+// Note: dioxus hot reloading support requires the app in main.rs (see
 // <https://github.com/DioxusLabs/dioxus/issues/4160>).
 impl App for XbrlApp {
     fn update(&mut self, ctx: &Context, _: &mut Frame) {
