@@ -18,6 +18,3 @@ anyhow = { workspace = true }
 log = { workspace = true }
 env_logger = { workspace = true }
 clap = { workspace = true, default-features = false, features = ["std", "cargo"] }
-
-[dev-dependencies]
-taxel = { version = "0.1.0", path = "../taxel" }
