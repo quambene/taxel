@@ -3839,6 +3839,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "taxel-xbrl"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "log",
+ "quick-xml 0.29.0",
+]
+
+[[package]]
 name = "tempfile"
 version = "3.24.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
