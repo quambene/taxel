@@ -1,0 +1,17 @@
+[package]
+name = "taxel-gui"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+
+[[bin]]
+path = "src/main.rs"
+name = "taxel-gui"
+
+[dependencies]
+anyhow = { workspace = true }
+log = { workspace = true }
+quick-xml = { workspace = true }
+eframe = { workspace = true }
+rfd = { workspace = true }
+dioxus-devtools = { workspace = true }

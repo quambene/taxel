@@ -9,7 +9,7 @@ use std::{
     io::{BufRead, BufReader},
     path::{Path, PathBuf},
 };
-use taxel_xml::{CsvReaderBuilder, Reader, Tags, Trim, Writer, XbrlElement};
+use taxel::{CsvReaderBuilder, Reader, Tags, Trim, Writer, XbrlElement};
 
 pub fn generate_args() -> [Arg<'static>; 3] {
     [arg::csv_file(), arg::template_file(), arg::output_file()]
@@ -62,7 +62,7 @@ pub fn generate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     // Format XML file
     let mut xml_writer = Writer::new_with_indent(output_file, b' ', 4);
 
-    let target_tags = taxel_xml::read_tags(csv_reader.as_mut())?;
+    let target_tags = taxel::read_tags(csv_reader.as_mut())?;
 
     update_values(target_tags, &mut xml_reader, &mut xml_writer)?;
 
@@ -87,7 +87,7 @@ where
     let mut element = XbrlElement::parse(xml_reader)?;
     element.remove_values();
     element.add_values(&target_tags);
-    taxel_xml::write_declaration(xml_writer)?;
+    taxel::write_declaration(xml_writer)?;
     element.serialize(xml_writer)?;
 
     Ok(())
@@ -97,7 +97,7 @@ where
 mod tests {
     use super::*;
     use std::io::Cursor;
-    use taxel_xml::{remove_formatting, Tags};
+    use taxel::{remove_formatting, Tags};
 
     // Helper function to test updated tags.
     fn test_update_target_tags(xml: &str, expected_xml: &str, target_tags: Tags) {

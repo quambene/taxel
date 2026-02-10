@@ -91,8 +91,8 @@ cargo test -p taxel-cli --test '*' --features integration-test -- --test-threads
 # Run integration tests for taxel-cli in release mode
 cargo test -p taxel-cli --release --test '*' --features integration-test -- --test-threads=1
 
-# Run unit tests for taxel-xml
-cargo test --lib -p taxel-xml
+# Run unit tests for taxel
+cargo test --lib -p taxel
 
 # Run unit tests for taxel-py
 cd taxel-py

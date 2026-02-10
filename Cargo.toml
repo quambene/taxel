@@ -1,8 +1,9 @@
 [workspace]
 members = [
+    "taxel",
     "taxel-cli",
+    "taxel-gui",
     "taxel-util",
-    "taxel-xml",
 ]
 resolver = "2"
 
@@ -12,6 +13,7 @@ edition = "2021"
 version = "0.1.0"
 
 [workspace.dependencies]
+eric-sdk = "0.4.0"
 anyhow = "1.0.71"
 log = "0.4.19"
 env_logger = "0.10.0"
@@ -21,3 +23,7 @@ csv = "1.2.2"
 spreadsheet-ods = "0.22.0"
 roxmltree = "0.14.1"
 clap = { version = "3.2.14", default-features = false, features = ["std", "cargo"] }
+eframe = "0.33.3"
+# egui_extras = "0.33.3"
+rfd = "0.17.2"
+dioxus-devtools = "0.7.3"
