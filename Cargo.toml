@@ -3,7 +3,6 @@ members = [
     "taxel",
     "taxel-cli",
     "taxel-gui",
-    "taxel-util",
 ]
 resolver = "2"
 
