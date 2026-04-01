@@ -19,6 +19,9 @@ server_response.xml
 test_data/schema/ebilanz
 test_data/schema/elster
 
+# Test data
+test_data/taxonomies
+
 # csv
 .~lock.**.csv#
 
