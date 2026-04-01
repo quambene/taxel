@@ -1,8 +1,7 @@
 use anyhow::Result;
-use quick_xml::{
-    events::{BytesStart, Event},
-    Reader,
-};
+use log::debug;
+use std::path::PathBuf;
+use xbrl_rs::{InstanceDocument, TaxonomySet};
 
 #[derive(Debug, Clone)]
 pub struct TableRow {
@@ -19,74 +18,34 @@ pub struct XbrlTable {
     pub rows: Vec<TableRow>,
 }
 
-// TODO: replace by XBRL parser
-/// Read XBRL in table format.
-pub fn read_xbrl(xml: &str) -> Result<XbrlTable> {
-    let mut reader = Reader::from_str(xml);
-    reader.trim_text(true);
+pub fn load_xml(table: &mut Option<XbrlTable>, path: &PathBuf) -> Result<(), anyhow::Error> {
+    debug!("Read xml file: {}", path.display());
 
-    let mut buf = Vec::new();
-    let mut table = XbrlTable::default();
-    let mut inside_xbrl = false;
+    let instance = InstanceDocument::from_file(path)?;
+    let schema_refs: Vec<String> = instance.schema_refs().to_vec();
+    let entry_point = PathBuf::from("../../test_data/taxonomies");
+    let taxonomy = TaxonomySet::discover(schema_refs, entry_point)?;
+    let view = instance.view(&taxonomy);
+    let item_facts = instance.item_facts();
 
-    loop {
-        match reader.read_event_into(&mut buf)? {
-            Event::Start(event) => {
-                let name = event.name();
+    for section in view.sections {
+        for node in &section.nodes {
+            for &idx in &node.fact_indices {
+                debug!("Fact index: {idx}");
 
-                // detect start of XBRL instance
-                if name.as_ref().ends_with(b"xbrl") {
-                    inside_xbrl = true;
-                }
-
-                if inside_xbrl {
-                    parse_xbrl_fact(&mut reader, &event, &mut table)?;
-                }
-            }
-
-            Event::End(event) => {
-                if event.name().as_ref().ends_with(b"xbrl") {
-                    break;
+                if let Some(fact) = item_facts.get(idx) {
+                    table
+                        .get_or_insert_with(XbrlTable::default)
+                        .rows
+                        .push(TableRow {
+                            concept: fact.id().unwrap_or_default().to_string(),
+                            label: None,
+                            context: fact.context_ref().to_string(),
+                            unit: fact.unit_ref().map(|unit| unit.to_string()),
+                            value: fact.value().to_string(),
+                        });
                 }
             }
-
-            Event::Eof => break,
-            _ => {}
-        }
-
-        buf.clear();
-    }
-
-    Ok(table)
-}
-
-fn parse_xbrl_fact(
-    reader: &mut Reader<&[u8]>,
-    e: &BytesStart,
-    table: &mut XbrlTable,
-) -> Result<()> {
-    let mut context = None;
-    let mut unit = None;
-
-    for attr in e.attributes().flatten() {
-        match attr.key.as_ref() {
-            b"contextRef" => context = Some(attr.unescape_value()?.to_string()),
-            b"unitRef" => unit = Some(attr.unescape_value()?.to_string()),
-            _ => {}
-        }
-    }
-
-    if let Some(ctx) = context {
-        let concept = String::from_utf8_lossy(e.name().as_ref()).to_string();
-
-        if let Event::Text(t) = reader.read_event()? {
-            table.rows.push(TableRow {
-                concept,
-                label: None,
-                context: ctx,
-                unit,
-                value: t.unescape()?.to_string(),
-            });
         }
     }
 

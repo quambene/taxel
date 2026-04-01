@@ -5,8 +5,8 @@ use eframe::{
 };
 use log::debug;
 use rfd::FileDialog;
-use std::{fs, path::PathBuf};
-use taxel_gui::{read_xbrl, TableRow, XbrlTable};
+use std::path::PathBuf;
+use taxel_gui::{load_xml, TableRow, XbrlTable};
 
 fn main() -> Result<(), anyhow::Error> {
     // TODO: remove hot reloading support for release builds
@@ -65,25 +65,8 @@ impl XbrlApp {
     }
 
     fn load_xml(&mut self, path: &PathBuf) {
-        debug!("Read xml file: {}", path.display());
-
-        match fs::read_to_string(path) {
-            Ok(xml) => {
-                debug!("Parse xml file: {}", path.display());
-
-                match read_xbrl(&xml) {
-                    Ok(table) => {
-                        self.table = Some(table);
-                        self.error_message = None;
-                    }
-                    Err(err) => {
-                        self.error_message = Some(format!("Failed to parse XML: {err}",));
-                    }
-                }
-            }
-            Err(err) => {
-                self.error_message = Some(format!("Failed to read file: {err}"));
-            }
+        if let Err(err) = load_xml(&mut self.table, path) {
+            self.error_message = Some(format!("{err}"));
         }
     }
 }

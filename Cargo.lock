@@ -760,7 +760,9 @@ checksum = "a21f936df1771bf62b77f047b726c4625ff2e8aa607c01ec06e5a05bd8463401"
 dependencies = [
  "android-tzdata",
  "iana-time-zone",
+ "js-sys",
  "num-traits",
+ "wasm-bindgen",
  "windows-targets 0.52.6",
 ]
 
@@ -3104,6 +3106,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "quick-xml"
+version = "0.39.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "958f21e8e7ceb5a1aa7fa87fab28e7c75976e0bfe7e23ff069e0a260f894067d"
+dependencies = [
+ "memchr",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.36"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3829,6 +3840,7 @@ dependencies = [
  "log",
  "quick-xml 0.29.0",
  "rfd",
+ "xbrl-rs",
 ]
 
 [[package]]
@@ -5087,6 +5099,20 @@ name = "x11rb-protocol"
 version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ea6fc2961e4ef194dcbfe56bb845534d0dc8098940c7e5c012a258bfec6701bd"
+
+[[package]]
+name = "xbrl-rs"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8a1f6d345ae925ba82bb40b0d6019a93649eb1f1e9c98a154f6583e660fac3f8"
+dependencies = [
+ "chrono",
+ "indexmap 2.13.0",
+ "log",
+ "quick-xml 0.39.2",
+ "rust_decimal",
+ "thiserror 2.0.18",
+]
 
 [[package]]
 name = "xcursor"
