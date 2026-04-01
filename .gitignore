@@ -21,6 +21,7 @@ test_data/schema/elster
 
 # Test data
 test_data/taxonomies
+test_data/examples
 
 # csv
 .~lock.**.csv#
