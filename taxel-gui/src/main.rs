@@ -58,27 +58,30 @@ impl TaxelApp {
         }
     }
 
-    fn import_button(&mut self, ui: &mut Ui) {
-        if ui.button("Import XML").clicked() {
-            if let Some(path) = FileDialog::new()
-                .add_filter("XML", &["xml"])
-                .add_filter("All", &["*"])
-                .pick_file()
-            {
-                self.load_xml(&path);
+    fn draw_header(&mut self, ui: &mut Ui) {
+        ui.horizontal_centered(|ui| {
+            if ui.button("Import XML").clicked() {
+                if let Some(path) = FileDialog::new()
+                    .add_filter("XML", &["xml"])
+                    .add_filter("All", &["*"])
+                    .pick_file()
+                {
+                    self.load_xml(&path);
+                }
             }
-        }
 
-        ui.separator();
-
-        // Display error if present
-        if let Some(err) = &self.error_message {
-            ui.colored_label(Color32::RED, err.to_string());
-
-            if ui.button("Dismiss").clicked() {
-                self.error_message = None;
+            if self.table.is_some() && ui.button("Clear table").clicked() {
+                self.table = None;
             }
-        }
+
+            if let Some(err) = &self.error_message {
+                ui.separator();
+                ui.colored_label(Color32::RED, err.to_string());
+                if ui.button("Dismiss").clicked() {
+                    self.error_message = None;
+                }
+            }
+        });
     }
 
     fn load_xml(&mut self, path: &Path) {
@@ -96,15 +99,15 @@ impl App for TaxelApp {
     fn ui(&mut self, ctx: &mut Ui, _: &mut Frame) {
         // TODO: remove hot reloading support for release builds
         subsecond::call(|| {
+            Panel::top("header").min_size(32.0).show_inside(ctx, |ui| {
+                self.draw_header(ui);
+            });
+
             if let Some(table) = &self.table {
                 draw_sidebar(ctx, table.sections.as_slice(), &mut self.selected_tab);
             }
 
             CentralPanel::default().show_inside(ctx, |ui| {
-                self.import_button(ui);
-
-                ui.heading("eBilanz");
-
                 if let Some(table) = &self.table {
                     if let Some(section) = table.sections.get(self.selected_tab) {
                         draw_table(&section.rows, &mut self.collapsed, ui);
