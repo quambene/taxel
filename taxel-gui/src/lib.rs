@@ -8,7 +8,7 @@ use xbrl_rs::{
 /// A row in the fact table, representing a single fact or a concept without
 /// facts.
 #[derive(Debug, Clone)]
-pub struct TableRow {
+pub struct FactRow {
     /// The concept name, e.g. "us-gaap:Assets".
     pub concept: String,
     /// The resolved label for the concept, if available.
@@ -21,6 +21,8 @@ pub struct TableRow {
     pub unit: Option<String>,
     /// The value of the fact, or an empty string for concepts without facts.
     pub value: String,
+    /// Whether this concept has child concepts in the presentation tree.
+    pub has_children: bool,
 }
 
 /// One presentation section with its rows.
@@ -29,7 +31,7 @@ pub struct FactSection {
     /// The full extended link role URI, e.g. `http://example.com/role/BalanceSheet`.
     pub role: String,
     /// The rows for this section.
-    pub rows: Vec<TableRow>,
+    pub rows: Vec<FactRow>,
 }
 
 /// A collection of fact sections, one per presentation section in the XBRL document.
@@ -62,17 +64,20 @@ fn resolve_label<'a>(node: &'a TreeNode<'a>, lang: &str) -> Option<&'a str> {
 
 /// Recursively collects facts from the tree nodes and populates the fact table
 /// rows.
-fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<TableRow>) {
+fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<FactRow>) {
     let label = resolve_label(node, "en");
 
+    let has_children = !node.children.is_empty();
+
     if node.fact_indices.is_empty() {
-        rows.push(TableRow {
+        rows.push(FactRow {
             concept: node.concept_name.to_string(),
             label: label.map(|label| label.to_string()),
             depth: node.depth,
             context: String::new(),
             unit: None,
             value: String::new(),
+            has_children,
         });
     } else {
         for &idx in &node.fact_indices {
@@ -82,13 +87,14 @@ fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<TableRow>) 
                 if fact.is_nil() {
                     continue;
                 }
-                rows.push(TableRow {
+                rows.push(FactRow {
                     concept: node.concept_name.to_string(),
                     label: label.map(|l| l.to_string()),
                     depth: node.depth,
                     context: fact.context_ref().to_string(),
                     unit: fact.unit_ref().map(|u| u.to_string()),
                     value: fact.value().to_string(),
+                    has_children,
                 });
             }
         }
