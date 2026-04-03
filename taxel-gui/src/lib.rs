@@ -23,11 +23,19 @@ pub struct TableRow {
     pub value: String,
 }
 
-/// A simple wrapper around the fact table data.
+/// One presentation section with its rows.
+#[derive(Debug, Default, Clone)]
+pub struct FactSection {
+    /// The full extended link role URI, e.g. `http://example.com/role/BalanceSheet`.
+    pub role: String,
+    /// The rows for this section.
+    pub rows: Vec<TableRow>,
+}
+
+/// A collection of fact sections, one per presentation section in the XBRL document.
 #[derive(Debug, Default)]
 pub struct FactTable {
-    /// The rows of the fact table.
-    pub rows: Vec<TableRow>,
+    pub sections: Vec<FactSection>,
 }
 
 /// Resolves the label for a given tree node, preferring terse labels over
@@ -95,9 +103,16 @@ fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<TableRow>) 
 /// facts from the tree nodes.
 fn populate_table(view: DocumentView, item_facts: &[&ItemFact], table: &mut FactTable) {
     for section in &view.sections {
+        let mut fact_section = FactSection {
+            role: section.role.to_string(),
+            rows: Vec::new(),
+        };
+
         for node in &section.nodes {
-            collect_node(node, item_facts, &mut table.rows);
+            collect_node(node, item_facts, &mut fact_section.rows);
         }
+
+        table.sections.push(fact_section);
     }
 }
 

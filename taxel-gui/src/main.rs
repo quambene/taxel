@@ -1,13 +1,13 @@
 use dioxus_devtools::subsecond;
 use eframe::{
-    egui::{self, CentralPanel, Color32, Ui, Visuals},
+    egui::{self, CentralPanel, Color32, Panel, Ui, Visuals},
     App, Frame,
 };
 use egui_extras::{Column, TableBuilder};
 use log::debug;
 use rfd::FileDialog;
 use std::path::Path;
-use taxel_gui::{load_xml, FactTable, TableRow};
+use taxel_gui::{load_xml, FactSection, FactTable, TableRow};
 
 fn main() -> Result<(), anyhow::Error> {
     // TODO: remove hot reloading support for release builds
@@ -33,8 +33,15 @@ fn main() -> Result<(), anyhow::Error> {
     Ok(())
 }
 
+/// Main application struct for the Taxel GUI, managing the state of the app.
 pub struct TaxelApp {
+    /// The fact table containing the extracted facts from the XBRL instance
+    /// document.
     table: Option<FactTable>,
+    /// The index of the currently selected section tab in the sidebar.
+    selected_tab: usize,
+    /// An optional error message to display in the UI if an error occurs during
+    /// XML loading or processing.
     error_message: Option<String>,
 }
 
@@ -42,6 +49,7 @@ impl TaxelApp {
     pub fn new(table: Option<FactTable>, error_message: Option<String>) -> TaxelApp {
         Self {
             table,
+            selected_tab: 0,
             error_message,
         }
     }
@@ -70,6 +78,7 @@ impl TaxelApp {
     }
 
     fn load_xml(&mut self, path: &Path) {
+        self.selected_tab = 0;
         if let Err(err) = load_xml(&mut self.table, path) {
             self.error_message = Some(format!("{err}"));
         }
@@ -82,17 +91,39 @@ impl App for TaxelApp {
     fn ui(&mut self, ctx: &mut Ui, _: &mut Frame) {
         // TODO: remove hot reloading support for release builds
         subsecond::call(|| {
+            if let Some(table) = &self.table {
+                draw_sidebar(ctx, table.sections.as_slice(), &mut self.selected_tab);
+            }
+
             CentralPanel::default().show_inside(ctx, |ui| {
                 self.import_button(ui);
 
                 ui.heading("eBilanz");
 
                 if let Some(table) = &self.table {
-                    draw_table(&table.rows, ui);
+                    if let Some(section) = table.sections.get(self.selected_tab) {
+                        draw_table(&section.rows, ui);
+                    }
                 }
             })
         });
     }
+}
+
+fn draw_sidebar(ctx: &mut Ui, sections: &[FactSection], selected: &mut usize) {
+    Panel::left("sections_panel")
+        .resizable(true)
+        .default_size(200.0)
+        .show_inside(ctx, |ui| {
+            ui.heading("Sections");
+            ui.separator();
+            egui::ScrollArea::vertical().show(ui, |ui| {
+                for (i, section) in sections.iter().enumerate() {
+                    let title = section.role.rsplit('/').next().unwrap_or(&section.role);
+                    ui.selectable_value(selected, i, title);
+                }
+            });
+        });
 }
 
 fn draw_table(rows: &[TableRow], ui: &mut Ui) {
@@ -101,8 +132,8 @@ fn draw_table(rows: &[TableRow], ui: &mut Ui) {
     TableBuilder::new(ui)
         .resizable(true)
         .striped(true)
-        .column(Column::initial(200.0).clip(true))
-        .column(Column::initial(200.0).clip(true))
+        .column(Column::initial(500.0).clip(true))
+        .column(Column::initial(500.0).clip(true))
         .column(Column::initial(120.0).clip(true))
         .column(Column::initial(60.0).clip(true))
         .column(Column::remainder().clip(true))
