@@ -74,7 +74,7 @@ impl XbrlApp {
 // Note: dioxus hot reloading support requires the app in main.rs (see
 // <https://github.com/DioxusLabs/dioxus/issues/4160>).
 impl App for XbrlApp {
-    fn update(&mut self, ctx: &Context, _: &mut Frame) {
+    fn ui(&mut self, ctx: &mut Ui, _: &mut Frame) {
         // TODO: remove hot reloading support for release builds
         subsecond::call(|| {
             CentralPanel::default().show(ctx, |ui| {
