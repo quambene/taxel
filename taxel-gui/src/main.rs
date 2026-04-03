@@ -6,14 +6,17 @@ use eframe::{
 use egui_extras::{Column, TableBuilder};
 use log::debug;
 use rfd::FileDialog;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use taxel_gui::{load_xml, FactTable, TableRow};
 
 fn main() -> Result<(), anyhow::Error> {
     // TODO: remove hot reloading support for release builds
     dioxus_devtools::connect_subsecond();
 
-    let options = eframe::NativeOptions::default();
+    let options = eframe::NativeOptions {
+        viewport: egui::ViewportBuilder::default().with_maximized(true),
+        ..Default::default()
+    };
 
     debug!("Run app");
 
