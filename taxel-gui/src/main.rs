@@ -1,12 +1,13 @@
 use dioxus_devtools::subsecond;
 use eframe::{
-    egui::{self, CentralPanel, Color32, Context, Grid, ScrollArea, Ui, Visuals},
+    egui::{self, CentralPanel, Color32, Ui, Visuals},
     App, Frame,
 };
+use egui_extras::{Column, TableBuilder};
 use log::debug;
 use rfd::FileDialog;
 use std::path::PathBuf;
-use taxel_gui::{load_xml, TableRow, XbrlTable};
+use taxel_gui::{load_xml, FactTable, TableRow};
 
 fn main() -> Result<(), anyhow::Error> {
     // TODO: remove hot reloading support for release builds
@@ -21,7 +22,7 @@ fn main() -> Result<(), anyhow::Error> {
         options,
         Box::new(|ctx| {
             ctx.egui_ctx.set_visuals(Visuals::light());
-            Ok(Box::new(XbrlApp::new(None, None)))
+            Ok(Box::new(TaxelApp::new(None, None)))
         }),
     )
     .map_err(|e| anyhow::anyhow!(e.to_string()))?;
@@ -29,13 +30,13 @@ fn main() -> Result<(), anyhow::Error> {
     Ok(())
 }
 
-pub struct XbrlApp {
-    table: Option<XbrlTable>,
+pub struct TaxelApp {
+    table: Option<FactTable>,
     error_message: Option<String>,
 }
 
-impl XbrlApp {
-    pub fn new(table: Option<XbrlTable>, error_message: Option<String>) -> XbrlApp {
+impl TaxelApp {
+    pub fn new(table: Option<FactTable>, error_message: Option<String>) -> TaxelApp {
         Self {
             table,
             error_message,
@@ -73,52 +74,69 @@ impl XbrlApp {
 
 // Note: dioxus hot reloading support requires the app in main.rs (see
 // <https://github.com/DioxusLabs/dioxus/issues/4160>).
-impl App for XbrlApp {
+impl App for TaxelApp {
     fn ui(&mut self, ctx: &mut Ui, _: &mut Frame) {
         // TODO: remove hot reloading support for release builds
         subsecond::call(|| {
-            CentralPanel::default().show(ctx, |ui| {
+            CentralPanel::default().show_inside(ctx, |ui| {
                 self.import_button(ui);
 
-                ScrollArea::vertical()
-                    .auto_shrink([false; 2])
-                    .show(ui, |ui| {
-                        ui.heading("eBilanz");
+                ui.heading("eBilanz");
 
-                        if let Some(table) = &mut self.table {
-                            draw_xbrl_table(&mut table.rows, ui);
-                        }
-                    });
+                if let Some(table) = &self.table {
+                    draw_table(&table.rows, ui);
+                }
             })
         });
     }
 }
 
-fn draw_xbrl_table(rows: &mut [TableRow], ui: &mut Ui) {
-    Grid::new("xbrl_table").show(ui, |ui| {
-        ui.label("Key");
-        ui.label("Context");
-        ui.label("Unit");
-        ui.label("Value");
-        ui.end_row();
+fn draw_table(rows: &[TableRow], ui: &mut Ui) {
+    let row_height = ui.text_style_height(&egui::TextStyle::Body) + ui.spacing().item_spacing.y;
 
-        for row in rows {
-            ui.label(&row.concept);
-            ui.label(&row.context);
-            ui.label(row.unit.as_deref().unwrap_or("-"));
-
-            egui::Frame::new()
-                .inner_margin(egui::Margin::ZERO)
-                .show(ui, |ui| {
-                    ui.allocate_ui_with_layout(
-                        egui::vec2(600.0, ui.spacing().interact_size.y),
-                        egui::Layout::left_to_right(egui::Align::Min),
-                        |ui| {
-                            ui.add(egui::TextEdit::singleline(&mut row.value));
-                        },
-                    );
+    TableBuilder::new(ui)
+        .resizable(true)
+        .striped(true)
+        .column(Column::initial(200.0).clip(true))
+        .column(Column::initial(200.0).clip(true))
+        .column(Column::initial(120.0).clip(true))
+        .column(Column::initial(60.0).clip(true))
+        .column(Column::remainder().clip(true))
+        .header(row_height, |mut header| {
+            header.col(|ui| {
+                ui.label("Concept");
+            });
+            header.col(|ui| {
+                ui.label("Label");
+            });
+            header.col(|ui| {
+                ui.label("Context");
+            });
+            header.col(|ui| {
+                ui.label("Unit");
+            });
+            header.col(|ui| {
+                ui.label("Value");
+            });
+        })
+        .body(|body| {
+            body.rows(row_height, rows.len(), |mut row| {
+                let idx = row.index();
+                row.col(|ui| {
+                    ui.label(&rows[idx].concept);
                 });
-            ui.end_row();
-        }
-    });
+                row.col(|ui| {
+                    ui.label(rows[idx].label.as_deref().unwrap_or("-"));
+                });
+                row.col(|ui| {
+                    ui.label(&rows[idx].context);
+                });
+                row.col(|ui| {
+                    ui.label(rows[idx].unit.as_deref().unwrap_or("-"));
+                });
+                row.col(|ui| {
+                    ui.label(&rows[idx].value);
+                });
+            });
+        });
 }

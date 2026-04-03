@@ -2,4 +2,6 @@
 
 ## v0.1.0 (unreleased)
 
-Initial release
+- added
+  - Import instance document
+  - Display facts
