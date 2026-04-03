@@ -6,7 +6,7 @@ use eframe::{
 use egui_extras::{Column, TableBuilder};
 use log::debug;
 use rfd::FileDialog;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use taxel_gui::{load_xml, FactTable, TableRow};
 
 fn main() -> Result<(), anyhow::Error> {
@@ -58,14 +58,15 @@ impl TaxelApp {
 
         // Display error if present
         if let Some(err) = &self.error_message {
-            ui.colored_label(Color32::RED, format!("{err}"));
+            ui.colored_label(Color32::RED, err.to_string());
+
             if ui.button("Dismiss").clicked() {
                 self.error_message = None;
             }
         }
     }
 
-    fn load_xml(&mut self, path: &PathBuf) {
+    fn load_xml(&mut self, path: &Path) {
         if let Err(err) = load_xml(&mut self.table, path) {
             self.error_message = Some(format!("{err}"));
         }

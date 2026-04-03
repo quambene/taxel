@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use log::debug;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use xbrl_rs::{
     DocumentView, InstanceDocument, ItemFact, TaxonomySet, TreeNode, ROLE_LABEL, ROLE_TERSE,
 };
@@ -96,7 +96,7 @@ fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<TableRow>) 
 fn populate_table(view: DocumentView, item_facts: &[&ItemFact], table: &mut FactTable) {
     for section in &view.sections {
         for node in &section.nodes {
-            collect_node(node, &item_facts, &mut table.rows);
+            collect_node(node, item_facts, &mut table.rows);
         }
     }
 }
@@ -104,7 +104,7 @@ fn populate_table(view: DocumentView, item_facts: &[&ItemFact], table: &mut Fact
 /// Loads an XBRL instance document from the specified path, discovers the
 /// referenced taxonomies, and populates the fact table with the extracted
 /// facts.
-pub fn load_xml(table: &mut Option<FactTable>, path: &PathBuf) -> Result<(), anyhow::Error> {
+pub fn load_xml(table: &mut Option<FactTable>, path: &Path) -> Result<(), anyhow::Error> {
     debug!("Read xml file: {}", path.display());
 
     let instance = InstanceDocument::from_file(path)?;
