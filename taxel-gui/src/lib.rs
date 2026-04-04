@@ -1,5 +1,6 @@
 use anyhow::{Context, Result};
 use log::debug;
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use xbrl_rs::{
     DocumentView, InstanceDocument, ItemFact, TaxonomySet, TreeNode, ROLE_LABEL, ROLE_TERSE,
@@ -11,8 +12,8 @@ use xbrl_rs::{
 pub struct FactRow {
     /// The concept name, e.g. "us-gaap:Assets".
     pub concept: String,
-    /// The resolved label for the concept, if available.
-    pub label: Option<String>,
+    /// Labels resolved at load time, keyed by language code (e.g. "en", "de").
+    pub labels: HashMap<String, String>,
     /// The depth of the node in the tree, used for indentation.
     pub depth: usize,
     /// The context reference for the fact, if applicable.
@@ -62,17 +63,26 @@ fn resolve_label<'a>(node: &'a TreeNode<'a>, lang: &str) -> Option<&'a str> {
     None
 }
 
+/// Resolves labels for all supported languages for a given tree node.
+fn resolve_labels(node: &TreeNode) -> HashMap<String, String> {
+    ["en", "de"]
+        .iter()
+        .filter_map(|&lang| {
+            resolve_label(node, lang).map(|label| (lang.to_string(), label.to_string()))
+        })
+        .collect()
+}
+
 /// Recursively collects facts from the tree nodes and populates the fact table
 /// rows.
 fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<FactRow>) {
-    let label = resolve_label(node, "en");
-
+    let labels = resolve_labels(node);
     let has_children = !node.children.is_empty();
 
     if node.fact_indices.is_empty() {
         rows.push(FactRow {
             concept: node.concept_name.to_string(),
-            label: label.map(|label| label.to_string()),
+            labels,
             depth: node.depth,
             context: String::new(),
             unit: None,
@@ -89,7 +99,7 @@ fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<FactRow>) {
                 }
                 rows.push(FactRow {
                     concept: node.concept_name.to_string(),
-                    label: label.map(|l| l.to_string()),
+                    labels: labels.clone(),
                     depth: node.depth,
                     context: fact.context_ref().to_string(),
                     unit: fact.unit_ref().map(|u| u.to_string()),

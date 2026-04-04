@@ -29,6 +29,8 @@ pub struct TaxelApp {
     selected_tab: usize,
     /// Per-section UI state, indexed analogous to `table.sections`.
     section_states: Vec<SectionState>,
+    /// The currently selected language for labels (e.g. "en", "de").
+    lang: String,
     /// An optional error message to display in the UI if an error occurs during
     /// XML loading or processing.
     error_message: Option<String>,
@@ -44,11 +46,14 @@ impl TaxelApp {
             table,
             selected_tab: 0,
             section_states,
+            lang: "en".to_string(),
             error_message,
         }
     }
 
     fn draw_header(&mut self, ui: &mut Ui) {
+        let mut lang_changed = false;
+
         ui.horizontal_centered(|ui| {
             if ui.button("Import XML").clicked() {
                 if let Some(path) = FileDialog::new()
@@ -71,11 +76,16 @@ impl TaxelApp {
                     self.error_message = None;
                 }
             }
+
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                lang_changed = draw_language_toolbar(ui, &mut self.lang);
+            });
         });
     }
 
     fn load_xml(&mut self, path: &Path) {
         self.selected_tab = 0;
+        self.table = None;
 
         if let Err(err) = load_xml(&mut self.table, path) {
             self.error_message = Some(format!("{err}"));
@@ -109,6 +119,8 @@ impl App for TaxelApp {
                 draw_sidebar(ctx, table.sections.as_slice(), &mut self.selected_tab);
             }
 
+            let lang = self.lang.clone();
+
             CentralPanel::default().show_inside(ctx, |ui| {
                 if let Some(table) = &self.table {
                     if let Some(section) = table.sections.get(self.selected_tab) {
@@ -124,7 +136,7 @@ impl App for TaxelApp {
                             &section.rows,
                         );
 
-                        draw_table(&section.rows, &mut state.collapsed, ui);
+                        draw_table(&section.rows, &mut state.collapsed, &lang, ui);
                     }
                 }
             })
@@ -226,7 +238,10 @@ fn draw_level_toolbar(
     ui.separator();
 }
 
-fn draw_table(rows: &[FactRow], collapsed: &mut HashSet<usize>, ui: &mut Ui) {
+/// Draw the fact table in the main panel, showing only the rows that are not
+/// collapsed. Handles the toggle logic for expanding/collapsing rows with
+/// children.
+fn draw_table(rows: &[FactRow], collapsed: &mut HashSet<usize>, lang: &str, ui: &mut Ui) {
     let row_height = ui.text_style_height(&egui::TextStyle::Body) + ui.spacing().item_spacing.y;
     let visible = visible_rows(rows, collapsed);
     let mut toggle: Option<usize> = None;
@@ -278,7 +293,12 @@ fn draw_table(rows: &[FactRow], collapsed: &mut HashSet<usize>, ui: &mut Ui) {
                             ui.add_space(indent + triangle_width);
                         }
 
-                        ui.label(fact.label.as_deref().unwrap_or("-"));
+                        ui.label(
+                            fact.labels
+                                .get(lang)
+                                .map(|label| label.as_str())
+                                .unwrap_or("-"),
+                        );
                     });
                 });
                 row.col(|ui| {
@@ -310,4 +330,17 @@ fn draw_table(rows: &[FactRow], collapsed: &mut HashSet<usize>, ui: &mut Ui) {
             collapsed.insert(raw_idx);
         }
     }
+}
+
+/// Draw the language selector tabs ("en", "de"). Returns true if the language was changed.
+fn draw_language_toolbar(ui: &mut Ui, selected_lang: &mut String) -> bool {
+    let mut changed = false;
+
+    for lang in ["de", "en"] {
+        if ui.selectable_label(*selected_lang == lang, lang).clicked() && *selected_lang != lang {
+            *selected_lang = lang.to_string();
+            changed = true;
+        }
+    }
+    changed
 }
