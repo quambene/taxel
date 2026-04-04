@@ -165,7 +165,7 @@ fn draw_sidebar(ctx: &mut Ui, sections: &[FactSection], selected: &mut usize) {
             // Match the spacing above the first section in the main table for
             // visual alignment.
             ui.add_space(7.0);
-            ui.label("Sections");
+            ui.label("Reports");
             ui.add_space(2.0);
 
             ui.separator();
