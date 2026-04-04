@@ -1,3 +1,4 @@
+use crate::widgets;
 use dioxus_devtools::subsecond;
 use eframe::{
     egui::{self, CentralPanel, Color32, Panel, Ui},
@@ -5,11 +6,8 @@ use eframe::{
 };
 use egui_extras::{Column, TableBuilder};
 use rfd::FileDialog;
-use std::collections::HashSet;
-use std::path::Path;
+use std::{collections::HashSet, path::Path};
 use taxel_gui::{load_xml, FactRow, FactSection, FactTable};
-
-use crate::widgets;
 
 /// Per-section UI state (collapse state and depth filter).
 #[derive(Default)]

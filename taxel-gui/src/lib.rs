@@ -1,7 +1,9 @@
 use anyhow::{Context, Result};
 use log::debug;
-use std::collections::HashMap;
-use std::path::{Path, PathBuf};
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+};
 use xbrl_rs::{
     DocumentView, InstanceDocument, ItemFact, TaxonomySet, TreeNode, ROLE_LABEL, ROLE_TERSE,
 };
