@@ -1,3 +1,5 @@
+mod widgets;
+
 use dioxus_devtools::subsecond;
 use eframe::{
     egui::{self, CentralPanel, Color32, Panel, Ui, Visuals},
@@ -294,7 +296,7 @@ fn draw_table(rows: &[FactRow], collapsed: &mut HashSet<usize>, ui: &mut Ui) {
                             ui.add_space(indent);
                             let is_collapsed = collapsed.contains(&raw_idx);
 
-                            if triangle_button(ui, is_collapsed).clicked() {
+                            if widgets::triangle_button(ui, is_collapsed).clicked() {
                                 toggle = Some(raw_idx);
                             }
                         } else {
@@ -333,37 +335,4 @@ fn draw_table(rows: &[FactRow], collapsed: &mut HashSet<usize>, ui: &mut Ui) {
             collapsed.insert(raw_idx);
         }
     }
-}
-
-/// A small clickable triangle button: points right when collapsed, down when expanded.
-/// Painted directly rather than using a Unicode glyph to avoid font coverage issues.
-fn triangle_button(ui: &mut Ui, collapsed: bool) -> egui::Response {
-    let size = egui::vec2(12.0, 12.0);
-    let (rect, response) = ui.allocate_exact_size(size, egui::Sense::click());
-
-    if ui.is_rect_visible(rect) {
-        let color = ui.visuals().text_color();
-        let center = rect.center();
-        let r = 4.0_f32;
-        let points = if collapsed {
-            vec![
-                center + egui::vec2(-r * 0.6, -r),
-                center + egui::vec2(-r * 0.6, r),
-                center + egui::vec2(r, 0.0),
-            ]
-        } else {
-            vec![
-                center + egui::vec2(-r, -r * 0.6),
-                center + egui::vec2(r, -r * 0.6),
-                center + egui::vec2(0.0, r),
-            ]
-        };
-        ui.painter().add(egui::Shape::convex_polygon(
-            points,
-            color,
-            egui::Stroke::NONE,
-        ));
-    }
-
-    response
 }
