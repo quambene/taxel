@@ -35,6 +35,9 @@ pub struct TaxelApp {
 }
 
 impl TaxelApp {
+    /// Creates a new `TaxelApp` instance with the given fact table and error
+    /// message. Both parameters are optional to allow starting with an empty
+    /// state.
     pub fn new(table: Option<FactTable>, error_message: Option<String>) -> TaxelApp {
         let section_states = table
             .as_ref()
@@ -49,6 +52,9 @@ impl TaxelApp {
         }
     }
 
+    /// Draws the header panel of the application, including the "Import XML"
+    /// button, the "Clear table" button, any error messages, and the language
+    /// selector tabs.
     fn draw_header(&mut self, ui: &mut Ui) {
         let mut lang_changed = false;
 
@@ -81,6 +87,9 @@ impl TaxelApp {
         });
     }
 
+    /// Loads an XBRL instance document from the specified path and updates the
+    /// app. If an error occurs during loading, the error message is stored in
+    /// the app state to be displayed in the UI.
     fn load_xml(&mut self, path: &Path) {
         self.selected_tab = 0;
         self.table = None;
@@ -104,6 +113,7 @@ impl TaxelApp {
 }
 
 impl App for TaxelApp {
+    /// The main UI drawing function for the app, called on each frame.
     fn ui(&mut self, ctx: &mut Ui, _: &mut Frame) {
         // TODO: remove hot reloading support for release builds
         subsecond::call(|| {
