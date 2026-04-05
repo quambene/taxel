@@ -12,7 +12,7 @@ edition = "2021"
 version = "0.1.0"
 
 [workspace.dependencies]
-xbrl-rs = { version = "0.2.0", path = "../xbrl-rs" }
+xbrl-rs = { version = "0.2.0" }
 eric-sdk = "0.4.0"
 anyhow = "1.0.71"
 log = "0.4.19"
@@ -27,3 +27,7 @@ eframe = "0.34.1"
 egui_extras = "0.34.1"
 rfd = "0.17.2"
 dioxus-devtools = "0.7.4"
+
+# TODO: remove patch after 0.2.1 is published
+[patch.crates-io]
+xbrl-rs = { git = 'https://github.com/quambene/xbrl-rs.git' }
