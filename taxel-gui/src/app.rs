@@ -32,6 +32,8 @@ pub struct TaxelApp {
     /// An optional error message to display in the UI if an error occurs during
     /// XML loading or processing.
     error_message: Option<String>,
+    /// The text buffer for the zoom percentage input field.
+    zoom_input: String,
 }
 
 impl TaxelApp {
@@ -49,6 +51,7 @@ impl TaxelApp {
             section_states,
             lang: "en".to_string(),
             error_message,
+            zoom_input: "100".to_string(),
         }
     }
 
@@ -83,6 +86,10 @@ impl TaxelApp {
 
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 lang_changed = draw_language_toolbar(ui, &mut self.lang);
+
+                ui.separator();
+
+                draw_zoom_toolbar(ui, &mut self.zoom_input);
             });
         });
     }
@@ -335,6 +342,49 @@ fn draw_table(rows: &[FactRow], collapsed: &mut HashSet<usize>, lang: &str, ui: 
         } else {
             collapsed.insert(raw_idx);
         }
+    }
+}
+
+/// Draw the zoom controls: `[+] [100%] [-]`.
+fn draw_zoom_toolbar(ui: &mut Ui, zoom_input: &mut String) {
+    let zoom = ui.ctx().zoom_factor();
+
+    if ui
+        .add(egui::Button::new("−").min_size(egui::vec2(24.0, 24.0)))
+        .clicked()
+    {
+        let new_zoom = (zoom - 0.1).max(0.5);
+        ui.ctx().set_zoom_factor(new_zoom);
+        *zoom_input = format!("{}", (new_zoom * 100.0).round() as u32);
+    }
+
+    ui.label("%");
+
+    let response = ui.add(
+        egui::TextEdit::singleline(zoom_input)
+            .desired_width(35.0)
+            .horizontal_align(egui::Align::Center),
+    );
+
+    if response.lost_focus() {
+        if let Ok(percent) = zoom_input.trim().parse::<u32>() {
+            let clamped = percent.clamp(50, 400);
+            ui.ctx().set_zoom_factor(clamped as f32 / 100.0);
+            *zoom_input = format!("{}", clamped);
+        } else {
+            *zoom_input = format!("{}", (zoom * 100.0).round() as u32);
+        }
+    } else if !response.has_focus() {
+        *zoom_input = format!("{}", (zoom * 100.0).round() as u32);
+    }
+
+    if ui
+        .add(egui::Button::new("+").min_size(egui::vec2(24.0, 24.0)))
+        .clicked()
+    {
+        let new_zoom = (zoom + 0.1).min(4.0);
+        ui.ctx().set_zoom_factor(new_zoom);
+        *zoom_input = format!("{}", (new_zoom * 100.0).round() as u32);
     }
 }
 

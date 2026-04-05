@@ -8,4 +8,5 @@
   - Display sections in sidebar
   - Select display level
   - Select label language
+  - Zoom in & out
   - Clear main table
