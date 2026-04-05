@@ -12,6 +12,10 @@ name = "taxel-gui"
 anyhow = { workspace = true }
 log = { workspace = true }
 quick-xml = { workspace = true }
+xbrl-rs = { workspace = true }
 eframe = { workspace = true }
+egui_extras = { workspace = true }
 rfd = { workspace = true }
 dioxus-devtools = { workspace = true }
+# Workaround for <https://github.com/DioxusLabs/dioxus/issues/5433>.
+futures-channel = "0.3.32"

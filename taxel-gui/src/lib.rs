@@ -1,94 +1,157 @@
-use anyhow::Result;
-use quick_xml::{
-    events::{BytesStart, Event},
-    Reader,
+use anyhow::{Context, Result};
+use log::debug;
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+};
+use xbrl_rs::{
+    DocumentView, InstanceDocument, ItemFact, TaxonomySet, TreeNode, ROLE_LABEL, ROLE_TERSE,
 };
 
+/// A row in the fact table, representing a single fact or a concept without
+/// facts.
 #[derive(Debug, Clone)]
-pub struct TableRow {
+pub struct FactRow {
+    /// The concept name, e.g. "us-gaap:Assets".
     pub concept: String,
-    // Human-readable label
-    pub label: Option<String>,
+    /// Labels resolved at load time, keyed by language code (e.g. "en", "de").
+    pub labels: HashMap<String, String>,
+    /// The depth of the node in the tree, used for indentation.
+    pub depth: usize,
+    /// The context reference for the fact, if applicable.
     pub context: String,
+    /// The unit reference for the fact, if applicable.
     pub unit: Option<String>,
+    /// The value of the fact, or an empty string for concepts without facts.
     pub value: String,
+    /// Whether this concept has child concepts in the presentation tree.
+    pub has_children: bool,
 }
 
+/// One presentation section with its rows.
+#[derive(Debug, Default, Clone)]
+pub struct FactSection {
+    /// The full extended link role URI, e.g. `http://example.com/role/BalanceSheet`.
+    pub role: String,
+    /// The rows for this section.
+    pub rows: Vec<FactRow>,
+}
+
+/// A collection of fact sections, one per presentation section in the XBRL document.
 #[derive(Debug, Default)]
-pub struct XbrlTable {
-    pub rows: Vec<TableRow>,
+pub struct FactTable {
+    pub sections: Vec<FactSection>,
 }
 
-// TODO: replace by XBRL parser
-/// Read XBRL in table format.
-pub fn read_xbrl(xml: &str) -> Result<XbrlTable> {
-    let mut reader = Reader::from_str(xml);
-    reader.trim_text(true);
-
-    let mut buf = Vec::new();
-    let mut table = XbrlTable::default();
-    let mut inside_xbrl = false;
-
-    loop {
-        match reader.read_event_into(&mut buf)? {
-            Event::Start(event) => {
-                let name = event.name();
-
-                // detect start of XBRL instance
-                if name.as_ref().ends_with(b"xbrl") {
-                    inside_xbrl = true;
-                }
-
-                if inside_xbrl {
-                    parse_xbrl_fact(&mut reader, &event, &mut table)?;
-                }
-            }
-
-            Event::End(event) => {
-                if event.name().as_ref().ends_with(b"xbrl") {
-                    break;
-                }
-            }
-
-            Event::Eof => break,
-            _ => {}
-        }
-
-        buf.clear();
+/// Resolves the label for a given tree node, preferring terse labels over
+/// regular labels, and filtering by language.
+fn resolve_label<'a>(node: &'a TreeNode<'a>, lang: &str) -> Option<&'a str> {
+    if let Some(label) = node
+        .labels
+        .iter()
+        .find(|label| label.lang == lang && label.role == ROLE_TERSE)
+    {
+        return Some(label.text.as_str());
     }
 
-    Ok(table)
+    if let Some(label) = node
+        .labels
+        .iter()
+        .find(|label| label.lang == lang && label.role == ROLE_LABEL)
+    {
+        return Some(label.text.as_str());
+    }
+
+    None
 }
 
-fn parse_xbrl_fact(
-    reader: &mut Reader<&[u8]>,
-    e: &BytesStart,
-    table: &mut XbrlTable,
-) -> Result<()> {
-    let mut context = None;
-    let mut unit = None;
+/// Resolves labels for all supported languages for a given tree node.
+fn resolve_labels(node: &TreeNode) -> HashMap<String, String> {
+    ["en", "de"]
+        .iter()
+        .filter_map(|&lang| {
+            resolve_label(node, lang).map(|label| (lang.to_string(), label.to_string()))
+        })
+        .collect()
+}
 
-    for attr in e.attributes().flatten() {
-        match attr.key.as_ref() {
-            b"contextRef" => context = Some(attr.unescape_value()?.to_string()),
-            b"unitRef" => unit = Some(attr.unescape_value()?.to_string()),
-            _ => {}
+/// Recursively collects facts from the tree nodes and populates the fact table
+/// rows.
+fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<FactRow>) {
+    let labels = resolve_labels(node);
+    let has_children = !node.children.is_empty();
+
+    if node.fact_indices.is_empty() {
+        rows.push(FactRow {
+            concept: node.concept_name.to_string(),
+            labels,
+            depth: node.depth,
+            context: String::new(),
+            unit: None,
+            value: String::new(),
+            has_children,
+        });
+    } else {
+        for &idx in &node.fact_indices {
+            debug!("Fact index: {idx}");
+
+            if let Some(fact) = facts.get(idx) {
+                if fact.is_nil() {
+                    continue;
+                }
+                rows.push(FactRow {
+                    concept: node.concept_name.to_string(),
+                    labels: labels.clone(),
+                    depth: node.depth,
+                    context: fact.context_ref().to_string(),
+                    unit: fact.unit_ref().map(|u| u.to_string()),
+                    value: fact.value().to_string(),
+                    has_children,
+                });
+            }
         }
     }
 
-    if let Some(ctx) = context {
-        let concept = String::from_utf8_lossy(e.name().as_ref()).to_string();
-
-        if let Event::Text(t) = reader.read_event()? {
-            table.rows.push(TableRow {
-                concept,
-                label: None,
-                context: ctx,
-                unit,
-                value: t.unescape()?.to_string(),
-            });
-        }
+    for child in &node.children {
+        collect_node(child, facts, rows);
     }
+}
+
+/// Populates the fact table by traversing the document view and collecting
+/// facts from the tree nodes.
+fn populate_table(view: DocumentView, item_facts: &[&ItemFact], table: &mut FactTable) {
+    for section in &view.sections {
+        let mut fact_section = FactSection {
+            role: section.role.to_string(),
+            rows: Vec::new(),
+        };
+
+        for node in &section.nodes {
+            collect_node(node, item_facts, &mut fact_section.rows);
+        }
+
+        table.sections.push(fact_section);
+    }
+}
+
+/// Loads an XBRL instance document from the specified path, discovers the
+/// referenced taxonomies, and populates the fact table with the extracted
+/// facts.
+pub fn load_xml(table: &mut Option<FactTable>, path: &Path) -> Result<(), anyhow::Error> {
+    debug!("Read xml file: {}", path.display());
+
+    let instance = InstanceDocument::from_file(path)?;
+    let schema_refs: Vec<String> = instance.schema_refs().to_vec();
+    let entry_point = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .context("missing path to taxonomies")?
+        .join("test_data/taxonomies");
+    let taxonomy = TaxonomySet::discover(schema_refs, entry_point)?;
+    let view = instance.view(&taxonomy);
+    let item_facts = instance.item_facts();
+    let table = table.get_or_insert_with(FactTable::default);
+
+    populate_table(view, &item_facts, table);
 
     Ok(())
 }
