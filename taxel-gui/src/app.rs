@@ -247,7 +247,7 @@ fn draw_table(rows: &[FactRow], collapsed: &mut HashSet<usize>, lang: &str, ui: 
     TableBuilder::new(ui)
         .resizable(true)
         .striped(true)
-        .column(Column::initial(500.0).clip(true))
+        .column(Column::initial(250.0).clip(true))
         .column(Column::initial(500.0).clip(true))
         .column(Column::initial(120.0).clip(true))
         .column(Column::initial(60.0).clip(true))
