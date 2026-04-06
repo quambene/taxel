@@ -6,7 +6,8 @@ use eframe::egui::{ViewportBuilder, Visuals};
 use log::debug;
 
 fn main() -> Result<(), anyhow::Error> {
-    // TODO: remove hot reloading support for release builds
+    // Use hot reload in debug mode
+    #[cfg(debug_assertions)]
     dioxus_devtools::connect_subsecond();
 
     let options = eframe::NativeOptions {
