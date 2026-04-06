@@ -10,3 +10,4 @@
   - Select label language
   - Zoom in & out
   - Clear main table
+  - Add search bar

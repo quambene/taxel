@@ -6,8 +6,36 @@ use eframe::{
 };
 use egui_extras::{Column, TableBuilder};
 use rfd::FileDialog;
-use std::{collections::HashSet, path::Path};
-use taxel_gui::{load_xml, FactRow, FactSection, FactTable};
+use std::{
+    collections::HashSet,
+    path::Path,
+    time::{Duration, Instant},
+};
+use taxel_gui::{load_xml, FactRow, FactSection, FactTable, SearchHit};
+
+const JUMP_HIGHLIGHT_DURATION: Duration = Duration::from_millis(1400);
+
+/// Transient highlight for a row that was jumped to via search results, cleared
+/// after a short duration.
+struct RowHighlight {
+    section_idx: usize,
+    row_idx: usize,
+    until: Instant,
+}
+
+/// Grouped search state.
+#[derive(Default)]
+struct Search {
+    /// The current search query text.
+    query: String,
+    /// Cached search results, updated when the query or language changes.
+    results: Vec<SearchHit>,
+    /// Visible row index to scroll to after a search result click. Consumed
+    /// after one frame.
+    scroll_to_row: Option<usize>,
+    /// Transient highlight for the row selected via search results.
+    row_highlight: Option<RowHighlight>,
+}
 
 /// Per-section UI state (collapse state and depth filter).
 #[derive(Default)]
@@ -34,6 +62,8 @@ pub struct TaxelApp {
     error_message: Option<String>,
     /// The text buffer for the zoom percentage input field.
     zoom_input: String,
+    /// Search state.
+    search: Search,
 }
 
 impl TaxelApp {
@@ -52,6 +82,7 @@ impl TaxelApp {
             lang: "en".to_string(),
             error_message,
             zoom_input: "100".to_string(),
+            search: Search::default(),
         }
     }
 
@@ -141,15 +172,46 @@ impl App for TaxelApp {
                             section.rows.iter().map(|row| row.depth).max().unwrap_or(0) + 1;
                         let state = &mut self.section_states[self.selected_tab];
 
-                        draw_level_toolbar(
+                        draw_toolbar(
                             ui,
                             max_depth,
                             &mut state.max_depth,
                             &mut state.collapsed,
                             &section.rows,
+                            &mut self.search,
+                            table,
+                            &lang,
+                        );
+                    }
+
+                    if let Some(section) = table.sections.get(self.selected_tab) {
+                        let highlighted_row =
+                            highlight_row(&mut self.search, self.selected_tab, ui);
+
+                        let state = &mut self.section_states[self.selected_tab];
+                        let table_rect = ui.available_rect_before_wrap();
+
+                        let scroll_to = self.search.scroll_to_row.take();
+
+                        draw_table(
+                            &section.rows,
+                            &mut state.collapsed,
+                            &lang,
+                            scroll_to,
+                            highlighted_row,
+                            ui,
                         );
 
-                        draw_table(&section.rows, &mut state.collapsed, &lang, ui);
+                        if !self.search.results.is_empty() {
+                            draw_search_results_overlay(
+                                ui.ctx(),
+                                table_rect,
+                                &mut self.search,
+                                table,
+                                &mut self.selected_tab,
+                                &mut self.section_states,
+                            );
+                        }
                     }
                 }
             })
@@ -219,9 +281,31 @@ fn visible_rows<'a>(rows: &'a [FactRow], collapsed: &HashSet<usize>) -> Vec<(usi
     visible
 }
 
-/// Draw the fact table in the main panel, showing only the rows that are not
-/// collapsed. Handles the toggle logic for expanding/collapsing rows with
-/// children.
+/// Draw the toolbar above the fact table, including the level filter and search
+/// bar.
+fn draw_toolbar(
+    ui: &mut Ui,
+    max_available: usize,
+    max_depth: &mut Option<usize>,
+    collapsed: &mut HashSet<usize>,
+    rows: &[FactRow],
+    search: &mut Search,
+    table: &FactTable,
+    lang: &str,
+) {
+    let total_width = ui.available_width();
+    ui.horizontal(|ui| {
+        draw_level_toolbar(ui, max_available, max_depth, collapsed, rows);
+        draw_search_bar(ui, search, table, lang, total_width);
+    });
+
+    ui.separator();
+}
+
+/// Draw the level filter toolbar, allowing the user to select which levels of
+/// the fact tree to display. Handles the logic for collapsing/expanding rows to
+/// show only rows up to the selected depth level. Also updates the `collapsed`
+/// set to reflect the new collapsed state based on the selected level.
 fn draw_level_toolbar(
     ui: &mut Ui,
     max_available: usize,
@@ -229,44 +313,246 @@ fn draw_level_toolbar(
     collapsed: &mut HashSet<usize>,
     rows: &[FactRow],
 ) {
-    ui.horizontal(|ui| {
-        ui.label("Level:");
+    ui.label("Level:");
 
-        if ui.selectable_label(max_depth.is_none(), "All").clicked() {
-            *max_depth = None;
-            collapsed.clear();
+    if ui.selectable_label(max_depth.is_none(), "All").clicked() {
+        *max_depth = None;
+        collapsed.clear();
+    }
+
+    for depth in 1..=max_available {
+        if ui
+            .selectable_label(*max_depth == Some(depth), depth.to_string())
+            .clicked()
+        {
+            *max_depth = Some(depth);
+            *collapsed = collapsed_at_depth(rows, depth);
         }
+    }
+}
 
-        for depth in 1..=max_available {
-            if ui
-                .selectable_label(*max_depth == Some(depth), depth.to_string())
-                .clicked()
-            {
-                *max_depth = Some(depth);
-                *collapsed = collapsed_at_depth(rows, depth);
+/// Draw the level filter toolbar with search bar, allowing the user to select
+/// which levels of the fact tree to display and to search for
+/// concepts/labels/values.
+fn draw_search_bar(
+    ui: &mut Ui,
+    search: &mut Search,
+    table: &FactTable,
+    lang: &str,
+    total_width: f32,
+) {
+    let search_width = 400.0; // icon + text field
+    let cursor_x = ui.cursor().left() - ui.min_rect().left();
+    let padding = ((total_width - search_width) / 2.0 - cursor_x).max(0.0);
+    ui.add_space(padding);
+
+    ui.label("\u{1F50D}");
+    let response = ui.add(
+        egui::TextEdit::singleline(&mut search.query)
+            .desired_width(380.0)
+            .hint_text("Search ID, name, value ..."),
+    );
+
+    if response.changed() {
+        if search.query.is_empty() {
+            search.results.clear();
+        } else {
+            search.results = table.search(&search.query, lang);
+        }
+    } else if (response.gained_focus() || response.clicked()) && !search.query.is_empty() {
+        // Re-open results for the existing query when the user returns focus
+        // to the search field.
+        search.results = table.search(&search.query, lang);
+    }
+}
+
+/// Ensures that a given row is visible by expanding (uncollapsing) all its
+/// ancestors in the tree.
+fn ensure_row_visible(row_idx: usize, rows: &[FactRow], collapsed: &mut HashSet<usize>) {
+    let target_depth = rows[row_idx].depth;
+    let mut depth = target_depth;
+    for i in (0..row_idx).rev() {
+        if rows[i].depth < depth && rows[i].has_children {
+            collapsed.remove(&i);
+            depth = rows[i].depth;
+            if depth == 0 {
+                break;
             }
         }
+    }
+}
+
+/// Draw search results in a foreground overlay above the fact table. Clicking
+/// a result jumps to that row in the table.
+fn draw_search_results_overlay(
+    ctx: &egui::Context,
+    table_rect: egui::Rect,
+    search: &mut Search,
+    table: &FactTable,
+    selected_tab: &mut usize,
+    section_states: &mut [SectionState],
+) {
+    if search.results.is_empty() {
+        return;
+    }
+
+    let mut close_overlay = ctx.input(|input| input.key_pressed(egui::Key::Escape));
+
+    let horizontal_margin = 10.0;
+    let top_outer_margin = 2.0;
+    let bottom_outer_margin = 20.0;
+    let overlay_width = (table_rect.width() - horizontal_margin * 2.0).min(700.0);
+    let x = table_rect.center().x - overlay_width / 2.0;
+    let y = table_rect.top() + top_outer_margin;
+    let scroll_height = (table_rect.height() - top_outer_margin - bottom_outer_margin).max(40.0);
+
+    let area_response = egui::Area::new(egui::Id::new("search_results_overlay"))
+        .order(egui::Order::Foreground)
+        .fixed_pos(egui::pos2(x, y))
+        .show(ctx, |ui| {
+            egui::Frame::popup(ui.style())
+                .stroke(egui::Stroke::new(
+                    1.0,
+                    ui.visuals().widgets.noninteractive.bg_stroke.color,
+                ))
+                .show(ui, |ui| {
+                    ui.set_width(overlay_width);
+
+                    egui::ScrollArea::vertical()
+                        .id_salt("search_results")
+                        .min_scrolled_height(scroll_height)
+                        .max_height(scroll_height)
+                        .show(ui, |ui| {
+                            let mut clicked = None;
+
+                            for (i, hit) in search.results.iter().enumerate() {
+                                let row = egui::Frame::new()
+                                    .fill(ui.visuals().widgets.noninteractive.bg_fill)
+                                    .corner_radius(2.0)
+                                    .inner_margin(egui::Margin::symmetric(8, 5))
+                                    .show(ui, |ui| {
+                                        ui.set_width(ui.available_width());
+                                        ui.add(egui::Label::new(&hit.label).wrap());
+                                        ui.add(
+                                            egui::Label::new(
+                                                egui::RichText::new(format!(
+                                                    "{} [{}]",
+                                                    hit.concept, hit.section_name
+                                                ))
+                                                .color(ui.visuals().weak_text_color()),
+                                            )
+                                            .wrap(),
+                                        );
+                                    });
+
+                                let response = ui.interact(
+                                    row.response.rect,
+                                    ui.id().with(("search_result", i)),
+                                    egui::Sense::click(),
+                                );
+
+                                if response.is_pointer_button_down_on() {
+                                    ui.painter().rect_filled(
+                                        row.response.rect,
+                                        2.0,
+                                        ui.visuals().selection.bg_fill.gamma_multiply(0.35),
+                                    );
+                                } else if response.hovered() {
+                                    ui.painter().rect_filled(
+                                        row.response.rect,
+                                        2.0,
+                                        ui.visuals().widgets.hovered.bg_fill.gamma_multiply(0.25),
+                                    );
+                                }
+
+                                if response.clicked() {
+                                    clicked = Some(i);
+                                }
+
+                                ui.separator();
+                            }
+
+                            if let Some(i) = clicked {
+                                let hit = &search.results[i];
+                                let section_idx = hit.section_idx;
+                                let row_idx = hit.row_idx;
+
+                                *selected_tab = section_idx;
+
+                                if let Some(section) = table.sections.get(section_idx) {
+                                    let state = &mut section_states[section_idx];
+                                    ensure_row_visible(
+                                        row_idx,
+                                        &section.rows,
+                                        &mut state.collapsed,
+                                    );
+
+                                    let visible = visible_rows(&section.rows, &state.collapsed);
+                                    if let Some(vis_idx) =
+                                        visible.iter().position(|(raw, _)| *raw == row_idx)
+                                    {
+                                        search.scroll_to_row = Some(vis_idx);
+                                    }
+                                }
+
+                                search.row_highlight = Some(RowHighlight {
+                                    section_idx,
+                                    row_idx,
+                                    until: Instant::now() + JUMP_HIGHLIGHT_DURATION,
+                                });
+
+                                search.results.clear();
+                            }
+                        });
+                });
+        });
+
+    let clicked_outside = ctx.input(|input| {
+        input.pointer.any_pressed()
+            && input
+                .pointer
+                .interact_pos()
+                .is_some_and(|pos| !area_response.response.rect.contains(pos))
     });
 
-    ui.separator();
+    if clicked_outside {
+        close_overlay = true;
+    }
+
+    if close_overlay {
+        search.results.clear();
+    }
 }
 
 /// Draw the fact table in the main panel, showing only the rows that are not
 /// collapsed. Handles the toggle logic for expanding/collapsing rows with
 /// children.
-fn draw_table(rows: &[FactRow], collapsed: &mut HashSet<usize>, lang: &str, ui: &mut Ui) {
+fn draw_table(
+    rows: &[FactRow],
+    collapsed: &mut HashSet<usize>,
+    lang: &str,
+    scroll_to_row: Option<usize>,
+    highlight_row: Option<usize>,
+    ui: &mut Ui,
+) {
     let row_height = ui.text_style_height(&egui::TextStyle::Body) + ui.spacing().item_spacing.y;
     let visible = visible_rows(rows, collapsed);
     let mut toggle: Option<usize> = None;
 
-    TableBuilder::new(ui)
+    let mut builder = TableBuilder::new(ui)
         .resizable(true)
         .striped(true)
         .column(Column::initial(250.0).clip(true))
         .column(Column::initial(500.0).clip(true))
         .column(Column::initial(120.0).clip(true))
         .column(Column::initial(60.0).clip(true))
-        .column(Column::remainder().clip(true))
+        .column(Column::remainder().clip(true));
+
+    if let Some(row) = scroll_to_row {
+        builder = builder.scroll_to_row(row, Some(egui::Align::Center));
+    }
+
+    builder
         .header(row_height, |mut header| {
             header.col(|ui| {
                 ui.label("ID");
@@ -287,10 +573,25 @@ fn draw_table(rows: &[FactRow], collapsed: &mut HashSet<usize>, lang: &str, ui: 
         .body(|body| {
             body.rows(row_height, visible.len(), |mut row| {
                 let (raw_idx, fact) = visible[row.index()];
+                let is_highlighted = highlight_row == Some(raw_idx);
                 row.col(|ui| {
+                    if is_highlighted {
+                        ui.painter().rect_filled(
+                            ui.max_rect(),
+                            0.0,
+                            ui.visuals().selection.bg_fill.gamma_multiply(0.35),
+                        );
+                    }
                     ui.label(&fact.concept);
                 });
                 row.col(|ui| {
+                    if is_highlighted {
+                        ui.painter().rect_filled(
+                            ui.max_rect(),
+                            0.0,
+                            ui.visuals().selection.bg_fill.gamma_multiply(0.35),
+                        );
+                    }
                     ui.horizontal(|ui| {
                         let triangle_width = 12.0 + ui.spacing().item_spacing.x;
                         let indent = fact.depth as f32 * 24.0;
@@ -315,12 +616,33 @@ fn draw_table(rows: &[FactRow], collapsed: &mut HashSet<usize>, lang: &str, ui: 
                     });
                 });
                 row.col(|ui| {
+                    if is_highlighted {
+                        ui.painter().rect_filled(
+                            ui.max_rect(),
+                            0.0,
+                            ui.visuals().selection.bg_fill.gamma_multiply(0.35),
+                        );
+                    }
                     ui.label(&fact.context);
                 });
                 row.col(|ui| {
+                    if is_highlighted {
+                        ui.painter().rect_filled(
+                            ui.max_rect(),
+                            0.0,
+                            ui.visuals().selection.bg_fill.gamma_multiply(0.35),
+                        );
+                    }
                     ui.label(fact.unit.as_deref().unwrap_or("-"));
                 });
                 row.col(|ui| {
+                    if is_highlighted {
+                        ui.painter().rect_filled(
+                            ui.max_rect(),
+                            0.0,
+                            ui.visuals().selection.bg_fill.gamma_multiply(0.35),
+                        );
+                    }
                     ui.label(&fact.value);
                 });
             });
@@ -399,4 +721,27 @@ fn draw_language_toolbar(ui: &mut Ui, selected_lang: &mut String) -> bool {
         }
     }
     changed
+}
+
+fn highlight_row(search: &mut Search, selected_tab: usize, ui: &mut Ui) -> Option<usize> {
+    let now = Instant::now();
+
+    if search
+        .row_highlight
+        .as_ref()
+        .is_some_and(|highlight| now >= highlight.until)
+    {
+        search.row_highlight = None;
+    }
+
+    let highlight_row = search.row_highlight.as_ref().and_then(|highlight| {
+        if highlight.section_idx == selected_tab {
+            ui.ctx().request_repaint();
+            Some(highlight.row_idx)
+        } else {
+            None
+        }
+    });
+
+    highlight_row
 }
