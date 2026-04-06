@@ -8,6 +8,21 @@ use xbrl_rs::{
     DocumentView, InstanceDocument, ItemFact, TaxonomySet, TreeNode, ROLE_LABEL, ROLE_TERSE,
 };
 
+/// A single search result pointing to a specific row in a specific section.
+#[derive(Debug, Clone)]
+pub struct SearchHit {
+    /// Index into `FactTable::sections`.
+    pub section_idx: usize,
+    /// Raw index into `FactSection::rows`.
+    pub row_idx: usize,
+    /// The concept name of the matched row.
+    pub concept: String,
+    /// The resolved label of the matched row.
+    pub label: String,
+    /// The section role (short name) for display.
+    pub section_name: String,
+}
+
 /// A row in the fact table, representing a single fact or a concept without
 /// facts.
 #[derive(Debug, Clone)]
@@ -41,21 +56,6 @@ pub struct FactSection {
 #[derive(Debug, Default)]
 pub struct FactTable {
     pub sections: Vec<FactSection>,
-}
-
-/// A single search result pointing to a specific row in a specific section.
-#[derive(Debug, Clone)]
-pub struct SearchHit {
-    /// Index into `FactTable::sections`.
-    pub section_idx: usize,
-    /// Raw index into `FactSection::rows`.
-    pub row_idx: usize,
-    /// The concept name of the matched row.
-    pub concept: String,
-    /// The resolved label of the matched row.
-    pub label: String,
-    /// The section role (short name) for display.
-    pub section_name: String,
 }
 
 impl FactTable {
