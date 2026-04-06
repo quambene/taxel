@@ -283,6 +283,7 @@ fn visible_rows<'a>(rows: &'a [FactRow], collapsed: &HashSet<usize>) -> Vec<(usi
 
 /// Draw the toolbar above the fact table, including the level filter and search
 /// bar.
+#[allow(clippy::too_many_arguments)]
 fn draw_toolbar(
     ui: &mut Ui,
     max_available: usize,
