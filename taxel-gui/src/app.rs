@@ -726,6 +726,8 @@ fn draw_language_toolbar(ui: &mut Ui, selected_lang: &mut String) -> bool {
     changed
 }
 
+/// Highlight the row that was jumped to via search results, if the highlight
+/// duration has not yet expired.
 fn highlight_row(search: &mut Search, selected_tab: usize, ui: &mut Ui) -> Option<usize> {
     let now = Instant::now();
 
