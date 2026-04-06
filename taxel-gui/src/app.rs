@@ -353,16 +353,18 @@ fn draw_search_bar(
             .hint_text("Search ID, name, value ..."),
     );
 
+    let query = search.query.trim();
+
     if response.changed() {
-        if search.query.is_empty() {
+        if query.is_empty() {
             search.results.clear();
         } else {
-            search.results = table.search(&search.query, lang);
+            search.results = table.search(query, lang);
         }
-    } else if (response.gained_focus() || response.clicked()) && !search.query.is_empty() {
+    } else if (response.gained_focus() || response.clicked()) && !query.is_empty() {
         // Re-open results for the existing query when the user returns focus
         // to the search field.
-        search.results = table.search(&search.query, lang);
+        search.results = table.search(query, lang);
     }
 }
 
