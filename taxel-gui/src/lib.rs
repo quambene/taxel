@@ -8,6 +8,21 @@ use xbrl_rs::{
     DocumentView, InstanceDocument, ItemFact, TaxonomySet, TreeNode, ROLE_LABEL, ROLE_TERSE,
 };
 
+/// A single search result pointing to a specific row in a specific section.
+#[derive(Debug, Clone)]
+pub struct SearchHit {
+    /// Index into `FactTable::sections`.
+    pub section_idx: usize,
+    /// Raw index into `FactSection::rows`.
+    pub row_idx: usize,
+    /// The concept name of the matched row.
+    pub concept: String,
+    /// The resolved label of the matched row.
+    pub label: String,
+    /// The section role (short name) for display.
+    pub section_name: String,
+}
+
 /// A row in the fact table, representing a single fact or a concept without
 /// facts.
 #[derive(Debug, Clone)]
@@ -41,6 +56,47 @@ pub struct FactSection {
 #[derive(Debug, Default)]
 pub struct FactTable {
     pub sections: Vec<FactSection>,
+}
+
+impl FactTable {
+    /// Search all sections for rows matching `query` (case-insensitive substring
+    /// match on concept, label, or value).
+    pub fn search(&self, query: &str, lang: &str) -> Vec<SearchHit> {
+        let query_lower = query.to_lowercase();
+        let mut hits = Vec::new();
+
+        for (section_idx, section) in self.sections.iter().enumerate() {
+            let section_name = section
+                .role
+                .rsplit('/')
+                .next()
+                .unwrap_or(&section.role)
+                .to_string();
+
+            for (row_idx, row) in section.rows.iter().enumerate() {
+                let label = row
+                    .labels
+                    .get(lang)
+                    .map(|label| label.as_str())
+                    .unwrap_or("");
+
+                if row.concept.to_lowercase().contains(&query_lower)
+                    || label.to_lowercase().contains(&query_lower)
+                    || row.value.to_lowercase().contains(&query_lower)
+                {
+                    hits.push(SearchHit {
+                        section_idx,
+                        row_idx,
+                        concept: row.concept.clone(),
+                        label: label.to_string(),
+                        section_name: section_name.clone(),
+                    });
+                }
+            }
+        }
+
+        hits
+    }
 }
 
 /// Resolves the label for a given tree node, preferring terse labels over
