@@ -77,7 +77,7 @@ impl FactTable {
                 let label = row
                     .labels
                     .get(lang)
-                    .map(|l| l.as_str())
+                    .map(|label| label.as_str())
                     .unwrap_or("");
 
                 if row.concept.to_lowercase().contains(&query_lower)
