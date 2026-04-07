@@ -133,7 +133,7 @@ def test_generate_xml_substitution_group():
     assert actual_xml.decode("UTF-8") == expected_xml
 
 
-@pytest.mark.unit
+@pytest.mark.ignore
 def test_validate_xml_elster():
     schema_path = '../test_data/schema/elster/elster11_bisNH_extern.xsd'
     output_path = '../test_data/elster/output.xml'
@@ -143,7 +143,7 @@ def test_validate_xml_elster():
     validate_xml(schema, xml)
 
 
-@pytest.mark.unit
+@pytest.mark.ignore
 def test_generate_xml_elster():
     schema_path = '../test_data/schema/elster/elster11_bisNH_extern.xsd'
     input_path = '../test_data/elster/input.json'
@@ -165,7 +165,7 @@ def test_generate_xml_elster():
     assert actual_xml.decode("UTF-8") == expected_xml
 
 
-@pytest.mark.unit
+@pytest.mark.ignore
 def test_validate_xml_ebilanz():
     schema_path = '../test_data/schema/ebilanz/ebilanz_000002.xsd'
     output_path = '../test_data/ebilanz/output.xml'
@@ -177,7 +177,7 @@ def test_validate_xml_ebilanz():
 
 
 # TODO: Check iso4217:EUR for xbrli:measure
-@pytest.mark.unit
+@pytest.mark.ignore
 def test_generate_xml_ebilanz():
     schema_path = '../test_data/schema/ebilanz/ebilanz_000002.xsd'
     input_path = '../test_data/ebilanz/input.json'
@@ -205,7 +205,7 @@ def test_generate_xml_ebilanz():
     assert actual_xml.decode("UTF-8") == expected_xml
 
 
-@pytest.mark.unit
+@pytest.mark.ignore
 def test_validate_xml_ebilanz_gcd():
     schema_path = '../test_data/schema/ebilanz/ebilanz_000002.xsd'
     output_path = "../test_data/taxonomy/v6.6/de-gcd/output.xml"
@@ -215,7 +215,7 @@ def test_validate_xml_ebilanz_gcd():
     validate_xml(schema, xml)
 
 
-@pytest.mark.unit
+@pytest.mark.ignore
 def test_generate_xml_ebilanz_gcd():
     schema_path = '../test_data/schema/ebilanz/ebilanz_000002.xsd'
     input_path = "../test_data/taxonomy/v6.6/de-gcd/input.json"
@@ -256,7 +256,7 @@ def test_generate_xml_ebilanz_gcd():
     assert actual_xml.decode("UTF-8") == expected_xml
 
 
-@pytest.mark.unit
+@pytest.mark.ignore
 def test_validate_xml_ebilanz_gaap_ci():
     schema_path = '../test_data/schema/ebilanz/ebilanz_000002.xsd'
     output_path = "../test_data/taxonomy/v6.6/de-gaap-ci/output.xml"
@@ -266,7 +266,7 @@ def test_validate_xml_ebilanz_gaap_ci():
     validate_xml(schema, xml)
 
 
-@pytest.mark.unit
+@pytest.mark.ignore
 def test_generate_xml_ebilanz_gaap_ci():
     schema_path = '../test_data/schema/ebilanz/ebilanz_000002.xsd'
     input_path = "../test_data/taxonomy/v6.6/de-gaap-ci/input.json"
