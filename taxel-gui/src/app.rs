@@ -86,14 +86,14 @@ impl TaxelApp {
         }
     }
 
-    /// Draws the header panel of the application, including the "Import XML"
-    /// button, the "Clear table" button, any error messages, and the language
+    /// Draws the header panel of the application, including the "Import report"
+    /// button, the "Clear report" button, any error messages, and the language
     /// selector tabs.
     fn draw_header(&mut self, ui: &mut Ui) {
         let mut lang_changed = false;
 
         ui.horizontal_centered(|ui| {
-            if ui.button("Import XML").clicked() {
+            if ui.button("Import report").clicked() {
                 if let Some(path) = FileDialog::new()
                     .add_filter("XML", &["xml"])
                     .add_filter("All", &["*"])
@@ -103,7 +103,7 @@ impl TaxelApp {
                 }
             }
 
-            if self.table.is_some() && ui.button("Clear table").clicked() {
+            if self.table.is_some() && ui.button("Clear report").clicked() {
                 self.table = None;
             }
 
