@@ -120,6 +120,10 @@ impl TaxelApp {
 
                 ui.separator();
 
+                draw_dark_mode_toggle(ui);
+
+                ui.separator();
+
                 draw_zoom_toolbar(ui, &mut self.zoom_input);
             });
         });
@@ -710,6 +714,34 @@ fn draw_zoom_toolbar(ui: &mut Ui, zoom_input: &mut String) {
         let new_zoom = (zoom + 0.1).min(4.0);
         ui.ctx().set_zoom_factor(new_zoom);
         *zoom_input = format!("{}", (new_zoom * 100.0).round() as u32);
+    }
+}
+
+/// Draw the dark mode toggle button (☀ / ☾).
+fn draw_dark_mode_toggle(ui: &mut Ui) {
+    let dark_mode = ui.ctx().global_style().visuals.dark_mode;
+
+    // Show sun icon in dark mode (to switch to light) and moon icon in light
+    // mode (to switch to dark).
+    let icon = if dark_mode { "\u{2600}" } else { "\u{1F319}" };
+
+    let tooltip = if dark_mode {
+        "Switch to light mode"
+    } else {
+        "Switch to dark mode"
+    };
+
+    if ui
+        .add(egui::Button::new(icon).min_size(egui::vec2(24.0, 24.0)))
+        .on_hover_text(tooltip)
+        .clicked()
+    {
+        let visuals = if dark_mode {
+            egui::Visuals::light()
+        } else {
+            egui::Visuals::dark()
+        };
+        ui.ctx().set_visuals(visuals);
     }
 }
 
