@@ -86,14 +86,14 @@ impl TaxelApp {
         }
     }
 
-    /// Draws the header panel of the application, including the "Import XML"
-    /// button, the "Clear table" button, any error messages, and the language
+    /// Draws the header panel of the application, including the "Import report"
+    /// button, the "Clear report" button, any error messages, and the language
     /// selector tabs.
     fn draw_header(&mut self, ui: &mut Ui) {
         let mut lang_changed = false;
 
         ui.horizontal_centered(|ui| {
-            if ui.button("Import XML").clicked() {
+            if ui.button("Import report").clicked() {
                 if let Some(path) = FileDialog::new()
                     .add_filter("XML", &["xml"])
                     .add_filter("All", &["*"])
@@ -103,7 +103,7 @@ impl TaxelApp {
                 }
             }
 
-            if self.table.is_some() && ui.button("Clear table").clicked() {
+            if self.table.is_some() && ui.button("Clear report").clicked() {
                 self.table = None;
             }
 
@@ -117,6 +117,10 @@ impl TaxelApp {
 
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 lang_changed = draw_language_toolbar(ui, &mut self.lang);
+
+                ui.separator();
+
+                draw_dark_mode_toggle(ui);
 
                 ui.separator();
 
@@ -713,12 +717,45 @@ fn draw_zoom_toolbar(ui: &mut Ui, zoom_input: &mut String) {
     }
 }
 
+/// Draw the dark mode toggle button (☀ / ☾).
+fn draw_dark_mode_toggle(ui: &mut Ui) {
+    let dark_mode = ui.ctx().global_style().visuals.dark_mode;
+
+    // Show sun icon in dark mode (to switch to light) and moon icon in light
+    // mode (to switch to dark).
+    let icon = if dark_mode { "\u{2600}" } else { "\u{1F319}" };
+
+    let tooltip = if dark_mode {
+        "Switch to light mode"
+    } else {
+        "Switch to dark mode"
+    };
+
+    if ui
+        .add(egui::Button::new(icon).min_size(egui::vec2(24.0, 24.0)))
+        .on_hover_text(tooltip)
+        .clicked()
+    {
+        let visuals = if dark_mode {
+            egui::Visuals::light()
+        } else {
+            egui::Visuals::dark()
+        };
+        ui.ctx().set_visuals(visuals);
+    }
+}
+
 /// Draw the language selector tabs ("en", "de"). Returns true if the language was changed.
 fn draw_language_toolbar(ui: &mut Ui, selected_lang: &mut String) -> bool {
     let mut changed = false;
 
-    for lang in ["de", "en"] {
-        if ui.selectable_label(*selected_lang == lang, lang).clicked() && *selected_lang != lang {
+    for (lang, tooltip) in [("de", "German"), ("en", "English")] {
+        if ui
+            .selectable_label(*selected_lang == lang, lang)
+            .on_hover_text(tooltip)
+            .clicked()
+            && *selected_lang != lang
+        {
             *selected_lang = lang.to_string();
             changed = true;
         }

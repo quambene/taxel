@@ -11,3 +11,4 @@
   - Zoom in & out
   - Clear main table
   - Add search bar
+  - Add toggle for light/dark mode
