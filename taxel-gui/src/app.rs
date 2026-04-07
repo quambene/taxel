@@ -749,8 +749,13 @@ fn draw_dark_mode_toggle(ui: &mut Ui) {
 fn draw_language_toolbar(ui: &mut Ui, selected_lang: &mut String) -> bool {
     let mut changed = false;
 
-    for lang in ["de", "en"] {
-        if ui.selectable_label(*selected_lang == lang, lang).clicked() && *selected_lang != lang {
+    for (lang, tooltip) in [("de", "German"), ("en", "English")] {
+        if ui
+            .selectable_label(*selected_lang == lang, lang)
+            .on_hover_text(tooltip)
+            .clicked()
+            && *selected_lang != lang
+        {
             *selected_lang = lang.to_string();
             changed = true;
         }
