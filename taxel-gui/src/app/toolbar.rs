@@ -34,21 +34,7 @@ pub(super) fn draw_toolbar(
         draw_level_toolbar(ui, max_available, max_depth, collapsed, rows);
         draw_search_bar(ui, search, table, lang, total_width);
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-            if editing {
-                if draw_dark_button(ui, "Save").clicked() {
-                    action = EditAction::Save;
-                }
-
-                if ui.button("Cancel").clicked() {
-                    action = EditAction::Cancel;
-                }
-            } else {
-                let button = draw_dark_button(ui, "Edit report");
-
-                if button.clicked() {
-                    action = EditAction::Start;
-                }
-            }
+            action = draw_edit_buttons(ui, editing);
         });
     });
 
@@ -118,4 +104,26 @@ fn draw_search_bar(
         // to the search field.
         search.results = table.search(query, lang);
     }
+}
+
+/// Draw the edit-mode buttons on the right side of the toolbar. Returns an
+/// `EditAction` indicating which button (if any) was clicked.
+fn draw_edit_buttons(ui: &mut Ui, editing: bool) -> EditAction {
+    if editing {
+        if draw_dark_button(ui, "Save").clicked() {
+            return EditAction::Save;
+        }
+
+        if ui.button("Cancel").clicked() {
+            return EditAction::Cancel;
+        }
+    } else {
+        let button = draw_dark_button(ui, "Edit report");
+
+        if button.clicked() {
+            return EditAction::Start;
+        }
+    }
+
+    EditAction::None
 }
