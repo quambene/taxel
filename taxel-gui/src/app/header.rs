@@ -32,7 +32,7 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
         }
 
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-            let _ = draw_language_toolbar(ui, &mut app.lang);
+            draw_language_toolbar(ui, &mut app.lang);
 
             ui.separator();
 
@@ -141,10 +141,8 @@ fn draw_dark_mode_toggle(ui: &mut Ui) {
     }
 }
 
-/// Draw the language selector tabs ("en", "de"). Returns true if the language was changed.
-fn draw_language_toolbar(ui: &mut Ui, selected_lang: &mut String) -> bool {
-    let mut changed = false;
-
+/// Draw the language selector tabs ("en", "de").
+fn draw_language_toolbar(ui: &mut Ui, selected_lang: &mut String) {
     for (lang, tooltip) in [("de", "German"), ("en", "English")] {
         if ui
             .selectable_label(*selected_lang == lang, lang)
@@ -153,8 +151,6 @@ fn draw_language_toolbar(ui: &mut Ui, selected_lang: &mut String) -> bool {
             && *selected_lang != lang
         {
             *selected_lang = lang.to_string();
-            changed = true;
         }
     }
-    changed
 }
