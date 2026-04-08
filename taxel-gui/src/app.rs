@@ -1,4 +1,4 @@
-use crate::widgets;
+use crate::widgets::{self, draw_dark_button, draw_unsaved_changes_modal};
 use dioxus_devtools::subsecond;
 use eframe::{
     egui::{self, CentralPanel, Color32, Panel, Ui},
@@ -14,6 +14,15 @@ use std::{
 use taxel_gui::{load_xml, FactRow, FactSection, FactTable, SearchHit};
 
 const JUMP_HIGHLIGHT_DURATION: Duration = Duration::from_millis(1400);
+
+/// Action returned by [`draw_toolbar`] when the user clicks an edit-mode
+/// button.
+enum EditAction {
+    None,
+    Start,
+    Save,
+    Cancel,
+}
 
 /// Transient highlight for a row that was jumped to via search results, cleared
 /// after a short duration.
@@ -64,6 +73,13 @@ pub struct TaxelApp {
     zoom_input: String,
     /// Search state.
     search: Search,
+    /// Some while the value column of that section is being edited, None
+    /// otherwise.
+    editing_section: Option<usize>,
+    /// Snapshot of `row.value` for every row in the edited section at the
+    /// moment editing started, indexed by raw row index. Used to restore values
+    /// if editing is canceled.
+    edit_snapshot: Vec<String>,
 }
 
 impl TaxelApp {
@@ -83,6 +99,8 @@ impl TaxelApp {
             error_message,
             zoom_input: "100".to_string(),
             search: Search::default(),
+            editing_section: None,
+            edit_snapshot: Vec::new(),
         }
     }
 
@@ -135,6 +153,8 @@ impl TaxelApp {
     fn load_xml(&mut self, path: &Path) {
         self.selected_tab = 0;
         self.table = None;
+        self.editing_section = None;
+        self.edit_snapshot.clear();
 
         if let Err(err) = load_xml(&mut self.table, path) {
             self.error_message = Some(format!("{err}"));
@@ -170,11 +190,23 @@ impl App for TaxelApp {
             let lang = self.lang.clone();
 
             CentralPanel::default().show_inside(ctx, |ui| {
-                if let Some(table) = &self.table {
-                    if let Some(section) = table.sections.get(self.selected_tab) {
+                // While the unsaved-changes modal is visible (user clicked a
+                // different section but hasn't confirmed yet), keep rendering
+                // the editing section so the view doesn't jump before the user
+                // decides. `selected_tab` acts as the pending destination.
+                let content_tab = self
+                    .editing_section
+                    .filter(|&s| s != self.selected_tab)
+                    .unwrap_or(self.selected_tab);
+                let editing = self.editing_section == Some(content_tab);
+
+                // Toolbar block: immutable borrow for read-only access to table
+                // data.
+                let mut action = if let Some(table) = &self.table {
+                    if let Some(section) = table.sections.get(content_tab) {
                         let max_depth =
                             section.rows.iter().map(|row| row.depth).max().unwrap_or(0) + 1;
-                        let state = &mut self.section_states[self.selected_tab];
+                        let state = &mut self.section_states[content_tab];
 
                         draw_toolbar(
                             ui,
@@ -185,37 +217,131 @@ impl App for TaxelApp {
                             &mut self.search,
                             table,
                             &lang,
-                        );
+                            editing,
+                        )
+                    } else {
+                        EditAction::None
                     }
+                } else {
+                    EditAction::None
+                };
 
-                    if let Some(section) = table.sections.get(self.selected_tab) {
-                        let highlighted_row =
-                            highlight_row(&mut self.search, self.selected_tab, ui);
+                // Support keyboard shortcuts Ctrl+S and ESC while editing.
+                let pending_section_switch =
+                    self.editing_section.is_some_and(|s| s != self.selected_tab);
 
-                        let state = &mut self.section_states[self.selected_tab];
-                        let table_rect = ui.available_rect_before_wrap();
+                if editing && !pending_section_switch {
+                    let save_shortcut =
+                        egui::KeyboardShortcut::new(egui::Modifiers::COMMAND, egui::Key::S);
+                    let save_pressed = ui
+                        .ctx()
+                        .input_mut(|input| input.consume_shortcut(&save_shortcut));
+                    let cancel_pressed =
+                        ui.ctx().input(|input| input.key_pressed(egui::Key::Escape));
 
+                    if save_pressed {
+                        // TODO: Save changes to XBRL instance document.
+                        // Currently, edits are only stored in the app state and
+                        // will be lost on reload.
+
+                        action = EditAction::Save;
+                    } else if cancel_pressed {
+                        action = EditAction::Cancel;
+                    }
+                }
+
+                // Handle toolbar edit actions.
+                match action {
+                    EditAction::Start => {
+                        if let Some(table) = &self.table {
+                            if let Some(section) = table.sections.get(self.selected_tab) {
+                                self.edit_snapshot =
+                                    section.rows.iter().map(|r| r.value.clone()).collect();
+                            }
+                        }
+                        self.editing_section = Some(self.selected_tab);
+                    }
+                    EditAction::Save => {
+                        self.editing_section = None;
+                        self.edit_snapshot.clear();
+                    }
+                    EditAction::Cancel => {
+                        let editing_tab = self.editing_section.unwrap_or(self.selected_tab);
+
+                        if let Some(table) = &mut self.table {
+                            if let Some(section) = table.sections.get_mut(editing_tab) {
+                                for (row, value) in
+                                    section.rows.iter_mut().zip(self.edit_snapshot.iter())
+                                {
+                                    row.value = value.clone();
+                                }
+                            }
+                        }
+                        self.editing_section = None;
+                        self.edit_snapshot.clear();
+                    }
+                    EditAction::None => {}
+                }
+
+                // Table block: mutable borrow for in-place editing.
+                if let Some(table) = self.table.as_mut() {
+                    let tab = content_tab;
+                    let table_rect = ui.available_rect_before_wrap();
+
+                    if let Some(section) = table.sections.get_mut(tab) {
+                        let highlighted_row = highlight_row(&mut self.search, tab, ui);
+                        let state = &mut self.section_states[tab];
                         let scroll_to = self.search.scroll_to_row.take();
 
                         draw_table(
-                            &section.rows,
+                            &mut section.rows,
                             &mut state.collapsed,
                             &lang,
                             scroll_to,
                             highlighted_row,
+                            editing,
                             ui,
                         );
+                    }
 
-                        if !self.search.results.is_empty() {
-                            draw_search_results_overlay(
-                                ui.ctx(),
-                                table_rect,
-                                &mut self.search,
-                                table,
-                                &mut self.selected_tab,
-                                &mut self.section_states,
-                            );
+                    if !self.search.results.is_empty() {
+                        draw_search_results_overlay(
+                            ui.ctx(),
+                            table_rect,
+                            &mut self.search,
+                            table,
+                            &mut self.selected_tab,
+                            &mut self.section_states,
+                        );
+                    }
+                }
+
+                // Section-switch warning when navigating away with unsaved edits.
+                if self
+                    .editing_section
+                    .is_some_and(|section| section != self.selected_tab)
+                {
+                    let mut stay = false;
+                    let mut continue_nav = false;
+
+                    draw_unsaved_changes_modal(ui, &mut stay, &mut continue_nav);
+
+                    if stay {
+                        self.selected_tab = self.editing_section.unwrap();
+                    }
+                    if continue_nav {
+                        let editing_tab = self.editing_section.unwrap();
+                        if let Some(table) = &mut self.table {
+                            if let Some(section) = table.sections.get_mut(editing_tab) {
+                                for (row, value) in
+                                    section.rows.iter_mut().zip(self.edit_snapshot.iter())
+                                {
+                                    row.value = value.clone();
+                                }
+                            }
                         }
+                        self.editing_section = None;
+                        self.edit_snapshot.clear();
                     }
                 }
             })
@@ -233,7 +359,7 @@ fn draw_sidebar(ctx: &mut Ui, sections: &[FactSection], selected: &mut usize) {
             // Match the spacing above the first section in the main table for
             // visual alignment.
             ui.add_space(7.0);
-            ui.label("Reports");
+            ui.label("Report sections");
             ui.add_space(2.0);
 
             ui.separator();
@@ -262,10 +388,10 @@ fn collapsed_at_depth(rows: &[FactRow], max_depth: usize) -> HashSet<usize> {
         .collect()
 }
 
-/// Returns the visible rows as `(raw_index, &FactRow)` pairs.
-/// `collapsed` stores raw indices (positions in `rows`), which are stable
-/// across expand/collapse operations.
-fn visible_rows<'a>(rows: &'a [FactRow], collapsed: &HashSet<usize>) -> Vec<(usize, &'a FactRow)> {
+/// Returns the raw indices of visible rows (positions in `rows`).
+/// `collapsed` stores raw indices, which are stable across expand/collapse
+/// operations.
+fn visible_rows(rows: &[FactRow], collapsed: &HashSet<usize>) -> Vec<usize> {
     let mut visible = Vec::new();
     let mut hidden_above_depth: Option<usize> = None;
 
@@ -276,7 +402,7 @@ fn visible_rows<'a>(rows: &'a [FactRow], collapsed: &HashSet<usize>) -> Vec<(usi
             }
             hidden_above_depth = None;
         }
-        visible.push((raw_idx, row));
+        visible.push(raw_idx);
         if row.has_children && collapsed.contains(&raw_idx) {
             hidden_above_depth = Some(row.depth);
         }
@@ -285,8 +411,8 @@ fn visible_rows<'a>(rows: &'a [FactRow], collapsed: &HashSet<usize>) -> Vec<(usi
     visible
 }
 
-/// Draw the toolbar above the fact table, including the level filter and search
-/// bar.
+/// Draw the toolbar above the fact table, including the level filter, search
+/// bar, and edit-mode buttons.
 #[allow(clippy::too_many_arguments)]
 fn draw_toolbar(
     ui: &mut Ui,
@@ -297,14 +423,35 @@ fn draw_toolbar(
     search: &mut Search,
     table: &FactTable,
     lang: &str,
-) {
+    editing: bool,
+) -> EditAction {
     let total_width = ui.available_width();
+    let mut action = EditAction::None;
+
     ui.horizontal(|ui| {
         draw_level_toolbar(ui, max_available, max_depth, collapsed, rows);
         draw_search_bar(ui, search, table, lang, total_width);
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            if editing {
+                if draw_dark_button(ui, "Save").clicked() {
+                    action = EditAction::Save;
+                }
+
+                if ui.button("Cancel").clicked() {
+                    action = EditAction::Cancel;
+                }
+            } else {
+                let button = draw_dark_button(ui, "Edit report");
+
+                if button.clicked() {
+                    action = EditAction::Start;
+                }
+            }
+        });
     });
 
     ui.separator();
+    action
 }
 
 /// Draw the level filter toolbar, allowing the user to select which levels of
@@ -496,7 +643,7 @@ fn draw_search_results_overlay(
 
                                     let visible = visible_rows(&section.rows, &state.collapsed);
                                     if let Some(vis_idx) =
-                                        visible.iter().position(|(raw, _)| *raw == row_idx)
+                                        visible.iter().position(|&raw| raw == row_idx)
                                     {
                                         search.scroll_to_row = Some(vis_idx);
                                     }
@@ -535,11 +682,12 @@ fn draw_search_results_overlay(
 /// collapsed. Handles the toggle logic for expanding/collapsing rows with
 /// children.
 fn draw_table(
-    rows: &[FactRow],
+    rows: &mut [FactRow],
     collapsed: &mut HashSet<usize>,
     lang: &str,
     scroll_to_row: Option<usize>,
     highlight_row: Option<usize>,
+    editing: bool,
     ui: &mut Ui,
 ) {
     let row_height = ui.text_style_height(&egui::TextStyle::Body) + ui.spacing().item_spacing.y;
@@ -579,7 +727,7 @@ fn draw_table(
         })
         .body(|body| {
             body.rows(row_height, visible.len(), |mut row| {
-                let (raw_idx, fact) = visible[row.index()];
+                let raw_idx = visible[row.index()];
                 let is_highlighted = highlight_row == Some(raw_idx);
                 row.col(|ui| {
                     if is_highlighted {
@@ -589,7 +737,7 @@ fn draw_table(
                             ui.visuals().selection.bg_fill.gamma_multiply(0.35),
                         );
                     }
-                    ui.label(&fact.concept);
+                    ui.label(&rows[raw_idx].concept);
                 });
                 row.col(|ui| {
                     if is_highlighted {
@@ -601,9 +749,9 @@ fn draw_table(
                     }
                     ui.horizontal(|ui| {
                         let triangle_width = 12.0 + ui.spacing().item_spacing.x;
-                        let indent = fact.depth as f32 * 24.0;
+                        let indent = rows[raw_idx].depth as f32 * 24.0;
 
-                        if fact.has_children {
+                        if rows[raw_idx].has_children {
                             ui.add_space(indent);
                             let is_collapsed = collapsed.contains(&raw_idx);
 
@@ -615,7 +763,8 @@ fn draw_table(
                         }
 
                         ui.label(
-                            fact.labels
+                            rows[raw_idx]
+                                .labels
                                 .get(lang)
                                 .map(|label| label.as_str())
                                 .unwrap_or("-"),
@@ -630,7 +779,7 @@ fn draw_table(
                             ui.visuals().selection.bg_fill.gamma_multiply(0.35),
                         );
                     }
-                    ui.label(&fact.context);
+                    ui.label(&rows[raw_idx].context);
                 });
                 row.col(|ui| {
                     if is_highlighted {
@@ -640,7 +789,7 @@ fn draw_table(
                             ui.visuals().selection.bg_fill.gamma_multiply(0.35),
                         );
                     }
-                    ui.label(fact.unit.as_deref().unwrap_or("-"));
+                    ui.label(rows[raw_idx].unit.as_deref().unwrap_or("-"));
                 });
                 row.col(|ui| {
                     if is_highlighted {
@@ -650,7 +799,11 @@ fn draw_table(
                             ui.visuals().selection.bg_fill.gamma_multiply(0.35),
                         );
                     }
-                    ui.label(&fact.value);
+                    if editing {
+                        ui.text_edit_singleline(&mut rows[raw_idx].value);
+                    } else {
+                        ui.label(&rows[raw_idx].value);
+                    }
                 });
             });
         });
