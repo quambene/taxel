@@ -1,11 +1,15 @@
 mod csv;
+mod ebilanz;
 mod ods;
 mod xbrl;
 mod xml;
 
-pub use crate::csv::{
-    read_tags, write_tags, Reader as CsvReader, ReaderBuilder as CsvReaderBuilder, Trim,
-    Writer as CsvWriter, WriterBuilder as CsvWriterBuilder,
+pub use crate::{
+    csv::{
+        read_tags, write_tags, Reader as CsvReader, ReaderBuilder as CsvReaderBuilder, Trim,
+        Writer as CsvWriter, WriterBuilder as CsvWriterBuilder,
+    },
+    ebilanz::{GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT},
 };
 use log::warn;
 pub use quick_xml::{Reader, Writer};
