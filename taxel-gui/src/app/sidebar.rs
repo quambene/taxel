@@ -1,6 +1,6 @@
 use eframe::{
     self,
-    egui::{Color32, Frame, Label, Margin, Panel, RichText, ScrollArea, Sense, Ui},
+    egui::{Color32, CursorIcon, Frame, Label, Margin, Panel, RichText, ScrollArea, Sense, Ui},
 };
 use taxel_gui::FactSection;
 
@@ -62,11 +62,13 @@ fn draw_row(ui: &mut Ui, title: &str, i: usize, selected: &mut usize) {
             ui.add(Label::new(text).wrap());
         });
 
-    let response = ui.interact(
-        row.response.rect,
-        ui.id().with(("sidebar_section", i)),
-        Sense::click(),
-    );
+    let response = ui
+        .interact(
+            row.response.rect,
+            ui.id().with(("sidebar_section", i)),
+            Sense::click(),
+        )
+        .on_hover_cursor(CursorIcon::PointingHand);
 
     if response.is_pointer_button_down_on() && !is_selected {
         ui.painter().rect_filled(
