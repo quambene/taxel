@@ -4,6 +4,7 @@ use std::{
     collections::HashMap,
     path::{Path, PathBuf},
 };
+use taxel::{GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
 use xbrl_rs::{
     DocumentView, InstanceDocument, ItemFact, TaxonomySet, TreeNode, ROLE_LABEL, ROLE_TERSE,
 };
@@ -27,7 +28,7 @@ pub struct SearchHit {
 /// facts.
 #[derive(Debug, Clone)]
 pub struct FactRow {
-    /// The concept name, e.g. "us-gaap:Assets".
+    /// The concept name, e.g. "bs.ass.fixAss".
     pub concept: String,
     /// Labels resolved at load time, keyed by language code (e.g. "en", "de").
     pub labels: HashMap<String, String>,
@@ -48,6 +49,9 @@ pub struct FactRow {
 pub struct FactSection {
     /// The full extended link role URI, e.g. `http://example.com/role/BalanceSheet`.
     pub role: String,
+    /// Sidebar display labels resolved from taxonomy concepts, keyed by
+    /// language code (e.g. "en", "de").
+    pub labels: HashMap<String, String>,
     /// The rows for this section.
     pub rows: Vec<FactRow>,
 }
@@ -56,6 +60,9 @@ pub struct FactSection {
 #[derive(Debug, Default)]
 pub struct FactTable {
     pub sections: Vec<FactSection>,
+    /// Role URIs for sections that could not be mapped to a known report
+    /// element concept.
+    pub role_mapping_errors: Vec<String>,
 }
 
 impl FactTable {
@@ -67,11 +74,10 @@ impl FactTable {
 
         for (section_idx, section) in self.sections.iter().enumerate() {
             let section_name = section
-                .role
-                .rsplit('/')
-                .next()
-                .unwrap_or(&section.role)
-                .to_string();
+                .labels
+                .get(lang)
+                .map(|lang| lang.as_str())
+                .unwrap_or_else(|| section.role.rsplit('/').next().unwrap_or(&section.role));
 
             for (row_idx, row) in section.rows.iter().enumerate() {
                 let label = row
@@ -89,13 +95,74 @@ impl FactTable {
                         row_idx,
                         concept: row.concept.clone(),
                         label: label.to_string(),
-                        section_name: section_name.clone(),
+                        section_name: section_name.to_owned(),
                     });
                 }
             }
         }
 
         hits
+    }
+}
+
+/// Loads an XBRL instance document from the specified path, discovers the
+/// referenced taxonomies, and populates the fact table with the extracted
+/// facts.
+pub fn load_xml(table: &mut Option<FactTable>, path: &Path) -> Result<(), anyhow::Error> {
+    debug!("Read xml file: {}", path.display());
+
+    let instance = InstanceDocument::from_file(path)?;
+    let schema_refs: Vec<String> = instance.schema_refs().to_vec();
+    let entry_point = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .context("missing path to taxonomies")?
+        .join("test_data/taxonomies");
+    let taxonomy = TaxonomySet::discover(schema_refs, entry_point)?;
+    let view = instance.view(&taxonomy);
+    let item_facts = instance.item_facts();
+    let table = table.get_or_insert_with(FactTable::default);
+
+    populate_fact_table(view, &item_facts, table);
+
+    Ok(())
+}
+
+/// Populates the fact table by traversing the document view and collecting
+/// facts from the tree nodes.
+fn populate_fact_table(view: DocumentView, item_facts: &[&ItemFact], table: &mut FactTable) {
+    table.sections.clear();
+    table.role_mapping_errors.clear();
+
+    // Labels for report elements are sourced from the dedicated GCD section.
+    let gcd_nodes = view
+        .sections
+        .iter()
+        .find(|section| section.role == GCD_ROLE_URI)
+        .map(|section| section.nodes.as_slice())
+        .unwrap_or(&[]);
+    let labels_map = build_labels_map(gcd_nodes);
+
+    for section in &view.sections {
+        let role_uri = section.role;
+
+        let labels = if let Some(concept_name) = ROLE_URI_TO_REPORT_ELEMENT.get(role_uri) {
+            labels_map.get(concept_name).cloned()
+        } else {
+            table.role_mapping_errors.push(role_uri.to_owned());
+            None
+        };
+
+        let mut fact_section = FactSection {
+            role: role_uri.to_owned(),
+            labels: labels.unwrap_or_default(),
+            rows: Vec::new(),
+        };
+
+        for node in &section.nodes {
+            collect_node(node, item_facts, &mut fact_section.rows);
+        }
+
+        table.sections.push(fact_section);
     }
 }
 
@@ -173,41 +240,24 @@ fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<FactRow>) {
     }
 }
 
-/// Populates the fact table by traversing the document view and collecting
-/// facts from the tree nodes.
-fn populate_table(view: DocumentView, item_facts: &[&ItemFact], table: &mut FactTable) {
-    for section in &view.sections {
-        let mut fact_section = FactSection {
-            role: section.role.to_string(),
-            rows: Vec::new(),
-        };
+/// Recursively collects labels for a given concept name from the GCD nodes.
+fn collect_labels<'a>(node: &'a TreeNode<'a>, map: &mut HashMap<&'a str, HashMap<String, String>>) {
+    map.entry(node.concept_name)
+        .or_insert_with(|| resolve_labels(node));
 
-        for node in &section.nodes {
-            collect_node(node, item_facts, &mut fact_section.rows);
-        }
-
-        table.sections.push(fact_section);
+    for child in &node.children {
+        collect_labels(child, map);
     }
 }
 
-/// Loads an XBRL instance document from the specified path, discovers the
-/// referenced taxonomies, and populates the fact table with the extracted
-/// facts.
-pub fn load_xml(table: &mut Option<FactTable>, path: &Path) -> Result<(), anyhow::Error> {
-    debug!("Read xml file: {}", path.display());
+/// Builds a map of concept names to their labels for all nodes in the GCD
+/// section.
+fn build_labels_map<'a>(nodes: &'a [TreeNode<'a>]) -> HashMap<&'a str, HashMap<String, String>> {
+    let mut map = HashMap::new();
 
-    let instance = InstanceDocument::from_file(path)?;
-    let schema_refs: Vec<String> = instance.schema_refs().to_vec();
-    let entry_point = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .parent()
-        .context("missing path to taxonomies")?
-        .join("test_data/taxonomies");
-    let taxonomy = TaxonomySet::discover(schema_refs, entry_point)?;
-    let view = instance.view(&taxonomy);
-    let item_facts = instance.item_facts();
-    let table = table.get_or_insert_with(FactTable::default);
+    for node in nodes {
+        collect_labels(node, &mut map);
+    }
 
-    populate_table(view, &item_facts, table);
-
-    Ok(())
+    map
 }

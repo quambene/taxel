@@ -1,4 +1,5 @@
-use super::{SectionState, TaxelApp};
+use super::{AppIssue, IssueSeverity, SectionState, TaxelApp};
+use crate::app::error_panel::WARNING_COLOR;
 use eframe::egui::{self, Color32, Ui};
 use rfd::FileDialog;
 use std::path::Path;
@@ -15,21 +16,17 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
                 .add_filter("All", &["*"])
                 .pick_file()
             {
-                load_xml_into_app(app, &path);
+                import_report(app, &path);
             }
         }
 
         if app.table.is_some() && ui.button("Clear report").clicked() {
             app.table = None;
+            app.issues.clear();
+            app.show_error_panel = false;
         }
 
-        if let Some(err) = &app.error_message {
-            ui.separator();
-            ui.colored_label(Color32::RED, err.to_string());
-            if ui.button("Dismiss").clicked() {
-                app.error_message = None;
-            }
-        }
+        draw_error_summary(app, ui);
 
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
             draw_language_toolbar(ui, &mut app.lang);
@@ -47,15 +44,33 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
 
 /// Loads an XBRL instance document from the specified path and updates the app
 /// state.
-fn load_xml_into_app(app: &mut TaxelApp, path: &Path) {
+fn import_report(app: &mut TaxelApp, path: &Path) {
     app.selected_tab = 0;
     app.table = None;
+    app.issues.clear();
+    app.show_error_panel = false;
     app.editing_section = None;
     app.edit_snapshot.clear();
 
     if let Err(err) = load_xml(&mut app.table, path) {
-        app.error_message = Some(format!("{err}"));
+        app.issues.push(AppIssue {
+            severity: IssueSeverity::Error,
+            message: err.to_string(),
+        });
+        app.show_error_panel = true;
+        return;
     }
+
+    if let Some(table) = &app.table {
+        for missing_role in &table.role_mapping_errors {
+            app.issues.push(AppIssue {
+                severity: IssueSeverity::Warning,
+                message: format!("Missing report-element mapping for role URI: {missing_role}"),
+            });
+        }
+    }
+
+    app.show_error_panel = !app.issues.is_empty();
 
     app.section_states = app
         .table
@@ -68,6 +83,60 @@ fn load_xml_into_app(app: &mut TaxelApp, path: &Path) {
                 .collect()
         })
         .unwrap_or_default();
+}
+
+/// Draws a summary of errors and warnings in the header. Clicking on the
+/// summary toggles the visibility of the detailed diagnostics panel.
+fn draw_error_summary(app: &mut TaxelApp, ui: &mut Ui) {
+    let error_count = app
+        .issues
+        .iter()
+        .filter(|issue| issue.severity == IssueSeverity::Error)
+        .count();
+    let warning_count = app
+        .issues
+        .iter()
+        .filter(|issue| issue.severity == IssueSeverity::Warning)
+        .count();
+
+    if error_count > 0 || warning_count > 0 {
+        ui.separator();
+
+        let mut job = egui::text::LayoutJob::default();
+        job.append(
+            &format!("errors: {error_count}"),
+            0.0,
+            egui::TextFormat {
+                color: Color32::RED,
+                ..Default::default()
+            },
+        );
+        job.append(
+            &format!("  warnings: {warning_count}"),
+            0.0,
+            egui::TextFormat {
+                color: WARNING_COLOR,
+                ..Default::default()
+            },
+        );
+
+        let bg_idx = ui.painter().add(egui::Shape::Noop);
+        let response = ui.add(egui::Button::new(job).frame(false));
+        if response.hovered() {
+            ui.painter().set(
+                bg_idx,
+                egui::Shape::rect_filled(
+                    response.rect,
+                    ui.visuals().widgets.hovered.corner_radius,
+                    ui.visuals().widgets.hovered.weak_bg_fill,
+                ),
+            );
+        }
+
+        if response.clicked() {
+            app.show_error_panel = !app.show_error_panel;
+        }
+    }
 }
 
 /// Draw the zoom controls: `[+] [100%] [-]`.

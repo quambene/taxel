@@ -9,6 +9,7 @@ path = "src/main.rs"
 name = "taxel-gui"
 
 [dependencies]
+taxel = { path = "../taxel" }
 anyhow = { workspace = true }
 log = { workspace = true }
 quick-xml = { workspace = true }

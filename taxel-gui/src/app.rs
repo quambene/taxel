@@ -1,3 +1,4 @@
+mod error_panel;
 mod header;
 mod search_overlay;
 mod sidebar;
@@ -5,6 +6,7 @@ mod table;
 mod toolbar;
 
 use self::{
+    error_panel::draw_error_panel,
     header::draw_header,
     search_overlay::{draw_search_results_overlay, highlight_row},
     sidebar::draw_sidebar,
@@ -67,9 +69,10 @@ pub struct TaxelApp {
     section_states: Vec<SectionState>,
     /// The currently selected language for labels (e.g. "en", "de").
     lang: String,
-    /// An optional error message to display in the UI if an error occurs during
-    /// XML loading or processing.
-    error_message: Option<String>,
+    /// Structured diagnostics for non-blocking and blocking issues.
+    issues: Vec<AppIssue>,
+    /// Controls whether the detailed diagnostics panel is visible.
+    show_error_panel: bool,
     /// The text buffer for the zoom percentage input field.
     zoom_input: String,
     /// Search state.
@@ -83,6 +86,21 @@ pub struct TaxelApp {
     edit_snapshot: Vec<String>,
 }
 
+/// Indicates the issue severity for diagnostics.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(super) enum IssueSeverity {
+    Error,
+    Warning,
+}
+
+/// Collects all information about an error or warning to display in the
+/// diagnostics panel and error summary in the header.
+#[derive(Clone, Debug)]
+pub(super) struct AppIssue {
+    pub(super) severity: IssueSeverity,
+    pub(super) message: String,
+}
+
 impl TaxelApp {
     /// Creates a new `TaxelApp` instance with the given fact table and error
     /// message. Both parameters are optional to allow starting with an empty
@@ -92,12 +110,24 @@ impl TaxelApp {
             .as_ref()
             .map(|t| t.sections.iter().map(|_| SectionState::default()).collect())
             .unwrap_or_default();
+        let mut issues = Vec::new();
+
+        if let Some(message) = error_message {
+            issues.push(AppIssue {
+                severity: IssueSeverity::Error,
+                message,
+            });
+        }
+
+        let show_error_panel = !issues.is_empty();
+
         Self {
             table,
             selected_tab: 0,
             section_states,
             lang: "en".to_string(),
-            error_message,
+            issues,
+            show_error_panel,
             zoom_input: "100".to_string(),
             search: Search::default(),
             editing_section: None,
@@ -116,166 +146,185 @@ impl App for TaxelApp {
             });
 
             if let Some(table) = &self.table {
-                draw_sidebar(ctx, table.sections.as_slice(), &mut self.selected_tab);
+                draw_sidebar(
+                    ctx,
+                    table.sections.as_slice(),
+                    &mut self.selected_tab,
+                    &self.lang,
+                );
+            }
+
+            if !self.issues.is_empty() && self.show_error_panel {
+                draw_error_panel(ctx, &self.issues, &mut self.show_error_panel);
             }
 
             let lang = self.lang.clone();
 
-            CentralPanel::default().show_inside(ctx, |ui| {
-                // While the unsaved-changes modal is visible (user clicked a
-                // different section but hasn't confirmed yet), keep rendering
-                // the editing section so the view doesn't jump before the user
-                // decides. `selected_tab` acts as the pending destination.
-                let content_tab = self
-                    .editing_section
-                    .filter(|&s| s != self.selected_tab)
-                    .unwrap_or(self.selected_tab);
-                let editing = self.editing_section == Some(content_tab);
+            let central_frame = {
+                let mut frame = egui::Frame::central_panel(ctx.style());
+                if !self.issues.is_empty() && self.show_error_panel {
+                    frame.inner_margin.bottom = 0;
+                }
+                frame
+            };
 
-                // Toolbar block: immutable borrow for read-only access to table
-                // data.
-                let mut action = if let Some(table) = &self.table {
-                    if let Some(section) = table.sections.get(content_tab) {
-                        let max_depth =
-                            section.rows.iter().map(|row| row.depth).max().unwrap_or(0) + 1;
-                        let state = &mut self.section_states[content_tab];
+            CentralPanel::default()
+                .frame(central_frame)
+                .show_inside(ctx, |ui| {
+                    // While the unsaved-changes modal is visible (user clicked a
+                    // different section but hasn't confirmed yet), keep rendering
+                    // the editing section so the view doesn't jump before the user
+                    // decides. `selected_tab` acts as the pending destination.
+                    let content_tab = self
+                        .editing_section
+                        .filter(|&s| s != self.selected_tab)
+                        .unwrap_or(self.selected_tab);
+                    let editing = self.editing_section == Some(content_tab);
 
-                        draw_toolbar(
-                            ui,
-                            max_depth,
-                            &mut state.max_depth,
-                            &mut state.collapsed,
-                            &section.rows,
-                            &mut self.search,
-                            table,
-                            &lang,
-                            editing,
-                        )
+                    // Toolbar block: immutable borrow for read-only access to table
+                    // data.
+                    let mut action = if let Some(table) = &self.table {
+                        if let Some(section) = table.sections.get(content_tab) {
+                            let max_depth =
+                                section.rows.iter().map(|row| row.depth).max().unwrap_or(0) + 1;
+                            let state = &mut self.section_states[content_tab];
+
+                            draw_toolbar(
+                                ui,
+                                max_depth,
+                                &mut state.max_depth,
+                                &mut state.collapsed,
+                                &section.rows,
+                                &mut self.search,
+                                table,
+                                &lang,
+                                editing,
+                            )
+                        } else {
+                            EditAction::None
+                        }
                     } else {
                         EditAction::None
-                    }
-                } else {
-                    EditAction::None
-                };
+                    };
 
-                // Support keyboard shortcuts Ctrl+S and ESC while editing.
-                let pending_section_switch =
-                    self.editing_section.is_some_and(|s| s != self.selected_tab);
+                    // Support keyboard shortcuts Ctrl+S and ESC while editing.
+                    let pending_section_switch =
+                        self.editing_section.is_some_and(|s| s != self.selected_tab);
 
-                if editing && !pending_section_switch {
-                    let save_shortcut =
-                        egui::KeyboardShortcut::new(egui::Modifiers::COMMAND, egui::Key::S);
-                    let save_pressed = ui
-                        .ctx()
-                        .input_mut(|input| input.consume_shortcut(&save_shortcut));
-                    let cancel_pressed =
-                        ui.ctx().input(|input| input.key_pressed(egui::Key::Escape));
+                    if editing && !pending_section_switch {
+                        let save_shortcut =
+                            egui::KeyboardShortcut::new(egui::Modifiers::COMMAND, egui::Key::S);
+                        let save_pressed = ui
+                            .ctx()
+                            .input_mut(|input| input.consume_shortcut(&save_shortcut));
+                        let cancel_pressed =
+                            ui.ctx().input(|input| input.key_pressed(egui::Key::Escape));
 
-                    if save_pressed {
-                        // TODO: Save changes to XBRL instance document.
-                        // Currently, edits are only stored in the app state and
-                        // will be lost on reload.
-                        action = EditAction::Save;
-                    } else if cancel_pressed {
-                        action = EditAction::Cancel;
-                    }
-                }
-
-                // Handle toolbar edit actions.
-                match action {
-                    EditAction::Start => {
-                        if let Some(table) = &self.table {
-                            if let Some(section) = table.sections.get(self.selected_tab) {
-                                self.edit_snapshot =
-                                    section.rows.iter().map(|r| r.value.clone()).collect();
-                            }
+                        if save_pressed {
+                            // TODO: Save changes to XBRL instance document.
+                            // Currently, edits are only stored in the app state and
+                            // will be lost on reload.
+                            action = EditAction::Save;
+                        } else if cancel_pressed {
+                            action = EditAction::Cancel;
                         }
-                        self.editing_section = Some(self.selected_tab);
                     }
-                    EditAction::Save => {
-                        self.editing_section = None;
-                        self.edit_snapshot.clear();
-                    }
-                    EditAction::Cancel => {
-                        let editing_tab = self.editing_section.unwrap_or(self.selected_tab);
 
-                        if let Some(table) = &mut self.table {
-                            if let Some(section) = table.sections.get_mut(editing_tab) {
-                                for (row, value) in
-                                    section.rows.iter_mut().zip(self.edit_snapshot.iter())
-                                {
-                                    row.value = value.clone();
+                    // Handle toolbar edit actions.
+                    match action {
+                        EditAction::Start => {
+                            if let Some(table) = &self.table {
+                                if let Some(section) = table.sections.get(self.selected_tab) {
+                                    self.edit_snapshot =
+                                        section.rows.iter().map(|r| r.value.clone()).collect();
                                 }
                             }
+                            self.editing_section = Some(self.selected_tab);
                         }
-                        self.editing_section = None;
-                        self.edit_snapshot.clear();
-                    }
-                    EditAction::None => {}
-                }
+                        EditAction::Save => {
+                            self.editing_section = None;
+                            self.edit_snapshot.clear();
+                        }
+                        EditAction::Cancel => {
+                            let editing_tab = self.editing_section.unwrap_or(self.selected_tab);
 
-                // Table block: mutable borrow for in-place editing.
-                if let Some(table) = self.table.as_mut() {
-                    let tab = content_tab;
-                    let table_rect = ui.available_rect_before_wrap();
-
-                    if let Some(section) = table.sections.get_mut(tab) {
-                        let highlighted_row = highlight_row(&mut self.search, tab, ui);
-                        let state = &mut self.section_states[tab];
-                        let scroll_to = self.search.scroll_to_row.take();
-
-                        draw_table(
-                            &mut section.rows,
-                            &mut state.collapsed,
-                            &lang,
-                            scroll_to,
-                            highlighted_row,
-                            editing,
-                            ui,
-                        );
-                    }
-
-                    if !self.search.results.is_empty() {
-                        draw_search_results_overlay(
-                            ui.ctx(),
-                            table_rect,
-                            &mut self.search,
-                            table,
-                            &mut self.selected_tab,
-                            &mut self.section_states,
-                        );
-                    }
-                }
-
-                // Section-switch warning when navigating away with unsaved edits.
-                if self
-                    .editing_section
-                    .is_some_and(|section| section != self.selected_tab)
-                {
-                    let mut stay = false;
-                    let mut continue_nav = false;
-
-                    draw_unsaved_changes_modal(ui, &mut stay, &mut continue_nav);
-
-                    if stay {
-                        self.selected_tab = self.editing_section.unwrap();
-                    }
-                    if continue_nav {
-                        let editing_tab = self.editing_section.unwrap();
-                        if let Some(table) = &mut self.table {
-                            if let Some(section) = table.sections.get_mut(editing_tab) {
-                                for (row, value) in
-                                    section.rows.iter_mut().zip(self.edit_snapshot.iter())
-                                {
-                                    row.value = value.clone();
+                            if let Some(table) = &mut self.table {
+                                if let Some(section) = table.sections.get_mut(editing_tab) {
+                                    for (row, value) in
+                                        section.rows.iter_mut().zip(self.edit_snapshot.iter())
+                                    {
+                                        row.value = value.clone();
+                                    }
                                 }
                             }
+                            self.editing_section = None;
+                            self.edit_snapshot.clear();
                         }
-                        self.editing_section = None;
-                        self.edit_snapshot.clear();
+                        EditAction::None => {}
                     }
-                }
-            })
+
+                    // Table block: mutable borrow for in-place editing.
+                    if let Some(table) = self.table.as_mut() {
+                        let tab = content_tab;
+                        let table_rect = ui.available_rect_before_wrap();
+
+                        if let Some(section) = table.sections.get_mut(tab) {
+                            let highlighted_row = highlight_row(&mut self.search, tab, ui);
+                            let state = &mut self.section_states[tab];
+                            let scroll_to = self.search.scroll_to_row.take();
+
+                            draw_table(
+                                &mut section.rows,
+                                &mut state.collapsed,
+                                &lang,
+                                scroll_to,
+                                highlighted_row,
+                                editing,
+                                ui,
+                            );
+                        }
+
+                        if !self.search.results.is_empty() {
+                            draw_search_results_overlay(
+                                ui.ctx(),
+                                table_rect,
+                                &mut self.search,
+                                table,
+                                &mut self.selected_tab,
+                                &mut self.section_states,
+                            );
+                        }
+                    }
+
+                    // Section-switch warning when navigating away with unsaved edits.
+                    if self
+                        .editing_section
+                        .is_some_and(|section| section != self.selected_tab)
+                    {
+                        let mut stay = false;
+                        let mut continue_nav = false;
+
+                        draw_unsaved_changes_modal(ui, &mut stay, &mut continue_nav);
+
+                        if stay {
+                            self.selected_tab = self.editing_section.unwrap();
+                        }
+                        if continue_nav {
+                            let editing_tab = self.editing_section.unwrap();
+                            if let Some(table) = &mut self.table {
+                                if let Some(section) = table.sections.get_mut(editing_tab) {
+                                    for (row, value) in
+                                        section.rows.iter_mut().zip(self.edit_snapshot.iter())
+                                    {
+                                        row.value = value.clone();
+                                    }
+                                }
+                            }
+                            self.editing_section = None;
+                            self.edit_snapshot.clear();
+                        }
+                    }
+                })
         });
     }
 }
