@@ -9,59 +9,59 @@ pub static ROLE_URI_TO_REPORT_ELEMENT: LazyLock<HashMap<&'static str, &'static s
         HashMap::from([
             (
                 "http://www.xbrl.de/taxonomies/de-gaap-ci/role/balanceSheet",
-                "reportElements.B",
+                "genInfo.report.id.reportElement.reportElements.B",
             ),
             (
                 "http://www.xbrl.de/taxonomies/de-gaap-ci/role/incomeStatement",
-                "reportElements.GuV",
+                "genInfo.report.id.reportElement.reportElements.GuV",
             ),
             (
                 "http://www.xbrl.de/taxonomies/de-gaap-ci/role/incomeStatementMicroBilG",
-                "reportElements.GuVMicroBilG",
+                "genInfo.report.id.reportElement.reportElements.GuVMicroBilG",
             ),
             (
                 "http://www.xbrl.de/taxonomies/de-gaap-ci/role/managementReport",
-                "reportElements.L",
+                "genInfo.report.id.reportElement.reportElements.L",
             ),
             (
                 "http://www.xbrl.de/taxonomies/de-gaap-ci/role/notesBelowBalanceSheet",
-                "reportElements.H",
+                "genInfo.report.id.reportElement.reportElements.H",
             ),
             (
                 "http://www.xbrl.de/taxonomies/de-gaap-ci/role/cashFlowStatementDRS21",
-                "reportElements.CFS",
+                "genInfo.report.id.reportElement.reportElements.CFS",
             ),
             (
                 "http://www.xbrl.de/taxonomies/de-gaap-ci/role/changesEquityStatement",
-                "reportElements.EKE",
+                "genInfo.report.id.reportElement.reportElements.EKE",
             ),
             (
                 "http://www.xbrl.de/taxonomies/de-gaap-ci/role/changesEquityAccounts",
-                "reportElements.KKE",
+                "genInfo.report.id.reportElement.reportElements.KKE",
             ),
             (
                 "http://www.xbrl.de/taxonomies/de-gaap-ci/role/OtherReportElements",
-                "reportElements.SA",
+                "genInfo.report.id.reportElement.reportElements.SA",
             ),
             (
                 "http://www.xbrl.de/taxonomies/de-gaap-ci/role/determinationOfTaxableIncome",
-                "reportElements.SGE",
+                "genInfo.report.id.reportElement.reportElements.SGE",
             ),
             (
                 "http://www.xbrl.de/taxonomies/de-gaap-ci/role/determinationOfTaxableIncomeBusinessPartnership",
-                "reportElements.SGEP",
+                "genInfo.report.id.reportElement.reportElements.SGEP",
             ),
             (
                 "http://www.xbrl.de/taxonomies/de-gaap-ci/role/determinationOfTaxableIncomeSpecialCases",
-                "reportElements.SGEB",
+                "genInfo.report.id.reportElement.reportElements.SGEB",
             ),
             (
                 "http://www.xbrl.de/taxonomies/de-gaap-ci/role/adjustmentOfIncome",
-                "reportElements.BGWG",
+                "genInfo.report.id.reportElement.reportElements.BGWG",
             ),
             (
                 "http://www.xbrl.de/taxonomies/de-gaap-ci/role/transfersTaxAssets",
-                "reportElements.BVV",
+                "genInfo.report.id.reportElement.reportElements.BVV",
             ),
         ])
     });
