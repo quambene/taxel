@@ -1,0 +1,76 @@
+use super::{AppIssue, IssueSeverity};
+use eframe::egui::{self, Color32, Panel, Ui};
+
+pub const WARNING_COLOR: Color32 = Color32::from_rgb(180, 120, 0);
+pub const ERROR_COLOR: Color32 = Color32::RED;
+
+/// Draws a bottom diagnostics panel with detailed error and warning messages.
+pub(super) fn draw_error_panel(ctx: &mut Ui, issues: &[AppIssue], show_error_panel: &mut bool) {
+    Panel::bottom("error_panel")
+        .resizable(true)
+        .default_size(400.0)
+        .show_inside(ctx, |ui| {
+            ui.add_space(6.0);
+
+            if draw_panel_header(ui, issues) {
+                *show_error_panel = false;
+            }
+
+            ui.separator();
+
+            let available = ui.available_size();
+            ui.allocate_ui_with_layout(available, egui::Layout::top_down(egui::Align::Min), |ui| {
+                egui::ScrollArea::vertical()
+                    .auto_shrink([false, false])
+                    .show(ui, |ui| {
+                        for issue in issues {
+                            let (tag, color) = match issue.severity {
+                                IssueSeverity::Error => ("Error", ERROR_COLOR),
+                                IssueSeverity::Warning => ("Warning", WARNING_COLOR),
+                            };
+
+                            ui.horizontal_wrapped(|ui| {
+                                ui.colored_label(color, format!("[{tag}]"));
+                                ui.label(&issue.message);
+                            });
+                        }
+                    });
+            });
+        });
+}
+
+/// Draws the header of the diagnostics panel, showing a summary of errors and
+/// warnings, and a close button. Returns `true` if the close button was
+/// clicked.
+fn draw_panel_header(ui: &mut Ui, issues: &[AppIssue]) -> bool {
+    let errors = issues
+        .iter()
+        .filter(|issue| issue.severity == IssueSeverity::Error)
+        .count();
+    let warnings = issues
+        .iter()
+        .filter(|issue| issue.severity == IssueSeverity::Warning)
+        .count();
+
+    let mut close = false;
+
+    ui.allocate_ui_with_layout(
+        egui::vec2(ui.available_width(), ui.spacing().interact_size.y),
+        egui::Layout::left_to_right(egui::Align::Center),
+        |ui| {
+            ui.strong("Diagnostics");
+            ui.label(format!("errors: {errors}, warnings: {warnings}"));
+            draw_close_button(ui, &mut close);
+        },
+    );
+
+    close
+}
+
+fn draw_close_button(ui: &mut Ui, close: &mut bool) {
+    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+        if ui.add(egui::Button::new("\u{00D7}")).clicked() {
+            *close = true;
+        }
+    });
+}

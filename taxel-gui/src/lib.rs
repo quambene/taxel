@@ -2,7 +2,6 @@ use anyhow::{Context, Result};
 use log::debug;
 use std::{
     collections::HashMap,
-    hash::Hash,
     path::{Path, PathBuf},
 };
 use taxel::{GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
