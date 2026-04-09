@@ -134,7 +134,7 @@ impl TaxelApp {
 
         let lang = ctx
             .storage
-            .and_then(|s| eframe::get_value::<String>(s, "lang"))
+            .and_then(|storage| eframe::get_value::<String>(storage, "lang"))
             .unwrap_or_else(|| "en".to_string());
 
         let zoom_input = ctx
