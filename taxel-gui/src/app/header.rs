@@ -57,6 +57,7 @@ fn import_report(app: &mut TaxelApp, path: &Path) {
             severity: IssueSeverity::Error,
             message: err.to_string(),
         });
+        app.show_error_panel = true;
         return;
     }
 
@@ -68,6 +69,8 @@ fn import_report(app: &mut TaxelApp, path: &Path) {
             });
         }
     }
+
+    app.show_error_panel = !app.issues.is_empty();
 
     app.section_states = app
         .table

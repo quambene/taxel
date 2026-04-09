@@ -119,13 +119,15 @@ impl TaxelApp {
             });
         }
 
+        let show_error_panel = !issues.is_empty();
+
         Self {
             table,
             selected_tab: 0,
             section_states,
             lang: "en".to_string(),
             issues,
-            show_error_panel: false,
+            show_error_panel,
             zoom_input: "100".to_string(),
             search: Search::default(),
             editing_section: None,
