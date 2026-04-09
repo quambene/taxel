@@ -2,15 +2,18 @@ use super::{
     table::{ensure_row_visible, visible_rows},
     RowHighlight, Search, SectionState, JUMP_HIGHLIGHT_DURATION,
 };
-use eframe::egui::{self, Ui};
+use eframe::egui::{
+    pos2, Area, Context, Frame, Id, Key, Label, Margin, Order, Rect, RichText, ScrollArea, Sense,
+    Stroke, Ui,
+};
 use std::time::Instant;
 use taxel_gui::FactTable;
 
 /// Draw search results in a foreground overlay above the fact table. Clicking
 /// a result jumps to that row in the table.
 pub(super) fn draw_search_results_overlay(
-    ctx: &egui::Context,
-    table_rect: egui::Rect,
+    ctx: &Context,
+    table_rect: Rect,
     search: &mut Search,
     table: &FactTable,
     selected_tab: &mut usize,
@@ -20,7 +23,7 @@ pub(super) fn draw_search_results_overlay(
         return;
     }
 
-    let mut close_overlay = ctx.input(|input| input.key_pressed(egui::Key::Escape));
+    let mut close_overlay = ctx.input(|input| input.key_pressed(Key::Escape));
 
     let horizontal_margin = 10.0;
     let top_outer_margin = 2.0;
@@ -30,19 +33,19 @@ pub(super) fn draw_search_results_overlay(
     let y = table_rect.top() + top_outer_margin;
     let scroll_height = (table_rect.height() - top_outer_margin - bottom_outer_margin).max(40.0);
 
-    let area_response = egui::Area::new(egui::Id::new("search_results_overlay"))
-        .order(egui::Order::Foreground)
-        .fixed_pos(egui::pos2(x, y))
+    let area_response = Area::new(Id::new("search_results_overlay"))
+        .order(Order::Foreground)
+        .fixed_pos(pos2(x, y))
         .show(ctx, |ui| {
-            egui::Frame::popup(ui.style())
-                .stroke(egui::Stroke::new(
+            Frame::popup(ui.style())
+                .stroke(Stroke::new(
                     1.0,
                     ui.visuals().widgets.noninteractive.bg_stroke.color,
                 ))
                 .show(ui, |ui| {
                     ui.set_width(overlay_width);
 
-                    egui::ScrollArea::vertical()
+                    ScrollArea::vertical()
                         .id_salt("search_results")
                         .min_scrolled_height(scroll_height)
                         .max_height(scroll_height)
@@ -50,16 +53,16 @@ pub(super) fn draw_search_results_overlay(
                             let mut clicked = None;
 
                             for (i, hit) in search.results.iter().enumerate() {
-                                let row = egui::Frame::new()
+                                let row = Frame::new()
                                     .fill(ui.visuals().widgets.noninteractive.bg_fill)
                                     .corner_radius(2.0)
-                                    .inner_margin(egui::Margin::symmetric(8, 5))
+                                    .inner_margin(Margin::symmetric(8, 5))
                                     .show(ui, |ui| {
                                         ui.set_width(ui.available_width());
-                                        ui.add(egui::Label::new(&hit.label).wrap());
+                                        ui.add(Label::new(&hit.label).wrap());
                                         ui.add(
-                                            egui::Label::new(
-                                                egui::RichText::new(format!(
+                                            Label::new(
+                                                RichText::new(format!(
                                                     "{} [{}]",
                                                     hit.concept, hit.section_name
                                                 ))
@@ -72,7 +75,7 @@ pub(super) fn draw_search_results_overlay(
                                 let response = ui.interact(
                                     row.response.rect,
                                     ui.id().with(("search_result", i)),
-                                    egui::Sense::click(),
+                                    Sense::click(),
                                 );
 
                                 if response.is_pointer_button_down_on() {

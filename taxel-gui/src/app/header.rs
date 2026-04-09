@@ -1,6 +1,8 @@
 use super::{AppIssue, IssueSeverity, SectionState, TaxelApp};
 use crate::app::error_panel::WARNING_COLOR;
-use eframe::egui::{self, Color32, Ui};
+use eframe::egui::{
+    text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui, Visuals,
+};
 use rfd::FileDialog;
 use std::path::Path;
 use taxel_gui::load_xml;
@@ -28,7 +30,7 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
 
         draw_error_summary(app, ui);
 
-        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+        ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
             draw_language_toolbar(ui, &mut app.lang);
 
             ui.separator();
@@ -102,11 +104,11 @@ fn draw_error_summary(app: &mut TaxelApp, ui: &mut Ui) {
     if error_count > 0 || warning_count > 0 {
         ui.separator();
 
-        let mut job = egui::text::LayoutJob::default();
+        let mut job = LayoutJob::default();
         job.append(
             &format!("errors: {error_count}"),
             0.0,
-            egui::TextFormat {
+            TextFormat {
                 color: Color32::RED,
                 ..Default::default()
             },
@@ -114,18 +116,18 @@ fn draw_error_summary(app: &mut TaxelApp, ui: &mut Ui) {
         job.append(
             &format!("  warnings: {warning_count}"),
             0.0,
-            egui::TextFormat {
+            TextFormat {
                 color: WARNING_COLOR,
                 ..Default::default()
             },
         );
 
-        let bg_idx = ui.painter().add(egui::Shape::Noop);
-        let response = ui.add(egui::Button::new(job).frame(false));
+        let bg_idx = ui.painter().add(Shape::Noop);
+        let response = ui.add(Button::new(job).frame(false));
         if response.hovered() {
             ui.painter().set(
                 bg_idx,
-                egui::Shape::rect_filled(
+                Shape::rect_filled(
                     response.rect,
                     ui.visuals().widgets.hovered.corner_radius,
                     ui.visuals().widgets.hovered.weak_bg_fill,
@@ -144,7 +146,7 @@ fn draw_zoom_toolbar(ui: &mut Ui, zoom_input: &mut String) {
     let zoom = ui.ctx().zoom_factor();
 
     if ui
-        .add(egui::Button::new("−").min_size(egui::vec2(24.0, 24.0)))
+        .add(Button::new("−").min_size(vec2(24.0, 24.0)))
         .clicked()
     {
         let new_zoom = (zoom - 0.1).max(0.5);
@@ -155,9 +157,9 @@ fn draw_zoom_toolbar(ui: &mut Ui, zoom_input: &mut String) {
     ui.label("%");
 
     let response = ui.add(
-        egui::TextEdit::singleline(zoom_input)
+        TextEdit::singleline(zoom_input)
             .desired_width(35.0)
-            .horizontal_align(egui::Align::Center),
+            .horizontal_align(Align::Center),
     );
 
     if response.lost_focus() {
@@ -173,7 +175,7 @@ fn draw_zoom_toolbar(ui: &mut Ui, zoom_input: &mut String) {
     }
 
     if ui
-        .add(egui::Button::new("+").min_size(egui::vec2(24.0, 24.0)))
+        .add(Button::new("+").min_size(vec2(24.0, 24.0)))
         .clicked()
     {
         let new_zoom = (zoom + 0.1).min(4.0);
@@ -197,14 +199,14 @@ fn draw_dark_mode_toggle(ui: &mut Ui) {
     };
 
     if ui
-        .add(egui::Button::new(icon).min_size(egui::vec2(24.0, 24.0)))
+        .add(Button::new(icon).min_size(vec2(24.0, 24.0)))
         .on_hover_text(tooltip)
         .clicked()
     {
         let visuals = if dark_mode {
-            egui::Visuals::light()
+            Visuals::light()
         } else {
-            egui::Visuals::dark()
+            Visuals::dark()
         };
         ui.ctx().set_visuals(visuals);
     }

@@ -1,6 +1,6 @@
 use super::Search;
 use crate::{app::table::collapsed_at_depth, widgets::draw_dark_button};
-use eframe::egui::{self, Ui};
+use eframe::egui::{Align, Layout, TextEdit, Ui};
 use std::collections::HashSet;
 use taxel_gui::{FactRow, FactTable};
 
@@ -33,7 +33,7 @@ pub(super) fn draw_toolbar(
     ui.horizontal(|ui| {
         draw_level_toolbar(ui, max_available, max_depth, collapsed, rows);
         draw_search_bar(ui, search, table, lang, total_width);
-        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+        ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
             action = draw_edit_buttons(ui, editing);
         });
     });
@@ -86,7 +86,7 @@ fn draw_search_bar(
 
     ui.label("\u{1F50D}");
     let response = ui.add(
-        egui::TextEdit::singleline(&mut search.query)
+        TextEdit::singleline(&mut search.query)
             .desired_width(380.0)
             .hint_text("Search ID, name, value ..."),
     );

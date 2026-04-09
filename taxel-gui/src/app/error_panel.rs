@@ -1,5 +1,5 @@
 use super::{AppIssue, IssueSeverity};
-use eframe::egui::{self, Color32, Panel, Ui};
+use eframe::egui::{vec2, Align, Button, Color32, Layout, Panel, ScrollArea, Ui};
 
 pub const WARNING_COLOR: Color32 = Color32::from_rgb(180, 120, 0);
 pub const ERROR_COLOR: Color32 = Color32::RED;
@@ -19,8 +19,8 @@ pub(super) fn draw_error_panel(ctx: &mut Ui, issues: &[AppIssue], show_error_pan
             ui.separator();
 
             let available = ui.available_size();
-            ui.allocate_ui_with_layout(available, egui::Layout::top_down(egui::Align::Min), |ui| {
-                egui::ScrollArea::vertical()
+            ui.allocate_ui_with_layout(available, Layout::top_down(Align::Min), |ui| {
+                ScrollArea::vertical()
                     .auto_shrink([false, false])
                     .show(ui, |ui| {
                         for issue in issues {
@@ -55,8 +55,8 @@ fn draw_panel_header(ui: &mut Ui, issues: &[AppIssue]) -> bool {
     let mut close = false;
 
     ui.allocate_ui_with_layout(
-        egui::vec2(ui.available_width(), ui.spacing().interact_size.y),
-        egui::Layout::left_to_right(egui::Align::Center),
+        vec2(ui.available_width(), ui.spacing().interact_size.y),
+        Layout::left_to_right(Align::Center),
         |ui| {
             ui.strong("Diagnostics");
             ui.label(format!("errors: {errors}, warnings: {warnings}"));
@@ -68,8 +68,8 @@ fn draw_panel_header(ui: &mut Ui, issues: &[AppIssue]) -> bool {
 }
 
 fn draw_close_button(ui: &mut Ui, close: &mut bool) {
-    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-        if ui.add(egui::Button::new("\u{00D7}")).clicked() {
+    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+        if ui.add(Button::new("\u{00D7}")).clicked() {
             *close = true;
         }
     });

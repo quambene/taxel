@@ -16,7 +16,7 @@ use self::{
 use crate::widgets::draw_unsaved_changes_modal;
 use dioxus_devtools::subsecond;
 use eframe::{
-    egui::{self, CentralPanel, Panel, Ui},
+    egui::{self, CentralPanel, Key, KeyboardShortcut, Modifiers, Panel, Ui},
     App, Frame,
 };
 use std::{
@@ -212,13 +212,11 @@ impl App for TaxelApp {
                         self.editing_section.is_some_and(|s| s != self.selected_tab);
 
                     if editing && !pending_section_switch {
-                        let save_shortcut =
-                            egui::KeyboardShortcut::new(egui::Modifiers::COMMAND, egui::Key::S);
+                        let save_shortcut = KeyboardShortcut::new(Modifiers::COMMAND, Key::S);
                         let save_pressed = ui
                             .ctx()
                             .input_mut(|input| input.consume_shortcut(&save_shortcut));
-                        let cancel_pressed =
-                            ui.ctx().input(|input| input.key_pressed(egui::Key::Escape));
+                        let cancel_pressed = ui.ctx().input(|input| input.key_pressed(Key::Escape));
 
                         if save_pressed {
                             // TODO: Save changes to XBRL instance document.

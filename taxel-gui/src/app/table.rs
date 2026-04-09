@@ -1,5 +1,5 @@
 use crate::widgets;
-use eframe::egui::{self, Ui};
+use eframe::egui::{Align, TextStyle, Ui};
 use egui_extras::{Column, TableBuilder};
 use std::collections::HashSet;
 use taxel_gui::FactRow;
@@ -65,7 +65,7 @@ pub(super) fn draw_table(
     editing: bool,
     ui: &mut Ui,
 ) {
-    let row_height = ui.text_style_height(&egui::TextStyle::Body) + ui.spacing().item_spacing.y;
+    let row_height = ui.text_style_height(&TextStyle::Body) + ui.spacing().item_spacing.y;
     let visible = visible_rows(rows, collapsed);
     let mut toggle: Option<usize> = None;
 
@@ -79,7 +79,7 @@ pub(super) fn draw_table(
         .column(Column::remainder().clip(true));
 
     if let Some(row) = scroll_to_row {
-        builder = builder.scroll_to_row(row, Some(egui::Align::Center));
+        builder = builder.scroll_to_row(row, Some(Align::Center));
     }
 
     builder
