@@ -4,7 +4,7 @@ use std::{
     collections::HashMap,
     path::{Path, PathBuf},
 };
-use taxel::{GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
+use taxel::{GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
 use xbrl_rs::{
     DocumentView, InstanceDocument, ItemFact, TaxonomySet, TreeNode, ROLE_LABEL, ROLE_TERSE,
 };
@@ -146,7 +146,14 @@ fn populate_fact_table(view: DocumentView, item_facts: &[&ItemFact], table: &mut
     for section in &view.sections {
         let role_uri = section.role;
 
-        let labels = if let Some(concept_name) = ROLE_URI_TO_REPORT_ELEMENT.get(role_uri) {
+        let labels = if role_uri == GCD_ROLE_URI {
+            // The GCD section itself is a special case: we use the same label
+            // for all languages since it doesn't represent a report element.
+            Some(HashMap::from([
+                ("en".to_owned(), GCD_LABEL.to_string()),
+                ("de".to_owned(), GCD_LABEL.to_string()),
+            ]))
+        } else if let Some(concept_name) = ROLE_URI_TO_REPORT_ELEMENT.get(role_uri) {
             labels_map.get(concept_name).cloned()
         } else {
             table.role_mapping_errors.push(role_uri.to_owned());

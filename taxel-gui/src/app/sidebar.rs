@@ -2,7 +2,6 @@ use eframe::{
     self,
     egui::{Color32, Frame, Label, Margin, Panel, RichText, ScrollArea, Sense, Ui},
 };
-use taxel::{GCD_LABEL, GCD_ROLE_URI};
 use taxel_gui::FactSection;
 
 /// Draw the sidebar panel containing the list of sections. Allows the user to
@@ -26,17 +25,13 @@ pub(super) fn draw_sidebar(
             ui.separator();
             ScrollArea::vertical().show(ui, |ui| {
                 for (i, section) in sections.iter().enumerate() {
-                    let title = if section.role == GCD_ROLE_URI {
-                        GCD_LABEL
-                    } else {
-                        section
-                            .labels
-                            .get(lang)
-                            .map(|label| label.as_str())
-                            .unwrap_or_else(|| {
-                                section.role.rsplit('/').next().unwrap_or(&section.role)
-                            })
-                    };
+                    let title = section
+                        .labels
+                        .get(lang)
+                        .map(|label| label.as_str())
+                        .unwrap_or_else(|| {
+                            section.role.rsplit('/').next().unwrap_or(&section.role)
+                        });
 
                     draw_row(ui, title, i, selected);
                 }
