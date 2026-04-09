@@ -59,6 +59,7 @@ pub struct FactSection {
 /// A collection of fact sections, one per presentation section in the XBRL document.
 #[derive(Debug, Default)]
 pub struct FactTable {
+    /// The sections in the order they appear in the presentation linkbase.
     pub sections: Vec<FactSection>,
     /// Role URIs for sections that could not be mapped to a known report
     /// element concept.
