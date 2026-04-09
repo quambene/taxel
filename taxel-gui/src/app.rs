@@ -17,7 +17,7 @@ use crate::widgets::draw_unsaved_changes_modal;
 use dioxus_devtools::subsecond;
 use eframe::{
     egui::{self, CentralPanel, Key, KeyboardShortcut, Modifiers, Panel, Ui},
-    App, Frame,
+    App, CreationContext, Frame,
 };
 use std::{
     collections::HashSet,
@@ -104,11 +104,22 @@ pub(super) struct AppIssue {
 impl TaxelApp {
     /// Creates a new `TaxelApp` instance with the given fact table and error
     /// message. Both parameters are optional to allow starting with an empty
-    /// state.
-    pub fn new(table: Option<FactTable>, error_message: Option<String>) -> TaxelApp {
+    /// state. Loads persisted settings (language, zoom) from eframe storage if
+    /// available.
+    pub fn new(
+        ctx: &CreationContext<'_>,
+        table: Option<FactTable>,
+        error_message: Option<String>,
+    ) -> TaxelApp {
         let section_states = table
             .as_ref()
-            .map(|t| t.sections.iter().map(|_| SectionState::default()).collect())
+            .map(|table| {
+                table
+                    .sections
+                    .iter()
+                    .map(|_| SectionState::default())
+                    .collect()
+            })
             .unwrap_or_default();
         let mut issues = Vec::new();
 
@@ -121,14 +132,28 @@ impl TaxelApp {
 
         let show_error_panel = !issues.is_empty();
 
+        let lang = ctx
+            .storage
+            .and_then(|s| eframe::get_value::<String>(s, "lang"))
+            .unwrap_or_else(|| "en".to_string());
+
+        let zoom_input = ctx
+            .storage
+            .and_then(|storage| eframe::get_value::<String>(storage, "zoom_input"))
+            .unwrap_or_else(|| "100".to_string());
+
+        if let Ok(percent) = zoom_input.trim().parse::<u32>() {
+            ctx.egui_ctx.set_zoom_factor(percent as f32 / 100.0);
+        }
+
         Self {
             table,
             selected_tab: 0,
             section_states,
-            lang: "en".to_string(),
+            lang,
             issues,
             show_error_panel,
-            zoom_input: "100".to_string(),
+            zoom_input,
             search: Search::default(),
             editing_section: None,
             edit_snapshot: Vec::new(),
@@ -137,6 +162,11 @@ impl TaxelApp {
 }
 
 impl App for TaxelApp {
+    fn save(&mut self, storage: &mut dyn eframe::Storage) {
+        eframe::set_value(storage, "lang", &self.lang);
+        eframe::set_value(storage, "zoom_input", &self.zoom_input);
+    }
+
     /// The main UI drawing function for the app, called on each frame.
     fn ui(&mut self, ctx: &mut Ui, _: &mut Frame) {
         // TODO: remove hot reloading support for release builds

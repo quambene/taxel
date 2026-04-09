@@ -11,6 +11,7 @@ name = "taxel-gui"
 [dependencies]
 taxel = { path = "../taxel" }
 anyhow = { workspace = true }
+dirs = { workspace = true }
 log = { workspace = true }
 quick-xml = { workspace = true }
 xbrl-rs = { workspace = true }
