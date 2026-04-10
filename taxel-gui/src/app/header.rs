@@ -1,7 +1,7 @@
 use super::{AppIssue, IssueSeverity, SectionState, TaxelApp};
 use crate::app::error_panel::WARNING_COLOR;
 use eframe::egui::{
-    text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui, Visuals,
+    text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui,
 };
 use rfd::FileDialog;
 use std::path::Path;
@@ -35,7 +35,7 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
 
             ui.separator();
 
-            draw_dark_mode_toggle(ui);
+            draw_dark_mode_toggle(ui, &mut app.dark_mode);
 
             ui.separator();
 
@@ -185,14 +185,13 @@ fn draw_zoom_toolbar(ui: &mut Ui, zoom_input: &mut String) {
 }
 
 /// Draw the dark mode toggle button (☀ / ☾).
-fn draw_dark_mode_toggle(ui: &mut Ui) {
-    let dark_mode = ui.ctx().global_style().visuals.dark_mode;
+fn draw_dark_mode_toggle(ui: &mut Ui, dark_mode: &mut bool) {
 
     // Show sun icon in dark mode (to switch to light) and moon icon in light
     // mode (to switch to dark).
-    let icon = if dark_mode { "\u{2600}" } else { "\u{1F319}" };
+    let icon = if *dark_mode { "\u{2600}" } else { "\u{1F319}" };
 
-    let tooltip = if dark_mode {
+    let tooltip = if *dark_mode {
         "Switch to light mode"
     } else {
         "Switch to dark mode"
@@ -203,12 +202,7 @@ fn draw_dark_mode_toggle(ui: &mut Ui) {
         .on_hover_text(tooltip)
         .clicked()
     {
-        let visuals = if dark_mode {
-            Visuals::light()
-        } else {
-            Visuals::dark()
-        };
-        ui.ctx().set_visuals(visuals);
+        *dark_mode = !*dark_mode;
     }
 }
 

@@ -2,7 +2,7 @@ mod app;
 mod widgets;
 
 use crate::app::TaxelApp;
-use eframe::egui::{ViewportBuilder, Visuals};
+use eframe::egui::ViewportBuilder;
 use log::debug;
 fn main() -> Result<(), anyhow::Error> {
     // Use hot reload in debug mode
@@ -22,10 +22,7 @@ fn main() -> Result<(), anyhow::Error> {
     eframe::run_native(
         "Taxel",
         options,
-        Box::new(|ctx| {
-            ctx.egui_ctx.set_visuals(Visuals::light());
-            Ok(Box::new(TaxelApp::new(ctx, None, None)))
-        }),
+        Box::new(|ctx| Ok(Box::new(TaxelApp::new(ctx, None, None)))),
     )
     .map_err(|err| anyhow::anyhow!(err.to_string()))?;
 

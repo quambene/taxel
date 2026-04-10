@@ -16,7 +16,7 @@ use self::{
 use crate::widgets::draw_unsaved_changes_modal;
 use dioxus_devtools::subsecond;
 use eframe::{
-    egui::{self, CentralPanel, Key, KeyboardShortcut, Modifiers, Panel, Ui},
+    egui::{self, CentralPanel, Key, KeyboardShortcut, Modifiers, Panel, Ui, Visuals},
     App, CreationContext, Frame,
 };
 use std::{
@@ -77,6 +77,8 @@ pub struct TaxelApp {
     zoom_input: String,
     /// Search state.
     search: Search,
+    /// Whether dark mode is enabled.
+    pub dark_mode: bool,
     /// Some while the value column of that section is being edited, None
     /// otherwise.
     editing_section: Option<usize>,
@@ -146,6 +148,17 @@ impl TaxelApp {
             ctx.egui_ctx.set_zoom_factor(percent as f32 / 100.0);
         }
 
+        let dark_mode = ctx
+            .storage
+            .and_then(|storage| eframe::get_value::<bool>(storage, "dark_mode"))
+            .unwrap_or(false);
+
+        ctx.egui_ctx.set_visuals(if dark_mode {
+            Visuals::dark()
+        } else {
+            Visuals::light()
+        });
+
         Self {
             table,
             selected_tab: 0,
@@ -154,6 +167,7 @@ impl TaxelApp {
             issues,
             show_error_panel,
             zoom_input,
+            dark_mode,
             search: Search::default(),
             editing_section: None,
             edit_snapshot: Vec::new(),
@@ -165,10 +179,17 @@ impl App for TaxelApp {
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
         eframe::set_value(storage, "lang", &self.lang);
         eframe::set_value(storage, "zoom_input", &self.zoom_input);
+        eframe::set_value(storage, "dark_mode", &self.dark_mode);
     }
 
     /// The main UI drawing function for the app, called on each frame.
     fn ui(&mut self, ctx: &mut Ui, _: &mut Frame) {
+        ctx.ctx().set_visuals(if self.dark_mode {
+            Visuals::dark()
+        } else {
+            Visuals::light()
+        });
+
         // TODO: remove hot reloading support for release builds
         subsecond::call(|| {
             Panel::top("header").min_size(32.0).show_inside(ctx, |ui| {
