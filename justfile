@@ -1,4 +1,6 @@
 
+set dotenv-load
+
 # Run desktop app
 run:
   cd taxel-gui && cargo run
