@@ -19,11 +19,22 @@ pub(super) struct AppIssue {
 }
 
 impl AppIssue {
-    pub fn taxonomy_version_error() -> Self {
+    pub fn new_warning(message: String) -> Self {
+        AppIssue {
+            severity: IssueSeverity::Warning,
+            message,
+        }
+    }
+
+    pub fn new_error(message: String) -> Self {
         AppIssue {
             severity: IssueSeverity::Error,
-            message: "Failed to determine taxonomy version".to_string(),
+            message,
         }
+    }
+
+    pub fn taxonomy_version_error() -> Self {
+        AppIssue::new_error("Failed to determine taxonomy version".to_string())
     }
 }
 

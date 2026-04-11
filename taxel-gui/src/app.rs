@@ -140,10 +140,7 @@ impl TaxelApp {
         let mut issues = Vec::new();
 
         if let Some(message) = error_message {
-            issues.push(AppIssue {
-                severity: IssueSeverity::Error,
-                message,
-            });
+            issues.push(AppIssue::new_error(message));
         }
 
         let lang = ctx
@@ -174,28 +171,24 @@ impl TaxelApp {
         let eric =
             if let Some(log_path) = dirs::data_dir().map(|dir| dir.join("taxel").join("logs")) {
                 if let Err(err) = fs::create_dir_all(&log_path) {
-                    issues.push(AppIssue {
-                        severity: IssueSeverity::Error,
-                        message: format!("Failed to create log directory: {err}"),
-                    });
+                    issues.push(AppIssue::new_error(format!(
+                        "Failed to create log directory: {err}"
+                    )));
                 }
 
                 match Eric::new(&log_path) {
                     Ok(eric) => Some(eric),
                     Err(err) => {
-                        issues.push(AppIssue {
-                            severity: IssueSeverity::Error,
-                            message: format!("Failed to initialize Eric: {err}"),
-                        });
+                        issues.push(AppIssue::new_error(format!(
+                            "Failed to initialize Eric: {err}"
+                        )));
                         None
                     }
                 }
             } else {
-                issues.push(AppIssue {
-                    severity: IssueSeverity::Warning,
-                    message: "Could not determine data directory, skipping Eric initialization"
-                        .to_string(),
-                });
+                issues.push(AppIssue::new_warning(
+                    "Could not determine data directory, skipping Eric initialization".to_string(),
+                ));
                 None
             };
 
@@ -203,10 +196,9 @@ impl TaxelApp {
 
         let mut report_list = ReportList::new();
         if let Err(err) = report_list.refresh() {
-            issues.push(AppIssue {
-                severity: IssueSeverity::Warning,
-                message: format!("Failed to list imported reports: {err}"),
-            });
+            issues.push(AppIssue::new_warning(format!(
+                "Failed to list imported reports: {err}"
+            )));
         }
 
         Self {
@@ -234,10 +226,9 @@ impl TaxelApp {
         match self.report_list.refresh() {
             Ok(()) => {}
             Err(err) => {
-                self.issues.push(AppIssue {
-                    severity: IssueSeverity::Warning,
-                    message: format!("Failed to refresh imported reports: {err}"),
-                });
+                self.issues.push(AppIssue::new_warning(format!(
+                    "Failed to refresh imported reports: {err}"
+                )));
                 self.show_error_panel = true;
             }
         }
@@ -474,12 +465,9 @@ fn load_fact_table(app: &mut TaxelApp) {
                 populate_fact_table(view, &item_facts, &mut table);
 
                 for missing_role in &table.role_mapping_errors {
-                    app.issues.push(AppIssue {
-                        severity: IssueSeverity::Warning,
-                        message: format!(
-                            "Missing report-element mapping for role URI: {missing_role}"
-                        ),
-                    });
+                    app.issues.push(AppIssue::new_warning(format!(
+                        "Missing report-element mapping for role URI: {missing_role}"
+                    )));
                 }
 
                 app.section_states = table
@@ -494,10 +482,7 @@ fn load_fact_table(app: &mut TaxelApp) {
                 app.loading = None;
             }
             Ok(Err(err)) => {
-                app.issues.push(AppIssue {
-                    severity: IssueSeverity::Error,
-                    message: err.to_string(),
-                });
+                app.issues.push(AppIssue::new_error(err.to_string()));
                 app.show_error_panel = true;
                 app.loading = None;
             }

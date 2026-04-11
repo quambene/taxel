@@ -33,10 +33,9 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
                         load_report(app, copied_path, ui.ctx().clone());
                     }
                     Err(err) => {
-                        app.issues.push(AppIssue {
-                            severity: IssueSeverity::Error,
-                            message: format!("Failed to import report: {err}"),
-                        });
+                        app.issues.push(AppIssue::new_error(format!(
+                            "Failed to import report: {err}"
+                        )));
                         app.show_error_panel = true;
                     }
                 }
@@ -116,10 +115,9 @@ fn read_report_xml(app: &mut TaxelApp) -> Option<String> {
     match fs::read_to_string(path) {
         Ok(xml) => Some(xml),
         Err(err) => {
-            app.issues.push(AppIssue {
-                severity: IssueSeverity::Error,
-                message: format!("Failed to read report file: {err}"),
-            });
+            app.issues.push(AppIssue::new_error(format!(
+                "Failed to read report file: {err}"
+            )));
             app.show_error_panel = true;
             None
         }
@@ -155,19 +153,15 @@ fn validate_report(app: &mut TaxelApp) {
     match eric.validate(xml, "Bilanz", taxonomy_version, None) {
         Ok(response) => {
             if response.error_code != ErrorCode::ERIC_OK as i32 {
-                app.issues.push(AppIssue {
-                    severity: IssueSeverity::Error,
-                    message: format!(
-                        "Validation failed with error code {}: {}",
-                        response.error_code, response.validation_response
-                    ),
-                })
+                app.issues.push(AppIssue::new_error(format!(
+                    "Validation failed with error code {}: {}",
+                    response.error_code, response.validation_response
+                )));
             }
         }
-        Err(err) => app.issues.push(AppIssue {
-            severity: IssueSeverity::Error,
-            message: format!("Validation error: {err}"),
-        }),
+        Err(err) => app
+            .issues
+            .push(AppIssue::new_error(format!("Validation error: {err}"))),
     }
 
     app.show_error_panel = !app.issues.is_empty();
@@ -192,17 +186,13 @@ fn send_report(app: &mut TaxelApp) {
     };
 
     match eric.send(xml, "Bilanz", taxonomy_version, None) {
-        Ok(response) => app.issues.push(AppIssue {
-            severity: IssueSeverity::Error,
-            message: format!(
-                "Send failed with error code {}: {}",
-                response.error_code, response.server_response
-            ),
-        }),
-        Err(err) => app.issues.push(AppIssue {
-            severity: IssueSeverity::Error,
-            message: format!("Send error: {err}"),
-        }),
+        Ok(response) => app.issues.push(AppIssue::new_error(format!(
+            "Send failed with error code {}: {}",
+            response.error_code, response.server_response
+        ))),
+        Err(err) => app
+            .issues
+            .push(AppIssue::new_error(format!("Send error: {err}"))),
     }
 
     app.show_error_panel = !app.issues.is_empty();
