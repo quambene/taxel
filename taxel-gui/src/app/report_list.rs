@@ -42,6 +42,10 @@ impl ReportList {
         Ok(())
     }
 
+    /// Registers a newly imported report by storing its creation date in the
+    /// `creation_dates` HashMap. This ensures that the creation date is
+    /// preserved even if the report list is refreshed from the filesystem,
+    /// which may not retain the original creation date metadata.
     pub(super) fn register_imported_report(&mut self, report_path: &Path) {
         let unix_seconds = report_store::system_time_to_unix_seconds(SystemTime::now());
         let report_path = report_path.to_string_lossy().to_string();
