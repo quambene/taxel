@@ -25,7 +25,7 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
                 .add_filter("All", &["*"])
                 .pick_file()
             {
-                match report_store::copy_imported_report(&path) {
+                match report_store::copy_report(&path) {
                     Ok(copied_path) => {
                         app.register_imported_report(&copied_path);
                         app.refresh_imported_reports();

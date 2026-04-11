@@ -1,7 +1,7 @@
 use anyhow::Result;
 use eframe::Storage;
 use std::{collections::HashMap, path::Path, time::SystemTime};
-use taxel_gui::report_store::{self, ReportSummary};
+use taxel_gui::report_store::{self, ReportStore, ReportSummary};
 
 const CREATION_DATES_STORAGE_KEY: &str = "report_creation_dates";
 
@@ -36,9 +36,9 @@ impl ReportList {
     }
 
     pub(super) fn refresh(&mut self) -> Result<()> {
-        let mut reports = report_store::list_reports()?;
-        self.apply_creation_dates(&mut reports);
-        self.reports = reports;
+        let mut reports = ReportStore::load_reports()?;
+        self.apply_creation_dates(&mut reports.report_list);
+        self.reports = reports.report_list;
         Ok(())
     }
 

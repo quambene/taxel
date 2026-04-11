@@ -17,64 +17,96 @@ pub struct ReportSummary {
     pub created_unix: i64,
 }
 
-/// Lists all imported reports by reading the reports directory and extracting
-/// metadata for display. The list is sorted by creation date, newest first.
-pub fn list_reports() -> Result<Vec<ReportSummary>> {
-    let reports = ensure_reports_dir()?;
-    let mut summaries = Vec::new();
+/// The `ReportStore` struct manages the list of created or imported reports,
+/// including their metadata and creation dates.
+pub struct ReportStore {
+    pub report_list: Vec<ReportSummary>,
+}
 
-    for entry in fs::read_dir(&reports)
-        .with_context(|| format!("Failed to read reports directory: {}", reports.display()))?
-    {
-        let entry = entry?;
-        let path = entry.path();
-
-        if !path.is_file() {
-            continue;
-        }
-
-        if path.extension().and_then(|ext| ext.to_str()) != Some("xml") {
-            continue;
-        }
-
-        let metadata = entry.metadata().with_context(|| {
-            format!(
-                "Failed to read metadata for report file: {}",
-                path.display()
-            )
-        })?;
-
-        let modified_at = metadata.modified().unwrap_or(SystemTime::UNIX_EPOCH);
-        let created_unix = system_time_to_unix_seconds(modified_at);
-        let display_name = path
-            .file_name()
-            .and_then(|name| name.to_str())
-            .unwrap_or("unknown.xml")
-            .to_string();
-
-        summaries.push(ReportSummary {
-            path,
-            display_name,
-            created_date: format_date(created_unix),
-            created_unix,
-        });
+impl ReportStore {
+    pub fn new(report_list: Vec<ReportSummary>) -> Self {
+        Self { report_list }
     }
 
-    summaries.sort_by(|a, b| b.created_unix.cmp(&a.created_unix));
-    Ok(summaries)
+    /// Loads the list of imported reports from the filesystem, extracting metadata
+    /// for display. The list is sorted by creation date, newest first. This
+    /// method is called when the application starts and whenever the report
+    /// list is refreshed.
+    pub fn load_reports() -> Result<Self> {
+        let reports_dir = reports_dir()?;
+
+        create_reports_dir_if_not_exists(&reports_dir)?;
+
+        let mut summaries = Vec::new();
+
+        for entry in fs::read_dir(&reports_dir).with_context(|| {
+            format!(
+                "Failed to read reports directory: {}",
+                reports_dir.display()
+            )
+        })? {
+            let entry = entry?;
+            let path = entry.path();
+
+            if !path.is_file() {
+                continue;
+            }
+
+            if path.extension().and_then(|ext| ext.to_str()) != Some("xml") {
+                continue;
+            }
+
+            let metadata = entry.metadata().with_context(|| {
+                format!(
+                    "Failed to read metadata for report file: {}",
+                    path.display()
+                )
+            })?;
+
+            let modified_at = metadata.modified().unwrap_or(SystemTime::UNIX_EPOCH);
+            let created_unix = system_time_to_unix_seconds(modified_at);
+            let display_name = path
+                .file_name()
+                .and_then(|name| name.to_str())
+                .unwrap_or("unknown.xml")
+                .to_string();
+
+            summaries.push(ReportSummary {
+                path,
+                display_name,
+                created_date: format_date(created_unix),
+                created_unix,
+            });
+        }
+
+        summaries.sort_by(|a, b| b.created_unix.cmp(&a.created_unix));
+
+        let report_store = Self::new(summaries);
+
+        Ok(report_store)
+    }
 }
 
-pub fn ensure_reports_dir() -> Result<PathBuf> {
-    let path = reports_dir()?;
-    fs::create_dir_all(&path)
-        .with_context(|| format!("Failed to create reports directory: {}", path.display()))?;
-    Ok(path)
+pub fn create_reports_dir_if_not_exists(reports_dir: &Path) -> Result<()> {
+    if !reports_dir.exists() {
+        fs::create_dir_all(&reports_dir).with_context(|| {
+            format!(
+                "Failed to create reports directory: {}",
+                reports_dir.display()
+            )
+        })?;
+    }
+
+    Ok(())
 }
 
-pub fn copy_imported_report(path: &Path) -> Result<PathBuf> {
-    let reports = ensure_reports_dir()?;
+pub fn copy_report(path: &Path) -> Result<PathBuf> {
+    let reports_dir = reports_dir()?;
+
+    create_reports_dir_if_not_exists(&reports_dir)?;
+
     let uuid = Uuid::new_v4();
-    let copied_path = reports.join(format!("ebilanz_{uuid}.xml"));
+    let copied_path = reports_dir.join(format!("ebilanz_{uuid}.xml"));
 
     fs::copy(path, &copied_path).with_context(|| {
         format!(
