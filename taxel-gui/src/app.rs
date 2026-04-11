@@ -201,7 +201,7 @@ impl TaxelApp {
 
         let show_error_panel = !issues.is_empty();
 
-        let mut report_list = ReportList::load_from_storage(ctx.storage);
+        let mut report_list = ReportList::new();
         if let Err(err) = report_list.refresh() {
             issues.push(AppIssue {
                 severity: IssueSeverity::Warning,
@@ -253,7 +253,6 @@ impl App for TaxelApp {
         eframe::set_value(storage, "lang", &self.lang);
         eframe::set_value(storage, "zoom_input", &self.zoom_input);
         eframe::set_value(storage, "dark_mode", &self.dark_mode);
-        self.report_list.save_to_storage(storage);
     }
 
     /// The main UI drawing function for the app, called on each frame.

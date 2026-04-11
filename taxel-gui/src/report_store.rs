@@ -1,11 +1,14 @@
 use anyhow::{Context, Result};
 use chrono::{DateTime, Local, Utc};
 use std::{
+    collections::HashMap,
     fs,
     path::{Path, PathBuf},
     time::SystemTime,
 };
 use uuid::Uuid;
+
+const CREATION_MANIFEST_FILE: &str = "reports.json";
 
 /// The `ReportSummary` struct represents a summary of a created or imported
 /// report.
@@ -100,6 +103,10 @@ pub fn create_reports_dir_if_not_exists(reports_dir: &Path) -> Result<()> {
     Ok(())
 }
 
+/// Copies a report file to the application's reports directory, assigning it a
+/// unique name based on a UUID. This is used when importing a report, ensuring
+/// that the original file remains unchanged and that the imported report is
+/// stored in a consistent location for the application to manage.
 pub fn copy_report(path: &Path) -> Result<PathBuf> {
     let reports_dir = reports_dir()?;
 
@@ -129,6 +136,68 @@ pub fn format_date(unix_seconds: i64) -> String {
     DateTime::<Utc>::from_timestamp(unix_seconds, 0)
         .map(|utc| utc.with_timezone(&Local).format("%Y-%m-%d").to_string())
         .unwrap_or_else(|| "unknown".to_string())
+}
+
+/// Loads the creation manifest, which is a JSON file that maps report file
+/// paths to their creation dates (in Unix seconds). This manifest is used to
+/// preserve the original creation dates of imported reports, as the filesystem
+/// metadata may not retain this information when files are copied or moved.
+pub fn load_creation_manifest() -> Result<HashMap<String, i64>> {
+    let reports_dir = reports_dir()?;
+
+    create_reports_dir_if_not_exists(&reports_dir)?;
+
+    let manifest_path = reports_dir.join(CREATION_MANIFEST_FILE);
+
+    if !manifest_path.exists() {
+        return Ok(HashMap::new());
+    }
+
+    let content = fs::read_to_string(&manifest_path).with_context(|| {
+        format!(
+            "Failed to read reports manifest: {}",
+            manifest_path.display()
+        )
+    })?;
+
+    if content.trim().is_empty() {
+        return Ok(HashMap::new());
+    }
+
+    serde_json::from_str(&content).with_context(|| {
+        format!(
+            "Failed to parse reports manifest JSON: {}",
+            manifest_path.display()
+        )
+    })
+}
+
+/// Saves the creation manifest, which is a JSON file that maps report file
+/// paths to their creation dates (in Unix seconds).
+pub fn save_creation_manifest(creation_dates: &HashMap<String, i64>) -> Result<()> {
+    let reports_dir = reports_dir()?;
+    create_reports_dir_if_not_exists(&reports_dir)?;
+
+    let manifest_path = reports_dir.join(CREATION_MANIFEST_FILE);
+    let temp_path = reports_dir.join(format!("{CREATION_MANIFEST_FILE}.tmp"));
+    let json = serde_json::to_string_pretty(creation_dates)
+        .context("Failed to serialize reports manifest")?;
+
+    fs::write(&temp_path, json).with_context(|| {
+        format!(
+            "Failed to write temporary reports manifest: {}",
+            temp_path.display()
+        )
+    })?;
+
+    fs::rename(&temp_path, &manifest_path).with_context(|| {
+        format!(
+            "Failed to move temporary reports manifest to {}",
+            manifest_path.display()
+        )
+    })?;
+
+    Ok(())
 }
 
 fn reports_dir() -> Result<PathBuf> {

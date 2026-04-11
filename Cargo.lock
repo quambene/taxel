@@ -4228,6 +4228,7 @@ dependencies = [
  "log",
  "quick-xml 0.29.0",
  "rfd",
+ "serde_json",
  "taxel",
  "uuid",
  "xbrl-rs",
