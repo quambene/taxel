@@ -130,6 +130,7 @@ fn validate_report(app: &mut TaxelApp) {
     app.show_error_panel = !app.issues.is_empty();
 }
 
+// TODO: provide certifcate path and password
 /// Sends the imported report and reports the server response in the diagnostics
 /// panel.
 fn send_report(app: &mut TaxelApp) {
