@@ -3,6 +3,7 @@ use crate::app::{error_panel::WARNING_COLOR, AppIssue, IssueSeverity};
 use eframe::egui::{
     self, text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui,
 };
+use eric_sdk::ErrorCode;
 use rfd::FileDialog;
 use std::{
     fs::{self},
@@ -152,13 +153,17 @@ fn validate_report(app: &mut TaxelApp) {
     };
 
     match eric.validate(xml, "Bilanz", taxonomy_version, None) {
-        Ok(response) => app.issues.push(AppIssue {
-            severity: IssueSeverity::Error,
-            message: format!(
-                "Validation failed with error code {}: {}",
-                response.error_code, response.validation_response
-            ),
-        }),
+        Ok(response) => {
+            if response.error_code != ErrorCode::ERIC_OK as i32 {
+                app.issues.push(AppIssue {
+                    severity: IssueSeverity::Error,
+                    message: format!(
+                        "Validation failed with error code {}: {}",
+                        response.error_code, response.validation_response
+                    ),
+                })
+            }
+        }
         Err(err) => app.issues.push(AppIssue {
             severity: IssueSeverity::Error,
             message: format!("Validation error: {err}"),
