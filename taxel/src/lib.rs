@@ -1,6 +1,5 @@
 mod csv;
 mod ebilanz;
-mod elster;
 mod ods;
 mod xbrl;
 mod xml;
