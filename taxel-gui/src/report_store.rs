@@ -89,7 +89,7 @@ impl ReportStore {
 
 pub fn create_reports_dir_if_not_exists(reports_dir: &Path) -> Result<()> {
     if !reports_dir.exists() {
-        fs::create_dir_all(&reports_dir).with_context(|| {
+        fs::create_dir_all(reports_dir).with_context(|| {
             format!(
                 "Failed to create reports directory: {}",
                 reports_dir.display()
