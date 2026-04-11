@@ -35,8 +35,7 @@ use std::{
     sync::mpsc::{self, Receiver},
     time::{Duration, Instant},
 };
-use taxel_gui::report_store::ReportSummary;
-use taxel_gui::{populate_fact_table, FactTable, SearchHit};
+use taxel_gui::{populate_fact_table, report_store::ReportSummary, FactTable, SearchHit};
 use xbrl_rs::{InstanceDocument, TaxonomySet};
 
 const JUMP_HIGHLIGHT_DURATION: Duration = Duration::from_millis(1400);
