@@ -15,7 +15,7 @@ use taxel_gui::load_xml;
 use xbrl_rs::TaxonomySet;
 
 /// Draws the header panel of the application, including the "Import report"
-/// button, the "Clear report" button, any error messages, and the language
+/// button, the "Close report" button, any error messages, and the language
 /// selector tabs.
 pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
     ui.horizontal_centered(|ui| {
@@ -34,7 +34,7 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
             ui.label("Loading…");
         }
 
-        if app.table.is_some() && ui.button("Clear report").clicked() {
+        if app.table.is_some() && ui.button("Close report").clicked() {
             app.table = None;
             app.report_path = None;
             app.issues.clear();
