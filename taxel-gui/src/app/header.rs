@@ -11,7 +11,7 @@ use std::{
     thread,
 };
 use taxel::TAXONOMY_YEAR_TO_VERSION;
-use taxel_gui::load_xml;
+use taxel_gui::{load_xml, report_store};
 use xbrl_rs::TaxonomySet;
 
 /// Draws the header panel of the application, including the "Import report"
@@ -19,13 +19,26 @@ use xbrl_rs::TaxonomySet;
 /// selector tabs.
 pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
     ui.horizontal_centered(|ui| {
-        if ui.button("Import report").clicked() {
+        if app.table.is_none() && app.loading.is_none() && ui.button("Import report").clicked() {
             if let Some(path) = FileDialog::new()
                 .add_filter("XML", &["xml"])
                 .add_filter("All", &["*"])
                 .pick_file()
             {
-                import_report(app, path, ui.ctx().clone());
+                match report_store::copy_imported_report(&path) {
+                    Ok(copied_path) => {
+                        app.register_imported_report(&copied_path);
+                        app.refresh_imported_reports();
+                        load_report(app, copied_path, ui.ctx().clone());
+                    }
+                    Err(err) => {
+                        app.issues.push(AppIssue {
+                            severity: IssueSeverity::Error,
+                            message: format!("Failed to import report: {err}"),
+                        });
+                        app.show_error_panel = true;
+                    }
+                }
             }
         }
 
@@ -36,9 +49,18 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
 
         if app.table.is_some() && ui.button("Close report").clicked() {
             app.table = None;
+            app.taxonomy = None;
+            app.report = None;
             app.report_path = None;
+            app.selected_tab = 0;
+            app.search.results.clear();
+            app.search.scroll_to_row = None;
+            app.search.row_highlight = None;
+            app.loading = None;
             app.issues.clear();
             app.show_error_panel = false;
+            app.editing_section = None;
+            app.edit_snapshot.clear();
         }
 
         if app.table.is_some() && ui.button("Validate report").clicked() {
@@ -67,7 +89,7 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
 
 /// Loads an XBRL instance document from the specified path and updates the app
 /// state. The load runs on a background thread to keep the UI responsive.
-fn import_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context) {
+pub(super) fn load_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context) {
     app.selected_tab = 0;
     app.table = None;
     app.report_path = Some(path.clone());
