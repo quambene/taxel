@@ -29,6 +29,9 @@ egui_extras = { version = "0.34.1", features = ["serde"] }
 rfd = "0.17.2"
 dioxus-devtools = "0.7.4"
 
-# TODO: remove patch after 0.2.1 is published
+
 [patch.crates-io]
+# TODO: remove patch after 0.2.1 is published
 xbrl-rs = { git = 'https://github.com/quambene/xbrl-rs.git' }
+# TODO: remove patch after 0.5.1 is published
+eric-sdk = { path = '../eric-rs/eric-sdk' }

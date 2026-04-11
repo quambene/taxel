@@ -1446,8 +1446,6 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 [[package]]
 name = "eric-bindings"
 version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3120357d87c021956b18dc28adff90de3993a49db3c917e542fbcaa3ec741e39"
 dependencies = [
  "anyhow",
 ]
@@ -1455,8 +1453,6 @@ dependencies = [
 [[package]]
 name = "eric-sdk"
 version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0f2458f899cfa71bd720520b1bd33fa875ea5a1ad385fb658d1c44c2dbaf63a7"
 dependencies = [
  "anyhow",
  "eric-bindings",
