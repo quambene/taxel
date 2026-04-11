@@ -142,7 +142,7 @@ impl TaxelApp {
         }
 
         let settings = Settings::load(ctx.storage);
-        settings.apply_to_context(&ctx.egui_ctx);
+        settings.apply(&ctx.egui_ctx);
 
         let eric =
             if let Some(log_path) = dirs::data_dir().map(|dir| dir.join("taxel").join("logs")) {
