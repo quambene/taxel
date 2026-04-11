@@ -4,7 +4,11 @@ use eframe::egui::{
     text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui,
 };
 use rfd::FileDialog;
-use std::{sync::mpsc, thread};
+use std::{
+    fs::{self},
+    sync::mpsc,
+    thread,
+};
 use taxel_gui::load_xml;
 
 /// Draws the header panel of the application, including the "Import report"
@@ -29,6 +33,7 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
 
         if app.table.is_some() && ui.button("Clear report").clicked() {
             app.table = None;
+            app.report_path = None;
             app.issues.clear();
             app.show_error_panel = false;
         }
@@ -58,6 +63,7 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
 fn import_report(app: &mut TaxelApp, path: std::path::PathBuf, ctx: eframe::egui::Context) {
     app.selected_tab = 0;
     app.table = None;
+    app.report_path = Some(path.clone());
     app.issues.clear();
     app.show_error_panel = false;
     app.editing_section = None;
@@ -78,22 +84,43 @@ fn import_report(app: &mut TaxelApp, path: std::path::PathBuf, ctx: eframe::egui
 fn validate_report(app: &mut TaxelApp) {
     app.issues.clear();
 
-    // TODO: Implement report validation against XBRL taxonomy rules.
+    let xml = match &app.report_path {
+        None => return,
+        Some(path) => match fs::read_to_string(path) {
+            Ok(xml) => xml,
+            Err(err) => {
+                app.issues.push(AppIssue {
+                    severity: IssueSeverity::Error,
+                    message: format!("Failed to read report file: {err}"),
+                });
+                app.show_error_panel = true;
+                return;
+            }
+        },
+    };
+
     if let Some(eric) = &app.eric {
-        let xml = todo!();
         let taxonomy_type = "Bilanz";
         let taxonomy_version = "6.5";
-        let response = eric
-            .validate(xml, taxonomy_type, taxonomy_version, None)
-            .unwrap();
+        let response = eric.validate(xml, taxonomy_type, taxonomy_version, None);
 
-        app.issues = vec![AppIssue {
-            severity: IssueSeverity::Error,
-            message: format!(
-                "Validation failed with error code {}: {}",
-                response.error_code, response.validation_response
-            ),
-        }];
+        match response {
+            Ok(response) => {
+                app.issues = vec![AppIssue {
+                    severity: IssueSeverity::Error,
+                    message: format!(
+                        "Validation failed with error code {}: {}",
+                        response.error_code, response.validation_response
+                    ),
+                }];
+            }
+            Err(err) => {
+                app.issues.push(AppIssue {
+                    severity: IssueSeverity::Error,
+                    message: format!("Validation error: {err}"),
+                });
+            }
+        }
     }
 
     app.show_error_panel = !app.issues.is_empty();

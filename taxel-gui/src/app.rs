@@ -22,6 +22,7 @@ use eframe::{
 use eric_sdk::Eric;
 use std::{
     collections::HashSet,
+    fs,
     sync::mpsc::{self, Receiver},
     time::{Duration, Instant},
 };
@@ -94,6 +95,8 @@ pub struct TaxelApp {
     /// diagnostics. Initialized on app start if the data directory can be
     /// determined, otherwise skipped with a warning.
     eric: Option<Eric>,
+    /// Path of the currently imported report, if any.
+    report_path: Option<std::path::PathBuf>,
 }
 
 /// Indicates the issue severity for diagnostics.
@@ -167,6 +170,13 @@ impl TaxelApp {
 
         let eric =
             if let Some(log_path) = dirs::data_dir().map(|dir| dir.join("taxel").join("logs")) {
+                if let Err(err) = fs::create_dir_all(&log_path) {
+                    issues.push(AppIssue {
+                        severity: IssueSeverity::Error,
+                        message: format!("Failed to create log directory: {err}"),
+                    });
+                }
+
                 match Eric::new(&log_path) {
                     Ok(eric) => Some(eric),
                     Err(err) => {
@@ -199,6 +209,7 @@ impl TaxelApp {
             dark_mode,
             loading: None,
             search: Search::default(),
+            report_path: None,
             editing_section: None,
             edit_snapshot: Vec::new(),
             eric,
