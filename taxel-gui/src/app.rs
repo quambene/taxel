@@ -192,7 +192,7 @@ impl TaxelApp {
                 None
             };
 
-        let show_error_panel = !issues.is_empty();
+        let show_error_panel = true;
 
         let mut report_list = ReportList::new();
         if let Err(err) = report_list.refresh() {
@@ -262,16 +262,14 @@ impl App for TaxelApp {
                 draw_header(self, ui);
             });
 
-            if let Some(table) = &self.table {
-                draw_sidebar(
-                    ctx,
-                    table.sections.as_slice(),
-                    &mut self.selected_tab,
-                    &self.lang,
-                );
-            }
+            let sections = self
+                .table
+                .as_ref()
+                .map(|table| table.sections.as_slice())
+                .unwrap_or(&[]);
+            draw_sidebar(ctx, sections, &mut self.selected_tab, &self.lang);
 
-            if !self.issues.is_empty() && self.show_error_panel {
+            if self.show_error_panel {
                 draw_error_panel(ctx, &self.issues, &mut self.show_error_panel);
             }
 
@@ -279,7 +277,7 @@ impl App for TaxelApp {
 
             let central_frame = {
                 let mut frame = egui::Frame::central_panel(ctx.style());
-                if !self.issues.is_empty() && self.show_error_panel {
+                if self.show_error_panel {
                     frame.inner_margin.bottom = 0;
                 }
                 frame

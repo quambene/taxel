@@ -24,6 +24,12 @@ pub(super) fn draw_sidebar(
 
             ui.separator();
             ScrollArea::vertical().show(ui, |ui| {
+                if sections.is_empty() {
+                    ui.add_space(6.0);
+                    ui.weak("Import a report to view sections.");
+                    return;
+                }
+
                 for (i, section) in sections.iter().enumerate() {
                     let title = section
                         .labels

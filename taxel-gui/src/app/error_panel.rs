@@ -57,6 +57,11 @@ pub(super) fn draw_error_panel(ctx: &mut Ui, issues: &[AppIssue], show_error_pan
                 ScrollArea::vertical()
                     .auto_shrink([false, false])
                     .show(ui, |ui| {
+                        if issues.is_empty() {
+                            ui.weak("No issues.");
+                            return;
+                        }
+
                         for issue in issues {
                             let (tag, color) = match issue.severity {
                                 IssueSeverity::Error => ("Error", ERROR_COLOR),

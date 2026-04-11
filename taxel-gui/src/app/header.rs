@@ -58,7 +58,7 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
             app.search.row_highlight = None;
             app.loading = None;
             app.issues.clear();
-            app.show_error_panel = false;
+            app.show_error_panel = true;
             app.editing_section = None;
             app.edit_snapshot.clear();
         }
@@ -94,7 +94,6 @@ pub(super) fn load_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context)
     app.table = None;
     app.report_path = Some(path.clone());
     app.issues.clear();
-    app.show_error_panel = false;
     app.editing_section = None;
     app.edit_snapshot.clear();
 
@@ -163,8 +162,6 @@ fn validate_report(app: &mut TaxelApp) {
             .issues
             .push(AppIssue::new_error(format!("Validation error: {err}"))),
     }
-
-    app.show_error_panel = !app.issues.is_empty();
 }
 
 // TODO: provide certifcate path and password
@@ -194,8 +191,6 @@ fn send_report(app: &mut TaxelApp) {
             .issues
             .push(AppIssue::new_error(format!("Send error: {err}"))),
     }
-
-    app.show_error_panel = !app.issues.is_empty();
 }
 
 /// Draws a summary of errors and warnings in the header. Clicking on the
@@ -212,43 +207,41 @@ fn draw_error_summary(app: &mut TaxelApp, ui: &mut Ui) {
         .filter(|issue| issue.severity == IssueSeverity::Warning)
         .count();
 
-    if error_count > 0 || warning_count > 0 {
-        ui.separator();
+    ui.separator();
 
-        let mut job = LayoutJob::default();
-        job.append(
-            &format!("errors: {error_count}"),
-            0.0,
-            TextFormat {
-                color: Color32::RED,
-                ..Default::default()
-            },
+    let mut job = LayoutJob::default();
+    job.append(
+        &format!("errors: {error_count}"),
+        0.0,
+        TextFormat {
+            color: Color32::RED,
+            ..Default::default()
+        },
+    );
+    job.append(
+        &format!("  warnings: {warning_count}"),
+        0.0,
+        TextFormat {
+            color: WARNING_COLOR,
+            ..Default::default()
+        },
+    );
+
+    let bg_idx = ui.painter().add(Shape::Noop);
+    let response = ui.add(Button::new(job).frame(false));
+    if response.hovered() {
+        ui.painter().set(
+            bg_idx,
+            Shape::rect_filled(
+                response.rect,
+                ui.visuals().widgets.hovered.corner_radius,
+                ui.visuals().widgets.hovered.weak_bg_fill,
+            ),
         );
-        job.append(
-            &format!("  warnings: {warning_count}"),
-            0.0,
-            TextFormat {
-                color: WARNING_COLOR,
-                ..Default::default()
-            },
-        );
+    }
 
-        let bg_idx = ui.painter().add(Shape::Noop);
-        let response = ui.add(Button::new(job).frame(false));
-        if response.hovered() {
-            ui.painter().set(
-                bg_idx,
-                Shape::rect_filled(
-                    response.rect,
-                    ui.visuals().widgets.hovered.corner_radius,
-                    ui.visuals().widgets.hovered.weak_bg_fill,
-                ),
-            );
-        }
-
-        if response.clicked() {
-            app.show_error_panel = !app.show_error_panel;
-        }
+    if response.clicked() {
+        app.show_error_panel = !app.show_error_panel;
     }
 }
 
