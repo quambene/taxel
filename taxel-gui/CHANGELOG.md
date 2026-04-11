@@ -13,7 +13,7 @@
   - Add search bar
   - Add toggle for light/dark mode
   - Edit and save report
-  - Add error summary and error panel
+  - Add diagnostics panel
   - Persist app settings
   - Add loading spinner for import report
   - Display report list

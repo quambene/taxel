@@ -1,4 +1,4 @@
-mod error_panel;
+mod diagnostics_panel;
 mod header;
 mod report_list;
 mod search_overlay;
@@ -8,7 +8,7 @@ mod table;
 mod toolbar;
 
 use self::{
-    error_panel::draw_error_panel,
+    diagnostics_panel::draw_error_panel,
     header::{draw_header, load_report},
     report_list::ReportList,
     search_overlay::{draw_search_results_overlay, highlight_row},
@@ -18,7 +18,7 @@ use self::{
     toolbar::{draw_toolbar, EditAction},
 };
 use crate::{
-    app::error_panel::{AppIssue, IssueSeverity},
+    app::diagnostics_panel::{AppIssue, IssueSeverity},
     widgets::draw_unsaved_changes_modal,
 };
 use dioxus_devtools::subsecond;
