@@ -176,6 +176,7 @@ pub fn load_creation_manifest() -> Result<HashMap<String, i64>> {
 /// paths to their creation dates (in Unix seconds).
 pub fn save_creation_manifest(creation_dates: &HashMap<String, i64>) -> Result<()> {
     let reports_dir = reports_dir()?;
+
     create_reports_dir_if_not_exists(&reports_dir)?;
 
     let manifest_path = reports_dir.join(CREATION_MANIFEST_FILE);
