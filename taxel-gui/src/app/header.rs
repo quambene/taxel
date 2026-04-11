@@ -1,5 +1,5 @@
-use super::{IssueSeverity, TaxelApp};
-use crate::app::{error_panel::WARNING_COLOR, AppIssue};
+use super::TaxelApp;
+use crate::app::{error_panel::WARNING_COLOR, AppIssue, IssueSeverity};
 use eframe::egui::{
     self, text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui,
 };

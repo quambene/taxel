@@ -13,7 +13,10 @@ use self::{
     table::draw_table,
     toolbar::{draw_toolbar, EditAction},
 };
-use crate::widgets::draw_unsaved_changes_modal;
+use crate::{
+    app::error_panel::{AppIssue, IssueSeverity},
+    widgets::draw_unsaved_changes_modal,
+};
 use dioxus_devtools::subsecond;
 use eframe::{
     egui::{self, CentralPanel, Key, KeyboardShortcut, Modifiers, Panel, Ui, Visuals},
@@ -105,30 +108,6 @@ pub struct TaxelApp {
     eric: Option<Eric>,
     /// Path of the currently imported report, if any.
     report_path: Option<PathBuf>,
-}
-
-/// Indicates the issue severity for diagnostics.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub(super) enum IssueSeverity {
-    Error,
-    Warning,
-}
-
-/// Collects all information about an error or warning to display in the
-/// diagnostics panel and error summary in the header.
-#[derive(Clone, Debug)]
-pub(super) struct AppIssue {
-    pub(super) severity: IssueSeverity,
-    pub(super) message: String,
-}
-
-impl AppIssue {
-    pub fn taxonomy_version_error() -> Self {
-        AppIssue {
-            severity: IssueSeverity::Error,
-            message: "Failed to determine taxonomy version".to_string(),
-        }
-    }
 }
 
 impl TaxelApp {

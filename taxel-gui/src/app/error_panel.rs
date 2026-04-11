@@ -1,8 +1,31 @@
-use super::{AppIssue, IssueSeverity};
 use eframe::egui::{vec2, Align, Button, Color32, Layout, Panel, ScrollArea, Ui};
 
 pub const WARNING_COLOR: Color32 = Color32::from_rgb(180, 120, 0);
 pub const ERROR_COLOR: Color32 = Color32::RED;
+
+/// Indicates the issue severity for diagnostics.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(super) enum IssueSeverity {
+    Error,
+    Warning,
+}
+
+/// Collects all information about an error or warning to display in the
+/// diagnostics panel and error summary in the header.
+#[derive(Clone, Debug)]
+pub(super) struct AppIssue {
+    pub(super) severity: IssueSeverity,
+    pub(super) message: String,
+}
+
+impl AppIssue {
+    pub fn taxonomy_version_error() -> Self {
+        AppIssue {
+            severity: IssueSeverity::Error,
+            message: "Failed to determine taxonomy version".to_string(),
+        }
+    }
+}
 
 /// Draws a bottom diagnostics panel with detailed error and warning messages.
 pub(super) fn draw_error_panel(ctx: &mut Ui, issues: &[AppIssue], show_error_panel: &mut bool) {
