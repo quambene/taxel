@@ -9,7 +9,7 @@ pub use crate::{
         read_tags, write_tags, Reader as CsvReader, ReaderBuilder as CsvReaderBuilder, Trim,
         Writer as CsvWriter, WriterBuilder as CsvWriterBuilder,
     },
-    ebilanz::{GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT},
+    ebilanz::{GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT, TAXONOMY_YEAR_TO_VERSION},
 };
 use log::warn;
 pub use quick_xml::{Reader, Writer};

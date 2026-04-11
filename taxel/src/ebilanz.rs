@@ -3,6 +3,19 @@ use std::{collections::HashMap, sync::LazyLock};
 pub const GCD_ROLE_URI: &str = "http://www.xbrl.de/taxonomies/de-gcd/role/gcd";
 pub const GCD_LABEL: &str = "GCD (Global Common Document)";
 
+pub static TAXONOMY_YEAR_TO_VERSION: LazyLock<HashMap<&'static str, &'static str>> =
+    LazyLock::new(|| {
+        HashMap::from([
+            ("2020", "6.4"),
+            ("2021", "6.5"),
+            ("2022", "6.6"),
+            ("2023", "6.7"),
+            ("2024", "6.8"),
+            ("2025", "6.9"),
+            ("2026", "6.10"),
+        ])
+    });
+
 /// Static mapping from full eBilanz role URI to de-gcd report-element concept.
 pub static ROLE_URI_TO_REPORT_ELEMENT: LazyLock<HashMap<&'static str, &'static str>> =
     LazyLock::new(|| {

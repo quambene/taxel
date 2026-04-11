@@ -13,7 +13,7 @@ version = "0.1.0"
 
 [workspace.dependencies]
 xbrl-rs = "0.2.0"
-eric-sdk = "0.4.0"
+eric-sdk = "0.5.0"
 anyhow = "1.0.71"
 log = "0.4.19"
 env_logger = "0.10.0"
@@ -29,6 +29,9 @@ egui_extras = { version = "0.34.1", features = ["serde"] }
 rfd = "0.17.2"
 dioxus-devtools = "0.7.4"
 
-# TODO: remove patch after 0.2.1 is published
+
 [patch.crates-io]
+# TODO: remove patch after 0.2.1 is published
 xbrl-rs = { git = 'https://github.com/quambene/xbrl-rs.git' }
+# TODO: remove patch after 0.5.1 is published
+eric-sdk = { git = 'https://github.com/quambene/eric-rs.git' }

@@ -1,11 +1,18 @@
 use super::{IssueSeverity, TaxelApp};
-use crate::app::error_panel::WARNING_COLOR;
+use crate::app::{error_panel::WARNING_COLOR, AppIssue};
 use eframe::egui::{
-    text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui,
+    self, text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui,
 };
 use rfd::FileDialog;
-use std::{sync::mpsc, thread};
+use std::{
+    fs::{self},
+    path::PathBuf,
+    sync::mpsc,
+    thread,
+};
+use taxel::TAXONOMY_YEAR_TO_VERSION;
 use taxel_gui::load_xml;
+use xbrl_rs::TaxonomySet;
 
 /// Draws the header panel of the application, including the "Import report"
 /// button, the "Clear report" button, any error messages, and the language
@@ -29,8 +36,17 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
 
         if app.table.is_some() && ui.button("Clear report").clicked() {
             app.table = None;
+            app.report_path = None;
             app.issues.clear();
             app.show_error_panel = false;
+        }
+
+        if app.table.is_some() && ui.button("Validate report").clicked() {
+            validate_report(app);
+        }
+
+        if app.table.is_some() && ui.button("Send report").clicked() {
+            send_report(app);
         }
 
         draw_error_summary(app, ui);
@@ -51,9 +67,10 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
 
 /// Loads an XBRL instance document from the specified path and updates the app
 /// state. The load runs on a background thread to keep the UI responsive.
-fn import_report(app: &mut TaxelApp, path: std::path::PathBuf, ctx: eframe::egui::Context) {
+fn import_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context) {
     app.selected_tab = 0;
     app.table = None;
+    app.report_path = Some(path.clone());
     app.issues.clear();
     app.show_error_panel = false;
     app.editing_section = None;
@@ -67,6 +84,101 @@ fn import_report(app: &mut TaxelApp, path: std::path::PathBuf, ctx: eframe::egui
         let _ = tx.send(table);
         ctx.request_repaint();
     });
+}
+
+/// Reads the XML from `report_path`.
+fn read_report_xml(app: &mut TaxelApp) -> Option<String> {
+    let path = app.report_path.as_ref()?;
+
+    match fs::read_to_string(path) {
+        Ok(xml) => Some(xml),
+        Err(err) => {
+            app.issues.push(AppIssue {
+                severity: IssueSeverity::Error,
+                message: format!("Failed to read report file: {err}"),
+            });
+            app.show_error_panel = true;
+            None
+        }
+    }
+}
+
+/// The taxonomy version is derived from the schemaRef URLs, which
+/// contain a date like "2024-06-30". We extract the year and map it to
+/// the corresponding version string expected by ERiC.
+fn extract_taxonomy_version(taxonomy: &Option<TaxonomySet>) -> Option<&&str> {
+    taxonomy
+        .as_ref()
+        .and_then(|taxonomy| taxonomy.version())
+        .map(|date| date.split('-').next().unwrap_or(date))
+        .and_then(|version| TAXONOMY_YEAR_TO_VERSION.get(version))
+}
+
+/// Validates the imported report and reports any issues in the diagnostics
+/// panel.
+fn validate_report(app: &mut TaxelApp) {
+    app.issues.clear();
+
+    let Some(xml) = read_report_xml(app) else {
+        return;
+    };
+    let Some(eric) = &app.eric else { return };
+    let Some(taxonomy_version) = extract_taxonomy_version(&app.taxonomy) else {
+        app.issues.push(AppIssue::taxonomy_version_error());
+        app.show_error_panel = true;
+        return;
+    };
+
+    match eric.validate(xml, "Bilanz", taxonomy_version, None) {
+        Ok(response) => app.issues.push(AppIssue {
+            severity: IssueSeverity::Error,
+            message: format!(
+                "Validation failed with error code {}: {}",
+                response.error_code, response.validation_response
+            ),
+        }),
+        Err(err) => app.issues.push(AppIssue {
+            severity: IssueSeverity::Error,
+            message: format!("Validation error: {err}"),
+        }),
+    }
+
+    app.show_error_panel = !app.issues.is_empty();
+}
+
+// TODO: provide certifcate path and password
+/// Sends the imported report and reports the server response in the diagnostics
+/// panel.
+fn send_report(app: &mut TaxelApp) {
+    app.issues.clear();
+
+    let Some(xml) = read_report_xml(app) else {
+        return;
+    };
+    let Some(eric) = &app.eric else {
+        return;
+    };
+    let Some(taxonomy_version) = extract_taxonomy_version(&app.taxonomy) else {
+        app.issues.push(AppIssue::taxonomy_version_error());
+        app.show_error_panel = true;
+        return;
+    };
+
+    match eric.send(xml, "Bilanz", taxonomy_version, None) {
+        Ok(response) => app.issues.push(AppIssue {
+            severity: IssueSeverity::Error,
+            message: format!(
+                "Send failed with error code {}: {}",
+                response.error_code, response.server_response
+            ),
+        }),
+        Err(err) => app.issues.push(AppIssue {
+            severity: IssueSeverity::Error,
+            message: format!("Send error: {err}"),
+        }),
+    }
+
+    app.show_error_panel = !app.issues.is_empty();
 }
 
 /// Draws a summary of errors and warnings in the header. Clicking on the

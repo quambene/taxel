@@ -109,7 +109,7 @@ impl FactTable {
 /// Loads an XBRL instance document from the specified path, discovers the
 /// referenced taxonomies, and populates the fact table with the extracted
 /// facts.
-pub fn load_xml(path: &Path) -> Result<FactTable, anyhow::Error> {
+pub fn load_xml(path: &Path) -> Result<(TaxonomySet, InstanceDocument), anyhow::Error> {
     debug!("Read xml file: {}", path.display());
 
     let instance = InstanceDocument::from_file(path)?;
@@ -119,18 +119,13 @@ pub fn load_xml(path: &Path) -> Result<FactTable, anyhow::Error> {
         .context("missing path to taxonomies")?
         .join("test_data/taxonomies");
     let taxonomy = TaxonomySet::discover(schema_refs, entry_point)?;
-    let view = instance.view(&taxonomy);
-    let item_facts = instance.item_facts();
-    let mut table = FactTable::default();
 
-    populate_fact_table(view, &item_facts, &mut table);
-
-    Ok(table)
+    Ok((taxonomy, instance))
 }
 
 /// Populates the fact table by traversing the document view and collecting
 /// facts from the tree nodes.
-fn populate_fact_table(view: DocumentView, item_facts: &[&ItemFact], table: &mut FactTable) {
+pub fn populate_fact_table(view: DocumentView, item_facts: &[&ItemFact], table: &mut FactTable) {
     table.sections.clear();
     table.role_mapping_errors.clear();
 
