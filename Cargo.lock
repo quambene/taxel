@@ -1454,12 +1454,13 @@ dependencies = [
 
 [[package]]
 name = "eric-sdk"
-version = "0.4.0"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bbe5d02ae98c93724b98e1926101724d4cb5a787b3f81e5329ddc43017c33159"
+checksum = "0f2458f899cfa71bd720520b1bd33fa875ea5a1ad385fb658d1c44c2dbaf63a7"
 dependencies = [
  "anyhow",
  "eric-bindings",
+ "thiserror 2.0.18",
 ]
 
 [[package]]
@@ -4223,6 +4224,7 @@ dependencies = [
  "dirs",
  "eframe",
  "egui_extras",
+ "eric-sdk",
  "futures-channel",
  "log",
  "quick-xml 0.29.0",
