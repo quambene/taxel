@@ -27,7 +27,8 @@ use std::{
     sync::mpsc::{self, Receiver},
     time::{Duration, Instant},
 };
-use taxel_gui::{FactTable, SearchHit};
+use taxel_gui::{populate_fact_table, FactTable, SearchHit};
+use xbrl_rs::{InstanceDocument, TaxonomySet};
 
 const JUMP_HIGHLIGHT_DURATION: Duration = Duration::from_millis(1400);
 
@@ -64,8 +65,14 @@ struct SectionState {
 
 /// Main application struct for the Taxel GUI, managing the state of the app.
 pub struct TaxelApp {
+    /// The taxonomy set for the currently loaded XBRL instance document, if
+    /// any.
+    taxonomy: Option<TaxonomySet>,
+    /// The instance document currently loaded in the app, if any.
+    report: Option<InstanceDocument>,
     /// The fact table containing the extracted facts from the XBRL instance
-    /// document.
+    /// document, enriched with the concept labels and presentation structure
+    /// for display in the UI.
     table: Option<FactTable>,
     /// The index of the currently selected section tab in the sidebar.
     selected_tab: usize,
@@ -84,7 +91,7 @@ pub struct TaxelApp {
     /// Whether dark mode is enabled.
     dark_mode: bool,
     /// Receives the result of a background XML load, if one is in progress.
-    loading: Option<Receiver<anyhow::Result<FactTable>>>,
+    loading: Option<Receiver<anyhow::Result<(TaxonomySet, InstanceDocument)>>>,
     /// Some while the value column of that section is being edited, None
     /// otherwise.
     editing_section: Option<usize>,
@@ -113,6 +120,15 @@ pub(super) enum IssueSeverity {
 pub(super) struct AppIssue {
     pub(super) severity: IssueSeverity,
     pub(super) message: String,
+}
+
+impl AppIssue {
+    pub fn taxonomy_version_error() -> Self {
+        AppIssue {
+            severity: IssueSeverity::Error,
+            message: "Failed to determine taxonomy version".to_string(),
+        }
+    }
 }
 
 impl TaxelApp {
@@ -200,6 +216,8 @@ impl TaxelApp {
         let show_error_panel = !issues.is_empty();
 
         Self {
+            taxonomy: None,
+            report: None,
             table,
             selected_tab: 0,
             section_states,
@@ -427,12 +445,12 @@ impl App for TaxelApp {
 fn load_fact_table(app: &mut TaxelApp) {
     if let Some(rx) = &app.loading {
         match rx.try_recv() {
-            Ok(Ok(table)) => {
-                app.section_states = table
-                    .sections
-                    .iter()
-                    .map(|_| SectionState::default())
-                    .collect();
+            Ok(Ok((taxonomy, report))) => {
+                let view = report.view(&taxonomy);
+                let item_facts = report.item_facts();
+                let mut table = FactTable::default();
+
+                populate_fact_table(view, &item_facts, &mut table);
 
                 for missing_role in &table.role_mapping_errors {
                     app.issues.push(AppIssue {
@@ -443,7 +461,14 @@ fn load_fact_table(app: &mut TaxelApp) {
                     });
                 }
 
+                app.section_states = table
+                    .sections
+                    .iter()
+                    .map(|_| SectionState::default())
+                    .collect();
                 app.table = Some(table);
+                app.taxonomy = Some(taxonomy);
+                app.report = Some(report);
                 app.show_error_panel = !app.issues.is_empty();
                 app.loading = None;
             }

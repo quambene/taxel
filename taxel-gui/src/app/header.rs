@@ -10,7 +10,9 @@ use std::{
     sync::mpsc,
     thread,
 };
+use taxel::TAXONOMY_YEAR_TO_VERSION;
 use taxel_gui::load_xml;
+use xbrl_rs::TaxonomySet;
 
 /// Draws the header panel of the application, including the "Import report"
 /// button, the "Clear report" button, any error messages, and the language
@@ -101,7 +103,17 @@ fn read_report_xml(app: &mut TaxelApp) -> Option<String> {
     }
 }
 
-// TODO: determine taxonomy version
+/// The taxonomy version is derived from the schemaRef URLs, which
+/// contain a date like "2024-06-30". We extract the year and map it to
+/// the corresponding version string expected by ERiC.
+fn extract_taxonomy_version(taxonomy: &Option<TaxonomySet>) -> Option<&&str> {
+    taxonomy
+        .as_ref()
+        .and_then(|taxonomy| taxonomy.version())
+        .map(|date| date.split('-').next().unwrap_or(date))
+        .and_then(|version| TAXONOMY_YEAR_TO_VERSION.get(version))
+}
+
 /// Validates the imported report and reports any issues in the diagnostics
 /// panel.
 fn validate_report(app: &mut TaxelApp) {
@@ -111,11 +123,13 @@ fn validate_report(app: &mut TaxelApp) {
         return;
     };
     let Some(eric) = &app.eric else { return };
+    let Some(taxonomy_version) = extract_taxonomy_version(&app.taxonomy) else {
+        app.issues.push(AppIssue::taxonomy_version_error());
+        app.show_error_panel = true;
+        return;
+    };
 
-    let taxonomy_type = "Bilanz";
-    let taxonomy_version = "6.5";
-
-    match eric.validate(xml, taxonomy_type, taxonomy_version, None) {
+    match eric.validate(xml, "Bilanz", taxonomy_version, None) {
         Ok(response) => app.issues.push(AppIssue {
             severity: IssueSeverity::Error,
             message: format!(
@@ -133,7 +147,6 @@ fn validate_report(app: &mut TaxelApp) {
 }
 
 // TODO: provide certifcate path and password
-// TODO: determine taxonomy version
 /// Sends the imported report and reports the server response in the diagnostics
 /// panel.
 fn send_report(app: &mut TaxelApp) {
@@ -142,12 +155,16 @@ fn send_report(app: &mut TaxelApp) {
     let Some(xml) = read_report_xml(app) else {
         return;
     };
-    let Some(eric) = &app.eric else { return };
+    let Some(eric) = &app.eric else {
+        return;
+    };
+    let Some(taxonomy_version) = extract_taxonomy_version(&app.taxonomy) else {
+        app.issues.push(AppIssue::taxonomy_version_error());
+        app.show_error_panel = true;
+        return;
+    };
 
-    let taxonomy_type = "Bilanz";
-    let taxonomy_version = "6.5";
-
-    match eric.send(xml, taxonomy_type, taxonomy_version, None) {
+    match eric.send(xml, "Bilanz", taxonomy_version, None) {
         Ok(response) => app.issues.push(AppIssue {
             severity: IssueSeverity::Error,
             message: format!(
