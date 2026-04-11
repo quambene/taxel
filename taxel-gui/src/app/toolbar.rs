@@ -119,7 +119,7 @@ fn draw_edit_buttons(ui: &mut Ui, editing: bool) -> EditAction {
             return EditAction::Cancel;
         }
     } else {
-        let button = draw_dark_button(ui, "Edit report");
+        let button = draw_dark_button(ui, "Edit section");
 
         if button.clicked() {
             return EditAction::Start;

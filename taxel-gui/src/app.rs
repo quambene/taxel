@@ -1,5 +1,6 @@
 mod error_panel;
 mod header;
+mod report_list;
 mod search_overlay;
 mod sidebar;
 mod table;
@@ -7,16 +8,23 @@ mod toolbar;
 
 use self::{
     error_panel::draw_error_panel,
-    header::draw_header,
+    header::{draw_header, load_report},
+    report_list::ReportList,
     search_overlay::{draw_search_results_overlay, highlight_row},
     sidebar::draw_sidebar,
     table::draw_table,
     toolbar::{draw_toolbar, EditAction},
 };
-use crate::widgets::draw_unsaved_changes_modal;
+use crate::{
+    app::error_panel::{AppIssue, IssueSeverity},
+    widgets::draw_unsaved_changes_modal,
+};
 use dioxus_devtools::subsecond;
 use eframe::{
-    egui::{self, CentralPanel, Key, KeyboardShortcut, Modifiers, Panel, Ui, Visuals},
+    egui::{
+        self, CentralPanel, CursorIcon, Key, KeyboardShortcut, Label, Modifiers, Panel, RichText,
+        Sense, Ui, Visuals,
+    },
     App, CreationContext, Frame,
 };
 use eric_sdk::Eric;
@@ -27,7 +35,7 @@ use std::{
     sync::mpsc::{self, Receiver},
     time::{Duration, Instant},
 };
-use taxel_gui::{populate_fact_table, FactTable, SearchHit};
+use taxel_gui::{populate_fact_table, report_store::ReportSummary, FactTable, SearchHit};
 use xbrl_rs::{InstanceDocument, TaxonomySet};
 
 const JUMP_HIGHLIGHT_DURATION: Duration = Duration::from_millis(1400);
@@ -105,30 +113,8 @@ pub struct TaxelApp {
     eric: Option<Eric>,
     /// Path of the currently imported report, if any.
     report_path: Option<PathBuf>,
-}
-
-/// Indicates the issue severity for diagnostics.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub(super) enum IssueSeverity {
-    Error,
-    Warning,
-}
-
-/// Collects all information about an error or warning to display in the
-/// diagnostics panel and error summary in the header.
-#[derive(Clone, Debug)]
-pub(super) struct AppIssue {
-    pub(super) severity: IssueSeverity,
-    pub(super) message: String,
-}
-
-impl AppIssue {
-    pub fn taxonomy_version_error() -> Self {
-        AppIssue {
-            severity: IssueSeverity::Error,
-            message: "Failed to determine taxonomy version".to_string(),
-        }
-    }
+    /// Imported reports and creation date bookkeeping.
+    report_list: ReportList,
 }
 
 impl TaxelApp {
@@ -215,6 +201,14 @@ impl TaxelApp {
 
         let show_error_panel = !issues.is_empty();
 
+        let mut report_list = ReportList::new();
+        if let Err(err) = report_list.refresh() {
+            issues.push(AppIssue {
+                severity: IssueSeverity::Warning,
+                message: format!("Failed to list imported reports: {err}"),
+            });
+        }
+
         Self {
             taxonomy: None,
             report: None,
@@ -229,10 +223,28 @@ impl TaxelApp {
             loading: None,
             search: Search::default(),
             report_path: None,
+            report_list,
             editing_section: None,
             edit_snapshot: Vec::new(),
             eric,
         }
+    }
+
+    fn refresh_imported_reports(&mut self) {
+        match self.report_list.refresh() {
+            Ok(()) => {}
+            Err(err) => {
+                self.issues.push(AppIssue {
+                    severity: IssueSeverity::Warning,
+                    message: format!("Failed to refresh imported reports: {err}"),
+                });
+                self.show_error_panel = true;
+            }
+        }
+    }
+
+    fn register_imported_report(&mut self, report_path: &std::path::Path) {
+        self.report_list.register_imported_report(report_path);
     }
 }
 
@@ -285,6 +297,15 @@ impl App for TaxelApp {
             CentralPanel::default()
                 .frame(central_frame)
                 .show_inside(ctx, |ui| {
+                    if self.table.is_none() {
+                        if let Some(path) =
+                            draw_report_list(ui, self.report_list.reports(), self.loading.is_some())
+                        {
+                            load_report(self, path, ui.ctx().clone());
+                        }
+                        return;
+                    }
+
                     // While the unsaved-changes modal is visible (user clicked a
                     // different section but hasn't confirmed yet), keep rendering
                     // the editing section so the view doesn't jump before the user
@@ -486,4 +507,81 @@ fn load_fact_table(app: &mut TaxelApp) {
             }
         }
     }
+}
+
+/// Draws the report list view, showing imported reports and allowing the user
+/// to select one to open.
+fn draw_report_list(ui: &mut Ui, reports: &[ReportSummary], loading: bool) -> Option<PathBuf> {
+    let list_width = ui.available_width().min(560.0);
+
+    ui.vertical_centered(|ui| {
+        ui.heading("Your Reports");
+        ui.add_space(6.0);
+    });
+
+    if reports.is_empty() {
+        ui.vertical_centered(|ui| {
+            ui.label("No imported reports yet. Use Import report to add an XML file.");
+        });
+        return None;
+    }
+
+    ui.vertical_centered(|ui| {
+        ui.label(format!("{} report(s)", reports.len()));
+    });
+    ui.add_space(4.0);
+
+    let mut selected = None;
+
+    ui.vertical_centered(|ui| {
+        ui.set_max_width(list_width);
+        ui.set_width(list_width);
+        ui.horizontal(|ui| {
+            ui.add_sized([120.0, 18.0], egui::Label::new(RichText::new("Created")));
+            ui.label(RichText::new("Report"));
+        });
+        ui.separator();
+
+        for (idx, report) in reports.iter().enumerate() {
+            let row = egui::Frame::new()
+                .fill(egui::Color32::TRANSPARENT)
+                .inner_margin(egui::Margin::symmetric(6, 6))
+                .show(ui, |ui| {
+                    ui.set_width(list_width);
+                    ui.horizontal(|ui| {
+                        ui.add_sized([120.0, 18.0], Label::new(&report.created_date));
+                        ui.label(&report.display_name);
+                    });
+                });
+
+            let response = ui.interact(
+                row.response.rect,
+                ui.id().with(("report_row", idx)),
+                if loading {
+                    Sense::hover()
+                } else {
+                    Sense::click()
+                },
+            );
+            let response = if loading {
+                response
+            } else {
+                response.on_hover_cursor(CursorIcon::PointingHand)
+            };
+
+            if response.hovered() && !loading {
+                ui.painter().rect_filled(
+                    row.response.rect,
+                    2.0,
+                    ui.visuals().widgets.hovered.bg_fill.gamma_multiply(0.25),
+                );
+            }
+
+            if response.clicked() {
+                selected = Some(report.path.clone());
+            }
+        }
+    });
+
+    selected
 }
