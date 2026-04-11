@@ -1,10 +1,10 @@
-use super::{AppIssue, IssueSeverity, SectionState, TaxelApp};
+use super::{IssueSeverity, TaxelApp};
 use crate::app::error_panel::WARNING_COLOR;
 use eframe::egui::{
     text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui,
 };
 use rfd::FileDialog;
-use std::path::Path;
+use std::{sync::mpsc, thread};
 use taxel_gui::load_xml;
 
 /// Draws the header panel of the application, including the "Import report"
@@ -18,8 +18,13 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
                 .add_filter("All", &["*"])
                 .pick_file()
             {
-                import_report(app, &path);
+                import_report(app, path, ui.ctx().clone());
             }
+        }
+
+        if app.loading.is_some() {
+            ui.spinner();
+            ui.label("Loading…");
         }
 
         if app.table.is_some() && ui.button("Clear report").clicked() {
@@ -45,8 +50,8 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
 }
 
 /// Loads an XBRL instance document from the specified path and updates the app
-/// state.
-fn import_report(app: &mut TaxelApp, path: &Path) {
+/// state. The load runs on a background thread to keep the UI responsive.
+fn import_report(app: &mut TaxelApp, path: std::path::PathBuf, ctx: eframe::egui::Context) {
     app.selected_tab = 0;
     app.table = None;
     app.issues.clear();
@@ -54,37 +59,14 @@ fn import_report(app: &mut TaxelApp, path: &Path) {
     app.editing_section = None;
     app.edit_snapshot.clear();
 
-    if let Err(err) = load_xml(&mut app.table, path) {
-        app.issues.push(AppIssue {
-            severity: IssueSeverity::Error,
-            message: err.to_string(),
-        });
-        app.show_error_panel = true;
-        return;
-    }
+    let (tx, rx) = mpsc::channel();
+    app.loading = Some(rx);
 
-    if let Some(table) = &app.table {
-        for missing_role in &table.role_mapping_errors {
-            app.issues.push(AppIssue {
-                severity: IssueSeverity::Warning,
-                message: format!("Missing report-element mapping for role URI: {missing_role}"),
-            });
-        }
-    }
-
-    app.show_error_panel = !app.issues.is_empty();
-
-    app.section_states = app
-        .table
-        .as_ref()
-        .map(|table| {
-            table
-                .sections
-                .iter()
-                .map(|_| SectionState::default())
-                .collect()
-        })
-        .unwrap_or_default();
+    thread::spawn(move || {
+        let table = load_xml(&path);
+        let _ = tx.send(table);
+        ctx.request_repaint();
+    });
 }
 
 /// Draws a summary of errors and warnings in the header. Clicking on the
@@ -186,7 +168,6 @@ fn draw_zoom_toolbar(ui: &mut Ui, zoom_input: &mut String) {
 
 /// Draw the dark mode toggle button (☀ / ☾).
 fn draw_dark_mode_toggle(ui: &mut Ui, dark_mode: &mut bool) {
-
     // Show sun icon in dark mode (to switch to light) and moon icon in light
     // mode (to switch to dark).
     let icon = if *dark_mode { "\u{2600}" } else { "\u{1F319}" };

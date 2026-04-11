@@ -33,6 +33,7 @@ pub(super) fn draw_toolbar(
     ui.horizontal(|ui| {
         draw_level_toolbar(ui, max_available, max_depth, collapsed, rows);
         draw_search_bar(ui, search, table, lang, total_width);
+
         ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
             action = draw_edit_buttons(ui, editing);
         });

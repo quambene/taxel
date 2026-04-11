@@ -21,6 +21,7 @@ use eframe::{
 };
 use std::{
     collections::HashSet,
+    sync::mpsc::{self, Receiver},
     time::{Duration, Instant},
 };
 use taxel_gui::{FactTable, SearchHit};
@@ -78,7 +79,9 @@ pub struct TaxelApp {
     /// Search state.
     search: Search,
     /// Whether dark mode is enabled.
-    pub dark_mode: bool,
+    dark_mode: bool,
+    /// Receives the result of a background XML load, if one is in progress.
+    loading: Option<Receiver<anyhow::Result<FactTable>>>,
     /// Some while the value column of that section is being edited, None
     /// otherwise.
     editing_section: Option<usize>,
@@ -168,6 +171,7 @@ impl TaxelApp {
             show_error_panel,
             zoom_input,
             dark_mode,
+            loading: None,
             search: Search::default(),
             editing_section: None,
             edit_snapshot: Vec::new(),
@@ -189,6 +193,8 @@ impl App for TaxelApp {
         } else {
             Visuals::light()
         });
+
+        load_fact_table(self);
 
         // TODO: remove hot reloading support for release builds
         subsecond::call(|| {
@@ -375,5 +381,45 @@ impl App for TaxelApp {
                     }
                 })
         });
+    }
+}
+
+/// Polls the background XML load result and updates the app state accordingly.
+fn load_fact_table(app: &mut TaxelApp) {
+    if let Some(rx) = &app.loading {
+        match rx.try_recv() {
+            Ok(Ok(table)) => {
+                app.section_states = table
+                    .sections
+                    .iter()
+                    .map(|_| SectionState::default())
+                    .collect();
+
+                for missing_role in &table.role_mapping_errors {
+                    app.issues.push(AppIssue {
+                        severity: IssueSeverity::Warning,
+                        message: format!(
+                            "Missing report-element mapping for role URI: {missing_role}"
+                        ),
+                    });
+                }
+
+                app.table = Some(table);
+                app.show_error_panel = !app.issues.is_empty();
+                app.loading = None;
+            }
+            Ok(Err(err)) => {
+                app.issues.push(AppIssue {
+                    severity: IssueSeverity::Error,
+                    message: err.to_string(),
+                });
+                app.show_error_panel = true;
+                app.loading = None;
+            }
+            Err(mpsc::TryRecvError::Empty) => {}
+            Err(mpsc::TryRecvError::Disconnected) => {
+                app.loading = None;
+            }
+        }
     }
 }

@@ -15,3 +15,4 @@
   - Edit and save report
   - Add error summary and error panel
   - Persist app settings
+  - Add loading spinner for import report
