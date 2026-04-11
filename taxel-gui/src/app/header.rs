@@ -137,6 +137,7 @@ fn extract_taxonomy_version(taxonomy: &Option<TaxonomySet>) -> Option<&&str> {
 /// Validates the imported report and reports any issues in the diagnostics
 /// panel.
 fn validate_report(app: &mut TaxelApp) {
+    // TODO: only clear validation errors, but keep app-level errors
     app.issues.clear();
 
     let Some(xml) = read_report_xml(app) else {
@@ -168,6 +169,7 @@ fn validate_report(app: &mut TaxelApp) {
 /// Sends the imported report and reports the server response in the diagnostics
 /// panel.
 fn send_report(app: &mut TaxelApp) {
+    // TODO: only clear validation errors, but keep app-level errors
     app.issues.clear();
 
     let Some(xml) = read_report_xml(app) else {
