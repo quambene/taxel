@@ -42,6 +42,10 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
             validate_report(app);
         }
 
+        if app.table.is_some() && ui.button("Send report").clicked() {
+            send_report(app);
+        }
+
         draw_error_summary(app, ui);
 
         ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
@@ -79,48 +83,78 @@ fn import_report(app: &mut TaxelApp, path: std::path::PathBuf, ctx: eframe::egui
     });
 }
 
-/// Validates the loaded report and surfaces any issues in the diagnostics
+/// Reads the XML from `report_path`.
+fn read_report_xml(app: &mut TaxelApp) -> Option<String> {
+    let path = app.report_path.as_ref()?;
+
+    match fs::read_to_string(path) {
+        Ok(xml) => Some(xml),
+        Err(err) => {
+            app.issues.push(AppIssue {
+                severity: IssueSeverity::Error,
+                message: format!("Failed to read report file: {err}"),
+            });
+            app.show_error_panel = true;
+            None
+        }
+    }
+}
+
+/// Validates the imported report and reports any issues in the diagnostics
 /// panel.
 fn validate_report(app: &mut TaxelApp) {
     app.issues.clear();
 
-    let xml = match &app.report_path {
-        None => return,
-        Some(path) => match fs::read_to_string(path) {
-            Ok(xml) => xml,
-            Err(err) => {
-                app.issues.push(AppIssue {
-                    severity: IssueSeverity::Error,
-                    message: format!("Failed to read report file: {err}"),
-                });
-                app.show_error_panel = true;
-                return;
-            }
-        },
+    let Some(xml) = read_report_xml(app) else {
+        return;
     };
+    let Some(eric) = &app.eric else { return };
 
-    if let Some(eric) = &app.eric {
-        let taxonomy_type = "Bilanz";
-        let taxonomy_version = "6.5";
-        let response = eric.validate(xml, taxonomy_type, taxonomy_version, None);
+    let taxonomy_type = "Bilanz";
+    let taxonomy_version = "6.5";
 
-        match response {
-            Ok(response) => {
-                app.issues = vec![AppIssue {
-                    severity: IssueSeverity::Error,
-                    message: format!(
-                        "Validation failed with error code {}: {}",
-                        response.error_code, response.validation_response
-                    ),
-                }];
-            }
-            Err(err) => {
-                app.issues.push(AppIssue {
-                    severity: IssueSeverity::Error,
-                    message: format!("Validation error: {err}"),
-                });
-            }
-        }
+    match eric.validate(xml, taxonomy_type, taxonomy_version, None) {
+        Ok(response) => app.issues.push(AppIssue {
+            severity: IssueSeverity::Error,
+            message: format!(
+                "Validation failed with error code {}: {}",
+                response.error_code, response.validation_response
+            ),
+        }),
+        Err(err) => app.issues.push(AppIssue {
+            severity: IssueSeverity::Error,
+            message: format!("Validation error: {err}"),
+        }),
+    }
+
+    app.show_error_panel = !app.issues.is_empty();
+}
+
+/// Sends the imported report and reports the server response in the diagnostics
+/// panel.
+fn send_report(app: &mut TaxelApp) {
+    app.issues.clear();
+
+    let Some(xml) = read_report_xml(app) else {
+        return;
+    };
+    let Some(eric) = &app.eric else { return };
+
+    let taxonomy_type = "Bilanz";
+    let taxonomy_version = "6.5";
+
+    match eric.send(xml, taxonomy_type, taxonomy_version, None) {
+        Ok(response) => app.issues.push(AppIssue {
+            severity: IssueSeverity::Error,
+            message: format!(
+                "Send failed with error code {}: {}",
+                response.error_code, response.server_response
+            ),
+        }),
+        Err(err) => app.issues.push(AppIssue {
+            severity: IssueSeverity::Error,
+            message: format!("Send error: {err}"),
+        }),
     }
 
     app.show_error_panel = !app.issues.is_empty();
