@@ -1,5 +1,5 @@
 use super::{IssueSeverity, TaxelApp};
-use crate::app::error_panel::WARNING_COLOR;
+use crate::app::{error_panel::WARNING_COLOR, AppIssue};
 use eframe::egui::{
     text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui,
 };
@@ -31,6 +31,10 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
             app.table = None;
             app.issues.clear();
             app.show_error_panel = false;
+        }
+
+        if app.table.is_some() && ui.button("Validate report").clicked() {
+            validate_report(app);
         }
 
         draw_error_summary(app, ui);
@@ -67,6 +71,32 @@ fn import_report(app: &mut TaxelApp, path: std::path::PathBuf, ctx: eframe::egui
         let _ = tx.send(table);
         ctx.request_repaint();
     });
+}
+
+/// Validates the loaded report and surfaces any issues in the diagnostics
+/// panel.
+fn validate_report(app: &mut TaxelApp) {
+    app.issues.clear();
+
+    // TODO: Implement report validation against XBRL taxonomy rules.
+    if let Some(eric) = &app.eric {
+        let xml = todo!();
+        let taxonomy_type = "Bilanz";
+        let taxonomy_version = "6.5";
+        let response = eric
+            .validate(xml, taxonomy_type, taxonomy_version, None)
+            .unwrap();
+
+        app.issues = vec![AppIssue {
+            severity: IssueSeverity::Error,
+            message: format!(
+                "Validation failed with error code {}: {}",
+                response.error_code, response.validation_response
+            ),
+        }];
+    }
+
+    app.show_error_panel = !app.issues.is_empty();
 }
 
 /// Draws a summary of errors and warnings in the header. Clicking on the

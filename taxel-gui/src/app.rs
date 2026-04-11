@@ -19,6 +19,7 @@ use eframe::{
     egui::{self, CentralPanel, Key, KeyboardShortcut, Modifiers, Panel, Ui, Visuals},
     App, CreationContext, Frame,
 };
+use eric_sdk::Eric;
 use std::{
     collections::HashSet,
     sync::mpsc::{self, Receiver},
@@ -89,6 +90,10 @@ pub struct TaxelApp {
     /// moment editing started, indexed by raw row index. Used to restore values
     /// if editing is canceled.
     edit_snapshot: Vec<String>,
+    /// Eric instance to validate XBRL instance documents and provide
+    /// diagnostics. Initialized on app start if the data directory can be
+    /// determined, otherwise skipped with a warning.
+    eric: Option<Eric>,
 }
 
 /// Indicates the issue severity for diagnostics.
@@ -135,8 +140,6 @@ impl TaxelApp {
             });
         }
 
-        let show_error_panel = !issues.is_empty();
-
         let lang = ctx
             .storage
             .and_then(|storage| eframe::get_value::<String>(storage, "lang"))
@@ -162,6 +165,29 @@ impl TaxelApp {
             Visuals::light()
         });
 
+        let eric =
+            if let Some(log_path) = dirs::data_dir().map(|dir| dir.join("taxel").join("logs")) {
+                match Eric::new(&log_path) {
+                    Ok(eric) => Some(eric),
+                    Err(err) => {
+                        issues.push(AppIssue {
+                            severity: IssueSeverity::Error,
+                            message: format!("Failed to initialize Eric: {err}"),
+                        });
+                        None
+                    }
+                }
+            } else {
+                issues.push(AppIssue {
+                    severity: IssueSeverity::Warning,
+                    message: "Could not determine data directory, skipping Eric initialization"
+                        .to_string(),
+                });
+                None
+            };
+
+        let show_error_panel = !issues.is_empty();
+
         Self {
             table,
             selected_tab: 0,
@@ -175,6 +201,7 @@ impl TaxelApp {
             search: Search::default(),
             editing_section: None,
             edit_snapshot: Vec::new(),
+            eric,
         }
     }
 }
