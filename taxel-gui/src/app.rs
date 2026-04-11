@@ -23,6 +23,7 @@ use eric_sdk::Eric;
 use std::{
     collections::HashSet,
     fs,
+    path::PathBuf,
     sync::mpsc::{self, Receiver},
     time::{Duration, Instant},
 };
@@ -96,7 +97,7 @@ pub struct TaxelApp {
     /// determined, otherwise skipped with a warning.
     eric: Option<Eric>,
     /// Path of the currently imported report, if any.
-    report_path: Option<std::path::PathBuf>,
+    report_path: Option<PathBuf>,
 }
 
 /// Indicates the issue severity for diagnostics.

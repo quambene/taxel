@@ -1,11 +1,12 @@
 use super::{IssueSeverity, TaxelApp};
 use crate::app::{error_panel::WARNING_COLOR, AppIssue};
 use eframe::egui::{
-    text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui,
+    self, text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui,
 };
 use rfd::FileDialog;
 use std::{
     fs::{self},
+    path::PathBuf,
     sync::mpsc,
     thread,
 };
@@ -64,7 +65,7 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
 
 /// Loads an XBRL instance document from the specified path and updates the app
 /// state. The load runs on a background thread to keep the UI responsive.
-fn import_report(app: &mut TaxelApp, path: std::path::PathBuf, ctx: eframe::egui::Context) {
+fn import_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context) {
     app.selected_tab = 0;
     app.table = None;
     app.report_path = Some(path.clone());
