@@ -100,6 +100,7 @@ fn read_report_xml(app: &mut TaxelApp) -> Option<String> {
     }
 }
 
+// TODO: determine taxonomy version
 /// Validates the imported report and reports any issues in the diagnostics
 /// panel.
 fn validate_report(app: &mut TaxelApp) {
@@ -131,6 +132,7 @@ fn validate_report(app: &mut TaxelApp) {
 }
 
 // TODO: provide certifcate path and password
+// TODO: determine taxonomy version
 /// Sends the imported report and reports the server response in the diagnostics
 /// panel.
 fn send_report(app: &mut TaxelApp) {
