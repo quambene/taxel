@@ -74,15 +74,15 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
         draw_error_summary(app, ui);
 
         ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-            draw_language_toolbar(ui, &mut app.lang);
+            draw_language_toolbar(ui, &mut app.settings.lang);
 
             ui.separator();
 
-            draw_dark_mode_toggle(ui, &mut app.dark_mode);
+            draw_dark_mode_toggle(ui, &mut app.settings.dark_mode);
 
             ui.separator();
 
-            draw_zoom_toolbar(ui, &mut app.zoom_input);
+            draw_zoom_toolbar(ui, &mut app.settings.zoom_input);
         });
     });
 }

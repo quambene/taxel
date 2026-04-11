@@ -2,6 +2,7 @@ mod error_panel;
 mod header;
 mod report_list;
 mod search_overlay;
+mod settings;
 mod sidebar;
 mod table;
 mod toolbar;
@@ -11,6 +12,7 @@ use self::{
     header::{draw_header, load_report},
     report_list::ReportList,
     search_overlay::{draw_search_results_overlay, highlight_row},
+    settings::Settings,
     sidebar::draw_sidebar,
     table::draw_table,
     toolbar::{draw_toolbar, EditAction},
@@ -86,18 +88,14 @@ pub struct TaxelApp {
     selected_tab: usize,
     /// Per-section UI state, indexed analogous to `table.sections`.
     section_states: Vec<SectionState>,
-    /// The currently selected language for labels (e.g. "en", "de").
-    lang: String,
+    /// Persisted UI settings (language, zoom, theme).
+    settings: Settings,
     /// Structured diagnostics for non-blocking and blocking issues.
     issues: Vec<AppIssue>,
     /// Controls whether the detailed diagnostics panel is visible.
     show_error_panel: bool,
-    /// The text buffer for the zoom percentage input field.
-    zoom_input: String,
     /// Search state.
     search: Search,
-    /// Whether dark mode is enabled.
-    dark_mode: bool,
     /// Receives the result of a background XML load, if one is in progress.
     loading: Option<Receiver<anyhow::Result<(TaxonomySet, InstanceDocument)>>>,
     /// Some while the value column of that section is being edited, None
@@ -143,30 +141,8 @@ impl TaxelApp {
             issues.push(AppIssue::new_error(message));
         }
 
-        let lang = ctx
-            .storage
-            .and_then(|storage| eframe::get_value::<String>(storage, "lang"))
-            .unwrap_or_else(|| "en".to_string());
-
-        let zoom_input = ctx
-            .storage
-            .and_then(|storage| eframe::get_value::<String>(storage, "zoom_input"))
-            .unwrap_or_else(|| "100".to_string());
-
-        if let Ok(percent) = zoom_input.trim().parse::<u32>() {
-            ctx.egui_ctx.set_zoom_factor(percent as f32 / 100.0);
-        }
-
-        let dark_mode = ctx
-            .storage
-            .and_then(|storage| eframe::get_value::<bool>(storage, "dark_mode"))
-            .unwrap_or(false);
-
-        ctx.egui_ctx.set_visuals(if dark_mode {
-            Visuals::dark()
-        } else {
-            Visuals::light()
-        });
+        let settings = Settings::load(ctx.storage);
+        settings.apply_to_context(&ctx.egui_ctx);
 
         let eric =
             if let Some(log_path) = dirs::data_dir().map(|dir| dir.join("taxel").join("logs")) {
@@ -207,11 +183,9 @@ impl TaxelApp {
             table,
             selected_tab: 0,
             section_states,
-            lang,
+            settings,
             issues,
             show_error_panel,
-            zoom_input,
-            dark_mode,
             loading: None,
             search: Search::default(),
             report_path: None,
@@ -241,14 +215,12 @@ impl TaxelApp {
 
 impl App for TaxelApp {
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
-        eframe::set_value(storage, "lang", &self.lang);
-        eframe::set_value(storage, "zoom_input", &self.zoom_input);
-        eframe::set_value(storage, "dark_mode", &self.dark_mode);
+        self.settings.save(storage);
     }
 
     /// The main UI drawing function for the app, called on each frame.
     fn ui(&mut self, ctx: &mut Ui, _: &mut Frame) {
-        ctx.ctx().set_visuals(if self.dark_mode {
+        ctx.ctx().set_visuals(if self.settings.dark_mode {
             Visuals::dark()
         } else {
             Visuals::light()
@@ -267,13 +239,13 @@ impl App for TaxelApp {
                 .as_ref()
                 .map(|table| table.sections.as_slice())
                 .unwrap_or(&[]);
-            draw_sidebar(ctx, sections, &mut self.selected_tab, &self.lang);
+            draw_sidebar(ctx, sections, &mut self.selected_tab, &self.settings.lang);
 
             if self.show_error_panel {
                 draw_error_panel(ctx, &self.issues, &mut self.show_error_panel);
             }
 
-            let lang = self.lang.clone();
+            let lang = self.settings.lang.clone();
 
             let central_frame = {
                 let mut frame = egui::Frame::central_panel(ctx.style());
