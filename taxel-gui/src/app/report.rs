@@ -23,7 +23,6 @@ use xbrl_rs::{InstanceDocument, TaxonomySet};
 pub fn load_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context) {
     app.selected_tab = 0;
     app.report = None;
-    app.report_path = Some(path.clone());
     app.diagnostics.clear();
     app.editing_section = None;
     app.edit_snapshot.clear();
@@ -66,9 +65,10 @@ pub fn load_xml(path: &Path) -> Result<(TaxonomySet, InstanceDocument, Report), 
 pub fn validate_report(app: &mut TaxelApp) {
     clear_diagnostics_by_category(app, DiagnosticCategory::Validation);
     app.report_status = ReportStatus::Draft;
-    if let Some(path) = app.report_path.as_ref() {
+
+    if let Some(report) = &app.report {
         app.report_list
-            .set_report_status(path, ReportStatus::Draft, &mut app.diagnostics);
+            .set_report_status(&report.path, ReportStatus::Draft, &mut app.diagnostics);
     }
 
     let Some(xml) = read_report_xml(app) else {
@@ -87,9 +87,10 @@ pub fn validate_report(app: &mut TaxelApp) {
         Ok(response) => {
             if response.error_code == ErrorCode::ERIC_OK as i32 {
                 app.report_status = ReportStatus::Validated;
-                if let Some(path) = app.report_path.as_ref() {
+
+                if let Some(report) = &app.report {
                     app.report_list.set_report_status(
-                        path,
+                        &report.path,
                         ReportStatus::Validated,
                         &mut app.diagnostics,
                     );
@@ -154,9 +155,10 @@ pub fn send_report(app: &mut TaxelApp) {
         Ok(response) => {
             if response.error_code == ErrorCode::ERIC_OK as i32 {
                 app.report_status = ReportStatus::Sent;
-                if let Some(path) = app.report_path.as_ref() {
+
+                if let Some(report) = &app.report {
                     app.report_list.set_report_status(
-                        path,
+                        &report.path,
                         ReportStatus::Sent,
                         &mut app.diagnostics,
                     );
@@ -196,9 +198,9 @@ fn clear_diagnostics_by_category(app: &mut TaxelApp, category: DiagnosticCategor
 
 /// Reads the XML from `report_path`.
 fn read_report_xml(app: &mut TaxelApp) -> Option<String> {
-    let path = app.report_path.as_ref()?;
+    let report = app.report.as_ref()?;
 
-    match fs::read_to_string(path) {
+    match fs::read_to_string(&report.path) {
         Ok(xml) => Some(xml),
         Err(err) => {
             app.diagnostics.push(AppDiagnostic::new_error(

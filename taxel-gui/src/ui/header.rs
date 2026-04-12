@@ -47,7 +47,6 @@ pub fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
             app.report = None;
             app.taxonomy = None;
             app.instance_document = None;
-            app.report_path = None;
             app.selected_tab = 0;
             app.search.results.clear();
             app.search.scroll_to_row = None;

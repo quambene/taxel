@@ -33,7 +33,7 @@ pub use search::{RowHighlight, Search};
 use std::{
     collections::HashSet,
     fs,
-    path::{Path, PathBuf},
+    path::Path,
     sync::mpsc::{self, Receiver},
 };
 use xbrl_rs::{InstanceDocument, TaxonomySet};
@@ -54,12 +54,9 @@ pub struct TaxelApp {
     pub taxonomy: Option<TaxonomySet>,
     /// The instance document currently loaded in the app, if any.
     pub instance_document: Option<InstanceDocument>,
-    /// Path of the currently imported report, if any.
-    pub report_path: Option<PathBuf>,
     /// The validation and submission status of the currently open report.
     pub report_status: ReportStatus,
-    /// The report containing the extracted facts from the XBRL instance
-    /// document, enriched with the concept labels and presentation structure.
+    /// The currently loaded report.
     pub report: Option<Report>,
     /// Imported reports and creation date bookkeeping.
     pub report_list: ReportList,
@@ -168,7 +165,6 @@ impl TaxelApp {
             show_error_panel,
             loading: None,
             search: Search::default(),
-            report_path: None,
             report_list,
             editing_section: None,
             edit_snapshot: Vec::new(),
@@ -321,9 +317,9 @@ impl App for TaxelApp {
 
                             // If the report was previously validated, mark it
                             // as draft again since it has unsaved changes now.
-                            if let Some(path) = self.report_path.as_ref() {
+                            if let Some(report) = &self.report {
                                 self.report_list.set_report_status(
-                                    path,
+                                    &report.path,
                                     ReportStatus::Draft,
                                     &mut self.diagnostics,
                                 );
