@@ -1,6 +1,6 @@
 use crate::{
     app::{
-        diagnostics_panel::{AppDiagnostic, DiagnosticCategory},
+        diagnostics::{AppDiagnostic, DiagnosticCategory},
         TaxelApp,
     },
     load_xml,

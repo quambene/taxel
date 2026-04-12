@@ -1,78 +1,12 @@
+use crate::app::{AppDiagnostic, DiagnosticLevel};
 use eframe::egui::{vec2, Align, Button, Color32, Layout, Panel, ScrollArea, Ui};
 
 pub const WARNING_COLOR: Color32 = Color32::from_rgb(180, 120, 0);
 pub const ERROR_COLOR: Color32 = Color32::RED;
 pub const SUCCESS_COLOR: Color32 = Color32::from_rgb(34, 139, 34);
 
-/// Indicates the level of a diagnostics message.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub(super) enum DiagnosticLevel {
-    Error,
-    Warning,
-    Success,
-}
-
-/// Groups diagnostics by their source domain so they can be cleared
-/// independently.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub(super) enum DiagnosticCategory {
-    /// Issues related to the application itself, such as unexpected panics or
-    /// unhandled errors that should never occur during normal operation.
-    App,
-    /// Issues related to creating or importing a report, such as file I/O
-    /// errors or parsing errors.
-    Import,
-    /// Issues related to validating the report against the taxonomy.
-    Validation,
-    /// Issues related to sending the report to the tax authority's API.
-    Send,
-}
-
-/// Collects all information about a diagnostics message to display in the
-/// diagnostics panel and diagnostics summary in the header.
-#[derive(Clone, Debug)]
-pub(super) struct AppDiagnostic {
-    pub(super) level: DiagnosticLevel,
-    pub(super) category: DiagnosticCategory,
-    pub(super) message: String,
-}
-
-impl AppDiagnostic {
-    pub fn new_warning(category: DiagnosticCategory, message: String) -> Self {
-        AppDiagnostic {
-            level: DiagnosticLevel::Warning,
-            category,
-            message,
-        }
-    }
-
-    pub fn new_error(category: DiagnosticCategory, message: String) -> Self {
-        AppDiagnostic {
-            level: DiagnosticLevel::Error,
-            category,
-            message,
-        }
-    }
-
-    pub fn new_success(category: DiagnosticCategory, message: String) -> Self {
-        AppDiagnostic {
-            level: DiagnosticLevel::Success,
-            category,
-            message,
-        }
-    }
-
-    pub fn taxonomy_version_error(category: DiagnosticCategory) -> Self {
-        AppDiagnostic::new_error(category, "Failed to determine taxonomy version".to_string())
-    }
-}
-
 /// Draws a bottom diagnostics panel with detailed error and warning messages.
-pub(super) fn draw_error_panel(
-    ctx: &mut Ui,
-    diagnostics: &[AppDiagnostic],
-    show_error_panel: &mut bool,
-) {
+pub fn draw_error_panel(ctx: &mut Ui, diagnostics: &[AppDiagnostic], show_error_panel: &mut bool) {
     Panel::bottom("error_panel")
         .resizable(true)
         .default_size(400.0)

@@ -1,12 +1,8 @@
-use super::TaxelApp;
 use crate::{
-    app::{
-        diagnostics_panel::{
-            AppDiagnostic, DiagnosticCategory, DiagnosticLevel, SUCCESS_COLOR, WARNING_COLOR,
-        },
-        report::{load_report, send_report, validate_report},
-    },
+    app::{self, AppDiagnostic, DiagnosticCategory, DiagnosticLevel},
     report_store::{self, ReportStatus},
+    ui::diagnostic_panel::{SUCCESS_COLOR, WARNING_COLOR},
+    TaxelApp,
 };
 use eframe::egui::{
     text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui,
@@ -16,7 +12,7 @@ use rfd::FileDialog;
 /// Draws the header panel of the application, including the "Import report"
 /// button, the "Close report" button, any error messages, and the language
 /// selector tabs.
-pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
+pub fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
     ui.horizontal_centered(|ui| {
         if app.table.is_none() && app.loading.is_none() && ui.button("Import report").clicked() {
             if let Some(path) = FileDialog::new()
@@ -28,7 +24,7 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
                     Ok(copied_path) => {
                         app.register_imported_report(&copied_path);
                         app.refresh_imported_reports();
-                        load_report(app, copied_path, ui.ctx().clone());
+                        app::load_report(app, copied_path, ui.ctx().clone());
                     }
                     Err(err) => {
                         app.diagnostics.push(AppDiagnostic::new_error(
@@ -64,11 +60,11 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
         }
 
         if app.table.is_some() && ui.button("Validate report").clicked() {
-            validate_report(app);
+            app::validate_report(app);
         }
 
         if app.table.is_some() && ui.button("Send report").clicked() {
-            send_report(app);
+            app::send_report(app);
         }
 
         draw_error_summary(app, ui);

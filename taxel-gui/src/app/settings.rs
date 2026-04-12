@@ -4,19 +4,19 @@ use eframe::{
 };
 
 /// User-configurable UI settings persisted via eframe storage.
-pub(super) struct Settings {
+pub struct Settings {
     /// The language code for the UI, e.g. "en" for English or "de" for German.
-    pub(super) lang: String,
+    pub lang: String,
     /// The zoom level for the UI, stored as a percentage string, e.g. "100" for
     /// 100%.
-    pub(super) zoom_input: String,
+    pub zoom_input: String,
     /// Whether to use dark mode for the UI.
-    pub(super) dark_mode: bool,
+    pub dark_mode: bool,
 }
 
 impl Settings {
     /// Load settings from storage, applying defaults for any missing values.
-    pub(super) fn load(storage: Option<&dyn Storage>) -> Self {
+    pub fn load(storage: Option<&dyn Storage>) -> Self {
         let lang = storage
             .and_then(|storage| eframe::get_value::<String>(storage, "lang"))
             .unwrap_or_else(|| "en".to_string());
@@ -37,7 +37,7 @@ impl Settings {
     }
 
     /// Apply the current settings to the UI context.
-    pub(super) fn apply(&self, ctx: &Context) {
+    pub fn apply(&self, ctx: &Context) {
         if let Ok(percent) = self.zoom_input.trim().parse::<u32>() {
             ctx.set_zoom_factor(percent as f32 / 100.0);
         }
@@ -50,7 +50,7 @@ impl Settings {
     }
 
     /// Save the current settings to storage.
-    pub(super) fn save(&self, storage: &mut dyn Storage) {
+    pub fn save(&self, storage: &mut dyn Storage) {
         eframe::set_value(storage, "lang", &self.lang);
         eframe::set_value(storage, "zoom_input", &self.zoom_input);
         eframe::set_value(storage, "dark_mode", &self.dark_mode);

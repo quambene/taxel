@@ -1,21 +1,16 @@
-mod diagnostics_panel;
-mod header;
+mod diagnostics;
 mod report;
 mod report_list;
 mod settings;
 
-use self::{
-    diagnostics_panel::draw_error_panel, header::draw_header, report_list::ReportList,
-    settings::Settings,
-};
 use crate::{
-    app::{
-        diagnostics_panel::{AppDiagnostic, DiagnosticCategory},
-        report_list::draw_report_list,
-    },
+    app::{report_list::ReportList, settings::Settings},
     populate_fact_table,
     report_store::ReportStatus,
     ui::{
+        diagnostic_panel::draw_error_panel,
+        header::draw_header,
+        report_list_view::draw_report_list,
         report_view::{
             search_overlay::{draw_search_results_overlay, highlight_row},
             sidebar::draw_sidebar,
@@ -26,12 +21,14 @@ use crate::{
     },
     FactTable, SearchHit,
 };
+pub use diagnostics::{AppDiagnostic, DiagnosticCategory, DiagnosticLevel};
 use dioxus_devtools::subsecond;
 use eframe::{
     egui::{self, CentralPanel, Key, KeyboardShortcut, Modifiers, Panel, Ui, Visuals},
     App, CreationContext, Frame,
 };
 use eric_sdk::Eric;
+pub use report::{load_report, send_report, validate_report};
 use std::{
     collections::HashSet,
     fs,
@@ -76,44 +73,44 @@ pub struct SectionState {
 pub struct TaxelApp {
     /// The taxonomy set for the currently loaded XBRL instance document, if
     /// any.
-    taxonomy: Option<TaxonomySet>,
+    pub taxonomy: Option<TaxonomySet>,
     /// The instance document currently loaded in the app, if any.
-    report: Option<InstanceDocument>,
+    pub report: Option<InstanceDocument>,
     /// The fact table containing the extracted facts from the XBRL instance
     /// document, enriched with the concept labels and presentation structure
     /// for display in the UI.
-    table: Option<FactTable>,
+    pub table: Option<FactTable>,
     /// The index of the currently selected section tab in the sidebar.
-    selected_tab: usize,
+    pub selected_tab: usize,
     /// Per-section UI state, indexed analogous to `table.sections`.
-    section_states: Vec<SectionState>,
+    pub section_states: Vec<SectionState>,
     /// Persisted UI settings (language, zoom, theme).
-    settings: Settings,
+    pub settings: Settings,
     /// Structured diagnostics for non-blocking and blocking issues.
-    diagnostics: Vec<AppDiagnostic>,
+    pub diagnostics: Vec<AppDiagnostic>,
     /// Controls whether the detailed diagnostics panel is visible.
-    show_error_panel: bool,
+    pub show_error_panel: bool,
     /// Search state.
-    search: Search,
+    pub search: Search,
     /// Receives the result of a background XML load, if one is in progress.
-    loading: Option<Receiver<anyhow::Result<(TaxonomySet, InstanceDocument)>>>,
+    pub loading: Option<Receiver<anyhow::Result<(TaxonomySet, InstanceDocument)>>>,
     /// Some while the value column of that section is being edited, None
     /// otherwise.
-    editing_section: Option<usize>,
+    pub editing_section: Option<usize>,
     /// Snapshot of `row.value` for every row in the edited section at the
     /// moment editing started, indexed by raw row index. Used to restore values
     /// if editing is canceled.
-    edit_snapshot: Vec<String>,
+    pub edit_snapshot: Vec<String>,
     /// Eric instance to validate XBRL instance documents and provide
     /// diagnostics. Initialized on app start if the data directory can be
     /// determined, otherwise skipped with a warning.
-    eric: Option<Eric>,
+    pub eric: Option<Eric>,
     /// Path of the currently imported report, if any.
-    report_path: Option<PathBuf>,
+    pub report_path: Option<PathBuf>,
     /// Imported reports and creation date bookkeeping.
-    report_list: ReportList,
+    pub report_list: ReportList,
     /// The validation and submission status of the currently open report.
-    report_status: ReportStatus,
+    pub report_status: ReportStatus,
 }
 
 impl TaxelApp {
@@ -202,7 +199,7 @@ impl TaxelApp {
         }
     }
 
-    fn refresh_imported_reports(&mut self) {
+    pub fn refresh_imported_reports(&mut self) {
         match self.report_list.refresh() {
             Ok(()) => {}
             Err(err) => {
@@ -215,7 +212,7 @@ impl TaxelApp {
         }
     }
 
-    fn register_imported_report(&mut self, report_path: &std::path::Path) {
+    pub fn register_imported_report(&mut self, report_path: &std::path::Path) {
         self.report_list.register_imported_report(report_path);
     }
 }
