@@ -23,6 +23,14 @@ dx serve --hotpatch # Run app with hot reload
 
 The app is structured as follows:
 
+- `domain`: contains pure business data and rules
+- `app`: contains application state and orchestration logic that coordinates
+  domain objects and feature behavior
+- `infrastructure`: handles external concerns like files, XML parsing, JSON
+  storage, and network I/O
+- `ui`: contains egui-based rendering code that displays application state and
+  forwards user interactions to the app layer
+
 ``` txt
 src/
   main.rs
