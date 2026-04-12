@@ -9,6 +9,8 @@ use std::{
 };
 use uuid::Uuid;
 
+/// The file name of the manifest that stores report metadata. This manifest is
+/// stored in the application's directory.
 const CREATION_MANIFEST_FILE: &str = "reports.json";
 
 /// The lifecycle status of a report.
