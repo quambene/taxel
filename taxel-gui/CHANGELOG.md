@@ -17,3 +17,4 @@
   - Persist app settings
   - Add loading spinner for import report
   - Display report list
+  - Send and validate report
