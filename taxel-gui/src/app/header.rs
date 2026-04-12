@@ -1,5 +1,7 @@
 use super::TaxelApp;
-use crate::app::{diagnostics_panel::WARNING_COLOR, AppIssue, IssueSeverity};
+use crate::app::diagnostics_panel::{
+    AppDiagnostic, DiagnosticCategory, DiagnosticLevel, SUCCESS_COLOR, WARNING_COLOR,
+};
 use eframe::egui::{
     self, text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui,
 };
@@ -33,9 +35,10 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
                         load_report(app, copied_path, ui.ctx().clone());
                     }
                     Err(err) => {
-                        app.issues.push(AppIssue::new_error(format!(
-                            "Failed to import report: {err}"
-                        )));
+                        app.issues.push(AppDiagnostic::new_error(
+                            DiagnosticCategory::App,
+                            format!("Failed to import report: {err}"),
+                        ));
                         app.show_error_panel = true;
                     }
                 }
@@ -114,9 +117,10 @@ fn read_report_xml(app: &mut TaxelApp) -> Option<String> {
     match fs::read_to_string(path) {
         Ok(xml) => Some(xml),
         Err(err) => {
-            app.issues.push(AppIssue::new_error(format!(
-                "Failed to read report file: {err}"
-            )));
+            app.issues.push(AppDiagnostic::new_error(
+                DiagnosticCategory::App,
+                format!("Failed to read report file: {err}"),
+            ));
             app.show_error_panel = true;
             None
         }
@@ -137,40 +141,54 @@ fn extract_taxonomy_version(taxonomy: &Option<TaxonomySet>) -> Option<&&str> {
 /// Validates the imported report and reports any issues in the diagnostics
 /// panel.
 fn validate_report(app: &mut TaxelApp) {
-    // TODO: only clear validation errors, but keep app-level errors
-    app.issues.clear();
+    clear_diagnostics_by_category(app, DiagnosticCategory::Validation);
 
     let Some(xml) = read_report_xml(app) else {
         return;
     };
     let Some(eric) = &app.eric else { return };
     let Some(taxonomy_version) = extract_taxonomy_version(&app.taxonomy) else {
-        app.issues.push(AppIssue::taxonomy_version_error());
+        app.issues.push(AppDiagnostic::taxonomy_version_error(
+            DiagnosticCategory::Validation,
+        ));
         app.show_error_panel = true;
         return;
     };
 
     match eric.validate(xml, "Bilanz", taxonomy_version, None) {
         Ok(response) => {
-            if response.error_code != ErrorCode::ERIC_OK as i32 {
-                app.issues.push(AppIssue::new_error(format!(
-                    "Validation failed with error code {}: {}",
-                    response.error_code, response.validation_response
-                )));
+            if response.error_code == ErrorCode::ERIC_OK as i32 {
+                app.issues.push(AppDiagnostic::new_success(
+                    DiagnosticCategory::Validation,
+                    format!(
+                        "Validation completed successfully\n{}",
+                        response.validation_response
+                    ),
+                ));
+            } else {
+                app.issues.push(AppDiagnostic::new_error(
+                    DiagnosticCategory::Validation,
+                    format!(
+                        "Validation failed with error code {}\n{}",
+                        response.error_code, response.validation_response
+                    ),
+                ));
             }
         }
-        Err(err) => app
-            .issues
-            .push(AppIssue::new_error(format!("Validation error: {err}"))),
+        Err(err) => app.issues.push(AppDiagnostic::new_error(
+            DiagnosticCategory::Validation,
+            format!("Validation error: {err}"),
+        )),
     }
+
+    app.show_error_panel = true;
 }
 
 // TODO: provide certifcate path and password
 /// Sends the imported report and reports the server response in the diagnostics
 /// panel.
 fn send_report(app: &mut TaxelApp) {
-    // TODO: only clear validation errors, but keep app-level errors
-    app.issues.clear();
+    clear_diagnostics_by_category(app, DiagnosticCategory::Send);
 
     let Some(xml) = read_report_xml(app) else {
         return;
@@ -179,20 +197,46 @@ fn send_report(app: &mut TaxelApp) {
         return;
     };
     let Some(taxonomy_version) = extract_taxonomy_version(&app.taxonomy) else {
-        app.issues.push(AppIssue::taxonomy_version_error());
+        app.issues.push(AppDiagnostic::taxonomy_version_error(
+            DiagnosticCategory::Send,
+        ));
         app.show_error_panel = true;
         return;
     };
 
     match eric.send(xml, "Bilanz", taxonomy_version, None) {
-        Ok(response) => app.issues.push(AppIssue::new_error(format!(
-            "Send failed with error code {}: {}",
-            response.error_code, response.server_response
-        ))),
-        Err(err) => app
-            .issues
-            .push(AppIssue::new_error(format!("Send error: {err}"))),
+        Ok(response) => {
+            if response.error_code == ErrorCode::ERIC_OK as i32 {
+                app.issues.push(AppDiagnostic::new_success(
+                    DiagnosticCategory::Send,
+                    format!("Send completed successfully\n{}", response.server_response),
+                ));
+            } else {
+                app.issues.push(AppDiagnostic::new_error(
+                    DiagnosticCategory::Send,
+                    format!(
+                        "Send failed with error code {}\n{}",
+                        response.error_code, response.server_response
+                    ),
+                ))
+            }
+        }
+        Err(err) => app.issues.push(AppDiagnostic::new_error(
+            DiagnosticCategory::Send,
+            format!("Send error: {err}"),
+        )),
     }
+
+    app.show_error_panel = true;
+}
+
+/// Clears all diagnostics of the specified category from the app state. This is
+/// used to clear old validation errors when re-validating, or to clear old send
+/// errors when re-sending the report, while keeping other diagnostics (like app
+/// errors).
+fn clear_diagnostics_by_category(app: &mut TaxelApp, category: DiagnosticCategory) {
+    app.issues
+        .retain(|diagnostic| diagnostic.category != category);
 }
 
 /// Draws a summary of errors and warnings in the header. Clicking on the
@@ -201,12 +245,17 @@ fn draw_error_summary(app: &mut TaxelApp, ui: &mut Ui) {
     let error_count = app
         .issues
         .iter()
-        .filter(|issue| issue.severity == IssueSeverity::Error)
+        .filter(|diagnostic| diagnostic.level == DiagnosticLevel::Error)
         .count();
     let warning_count = app
         .issues
         .iter()
-        .filter(|issue| issue.severity == IssueSeverity::Warning)
+        .filter(|diagnostic| diagnostic.level == DiagnosticLevel::Warning)
+        .count();
+    let success_count = app
+        .issues
+        .iter()
+        .filter(|diagnostic| diagnostic.level == DiagnosticLevel::Success)
         .count();
 
     ui.separator();
@@ -225,6 +274,14 @@ fn draw_error_summary(app: &mut TaxelApp, ui: &mut Ui) {
         0.0,
         TextFormat {
             color: WARNING_COLOR,
+            ..Default::default()
+        },
+    );
+    job.append(
+        &format!("  success: {success_count}"),
+        0.0,
+        TextFormat {
+            color: SUCCESS_COLOR,
             ..Default::default()
         },
     );

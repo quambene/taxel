@@ -18,7 +18,7 @@ use self::{
     toolbar::{draw_toolbar, EditAction},
 };
 use crate::{
-    app::diagnostics_panel::{AppIssue, IssueSeverity},
+    app::diagnostics_panel::{AppDiagnostic, DiagnosticCategory},
     widgets::draw_unsaved_changes_modal,
 };
 use dioxus_devtools::subsecond;
@@ -91,7 +91,7 @@ pub struct TaxelApp {
     /// Persisted UI settings (language, zoom, theme).
     settings: Settings,
     /// Structured diagnostics for non-blocking and blocking issues.
-    issues: Vec<AppIssue>,
+    issues: Vec<AppDiagnostic>,
     /// Controls whether the detailed diagnostics panel is visible.
     show_error_panel: bool,
     /// Search state.
@@ -138,7 +138,7 @@ impl TaxelApp {
         let mut issues = Vec::new();
 
         if let Some(message) = error_message {
-            issues.push(AppIssue::new_error(message));
+            issues.push(AppDiagnostic::new_error(DiagnosticCategory::App, message));
         }
 
         let settings = Settings::load(ctx.storage);
@@ -147,22 +147,25 @@ impl TaxelApp {
         let eric =
             if let Some(log_path) = dirs::data_dir().map(|dir| dir.join("taxel").join("logs")) {
                 if let Err(err) = fs::create_dir_all(&log_path) {
-                    issues.push(AppIssue::new_error(format!(
-                        "Failed to create log directory: {err}"
-                    )));
+                    issues.push(AppDiagnostic::new_error(
+                        DiagnosticCategory::App,
+                        format!("Failed to create log directory: {err}"),
+                    ));
                 }
 
                 match Eric::new(&log_path) {
                     Ok(eric) => Some(eric),
                     Err(err) => {
-                        issues.push(AppIssue::new_error(format!(
-                            "Failed to initialize Eric: {err}"
-                        )));
+                        issues.push(AppDiagnostic::new_error(
+                            DiagnosticCategory::App,
+                            format!("Failed to initialize Eric: {err}"),
+                        ));
                         None
                     }
                 }
             } else {
-                issues.push(AppIssue::new_warning(
+                issues.push(AppDiagnostic::new_warning(
+                    DiagnosticCategory::App,
                     "Could not determine data directory, skipping Eric initialization".to_string(),
                 ));
                 None
@@ -172,9 +175,10 @@ impl TaxelApp {
 
         let mut report_list = ReportList::new();
         if let Err(err) = report_list.refresh() {
-            issues.push(AppIssue::new_warning(format!(
-                "Failed to list imported reports: {err}"
-            )));
+            issues.push(AppDiagnostic::new_warning(
+                DiagnosticCategory::App,
+                format!("Failed to list imported reports: {err}"),
+            ));
         }
 
         Self {
@@ -200,9 +204,10 @@ impl TaxelApp {
         match self.report_list.refresh() {
             Ok(()) => {}
             Err(err) => {
-                self.issues.push(AppIssue::new_warning(format!(
-                    "Failed to refresh imported reports: {err}"
-                )));
+                self.issues.push(AppDiagnostic::new_warning(
+                    DiagnosticCategory::App,
+                    format!("Failed to refresh imported reports: {err}"),
+                ));
                 self.show_error_panel = true;
             }
         }
@@ -435,9 +440,10 @@ fn load_fact_table(app: &mut TaxelApp) {
                 populate_fact_table(view, &item_facts, &mut table);
 
                 for missing_role in &table.role_mapping_errors {
-                    app.issues.push(AppIssue::new_warning(format!(
-                        "Missing report-element mapping for role URI: {missing_role}"
-                    )));
+                    app.issues.push(AppDiagnostic::new_warning(
+                        DiagnosticCategory::Import,
+                        format!("Missing report-element mapping for role URI: {missing_role}"),
+                    ));
                 }
 
                 app.section_states = table
@@ -452,7 +458,10 @@ fn load_fact_table(app: &mut TaxelApp) {
                 app.loading = None;
             }
             Ok(Err(err)) => {
-                app.issues.push(AppIssue::new_error(err.to_string()));
+                app.issues.push(AppDiagnostic::new_error(
+                    DiagnosticCategory::Import,
+                    err.to_string(),
+                ));
                 app.show_error_panel = true;
                 app.loading = None;
             }
