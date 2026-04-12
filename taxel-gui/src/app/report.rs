@@ -26,7 +26,6 @@ pub fn load_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context) {
     app.diagnostics.clear();
     app.editing_section = None;
     app.edit_snapshot.clear();
-    app.report_status = ReportStatus::Draft;
 
     let (tx, rx) = mpsc::channel();
     app.loading = Some(rx);
@@ -64,14 +63,20 @@ pub fn load_xml(path: &Path) -> Result<(TaxonomySet, InstanceDocument, Report), 
 /// panel.
 pub fn validate_report(app: &mut TaxelApp) {
     clear_diagnostics_by_category(app, DiagnosticCategory::Validation);
-    app.report_status = ReportStatus::Draft;
 
-    if let Some(report) = &app.report {
-        app.report_list
-            .set_report_status(&report.path, ReportStatus::Draft, &mut app.diagnostics);
-    }
+    let Some(report) = &mut app.report else {
+        return;
+    };
 
-    let Some(xml) = read_report_xml(app) else {
+    report.status = ReportStatus::Draft;
+    app.report_list
+        .set_report_status(&report.path, ReportStatus::Draft, &mut app.diagnostics);
+
+    let Some(xml) = read_report(
+        &report.path,
+        &mut app.diagnostics,
+        &mut app.show_error_panel,
+    ) else {
         return;
     };
     let Some(eric) = &app.eric else { return };
@@ -86,9 +91,8 @@ pub fn validate_report(app: &mut TaxelApp) {
     match eric.validate(xml, "Bilanz", taxonomy_version, None) {
         Ok(response) => {
             if response.error_code == ErrorCode::ERIC_OK as i32 {
-                app.report_status = ReportStatus::Validated;
-
-                if let Some(report) = &app.report {
+                if let Some(report) = &mut app.report {
+                    report.status = ReportStatus::Validated;
                     app.report_list.set_report_status(
                         &report.path,
                         ReportStatus::Validated,
@@ -128,7 +132,11 @@ pub fn validate_report(app: &mut TaxelApp) {
 pub fn send_report(app: &mut TaxelApp) {
     clear_diagnostics_by_category(app, DiagnosticCategory::Send);
 
-    if app.report_status != ReportStatus::Validated {
+    let Some(report) = &mut app.report else {
+        return;
+    };
+
+    if report.status != ReportStatus::Validated {
         app.diagnostics.push(AppDiagnostic::new_error(
             DiagnosticCategory::Send,
             "Validate the report first and make sure that all errors are resolved".to_string(),
@@ -137,9 +145,14 @@ pub fn send_report(app: &mut TaxelApp) {
         return;
     }
 
-    let Some(xml) = read_report_xml(app) else {
+    let Some(xml) = read_report(
+        &report.path,
+        &mut app.diagnostics,
+        &mut app.show_error_panel,
+    ) else {
         return;
     };
+
     let Some(eric) = &app.eric else {
         return;
     };
@@ -154,7 +167,7 @@ pub fn send_report(app: &mut TaxelApp) {
     match eric.send(xml, "Bilanz", taxonomy_version, None) {
         Ok(response) => {
             if response.error_code == ErrorCode::ERIC_OK as i32 {
-                app.report_status = ReportStatus::Sent;
+                report.status = ReportStatus::Sent;
 
                 if let Some(report) = &app.report {
                     app.report_list.set_report_status(
@@ -197,17 +210,19 @@ fn clear_diagnostics_by_category(app: &mut TaxelApp, category: DiagnosticCategor
 }
 
 /// Reads the XML from `report_path`.
-fn read_report_xml(app: &mut TaxelApp) -> Option<String> {
-    let report = app.report.as_ref()?;
-
-    match fs::read_to_string(&report.path) {
+fn read_report(
+    report_path: &Path,
+    diagnostics: &mut Vec<AppDiagnostic>,
+    show_error_panel: &mut bool,
+) -> Option<String> {
+    match fs::read_to_string(report_path) {
         Ok(xml) => Some(xml),
         Err(err) => {
-            app.diagnostics.push(AppDiagnostic::new_error(
+            diagnostics.push(AppDiagnostic::new_error(
                 DiagnosticCategory::App,
                 format!("Failed to read report file: {err}"),
             ));
-            app.show_error_panel = true;
+            *show_error_panel = true;
             None
         }
     }

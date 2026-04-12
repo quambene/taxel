@@ -54,8 +54,6 @@ pub struct TaxelApp {
     pub taxonomy: Option<TaxonomySet>,
     /// The instance document currently loaded in the app, if any.
     pub instance_document: Option<InstanceDocument>,
-    /// The validation and submission status of the currently open report.
-    pub report_status: ReportStatus,
     /// The currently loaded report.
     pub report: Option<Report>,
     /// Imported reports and creation date bookkeeping.
@@ -169,7 +167,6 @@ impl TaxelApp {
             editing_section: None,
             edit_snapshot: Vec::new(),
             eric,
-            report_status: ReportStatus::Draft,
         }
     }
 
@@ -313,7 +310,6 @@ impl App for TaxelApp {
                                 }
                             }
                             self.editing_section = Some(self.selected_tab);
-                            self.report_status = ReportStatus::Draft;
 
                             // If the report was previously validated, mark it
                             // as draft again since it has unsaved changes now.

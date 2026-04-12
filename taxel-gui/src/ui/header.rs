@@ -1,6 +1,5 @@
 use crate::{
     app::{self, AppDiagnostic, DiagnosticCategory, DiagnosticLevel},
-    domain::ReportStatus,
     infrastructure::report_store,
     ui::diagnostic_panel::{SUCCESS_COLOR, WARNING_COLOR},
     TaxelApp,
@@ -56,7 +55,6 @@ pub fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
             app.show_error_panel = true;
             app.editing_section = None;
             app.edit_snapshot.clear();
-            app.report_status = ReportStatus::Draft;
         }
 
         if app.report.is_some() && ui.button("Validate report").clicked() {
