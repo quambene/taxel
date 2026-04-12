@@ -1,4 +1,4 @@
-use super::TaxelApp;
+use super::{ReportStatus, TaxelApp};
 use crate::app::diagnostics_panel::{
     AppDiagnostic, DiagnosticCategory, DiagnosticLevel, SUCCESS_COLOR, WARNING_COLOR,
 };
@@ -64,6 +64,7 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
             app.show_error_panel = true;
             app.editing_section = None;
             app.edit_snapshot.clear();
+            app.report_status = ReportStatus::Draft;
         }
 
         if app.table.is_some() && ui.button("Validate report").clicked() {
@@ -99,6 +100,7 @@ pub(super) fn load_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context)
     app.issues.clear();
     app.editing_section = None;
     app.edit_snapshot.clear();
+    app.report_status = ReportStatus::Draft;
 
     let (tx, rx) = mpsc::channel();
     app.loading = Some(rx);
@@ -142,6 +144,7 @@ fn extract_taxonomy_version(taxonomy: &Option<TaxonomySet>) -> Option<&&str> {
 /// panel.
 fn validate_report(app: &mut TaxelApp) {
     clear_diagnostics_by_category(app, DiagnosticCategory::Validation);
+    app.report_status = ReportStatus::Draft;
 
     let Some(xml) = read_report_xml(app) else {
         return;
@@ -158,6 +161,7 @@ fn validate_report(app: &mut TaxelApp) {
     match eric.validate(xml, "Bilanz", taxonomy_version, None) {
         Ok(response) => {
             if response.error_code == ErrorCode::ERIC_OK as i32 {
+                app.report_status = ReportStatus::Validated;
                 app.issues.push(AppDiagnostic::new_success(
                     DiagnosticCategory::Validation,
                     format!(
@@ -191,6 +195,15 @@ fn validate_report(app: &mut TaxelApp) {
 fn send_report(app: &mut TaxelApp) {
     clear_diagnostics_by_category(app, DiagnosticCategory::Send);
 
+    if app.report_status != ReportStatus::Validated {
+        app.issues.push(AppDiagnostic::new_error(
+            DiagnosticCategory::Send,
+            "Validate the report first".to_string(),
+        ));
+        app.show_error_panel = true;
+        return;
+    }
+
     let Some(xml) = read_report_xml(app) else {
         return;
     };
@@ -208,6 +221,7 @@ fn send_report(app: &mut TaxelApp) {
     match eric.send(xml, "Bilanz", taxonomy_version, None) {
         Ok(response) => {
             if response.error_code == ErrorCode::ERIC_OK as i32 {
+                app.report_status = ReportStatus::Sent;
                 app.issues.push(AppDiagnostic::new_success(
                     DiagnosticCategory::Send,
                     format!("Send completed successfully\n{}", response.server_response),

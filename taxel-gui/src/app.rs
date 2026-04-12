@@ -73,6 +73,18 @@ struct SectionState {
     max_depth: Option<usize>,
 }
 
+/// The status of the currently open report, used to control validation and
+/// sending.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(super) enum ReportStatus {
+    /// The report has not been validated yet, either because it was just loaded or because it has unsaved edits.
+    Draft,
+    /// The report has been validated and no issues were found.
+    Validated,
+    /// The report has been submitted without errors.
+    Sent,
+}
+
 /// Main application struct for the Taxel GUI, managing the state of the app.
 pub struct TaxelApp {
     /// The taxonomy set for the currently loaded XBRL instance document, if
@@ -113,6 +125,8 @@ pub struct TaxelApp {
     report_path: Option<PathBuf>,
     /// Imported reports and creation date bookkeeping.
     report_list: ReportList,
+    /// The validation and submission status of the currently open report.
+    report_status: ReportStatus,
 }
 
 impl TaxelApp {
@@ -197,6 +211,7 @@ impl TaxelApp {
             editing_section: None,
             edit_snapshot: Vec::new(),
             eric,
+            report_status: ReportStatus::Draft,
         }
     }
 
@@ -339,6 +354,7 @@ impl App for TaxelApp {
                                 }
                             }
                             self.editing_section = Some(self.selected_tab);
+                            self.report_status = ReportStatus::Draft;
                         }
                         EditAction::Save => {
                             self.editing_section = None;
@@ -454,6 +470,7 @@ fn load_fact_table(app: &mut TaxelApp) {
                 app.table = Some(table);
                 app.taxonomy = Some(taxonomy);
                 app.report = Some(report);
+                app.report_status = ReportStatus::Draft;
                 app.show_error_panel = !app.issues.is_empty();
                 app.loading = None;
             }
