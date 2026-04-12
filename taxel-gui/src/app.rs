@@ -37,7 +37,11 @@ use std::{
     sync::mpsc::{self, Receiver},
     time::{Duration, Instant},
 };
-use taxel_gui::{populate_fact_table, report_store::ReportSummary, FactTable, SearchHit};
+use taxel_gui::{
+    populate_fact_table,
+    report_store::{ReportStatus, ReportSummary},
+    FactTable, SearchHit,
+};
 use xbrl_rs::{InstanceDocument, TaxonomySet};
 
 const JUMP_HIGHLIGHT_DURATION: Duration = Duration::from_millis(1400);
@@ -73,18 +77,6 @@ struct SectionState {
     max_depth: Option<usize>,
 }
 
-/// The status of the currently open report, used to control validation and
-/// sending.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub(super) enum ReportStatus {
-    /// The report has not been validated yet, either because it was just loaded or because it has unsaved edits.
-    Draft,
-    /// The report has been validated and no issues were found.
-    Validated,
-    /// The report has been submitted without errors.
-    Sent,
-}
-
 /// Main application struct for the Taxel GUI, managing the state of the app.
 pub struct TaxelApp {
     /// The taxonomy set for the currently loaded XBRL instance document, if
@@ -103,7 +95,7 @@ pub struct TaxelApp {
     /// Persisted UI settings (language, zoom, theme).
     settings: Settings,
     /// Structured diagnostics for non-blocking and blocking issues.
-    issues: Vec<AppDiagnostic>,
+    diagnostics: Vec<AppDiagnostic>,
     /// Controls whether the detailed diagnostics panel is visible.
     show_error_panel: bool,
     /// Search state.
@@ -149,10 +141,10 @@ impl TaxelApp {
                     .collect()
             })
             .unwrap_or_default();
-        let mut issues = Vec::new();
+        let mut diagnostics = Vec::new();
 
         if let Some(message) = error_message {
-            issues.push(AppDiagnostic::new_error(DiagnosticCategory::App, message));
+            diagnostics.push(AppDiagnostic::new_error(DiagnosticCategory::App, message));
         }
 
         let settings = Settings::load(ctx.storage);
@@ -161,7 +153,7 @@ impl TaxelApp {
         let eric =
             if let Some(log_path) = dirs::data_dir().map(|dir| dir.join("taxel").join("logs")) {
                 if let Err(err) = fs::create_dir_all(&log_path) {
-                    issues.push(AppDiagnostic::new_error(
+                    diagnostics.push(AppDiagnostic::new_error(
                         DiagnosticCategory::App,
                         format!("Failed to create log directory: {err}"),
                     ));
@@ -170,7 +162,7 @@ impl TaxelApp {
                 match Eric::new(&log_path) {
                     Ok(eric) => Some(eric),
                     Err(err) => {
-                        issues.push(AppDiagnostic::new_error(
+                        diagnostics.push(AppDiagnostic::new_error(
                             DiagnosticCategory::App,
                             format!("Failed to initialize Eric: {err}"),
                         ));
@@ -178,7 +170,7 @@ impl TaxelApp {
                     }
                 }
             } else {
-                issues.push(AppDiagnostic::new_warning(
+                diagnostics.push(AppDiagnostic::new_warning(
                     DiagnosticCategory::App,
                     "Could not determine data directory, skipping Eric initialization".to_string(),
                 ));
@@ -189,7 +181,7 @@ impl TaxelApp {
 
         let mut report_list = ReportList::new();
         if let Err(err) = report_list.refresh() {
-            issues.push(AppDiagnostic::new_warning(
+            diagnostics.push(AppDiagnostic::new_warning(
                 DiagnosticCategory::App,
                 format!("Failed to list imported reports: {err}"),
             ));
@@ -202,7 +194,7 @@ impl TaxelApp {
             selected_tab: 0,
             section_states,
             settings,
-            issues,
+            diagnostics,
             show_error_panel,
             loading: None,
             search: Search::default(),
@@ -219,7 +211,7 @@ impl TaxelApp {
         match self.report_list.refresh() {
             Ok(()) => {}
             Err(err) => {
-                self.issues.push(AppDiagnostic::new_warning(
+                self.diagnostics.push(AppDiagnostic::new_warning(
                     DiagnosticCategory::App,
                     format!("Failed to refresh imported reports: {err}"),
                 ));
@@ -262,7 +254,7 @@ impl App for TaxelApp {
             draw_sidebar(ctx, sections, &mut self.selected_tab, &self.settings.lang);
 
             if self.show_error_panel {
-                draw_error_panel(ctx, &self.issues, &mut self.show_error_panel);
+                draw_error_panel(ctx, &self.diagnostics, &mut self.show_error_panel);
             }
 
             let lang = self.settings.lang.clone();
@@ -355,6 +347,13 @@ impl App for TaxelApp {
                             }
                             self.editing_section = Some(self.selected_tab);
                             self.report_status = ReportStatus::Draft;
+                            if let Some(path) = self.report_path.as_ref() {
+                                self.report_list.set_report_status(
+                                    path,
+                                    ReportStatus::Draft,
+                                    &mut self.diagnostics,
+                                );
+                            }
                         }
                         EditAction::Save => {
                             self.editing_section = None;
@@ -456,7 +455,7 @@ fn load_fact_table(app: &mut TaxelApp) {
                 populate_fact_table(view, &item_facts, &mut table);
 
                 for missing_role in &table.role_mapping_errors {
-                    app.issues.push(AppDiagnostic::new_warning(
+                    app.diagnostics.push(AppDiagnostic::new_warning(
                         DiagnosticCategory::Import,
                         format!("Missing report-element mapping for role URI: {missing_role}"),
                     ));
@@ -470,12 +469,11 @@ fn load_fact_table(app: &mut TaxelApp) {
                 app.table = Some(table);
                 app.taxonomy = Some(taxonomy);
                 app.report = Some(report);
-                app.report_status = ReportStatus::Draft;
-                app.show_error_panel = !app.issues.is_empty();
+                app.show_error_panel = !app.diagnostics.is_empty();
                 app.loading = None;
             }
             Ok(Err(err)) => {
-                app.issues.push(AppDiagnostic::new_error(
+                app.diagnostics.push(AppDiagnostic::new_error(
                     DiagnosticCategory::Import,
                     err.to_string(),
                 ));
@@ -494,6 +492,11 @@ fn load_fact_table(app: &mut TaxelApp) {
 /// to select one to open.
 fn draw_report_list(ui: &mut Ui, reports: &[ReportSummary], loading: bool) -> Option<PathBuf> {
     let list_width = ui.available_width().min(560.0);
+    let created_col_width = 120.0;
+    let status_col_width = 90.0;
+    let column_spacing = ui.spacing().item_spacing.x * 2.0;
+    let report_col_width =
+        (list_width - created_col_width - status_col_width - column_spacing).max(240.0);
 
     ui.vertical_centered(|ui| {
         ui.heading("Your Reports");
@@ -518,20 +521,37 @@ fn draw_report_list(ui: &mut Ui, reports: &[ReportSummary], loading: bool) -> Op
         ui.set_max_width(list_width);
         ui.set_width(list_width);
         ui.horizontal(|ui| {
-            ui.add_sized([120.0, 18.0], egui::Label::new(RichText::new("Created")));
-            ui.label(RichText::new("Report"));
+            ui.add_sized(
+                [created_col_width, 18.0],
+                egui::Label::new(RichText::new("Created")),
+            );
+            ui.add_sized(
+                [report_col_width, 18.0],
+                egui::Label::new(RichText::new("Report")),
+            );
+            ui.add_sized(
+                [status_col_width, 18.0],
+                egui::Label::new(RichText::new("Status")),
+            );
         });
         ui.separator();
 
         for (idx, report) in reports.iter().enumerate() {
             let row = egui::Frame::new()
                 .fill(egui::Color32::TRANSPARENT)
-                .inner_margin(egui::Margin::symmetric(6, 6))
+                .inner_margin(egui::Margin::symmetric(0, 6))
                 .show(ui, |ui| {
                     ui.set_width(list_width);
                     ui.horizontal(|ui| {
-                        ui.add_sized([120.0, 18.0], Label::new(&report.created_date));
-                        ui.label(&report.display_name);
+                        ui.add_sized([created_col_width, 18.0], Label::new(&report.created_date));
+                        ui.add_sized(
+                            [report_col_width, 18.0],
+                            Label::new(&report.display_name).truncate(),
+                        );
+                        ui.add_sized(
+                            [status_col_width, 18.0],
+                            Label::new(report.report_status.as_str()),
+                        );
                     });
                 });
 

@@ -1,4 +1,4 @@
-use super::{ReportStatus, TaxelApp};
+use super::TaxelApp;
 use crate::app::diagnostics_panel::{
     AppDiagnostic, DiagnosticCategory, DiagnosticLevel, SUCCESS_COLOR, WARNING_COLOR,
 };
@@ -14,7 +14,7 @@ use std::{
     thread,
 };
 use taxel::TAXONOMY_YEAR_TO_VERSION;
-use taxel_gui::{load_xml, report_store};
+use taxel_gui::{load_xml, report_store, report_store::ReportStatus};
 use xbrl_rs::TaxonomySet;
 
 /// Draws the header panel of the application, including the "Import report"
@@ -35,7 +35,7 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
                         load_report(app, copied_path, ui.ctx().clone());
                     }
                     Err(err) => {
-                        app.issues.push(AppDiagnostic::new_error(
+                        app.diagnostics.push(AppDiagnostic::new_error(
                             DiagnosticCategory::App,
                             format!("Failed to import report: {err}"),
                         ));
@@ -60,7 +60,7 @@ pub(super) fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
             app.search.scroll_to_row = None;
             app.search.row_highlight = None;
             app.loading = None;
-            app.issues.clear();
+            app.diagnostics.clear();
             app.show_error_panel = true;
             app.editing_section = None;
             app.edit_snapshot.clear();
@@ -97,10 +97,13 @@ pub(super) fn load_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context)
     app.selected_tab = 0;
     app.table = None;
     app.report_path = Some(path.clone());
-    app.issues.clear();
+    app.diagnostics.clear();
     app.editing_section = None;
     app.edit_snapshot.clear();
-    app.report_status = ReportStatus::Draft;
+    app.report_status = app
+        .report_list
+        .report_status(&path)
+        .unwrap_or(ReportStatus::Draft);
 
     let (tx, rx) = mpsc::channel();
     app.loading = Some(rx);
@@ -119,7 +122,7 @@ fn read_report_xml(app: &mut TaxelApp) -> Option<String> {
     match fs::read_to_string(path) {
         Ok(xml) => Some(xml),
         Err(err) => {
-            app.issues.push(AppDiagnostic::new_error(
+            app.diagnostics.push(AppDiagnostic::new_error(
                 DiagnosticCategory::App,
                 format!("Failed to read report file: {err}"),
             ));
@@ -145,13 +148,17 @@ fn extract_taxonomy_version(taxonomy: &Option<TaxonomySet>) -> Option<&&str> {
 fn validate_report(app: &mut TaxelApp) {
     clear_diagnostics_by_category(app, DiagnosticCategory::Validation);
     app.report_status = ReportStatus::Draft;
+    if let Some(path) = app.report_path.as_ref() {
+        app.report_list
+            .set_report_status(path, ReportStatus::Draft, &mut app.diagnostics);
+    }
 
     let Some(xml) = read_report_xml(app) else {
         return;
     };
     let Some(eric) = &app.eric else { return };
     let Some(taxonomy_version) = extract_taxonomy_version(&app.taxonomy) else {
-        app.issues.push(AppDiagnostic::taxonomy_version_error(
+        app.diagnostics.push(AppDiagnostic::taxonomy_version_error(
             DiagnosticCategory::Validation,
         ));
         app.show_error_panel = true;
@@ -162,7 +169,14 @@ fn validate_report(app: &mut TaxelApp) {
         Ok(response) => {
             if response.error_code == ErrorCode::ERIC_OK as i32 {
                 app.report_status = ReportStatus::Validated;
-                app.issues.push(AppDiagnostic::new_success(
+                if let Some(path) = app.report_path.as_ref() {
+                    app.report_list.set_report_status(
+                        path,
+                        ReportStatus::Validated,
+                        &mut app.diagnostics,
+                    );
+                }
+                app.diagnostics.push(AppDiagnostic::new_success(
                     DiagnosticCategory::Validation,
                     format!(
                         "Validation completed successfully\n{}",
@@ -171,7 +185,7 @@ fn validate_report(app: &mut TaxelApp) {
                 ));
             } else {
                 // TODO: parse `validation_response` for better error messages
-                app.issues.push(AppDiagnostic::new_error(
+                app.diagnostics.push(AppDiagnostic::new_error(
                     DiagnosticCategory::Validation,
                     format!(
                         "Validation failed with error code {}\n{}",
@@ -180,7 +194,7 @@ fn validate_report(app: &mut TaxelApp) {
                 ));
             }
         }
-        Err(err) => app.issues.push(AppDiagnostic::new_error(
+        Err(err) => app.diagnostics.push(AppDiagnostic::new_error(
             DiagnosticCategory::Validation,
             format!("Validation error: {err}"),
         )),
@@ -196,7 +210,7 @@ fn send_report(app: &mut TaxelApp) {
     clear_diagnostics_by_category(app, DiagnosticCategory::Send);
 
     if app.report_status != ReportStatus::Validated {
-        app.issues.push(AppDiagnostic::new_error(
+        app.diagnostics.push(AppDiagnostic::new_error(
             DiagnosticCategory::Send,
             "Validate the report first and make sure that all errors are resolved".to_string(),
         ));
@@ -211,7 +225,7 @@ fn send_report(app: &mut TaxelApp) {
         return;
     };
     let Some(taxonomy_version) = extract_taxonomy_version(&app.taxonomy) else {
-        app.issues.push(AppDiagnostic::taxonomy_version_error(
+        app.diagnostics.push(AppDiagnostic::taxonomy_version_error(
             DiagnosticCategory::Send,
         ));
         app.show_error_panel = true;
@@ -222,13 +236,20 @@ fn send_report(app: &mut TaxelApp) {
         Ok(response) => {
             if response.error_code == ErrorCode::ERIC_OK as i32 {
                 app.report_status = ReportStatus::Sent;
-                app.issues.push(AppDiagnostic::new_success(
+                if let Some(path) = app.report_path.as_ref() {
+                    app.report_list.set_report_status(
+                        path,
+                        ReportStatus::Sent,
+                        &mut app.diagnostics,
+                    );
+                }
+                app.diagnostics.push(AppDiagnostic::new_success(
                     DiagnosticCategory::Send,
                     format!("Send completed successfully\n{}", response.server_response),
                 ));
             } else {
                 // TODO: parse `server_response` for better error messages
-                app.issues.push(AppDiagnostic::new_error(
+                app.diagnostics.push(AppDiagnostic::new_error(
                     DiagnosticCategory::Send,
                     format!(
                         "Send failed with error code {}\n{}",
@@ -237,7 +258,7 @@ fn send_report(app: &mut TaxelApp) {
                 ))
             }
         }
-        Err(err) => app.issues.push(AppDiagnostic::new_error(
+        Err(err) => app.diagnostics.push(AppDiagnostic::new_error(
             DiagnosticCategory::Send,
             format!("Send error: {err}"),
         )),
@@ -251,7 +272,7 @@ fn send_report(app: &mut TaxelApp) {
 /// errors when re-sending the report, while keeping other diagnostics (like app
 /// errors).
 fn clear_diagnostics_by_category(app: &mut TaxelApp, category: DiagnosticCategory) {
-    app.issues
+    app.diagnostics
         .retain(|diagnostic| diagnostic.category != category);
 }
 
@@ -259,17 +280,17 @@ fn clear_diagnostics_by_category(app: &mut TaxelApp, category: DiagnosticCategor
 /// summary toggles the visibility of the detailed diagnostics panel.
 fn draw_error_summary(app: &mut TaxelApp, ui: &mut Ui) {
     let error_count = app
-        .issues
+        .diagnostics
         .iter()
         .filter(|diagnostic| diagnostic.level == DiagnosticLevel::Error)
         .count();
     let warning_count = app
-        .issues
+        .diagnostics
         .iter()
         .filter(|diagnostic| diagnostic.level == DiagnosticLevel::Warning)
         .count();
     let success_count = app
-        .issues
+        .diagnostics
         .iter()
         .filter(|diagnostic| diagnostic.level == DiagnosticLevel::Success)
         .count();

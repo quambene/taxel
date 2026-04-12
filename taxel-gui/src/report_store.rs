@@ -1,5 +1,6 @@
 use anyhow::{Context, Result};
 use chrono::{DateTime, Local, Utc};
+use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
     fs,
@@ -10,14 +11,50 @@ use uuid::Uuid;
 
 const CREATION_MANIFEST_FILE: &str = "reports.json";
 
+/// The lifecycle status of a report.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
+pub enum ReportStatus {
+    #[default]
+    Draft,
+    Validated,
+    Sent,
+}
+
+impl ReportStatus {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            ReportStatus::Draft => "Draft",
+            ReportStatus::Validated => "Validated",
+            ReportStatus::Sent => "Sent",
+        }
+    }
+}
+
+/// Persisted metadata for a report in the manifest file.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ReportManifestEntry {
+    /// The creation date as a unix timestamp.
+    pub created: i64,
+    /// The lifecycle status of the report.
+    #[serde(default)]
+    pub status: ReportStatus,
+}
+
 /// The `ReportSummary` struct represents a summary of a created or imported
 /// report.
 #[derive(Clone)]
 pub struct ReportSummary {
+    /// The file path to the report XML file.
     pub path: PathBuf,
+    /// The display name of the report, typically derived from the file name.
     pub display_name: String,
+    /// The creation date as a formatted string for display in the UI.
     pub created_date: String,
-    pub created_unix: i64,
+    /// The creation date as a unix timestamp for sorting and comparison.
+    pub created: i64,
+    /// The lifecycle status of the report, used for display and filtering in
+    /// the UI.
+    pub report_status: ReportStatus,
 }
 
 /// The `ReportStore` struct manages the list of created or imported reports,
@@ -67,7 +104,7 @@ impl ReportStore {
             })?;
 
             let modified_at = metadata.modified().unwrap_or(SystemTime::UNIX_EPOCH);
-            let created_unix = system_time_to_unix_seconds(modified_at);
+            let created = system_time_to_unix_seconds(modified_at);
             let display_name = path
                 .file_name()
                 .and_then(|name| name.to_str())
@@ -77,12 +114,13 @@ impl ReportStore {
             summaries.push(ReportSummary {
                 path,
                 display_name,
-                created_date: format_date(created_unix),
-                created_unix,
+                created_date: format_date(created),
+                created,
+                report_status: ReportStatus::Draft,
             });
         }
 
-        summaries.sort_by(|a, b| b.created_unix.cmp(&a.created_unix));
+        summaries.sort_by(|a, b| b.created.cmp(&a.created));
 
         let report_store = Self::new(summaries);
 
@@ -138,11 +176,9 @@ pub fn format_date(unix_seconds: i64) -> String {
         .unwrap_or_else(|| "unknown".to_string())
 }
 
-/// Loads the creation manifest, which is a JSON file that maps report file
-/// paths to their creation dates (in Unix seconds). This manifest is used to
-/// preserve the original creation dates of imported reports, as the filesystem
-/// metadata may not retain this information when files are copied or moved.
-pub fn load_creation_manifest() -> Result<HashMap<String, i64>> {
+/// Loads the report manifest. Supports both the current object format and the
+/// legacy format where values were plain unix timestamps.
+pub fn load_report_manifest() -> Result<HashMap<String, ReportManifestEntry>> {
     let reports_dir = reports_dir()?;
 
     create_reports_dir_if_not_exists(&reports_dir)?;
@@ -164,25 +200,26 @@ pub fn load_creation_manifest() -> Result<HashMap<String, i64>> {
         return Ok(HashMap::new());
     }
 
-    serde_json::from_str(&content).with_context(|| {
-        format!(
-            "Failed to parse reports manifest JSON: {}",
-            manifest_path.display()
-        )
-    })
+    if let Ok(entries) = serde_json::from_str::<HashMap<String, ReportManifestEntry>>(&content) {
+        return Ok(entries);
+    }
+
+    Err(anyhow::anyhow!(
+        "Failed to parse reports manifest JSON: {}",
+        manifest_path.display()
+    ))
 }
 
-/// Saves the creation manifest, which is a JSON file that maps report file
-/// paths to their creation dates (in Unix seconds).
-pub fn save_creation_manifest(creation_dates: &HashMap<String, i64>) -> Result<()> {
+/// Saves the report manifest as JSON.
+pub fn save_report_manifest(manifest: &HashMap<String, ReportManifestEntry>) -> Result<()> {
     let reports_dir = reports_dir()?;
 
     create_reports_dir_if_not_exists(&reports_dir)?;
 
     let manifest_path = reports_dir.join(CREATION_MANIFEST_FILE);
     let temp_path = reports_dir.join(format!("{CREATION_MANIFEST_FILE}.tmp"));
-    let json = serde_json::to_string_pretty(creation_dates)
-        .context("Failed to serialize reports manifest")?;
+    let json =
+        serde_json::to_string_pretty(manifest).context("Failed to serialize reports manifest")?;
 
     fs::write(&temp_path, json).with_context(|| {
         format!(
