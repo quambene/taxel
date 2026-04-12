@@ -6,8 +6,6 @@ mod settings;
 
 use crate::{
     app::{report_list::ReportList, settings::Settings},
-    populate_fact_table,
-    report_store::ReportStatus,
     ui::{
         diagnostic_panel::draw_error_panel,
         header::draw_header,
@@ -30,6 +28,7 @@ use eframe::{
 };
 use eric_sdk::Eric;
 pub use report::{load_report, send_report, validate_report};
+pub use report_list::ReportOverview;
 pub use search::{RowHighlight, Search};
 use std::{
     collections::HashSet,
@@ -423,7 +422,7 @@ fn load_fact_table(app: &mut TaxelApp) {
                 let item_facts = report.item_facts();
                 let mut table = FactTable::default();
 
-                populate_fact_table(view, &item_facts, &mut table);
+                table.populate(view, &item_facts);
 
                 for missing_role in &table.role_mapping_errors {
                     app.diagnostics.push(AppDiagnostic::new_warning(

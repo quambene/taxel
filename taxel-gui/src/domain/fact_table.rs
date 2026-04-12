@@ -45,49 +45,51 @@ pub struct FactTable {
     pub role_mapping_errors: Vec<String>,
 }
 
-/// Populates the fact table by traversing the document view and collecting
-/// facts from the tree nodes.
-pub fn populate_fact_table(view: DocumentView, item_facts: &[&ItemFact], table: &mut FactTable) {
-    table.sections.clear();
-    table.role_mapping_errors.clear();
+impl FactTable {
+    /// Populates the fact table by traversing the document view and collecting
+    /// facts from the tree nodes.
+    pub fn populate(&mut self, view: DocumentView, item_facts: &[&ItemFact]) {
+        self.sections.clear();
+        self.role_mapping_errors.clear();
 
-    // Labels for report elements are sourced from the dedicated GCD section.
-    let gcd_nodes = view
-        .sections
-        .iter()
-        .find(|section| section.role == GCD_ROLE_URI)
-        .map(|section| section.nodes.as_slice())
-        .unwrap_or(&[]);
-    let labels_map = build_labels_map(gcd_nodes);
+        // Labels for report elements are sourced from the dedicated GCD section.
+        let gcd_nodes = view
+            .sections
+            .iter()
+            .find(|section| section.role == GCD_ROLE_URI)
+            .map(|section| section.nodes.as_slice())
+            .unwrap_or(&[]);
+        let labels_map = build_labels_map(gcd_nodes);
 
-    for section in &view.sections {
-        let role_uri = section.role;
+        for section in &view.sections {
+            let role_uri = section.role;
 
-        let labels = if role_uri == GCD_ROLE_URI {
-            // The GCD section itself is a special case: we use the same label
-            // for all languages since it doesn't represent a report element.
-            Some(HashMap::from([
-                ("en".to_owned(), GCD_LABEL.to_string()),
-                ("de".to_owned(), GCD_LABEL.to_string()),
-            ]))
-        } else if let Some(concept_name) = ROLE_URI_TO_REPORT_ELEMENT.get(role_uri) {
-            labels_map.get(concept_name).cloned()
-        } else {
-            table.role_mapping_errors.push(role_uri.to_owned());
-            None
-        };
+            let labels = if role_uri == GCD_ROLE_URI {
+                // The GCD section itself is a special case: we use the same label
+                // for all languages since it doesn't represent a report element.
+                Some(HashMap::from([
+                    ("en".to_owned(), GCD_LABEL.to_string()),
+                    ("de".to_owned(), GCD_LABEL.to_string()),
+                ]))
+            } else if let Some(concept_name) = ROLE_URI_TO_REPORT_ELEMENT.get(role_uri) {
+                labels_map.get(concept_name).cloned()
+            } else {
+                self.role_mapping_errors.push(role_uri.to_owned());
+                None
+            };
 
-        let mut fact_section = FactSection {
-            role: role_uri.to_owned(),
-            labels: labels.unwrap_or_default(),
-            rows: Vec::new(),
-        };
+            let mut fact_section = FactSection {
+                role: role_uri.to_owned(),
+                labels: labels.unwrap_or_default(),
+                rows: Vec::new(),
+            };
 
-        for node in &section.nodes {
-            collect_node(node, item_facts, &mut fact_section.rows);
+            for node in &section.nodes {
+                collect_node(node, item_facts, &mut fact_section.rows);
+            }
+
+            self.sections.push(fact_section);
         }
-
-        table.sections.push(fact_section);
     }
 }
 
