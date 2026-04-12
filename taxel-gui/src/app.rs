@@ -1,5 +1,6 @@
 mod diagnostics_panel;
 mod header;
+mod report;
 mod report_list;
 mod search_overlay;
 mod settings;
@@ -9,7 +10,7 @@ mod toolbar;
 
 use self::{
     diagnostics_panel::draw_error_panel,
-    header::{draw_header, load_report},
+    header::draw_header,
     report_list::ReportList,
     search_overlay::{draw_search_results_overlay, highlight_row},
     settings::Settings,
@@ -18,15 +19,15 @@ use self::{
     toolbar::{draw_toolbar, EditAction},
 };
 use crate::{
-    app::diagnostics_panel::{AppDiagnostic, DiagnosticCategory},
+    app::{
+        diagnostics_panel::{AppDiagnostic, DiagnosticCategory},
+        report_list::draw_report_list,
+    },
     widgets::draw_unsaved_changes_modal,
 };
 use dioxus_devtools::subsecond;
 use eframe::{
-    egui::{
-        self, CentralPanel, CursorIcon, Key, KeyboardShortcut, Label, Modifiers, Panel, RichText,
-        Sense, Ui, Visuals,
-    },
+    egui::{self, CentralPanel, Key, KeyboardShortcut, Modifiers, Panel, Ui, Visuals},
     App, CreationContext, Frame,
 };
 use eric_sdk::Eric;
@@ -37,11 +38,7 @@ use std::{
     sync::mpsc::{self, Receiver},
     time::{Duration, Instant},
 };
-use taxel_gui::{
-    populate_fact_table,
-    report_store::{ReportStatus, ReportSummary},
-    FactTable, SearchHit,
-};
+use taxel_gui::{populate_fact_table, report_store::ReportStatus, FactTable, SearchHit};
 use xbrl_rs::{InstanceDocument, TaxonomySet};
 
 const JUMP_HIGHLIGHT_DURATION: Duration = Duration::from_millis(1400);
@@ -274,7 +271,7 @@ impl App for TaxelApp {
                         if let Some(path) =
                             draw_report_list(ui, self.report_list.reports(), self.loading.is_some())
                         {
-                            load_report(self, path, ui.ctx().clone());
+                            report::load_report(self, path, ui.ctx().clone());
                         }
                         return;
                     }
@@ -486,103 +483,4 @@ fn load_fact_table(app: &mut TaxelApp) {
             }
         }
     }
-}
-
-/// Draws the report list view, showing imported reports and allowing the user
-/// to select one to open.
-fn draw_report_list(ui: &mut Ui, reports: &[ReportSummary], loading: bool) -> Option<PathBuf> {
-    let list_width = ui.available_width().min(560.0);
-    let created_col_width = 120.0;
-    let status_col_width = 90.0;
-    let column_spacing = ui.spacing().item_spacing.x * 2.0;
-    let report_col_width =
-        (list_width - created_col_width - status_col_width - column_spacing).max(240.0);
-
-    ui.vertical_centered(|ui| {
-        ui.heading("Your Reports");
-        ui.add_space(6.0);
-    });
-
-    if reports.is_empty() {
-        ui.vertical_centered(|ui| {
-            ui.label("No imported reports yet. Use Import report to add an XML file.");
-        });
-        return None;
-    }
-
-    ui.vertical_centered(|ui| {
-        ui.label(format!("{} report(s)", reports.len()));
-    });
-    ui.add_space(4.0);
-
-    let mut selected = None;
-
-    ui.vertical_centered(|ui| {
-        ui.set_max_width(list_width);
-        ui.set_width(list_width);
-        ui.horizontal(|ui| {
-            ui.add_sized(
-                [created_col_width, 18.0],
-                egui::Label::new(RichText::new("Created")),
-            );
-            ui.add_sized(
-                [report_col_width, 18.0],
-                egui::Label::new(RichText::new("Report")),
-            );
-            ui.add_sized(
-                [status_col_width, 18.0],
-                egui::Label::new(RichText::new("Status")),
-            );
-        });
-        ui.separator();
-
-        for (idx, report) in reports.iter().enumerate() {
-            let row = egui::Frame::new()
-                .fill(egui::Color32::TRANSPARENT)
-                .inner_margin(egui::Margin::symmetric(0, 6))
-                .show(ui, |ui| {
-                    ui.set_width(list_width);
-                    ui.horizontal(|ui| {
-                        ui.add_sized([created_col_width, 18.0], Label::new(&report.created_date));
-                        ui.add_sized(
-                            [report_col_width, 18.0],
-                            Label::new(&report.display_name).truncate(),
-                        );
-                        ui.add_sized(
-                            [status_col_width, 18.0],
-                            Label::new(report.report_status.as_str()),
-                        );
-                    });
-                });
-
-            let response = ui.interact(
-                row.response.rect,
-                ui.id().with(("report_row", idx)),
-                if loading {
-                    Sense::hover()
-                } else {
-                    Sense::click()
-                },
-            );
-            let response = if loading {
-                response
-            } else {
-                response.on_hover_cursor(CursorIcon::PointingHand)
-            };
-
-            if response.hovered() && !loading {
-                ui.painter().rect_filled(
-                    row.response.rect,
-                    2.0,
-                    ui.visuals().widgets.hovered.bg_fill.gamma_multiply(0.25),
-                );
-            }
-
-            if response.clicked() {
-                selected = Some(report.path.clone());
-            }
-        }
-    });
-
-    selected
 }
