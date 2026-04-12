@@ -3,21 +3,6 @@ use std::collections::HashMap;
 use taxel::{GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
 use xbrl_rs::{DocumentView, ItemFact, TreeNode, ROLE_LABEL, ROLE_TERSE};
 
-/// A single search result pointing to a specific row in a specific section.
-#[derive(Debug, Clone)]
-pub struct SearchHit {
-    /// Index into `FactTable::sections`.
-    pub section_idx: usize,
-    /// Raw index into `FactSection::rows`.
-    pub row_idx: usize,
-    /// The concept name of the matched row.
-    pub concept: String,
-    /// The resolved label of the matched row.
-    pub label: String,
-    /// The section role (short name) for display.
-    pub section_name: String,
-}
-
 /// A row in the fact table, representing a single fact or a concept without
 /// facts.
 #[derive(Debug, Clone)]
@@ -58,46 +43,6 @@ pub struct FactTable {
     /// Role URIs for sections that could not be mapped to a known report
     /// element concept.
     pub role_mapping_errors: Vec<String>,
-}
-
-impl FactTable {
-    /// Search all sections for rows matching `query` (case-insensitive substring
-    /// match on concept, label, or value).
-    pub fn search(&self, query: &str, lang: &str) -> Vec<SearchHit> {
-        let query_lower = query.to_lowercase();
-        let mut hits = Vec::new();
-
-        for (section_idx, section) in self.sections.iter().enumerate() {
-            let section_name = section
-                .labels
-                .get(lang)
-                .map(|lang| lang.as_str())
-                .unwrap_or_else(|| section.role.rsplit('/').next().unwrap_or(&section.role));
-
-            for (row_idx, row) in section.rows.iter().enumerate() {
-                let label = row
-                    .labels
-                    .get(lang)
-                    .map(|label| label.as_str())
-                    .unwrap_or("");
-
-                if row.concept.to_lowercase().contains(&query_lower)
-                    || label.to_lowercase().contains(&query_lower)
-                    || row.value.to_lowercase().contains(&query_lower)
-                {
-                    hits.push(SearchHit {
-                        section_idx,
-                        row_idx,
-                        concept: row.concept.clone(),
-                        label: label.to_string(),
-                        section_name: section_name.to_owned(),
-                    });
-                }
-            }
-        }
-
-        hits
-    }
 }
 
 /// Populates the fact table by traversing the document view and collecting

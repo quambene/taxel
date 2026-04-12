@@ -1,6 +1,7 @@
 mod diagnostics;
 mod report;
 mod report_list;
+mod search;
 mod settings;
 
 use crate::{
@@ -19,7 +20,7 @@ use crate::{
         },
         widgets::draw_unsaved_changes_modal,
     },
-    FactTable, SearchHit,
+    FactTable,
 };
 pub use diagnostics::{AppDiagnostic, DiagnosticCategory, DiagnosticLevel};
 use dioxus_devtools::subsecond;
@@ -29,36 +30,14 @@ use eframe::{
 };
 use eric_sdk::Eric;
 pub use report::{load_report, send_report, validate_report};
+pub use search::{search, RowHighlight, Search};
 use std::{
     collections::HashSet,
     fs,
     path::PathBuf,
     sync::mpsc::{self, Receiver},
-    time::Instant,
 };
 use xbrl_rs::{InstanceDocument, TaxonomySet};
-
-/// Transient highlight for a row that was jumped to via search results, cleared
-/// after a short duration.
-pub struct RowHighlight {
-    pub section_idx: usize,
-    pub row_idx: usize,
-    pub until: Instant,
-}
-
-/// Grouped search state.
-#[derive(Default)]
-pub struct Search {
-    /// The current search query text.
-    pub query: String,
-    /// Cached search results, updated when the query or language changes.
-    pub results: Vec<SearchHit>,
-    /// Visible row index to scroll to after a search result click. Consumed
-    /// after one frame.
-    pub scroll_to_row: Option<usize>,
-    /// Transient highlight for the row selected via search results.
-    pub row_highlight: Option<RowHighlight>,
-}
 
 /// Per-section UI state (collapse state and depth filter).
 #[derive(Default)]
