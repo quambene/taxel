@@ -1,4 +1,4 @@
-use crate::FactSection;
+use crate::ReportSection;
 use eframe::{
     self,
     egui::{Color32, CursorIcon, Frame, Label, Margin, Panel, RichText, ScrollArea, Sense, Ui},
@@ -6,7 +6,7 @@ use eframe::{
 
 /// Draw the sidebar panel containing the list of sections. Allows the user to
 /// select a section to view its facts in the main table.
-pub fn draw_sidebar(ctx: &mut Ui, sections: &[FactSection], selected: &mut usize, lang: &str) {
+pub fn draw_sidebar(ctx: &mut Ui, sections: &[ReportSection], selected: &mut usize, lang: &str) {
     Panel::left("sections_panel")
         .resizable(true)
         .default_size(200.0)

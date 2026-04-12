@@ -18,7 +18,7 @@ use crate::{
         },
         widgets::draw_unsaved_changes_modal,
     },
-    FactTable,
+    Report, ReportStatus,
 };
 pub use diagnostics::{AppDiagnostic, DiagnosticCategory, DiagnosticLevel};
 use dioxus_devtools::subsecond;
@@ -53,14 +53,13 @@ pub struct TaxelApp {
     /// any.
     pub taxonomy: Option<TaxonomySet>,
     /// The instance document currently loaded in the app, if any.
-    pub report: Option<InstanceDocument>,
-    /// The fact table containing the extracted facts from the XBRL instance
-    /// document, enriched with the concept labels and presentation structure
-    /// for display in the UI.
-    pub table: Option<FactTable>,
+    pub instance_document: Option<InstanceDocument>,
+    /// The report containing the extracted facts from the XBRL instance
+    /// document, enriched with the concept labels and presentation structure.
+    pub report: Option<Report>,
     /// The index of the currently selected section tab in the sidebar.
     pub selected_tab: usize,
-    /// Per-section UI state, indexed analogous to `table.sections`.
+    /// Per-section UI state, indexed analogous to `report.sections`.
     pub section_states: Vec<SectionState>,
     /// Persisted UI settings (language, zoom, theme).
     pub settings: Settings,
@@ -98,7 +97,7 @@ impl TaxelApp {
     /// available.
     pub fn new(
         ctx: &CreationContext<'_>,
-        table: Option<FactTable>,
+        table: Option<Report>,
         error_message: Option<String>,
     ) -> TaxelApp {
         let section_states = table
@@ -159,8 +158,8 @@ impl TaxelApp {
 
         Self {
             taxonomy: None,
-            report: None,
-            table,
+            instance_document: None,
+            report: table,
             selected_tab: 0,
             section_states,
             settings,
@@ -217,7 +216,7 @@ impl App for TaxelApp {
             });
 
             let sections = self
-                .table
+                .report
                 .as_ref()
                 .map(|table| table.sections.as_slice())
                 .unwrap_or(&[]);
@@ -240,7 +239,7 @@ impl App for TaxelApp {
             CentralPanel::default()
                 .frame(central_frame)
                 .show_inside(ctx, |ui| {
-                    if self.table.is_none() {
+                    if self.report.is_none() {
                         if let Some(path) =
                             draw_report_list(ui, self.report_list.reports(), self.loading.is_some())
                         {
@@ -261,7 +260,7 @@ impl App for TaxelApp {
 
                     // Toolbar block: immutable borrow for read-only access to table
                     // data.
-                    let mut action = if let Some(table) = &self.table {
+                    let mut action = if let Some(table) = &self.report {
                         if let Some(section) = table.sections.get(content_tab) {
                             let max_depth =
                                 section.rows.iter().map(|row| row.depth).max().unwrap_or(0) + 1;
@@ -309,7 +308,7 @@ impl App for TaxelApp {
                     // Handle toolbar edit actions.
                     match action {
                         EditAction::Start => {
-                            if let Some(table) = &self.table {
+                            if let Some(table) = &self.report {
                                 if let Some(section) = table.sections.get(self.selected_tab) {
                                     self.edit_snapshot =
                                         section.rows.iter().map(|r| r.value.clone()).collect();
@@ -332,7 +331,7 @@ impl App for TaxelApp {
                         EditAction::Cancel => {
                             let editing_tab = self.editing_section.unwrap_or(self.selected_tab);
 
-                            if let Some(table) = &mut self.table {
+                            if let Some(table) = &mut self.report {
                                 if let Some(section) = table.sections.get_mut(editing_tab) {
                                     for (row, value) in
                                         section.rows.iter_mut().zip(self.edit_snapshot.iter())
@@ -348,7 +347,7 @@ impl App for TaxelApp {
                     }
 
                     // Table block: mutable borrow for in-place editing.
-                    if let Some(table) = self.table.as_mut() {
+                    if let Some(table) = self.report.as_mut() {
                         let tab = content_tab;
                         let table_rect = ui.available_rect_before_wrap();
 
@@ -395,7 +394,7 @@ impl App for TaxelApp {
                         }
                         if continue_nav {
                             let editing_tab = self.editing_section.unwrap();
-                            if let Some(table) = &mut self.table {
+                            if let Some(table) = &mut self.report {
                                 if let Some(section) = table.sections.get_mut(editing_tab) {
                                     for (row, value) in
                                         section.rows.iter_mut().zip(self.edit_snapshot.iter())
@@ -420,7 +419,7 @@ fn load_fact_table(app: &mut TaxelApp) {
             Ok(Ok((taxonomy, report))) => {
                 let view = report.view(&taxonomy);
                 let item_facts = report.item_facts();
-                let mut table = FactTable::default();
+                let mut table = Report::default();
 
                 table.populate(view, &item_facts);
 
@@ -436,9 +435,9 @@ fn load_fact_table(app: &mut TaxelApp) {
                     .iter()
                     .map(|_| SectionState::default())
                     .collect();
-                app.table = Some(table);
+                app.report = Some(table);
                 app.taxonomy = Some(taxonomy);
-                app.report = Some(report);
+                app.instance_document = Some(report);
                 app.show_error_panel = !app.diagnostics.is_empty();
                 app.loading = None;
             }

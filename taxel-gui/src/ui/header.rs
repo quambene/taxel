@@ -1,8 +1,8 @@
 use crate::{
     app::{self, AppDiagnostic, DiagnosticCategory, DiagnosticLevel},
-    report_store::{self, ReportStatus},
+    report_store::{self},
     ui::diagnostic_panel::{SUCCESS_COLOR, WARNING_COLOR},
-    TaxelApp,
+    ReportStatus, TaxelApp,
 };
 use eframe::egui::{
     text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui,
@@ -14,7 +14,7 @@ use rfd::FileDialog;
 /// selector tabs.
 pub fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
     ui.horizontal_centered(|ui| {
-        if app.table.is_none() && app.loading.is_none() && ui.button("Import report").clicked() {
+        if app.report.is_none() && app.loading.is_none() && ui.button("Import report").clicked() {
             if let Some(path) = FileDialog::new()
                 .add_filter("XML", &["xml"])
                 .add_filter("All", &["*"])
@@ -42,10 +42,10 @@ pub fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
             ui.label("Loading…");
         }
 
-        if app.table.is_some() && ui.button("Close report").clicked() {
-            app.table = None;
-            app.taxonomy = None;
+        if app.report.is_some() && ui.button("Close report").clicked() {
             app.report = None;
+            app.taxonomy = None;
+            app.instance_document = None;
             app.report_path = None;
             app.selected_tab = 0;
             app.search.results.clear();
@@ -59,11 +59,11 @@ pub fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
             app.report_status = ReportStatus::Draft;
         }
 
-        if app.table.is_some() && ui.button("Validate report").clicked() {
+        if app.report.is_some() && ui.button("Validate report").clicked() {
             app::validate_report(app);
         }
 
-        if app.table.is_some() && ui.button("Send report").clicked() {
+        if app.report.is_some() && ui.button("Send report").clicked() {
             app::send_report(app);
         }
 

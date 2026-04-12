@@ -1,5 +1,5 @@
-mod fact_table;
+mod report;
 mod report_meta;
 
-pub use fact_table::{FactRow, FactSection, FactTable};
+pub use report::{FactRow, Report, ReportSection};
 pub use report_meta::{ReportMeta, ReportStatus};

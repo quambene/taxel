@@ -25,7 +25,7 @@ pub struct FactRow {
 
 /// One presentation section with its rows.
 #[derive(Debug, Default, Clone)]
-pub struct FactSection {
+pub struct ReportSection {
     /// The full extended link role URI, e.g. `http://example.com/role/BalanceSheet`.
     pub role: String,
     /// Sidebar display labels resolved from taxonomy concepts, keyed by
@@ -37,15 +37,15 @@ pub struct FactSection {
 
 /// A collection of fact sections, one per presentation section in the XBRL document.
 #[derive(Debug, Default)]
-pub struct FactTable {
+pub struct Report {
     /// The sections in the order they appear in the presentation linkbase.
-    pub sections: Vec<FactSection>,
+    pub sections: Vec<ReportSection>,
     /// Role URIs for sections that could not be mapped to a known report
     /// element concept.
     pub role_mapping_errors: Vec<String>,
 }
 
-impl FactTable {
+impl Report {
     /// Populates the fact table by traversing the document view and collecting
     /// facts from the tree nodes.
     pub fn populate(&mut self, view: DocumentView, item_facts: &[&ItemFact]) {
@@ -78,7 +78,7 @@ impl FactTable {
                 None
             };
 
-            let mut fact_section = FactSection {
+            let mut fact_section = ReportSection {
                 role: role_uri.to_owned(),
                 labels: labels.unwrap_or_default(),
                 rows: Vec::new(),

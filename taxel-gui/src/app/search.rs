@@ -1,4 +1,4 @@
-use crate::FactSection;
+use crate::ReportSection;
 use std::time::Instant;
 
 /// Transient highlight for a row that was jumped to via search results, cleared
@@ -41,7 +41,7 @@ pub struct Search {
 impl Search {
     /// Search all sections for rows matching the current query (case-insensitive substring
     /// match on concept, label, or value).
-    pub fn search(&mut self, sections: &[FactSection], lang: &str) {
+    pub fn search(&mut self, sections: &[ReportSection], lang: &str) {
         let query = self.query.trim().to_lowercase();
 
         if query.is_empty() {

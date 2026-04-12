@@ -1,7 +1,7 @@
 use crate::{
     app::{RowHighlight, Search, SectionState},
     ui::report_view::table::{ensure_row_visible, visible_rows},
-    FactTable,
+    Report,
 };
 use eframe::egui::{
     pos2, Area, Context, Frame, Id, Key, Label, Margin, Order, Rect, RichText, ScrollArea, Sense,
@@ -17,7 +17,7 @@ pub fn draw_search_results_overlay(
     ctx: &Context,
     table_rect: Rect,
     search: &mut Search,
-    table: &FactTable,
+    report: &Report,
     selected_tab: &mut usize,
     section_states: &mut [SectionState],
 ) {
@@ -108,7 +108,7 @@ pub fn draw_search_results_overlay(
 
                                 *selected_tab = section_idx;
 
-                                if let Some(section) = table.sections.get(section_idx) {
+                                if let Some(section) = report.sections.get(section_idx) {
                                     let state = &mut section_states[section_idx];
                                     ensure_row_visible(
                                         row_idx,

@@ -3,18 +3,17 @@
 ## v0.1.0 (unreleased)
 
 - added
-  - Import instance document
-  - Display facts in main table
-  - Display sections in sidebar
+  - Import and display report
+  - Display report sections in sidebar
+  - Close report
+  - Edit and save report
+  - Send and validate report
   - Select display level
   - Select label language
   - Zoom in & out
-  - Clear main table
   - Add search bar
   - Add toggle for light/dark mode
-  - Edit and save report
   - Add diagnostics panel
   - Persist app settings
   - Add loading spinner for import report
   - Display report list
-  - Send and validate report

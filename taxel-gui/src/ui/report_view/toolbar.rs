@@ -1,7 +1,7 @@
 use crate::{
     app::Search,
     ui::{report_view::table::collapsed_at_depth, widgets::draw_dark_button},
-    FactRow, FactTable,
+    FactRow, Report,
 };
 use eframe::egui::{Align, Layout, TextEdit, Ui};
 use std::collections::HashSet;
@@ -25,7 +25,7 @@ pub fn draw_toolbar(
     collapsed: &mut HashSet<usize>,
     rows: &[FactRow],
     search: &mut Search,
-    table: &FactTable,
+    table: &Report,
     lang: &str,
     editing: bool,
 ) -> EditAction {
@@ -78,7 +78,7 @@ fn draw_level_toolbar(
 fn draw_search_bar(
     ui: &mut Ui,
     search: &mut Search,
-    table: &FactTable,
+    report: &Report,
     lang: &str,
     total_width: f32,
 ) {
@@ -97,7 +97,7 @@ fn draw_search_bar(
     // Re-open results for the existing query when the user returns focus
     // to the search field.
     if response.changed() || response.gained_focus() || response.clicked() {
-        search.search(&table.sections, lang);
+        search.search(&report.sections, lang);
     }
 }
 
