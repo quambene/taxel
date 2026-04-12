@@ -1,8 +1,9 @@
-mod fact_table;
-pub mod report_store;
+mod domain;
+mod infrastructure;
 
 use anyhow::{Context, Result};
-pub use fact_table::{populate_fact_table, FactRow, FactSection, FactTable, SearchHit};
+pub use domain::fact_table::{populate_fact_table, FactRow, FactSection, FactTable, SearchHit};
+pub use infrastructure::report_store;
 use log::debug;
 use std::path::{Path, PathBuf};
 use xbrl_rs::{InstanceDocument, TaxonomySet};
