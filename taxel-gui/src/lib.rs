@@ -5,7 +5,7 @@ pub mod ui;
 
 use anyhow::{Context, Result};
 pub use app::TaxelApp;
-pub use domain::fact_table::{populate_fact_table, FactRow, FactSection, FactTable};
+pub use domain::{FactRow, FactSection, FactTable, ReportMeta, ReportStatus};
 pub use infrastructure::report_store;
 use log::debug;
 use std::path::{Path, PathBuf};
