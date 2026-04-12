@@ -198,7 +198,7 @@ fn send_report(app: &mut TaxelApp) {
     if app.report_status != ReportStatus::Validated {
         app.issues.push(AppDiagnostic::new_error(
             DiagnosticCategory::Send,
-            "Validate the report first".to_string(),
+            "Validate the report first and make sure that all errors are resolved".to_string(),
         ));
         app.show_error_panel = true;
         return;
