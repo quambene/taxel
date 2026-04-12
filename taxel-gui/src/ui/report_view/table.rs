@@ -1,4 +1,4 @@
-use crate::{ui::widgets, FactRow};
+use crate::{domain::FactRow, ui::widgets};
 use eframe::egui::{Align, TextStyle, Ui};
 use egui_extras::{Column, TableBuilder};
 use std::collections::HashSet;

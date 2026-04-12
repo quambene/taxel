@@ -5,8 +5,6 @@ pub mod ui;
 
 use anyhow::{Context, Result};
 pub use app::TaxelApp;
-pub use domain::{FactRow, Report, ReportMeta, ReportSection, ReportStatus};
-pub use infrastructure::report_store;
 use log::debug;
 use std::path::{Path, PathBuf};
 use xbrl_rs::{InstanceDocument, TaxonomySet};

@@ -6,6 +6,7 @@ mod settings;
 
 use crate::{
     app::{report_list::ReportList, settings::Settings},
+    domain::{Report, ReportStatus},
     ui::{
         diagnostic_panel::draw_error_panel,
         header::draw_header,
@@ -18,7 +19,6 @@ use crate::{
         },
         widgets::draw_unsaved_changes_modal,
     },
-    Report, ReportStatus,
 };
 pub use diagnostics::{AppDiagnostic, DiagnosticCategory, DiagnosticLevel};
 use dioxus_devtools::subsecond;

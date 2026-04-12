@@ -1,4 +1,4 @@
-use crate::ReportSection;
+use crate::domain::ReportSection;
 use eframe::{
     self,
     egui::{Color32, CursorIcon, Frame, Label, Margin, Panel, RichText, ScrollArea, Sense, Ui},

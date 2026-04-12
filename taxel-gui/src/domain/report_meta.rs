@@ -1,7 +1,8 @@
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
 /// The lifecycle status of a report.
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
 pub enum ReportStatus {
     #[default]
     Draft,

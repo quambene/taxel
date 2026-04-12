@@ -1,7 +1,7 @@
 use crate::{
     app::{RowHighlight, Search, SectionState},
+    domain::Report,
     ui::report_view::table::{ensure_row_visible, visible_rows},
-    Report,
 };
 use eframe::egui::{
     pos2, Area, Context, Frame, Id, Key, Label, Margin, Order, Rect, RichText, ScrollArea, Sense,

@@ -3,8 +3,8 @@ use crate::{
         diagnostics::{AppDiagnostic, DiagnosticCategory},
         TaxelApp,
     },
+    domain::ReportStatus,
     load_xml,
-    report_store::ReportStatus,
 };
 use eframe::egui::{self};
 use eric_sdk::ErrorCode;
@@ -21,7 +21,7 @@ use xbrl_rs::TaxonomySet;
 /// state. The load runs on a background thread to keep the UI responsive.
 pub fn load_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context) {
     app.selected_tab = 0;
-    app.table = None;
+    app.report = None;
     app.report_path = Some(path.clone());
     app.diagnostics.clear();
     app.editing_section = None;

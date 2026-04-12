@@ -1,7 +1,7 @@
 use crate::{
     app::Search,
+    domain::{FactRow, Report},
     ui::{report_view::table::collapsed_at_depth, widgets::draw_dark_button},
-    FactRow, Report,
 };
 use eframe::egui::{Align, Layout, TextEdit, Ui};
 use std::collections::HashSet;

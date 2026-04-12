@@ -1,10 +1,10 @@
-use crate::report_store::ReportSummary;
+use crate::app::ReportOverview;
 use eframe::egui::{Color32, CursorIcon, Frame, Label, Margin, RichText, Sense, Ui};
 use std::path::PathBuf;
 
 /// Draws the report list view, showing imported reports and allowing the user
 /// to select one to open.
-pub fn draw_report_list(ui: &mut Ui, reports: &[ReportSummary], loading: bool) -> Option<PathBuf> {
+pub fn draw_report_list(ui: &mut Ui, reports: &[ReportOverview], loading: bool) -> Option<PathBuf> {
     let list_width = ui.available_width().min(560.0);
     let created_col_width = 120.0;
     let status_col_width = 90.0;

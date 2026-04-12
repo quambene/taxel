@@ -1,8 +1,9 @@
 use crate::{
     app::{self, AppDiagnostic, DiagnosticCategory, DiagnosticLevel},
-    report_store::{self},
+    domain::ReportStatus,
+    infrastructure::report_store,
     ui::diagnostic_panel::{SUCCESS_COLOR, WARNING_COLOR},
-    ReportStatus, TaxelApp,
+    TaxelApp,
 };
 use eframe::egui::{
     text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui,
