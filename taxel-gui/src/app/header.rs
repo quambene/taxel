@@ -166,6 +166,7 @@ fn validate_report(app: &mut TaxelApp) {
                     ),
                 ));
             } else {
+                // TODO: parse `validation_response` for better error messages
                 app.issues.push(AppDiagnostic::new_error(
                     DiagnosticCategory::Validation,
                     format!(
@@ -212,6 +213,7 @@ fn send_report(app: &mut TaxelApp) {
                     format!("Send completed successfully\n{}", response.server_response),
                 ));
             } else {
+                // TODO: parse `server_response` for better error messages
                 app.issues.push(AppDiagnostic::new_error(
                     DiagnosticCategory::Send,
                     format!(
