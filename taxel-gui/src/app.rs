@@ -33,7 +33,7 @@ pub use search::{RowHighlight, Search};
 use std::{
     collections::HashSet,
     fs,
-    path::PathBuf,
+    path::{Path, PathBuf},
     sync::mpsc::{self, Receiver},
 };
 use xbrl_rs::{InstanceDocument, TaxonomySet};
@@ -54,9 +54,15 @@ pub struct TaxelApp {
     pub taxonomy: Option<TaxonomySet>,
     /// The instance document currently loaded in the app, if any.
     pub instance_document: Option<InstanceDocument>,
+    /// Path of the currently imported report, if any.
+    pub report_path: Option<PathBuf>,
+    /// The validation and submission status of the currently open report.
+    pub report_status: ReportStatus,
     /// The report containing the extracted facts from the XBRL instance
     /// document, enriched with the concept labels and presentation structure.
     pub report: Option<Report>,
+    /// Imported reports and creation date bookkeeping.
+    pub report_list: ReportList,
     /// The index of the currently selected section tab in the sidebar.
     pub selected_tab: usize,
     /// Per-section UI state, indexed analogous to `report.sections`.
@@ -82,12 +88,6 @@ pub struct TaxelApp {
     /// diagnostics. Initialized on app start if the data directory can be
     /// determined, otherwise skipped with a warning.
     pub eric: Option<Eric>,
-    /// Path of the currently imported report, if any.
-    pub report_path: Option<PathBuf>,
-    /// Imported reports and creation date bookkeeping.
-    pub report_list: ReportList,
-    /// The validation and submission status of the currently open report.
-    pub report_status: ReportStatus,
 }
 
 impl TaxelApp {
@@ -149,6 +149,7 @@ impl TaxelApp {
         let show_error_panel = true;
 
         let mut report_list = ReportList::new();
+
         if let Err(err) = report_list.refresh() {
             diagnostics.push(AppDiagnostic::new_warning(
                 DiagnosticCategory::App,
@@ -176,7 +177,12 @@ impl TaxelApp {
         }
     }
 
-    pub fn refresh_imported_reports(&mut self) {
+    pub fn register_report(&mut self, path: &Path) {
+        self.report_list.register_report(path)
+    }
+
+    /// Registers a newly imported report by adding it to the report list.
+    pub fn refresh_reports(&mut self) {
         match self.report_list.refresh() {
             Ok(()) => {}
             Err(err) => {
@@ -187,10 +193,6 @@ impl TaxelApp {
                 self.show_error_panel = true;
             }
         }
-    }
-
-    pub fn register_imported_report(&mut self, report_path: &std::path::Path) {
-        self.report_list.register_imported_report(report_path);
     }
 }
 
@@ -316,6 +318,9 @@ impl App for TaxelApp {
                             }
                             self.editing_section = Some(self.selected_tab);
                             self.report_status = ReportStatus::Draft;
+
+                            // If the report was previously validated, mark it
+                            // as draft again since it has unsaved changes now.
                             if let Some(path) = self.report_path.as_ref() {
                                 self.report_list.set_report_status(
                                     path,

@@ -23,8 +23,8 @@ pub fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
             {
                 match report_store::copy_report(&path) {
                     Ok(copied_path) => {
-                        app.register_imported_report(&copied_path);
-                        app.refresh_imported_reports();
+                        app.register_report(&copied_path);
+                        app.refresh_reports();
                         app::load_report(app, copied_path, ui.ctx().clone());
                     }
                     Err(err) => {

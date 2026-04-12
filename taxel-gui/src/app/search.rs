@@ -1,6 +1,5 @@
-use std::time::Instant;
-
 use crate::domain::ReportSection;
+use std::time::Instant;
 
 /// Transient highlight for a row that was jumped to via search results, cleared
 /// after a short duration.

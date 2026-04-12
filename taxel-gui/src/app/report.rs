@@ -26,10 +26,7 @@ pub fn load_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context) {
     app.diagnostics.clear();
     app.editing_section = None;
     app.edit_snapshot.clear();
-    app.report_status = app
-        .report_list
-        .report_status(&path)
-        .unwrap_or(ReportStatus::Draft);
+    app.report_status = ReportStatus::Draft;
 
     let (tx, rx) = mpsc::channel();
     app.loading = Some(rx);
