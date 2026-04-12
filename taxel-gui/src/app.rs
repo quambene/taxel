@@ -2,21 +2,11 @@ mod diagnostics_panel;
 mod header;
 mod report;
 mod report_list;
-mod search_overlay;
 mod settings;
-mod sidebar;
-mod table;
-mod toolbar;
 
 use self::{
-    diagnostics_panel::draw_error_panel,
-    header::draw_header,
-    report_list::ReportList,
-    search_overlay::{draw_search_results_overlay, highlight_row},
+    diagnostics_panel::draw_error_panel, header::draw_header, report_list::ReportList,
     settings::Settings,
-    sidebar::draw_sidebar,
-    table::draw_table,
-    toolbar::{draw_toolbar, EditAction},
 };
 use crate::{
     app::{
@@ -25,7 +15,15 @@ use crate::{
     },
     populate_fact_table,
     report_store::ReportStatus,
-    widgets::draw_unsaved_changes_modal,
+    ui::{
+        report_view::{
+            search_overlay::{draw_search_results_overlay, highlight_row},
+            sidebar::draw_sidebar,
+            table::draw_table,
+            toolbar::{draw_toolbar, EditAction},
+        },
+        widgets::draw_unsaved_changes_modal,
+    },
     FactTable, SearchHit,
 };
 use dioxus_devtools::subsecond;
@@ -39,41 +37,39 @@ use std::{
     fs,
     path::PathBuf,
     sync::mpsc::{self, Receiver},
-    time::{Duration, Instant},
+    time::Instant,
 };
 use xbrl_rs::{InstanceDocument, TaxonomySet};
 
-const JUMP_HIGHLIGHT_DURATION: Duration = Duration::from_millis(1400);
-
 /// Transient highlight for a row that was jumped to via search results, cleared
 /// after a short duration.
-struct RowHighlight {
-    section_idx: usize,
-    row_idx: usize,
-    until: Instant,
+pub struct RowHighlight {
+    pub section_idx: usize,
+    pub row_idx: usize,
+    pub until: Instant,
 }
 
 /// Grouped search state.
 #[derive(Default)]
-struct Search {
+pub struct Search {
     /// The current search query text.
-    query: String,
+    pub query: String,
     /// Cached search results, updated when the query or language changes.
-    results: Vec<SearchHit>,
+    pub results: Vec<SearchHit>,
     /// Visible row index to scroll to after a search result click. Consumed
     /// after one frame.
-    scroll_to_row: Option<usize>,
+    pub scroll_to_row: Option<usize>,
     /// Transient highlight for the row selected via search results.
-    row_highlight: Option<RowHighlight>,
+    pub row_highlight: Option<RowHighlight>,
 }
 
 /// Per-section UI state (collapse state and depth filter).
 #[derive(Default)]
-struct SectionState {
+pub struct SectionState {
     /// Row indices whose children are collapsed.
-    collapsed: HashSet<usize>,
+    pub collapsed: HashSet<usize>,
     /// Maximum depth to display. None means show all depths.
-    max_depth: Option<usize>,
+    pub max_depth: Option<usize>,
 }
 
 /// Main application struct for the Taxel GUI, managing the state of the app.

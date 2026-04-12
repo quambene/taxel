@@ -1,11 +1,14 @@
-use super::Search;
-use crate::{app::table::collapsed_at_depth, widgets::draw_dark_button, FactRow, FactTable};
+use crate::{
+    app::Search,
+    ui::{report_view::table::collapsed_at_depth, widgets::draw_dark_button},
+    FactRow, FactTable,
+};
 use eframe::egui::{Align, Layout, TextEdit, Ui};
 use std::collections::HashSet;
 
 /// Action returned by [`draw_toolbar`] when the user clicks an edit-mode
 /// button.
-pub(super) enum EditAction {
+pub enum EditAction {
     None,
     Start,
     Save,
@@ -15,7 +18,7 @@ pub(super) enum EditAction {
 /// Draw the toolbar above the fact table, including the level filter, search
 /// bar, and edit-mode buttons.
 #[allow(clippy::too_many_arguments)]
-pub(super) fn draw_toolbar(
+pub fn draw_toolbar(
     ui: &mut Ui,
     max_available: usize,
     max_depth: &mut Option<usize>,

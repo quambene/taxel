@@ -1,17 +1,19 @@
-use super::{
-    table::{ensure_row_visible, visible_rows},
-    RowHighlight, Search, SectionState, JUMP_HIGHLIGHT_DURATION,
+use crate::{
+    app::{RowHighlight, Search, SectionState},
+    ui::report_view::table::{ensure_row_visible, visible_rows},
+    FactTable,
 };
-use crate::FactTable;
 use eframe::egui::{
     pos2, Area, Context, Frame, Id, Key, Label, Margin, Order, Rect, RichText, ScrollArea, Sense,
     Stroke, Ui,
 };
-use std::time::Instant;
+use std::time::{Duration, Instant};
+
+const JUMP_HIGHLIGHT_DURATION: Duration = Duration::from_millis(1400);
 
 /// Draw search results in a foreground overlay above the fact table. Clicking
 /// a result jumps to that row in the table.
-pub(super) fn draw_search_results_overlay(
+pub fn draw_search_results_overlay(
     ctx: &Context,
     table_rect: Rect,
     search: &mut Search,
@@ -153,11 +155,7 @@ pub(super) fn draw_search_results_overlay(
 
 /// Highlight the row that was jumped to via search results, if the highlight
 /// duration has not yet expired.
-pub(super) fn highlight_row(
-    search: &mut Search,
-    selected_tab: usize,
-    ui: &mut Ui,
-) -> Option<usize> {
+pub fn highlight_row(search: &mut Search, selected_tab: usize, ui: &mut Ui) -> Option<usize> {
     let now = Instant::now();
 
     if search

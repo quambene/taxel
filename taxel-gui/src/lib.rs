@@ -1,7 +1,7 @@
 mod app;
 mod domain;
 mod infrastructure;
-mod ui;
+pub mod ui;
 
 use anyhow::{Context, Result};
 pub use app::TaxelApp;
@@ -9,7 +9,6 @@ pub use domain::fact_table::{populate_fact_table, FactRow, FactSection, FactTabl
 pub use infrastructure::report_store;
 use log::debug;
 use std::path::{Path, PathBuf};
-pub use ui::widgets;
 use xbrl_rs::{InstanceDocument, TaxonomySet};
 
 /// Loads an XBRL instance document from the specified path, discovers the
