@@ -1,5 +1,5 @@
 use crate::{
-    app::{self, Search},
+    app::Search,
     ui::{report_view::table::collapsed_at_depth, widgets::draw_dark_button},
     FactRow, FactTable,
 };
@@ -94,18 +94,10 @@ fn draw_search_bar(
             .hint_text("Search ID, name, value ..."),
     );
 
-    let query = search.query.trim();
-
-    if response.changed() {
-        if query.is_empty() {
-            search.results.clear();
-        } else {
-            search.results = app::search(&table.sections, query, lang);
-        }
-    } else if (response.gained_focus() || response.clicked()) && !query.is_empty() {
-        // Re-open results for the existing query when the user returns focus
-        // to the search field.
-        search.results = app::search(&table.sections, query, lang);
+    // Re-open results for the existing query when the user returns focus
+    // to the search field.
+    if response.changed() || response.gained_focus() || response.clicked() {
+        search.search(&table.sections, lang);
     }
 }
 

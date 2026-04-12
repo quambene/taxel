@@ -38,40 +38,48 @@ pub struct Search {
     pub row_highlight: Option<RowHighlight>,
 }
 
-/// Search all sections for rows matching `query` (case-insensitive substring
-/// match on concept, label, or value).
-pub fn search(sections: &[FactSection], query: &str, lang: &str) -> Vec<SearchHit> {
-    let query_lower = query.to_lowercase();
-    let mut hits = Vec::new();
+impl Search {
+    /// Search all sections for rows matching the current query (case-insensitive substring
+    /// match on concept, label, or value).
+    pub fn search(&mut self, sections: &[FactSection], lang: &str) {
+        let query = self.query.trim().to_lowercase();
 
-    for (section_idx, section) in sections.iter().enumerate() {
-        let section_name = section
-            .labels
-            .get(lang)
-            .map(|lang| lang.as_str())
-            .unwrap_or_else(|| section.role.rsplit('/').next().unwrap_or(&section.role));
+        if query.is_empty() {
+            self.results.clear();
+            return;
+        }
 
-        for (row_idx, row) in section.rows.iter().enumerate() {
-            let label = row
+        let mut hits = Vec::new();
+
+        for (section_idx, section) in sections.iter().enumerate() {
+            let section_name = section
                 .labels
                 .get(lang)
-                .map(|label| label.as_str())
-                .unwrap_or("");
+                .map(|lang| lang.as_str())
+                .unwrap_or_else(|| section.role.rsplit('/').next().unwrap_or(&section.role));
 
-            if row.concept.to_lowercase().contains(&query_lower)
-                || label.to_lowercase().contains(&query_lower)
-                || row.value.to_lowercase().contains(&query_lower)
-            {
-                hits.push(SearchHit {
-                    section_idx,
-                    row_idx,
-                    concept: row.concept.clone(),
-                    label: label.to_string(),
-                    section_name: section_name.to_owned(),
-                });
+            for (row_idx, row) in section.rows.iter().enumerate() {
+                let label = row
+                    .labels
+                    .get(lang)
+                    .map(|label| label.as_str())
+                    .unwrap_or("");
+
+                if row.concept.to_lowercase().contains(&query)
+                    || label.to_lowercase().contains(&query)
+                    || row.value.to_lowercase().contains(&query)
+                {
+                    hits.push(SearchHit {
+                        section_idx,
+                        row_idx,
+                        concept: row.concept.clone(),
+                        label: label.to_string(),
+                        section_name: section_name.to_owned(),
+                    });
+                }
             }
         }
-    }
 
-    hits
+        self.results = hits;
+    }
 }

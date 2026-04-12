@@ -30,7 +30,7 @@ use eframe::{
 };
 use eric_sdk::Eric;
 pub use report::{load_report, send_report, validate_report};
-pub use search::{search, RowHighlight, Search};
+pub use search::{RowHighlight, Search};
 use std::{
     collections::HashSet,
     fs,
