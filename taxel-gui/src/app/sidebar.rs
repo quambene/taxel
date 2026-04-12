@@ -1,8 +1,8 @@
+use crate::FactSection;
 use eframe::{
     self,
     egui::{Color32, CursorIcon, Frame, Label, Margin, Panel, RichText, ScrollArea, Sense, Ui},
 };
-use taxel_gui::FactSection;
 
 /// Draw the sidebar panel containing the list of sections. Allows the user to
 /// select a section to view its facts in the main table.

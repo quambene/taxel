@@ -23,7 +23,10 @@ use crate::{
         diagnostics_panel::{AppDiagnostic, DiagnosticCategory},
         report_list::draw_report_list,
     },
+    populate_fact_table,
+    report_store::ReportStatus,
     widgets::draw_unsaved_changes_modal,
+    FactTable, SearchHit,
 };
 use dioxus_devtools::subsecond;
 use eframe::{
@@ -38,7 +41,6 @@ use std::{
     sync::mpsc::{self, Receiver},
     time::{Duration, Instant},
 };
-use taxel_gui::{populate_fact_table, report_store::ReportStatus, FactTable, SearchHit};
 use xbrl_rs::{InstanceDocument, TaxonomySet};
 
 const JUMP_HIGHLIGHT_DURATION: Duration = Duration::from_millis(1400);

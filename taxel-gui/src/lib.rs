@@ -1,7 +1,10 @@
+mod app;
 mod domain;
 mod infrastructure;
+mod widgets;
 
 use anyhow::{Context, Result};
+pub use app::TaxelApp;
 pub use domain::fact_table::{populate_fact_table, FactRow, FactSection, FactTable, SearchHit};
 pub use infrastructure::report_store;
 use log::debug;

@@ -1,6 +1,10 @@
-use crate::app::{
-    diagnostics_panel::{AppDiagnostic, DiagnosticCategory},
-    TaxelApp,
+use crate::{
+    app::{
+        diagnostics_panel::{AppDiagnostic, DiagnosticCategory},
+        TaxelApp,
+    },
+    load_xml,
+    report_store::ReportStatus,
 };
 use eframe::egui::{self};
 use eric_sdk::ErrorCode;
@@ -11,7 +15,6 @@ use std::{
     thread,
 };
 use taxel::TAXONOMY_YEAR_TO_VERSION;
-use taxel_gui::{load_xml, report_store::ReportStatus};
 use xbrl_rs::TaxonomySet;
 
 /// Loads an XBRL instance document from the specified path and updates the app

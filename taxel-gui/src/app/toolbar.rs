@@ -1,8 +1,7 @@
 use super::Search;
-use crate::{app::table::collapsed_at_depth, widgets::draw_dark_button};
+use crate::{app::table::collapsed_at_depth, widgets::draw_dark_button, FactRow, FactTable};
 use eframe::egui::{Align, Layout, TextEdit, Ui};
 use std::collections::HashSet;
-use taxel_gui::{FactRow, FactTable};
 
 /// Action returned by [`draw_toolbar`] when the user clicks an edit-mode
 /// button.

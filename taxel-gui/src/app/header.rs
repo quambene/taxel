@@ -1,15 +1,17 @@
 use super::TaxelApp;
-use crate::app::{
-    diagnostics_panel::{
-        AppDiagnostic, DiagnosticCategory, DiagnosticLevel, SUCCESS_COLOR, WARNING_COLOR,
+use crate::{
+    app::{
+        diagnostics_panel::{
+            AppDiagnostic, DiagnosticCategory, DiagnosticLevel, SUCCESS_COLOR, WARNING_COLOR,
+        },
+        report::{load_report, send_report, validate_report},
     },
-    report::{load_report, send_report, validate_report},
+    report_store::{self, ReportStatus},
 };
 use eframe::egui::{
     text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui,
 };
 use rfd::FileDialog;
-use taxel_gui::report_store::{self, ReportStatus};
 
 /// Draws the header panel of the application, including the "Import report"
 /// button, the "Close report" button, any error messages, and the language

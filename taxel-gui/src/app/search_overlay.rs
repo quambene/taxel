@@ -2,12 +2,12 @@ use super::{
     table::{ensure_row_visible, visible_rows},
     RowHighlight, Search, SectionState, JUMP_HIGHLIGHT_DURATION,
 };
+use crate::FactTable;
 use eframe::egui::{
     pos2, Area, Context, Frame, Id, Key, Label, Margin, Order, Rect, RichText, ScrollArea, Sense,
     Stroke, Ui,
 };
 use std::time::Instant;
-use taxel_gui::FactTable;
 
 /// Draw search results in a foreground overlay above the fact table. Clicking
 /// a result jumps to that row in the table.

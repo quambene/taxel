@@ -1,8 +1,7 @@
-use crate::widgets;
+use crate::{widgets, FactRow};
 use eframe::egui::{Align, TextStyle, Ui};
 use egui_extras::{Column, TableBuilder};
 use std::collections::HashSet;
-use taxel_gui::FactRow;
 
 /// Draw the fact table in the main panel, showing only the rows that are not
 /// collapsed. Handles the toggle logic for expanding/collapsing rows with

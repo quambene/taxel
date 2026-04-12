@@ -1,13 +1,13 @@
-use crate::app::{AppDiagnostic, DiagnosticCategory};
+use crate::{
+    app::{AppDiagnostic, DiagnosticCategory},
+    report_store::{self, ReportManifestEntry, ReportStatus, ReportStore, ReportSummary},
+};
 use anyhow::Result;
 use eframe::egui::{Color32, CursorIcon, Frame, Label, Margin, RichText, Sense, Ui};
 use std::{
     collections::{HashMap, HashSet},
     path::{Path, PathBuf},
     time::SystemTime,
-};
-use taxel_gui::report_store::{
-    self, ReportManifestEntry, ReportStatus, ReportStore, ReportSummary,
 };
 
 /// Draws the report list view, showing imported reports and allowing the user

@@ -1,9 +1,6 @@
-mod app;
-mod widgets;
-
-use crate::app::TaxelApp;
 use eframe::egui::ViewportBuilder;
 use log::debug;
+use taxel_gui::TaxelApp;
 
 fn main() -> Result<(), anyhow::Error> {
     // Use hot reload in debug mode
