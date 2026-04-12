@@ -3,19 +3,20 @@ use crate::{
         diagnostics::{AppDiagnostic, DiagnosticCategory},
         TaxelApp,
     },
-    domain::ReportStatus,
-    load_xml,
+    domain::{Report, ReportStatus},
 };
+use anyhow::Context;
 use eframe::egui::{self};
 use eric_sdk::ErrorCode;
+use log::debug;
 use std::{
     fs::{self},
-    path::PathBuf,
+    path::{Path, PathBuf},
     sync::mpsc,
     thread,
 };
 use taxel::TAXONOMY_YEAR_TO_VERSION;
-use xbrl_rs::TaxonomySet;
+use xbrl_rs::{InstanceDocument, TaxonomySet};
 
 /// Loads an XBRL instance document from the specified path and updates the app
 /// state. The load runs on a background thread to keep the UI responsive.
@@ -32,10 +33,32 @@ pub fn load_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context) {
     app.loading = Some(rx);
 
     thread::spawn(move || {
-        let table = load_xml(&path);
-        let _ = tx.send(table);
+        let report = load_xml(&path);
+        let _ = tx.send(report);
         ctx.request_repaint();
     });
+}
+
+/// Loads an XBRL instance document from the specified path, discovers the
+/// referenced taxonomies, and populates the fact table with the extracted
+/// facts.
+pub fn load_xml(path: &Path) -> Result<(TaxonomySet, InstanceDocument, Report), anyhow::Error> {
+    debug!("Read xml file: {}", path.display());
+
+    let instance = InstanceDocument::from_file(path)?;
+    let schema_refs: Vec<String> = instance.schema_refs().to_vec();
+    let entry_point = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .context("missing path to taxonomies")?
+        .join("test_data/taxonomies");
+    let taxonomy = TaxonomySet::discover(schema_refs, entry_point)?;
+    let view = instance.view(&taxonomy);
+    let item_facts = instance.item_facts();
+    let mut report = Report::new(path.to_path_buf());
+
+    report.populate(view, &item_facts);
+
+    Ok((taxonomy, instance, report))
 }
 
 /// Validates the imported report and reports any issues in the diagnostics

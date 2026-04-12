@@ -1,5 +1,6 @@
+use crate::domain::ReportStatus;
 use log::debug;
-use std::collections::HashMap;
+use std::{collections::HashMap, path::PathBuf};
 use taxel::{GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
 use xbrl_rs::{DocumentView, ItemFact, TreeNode, ROLE_LABEL, ROLE_TERSE};
 
@@ -35,9 +36,14 @@ pub struct ReportSection {
     pub rows: Vec<FactRow>,
 }
 
-/// A collection of fact sections, one per presentation section in the XBRL document.
-#[derive(Debug, Default)]
+/// The report containing the extracted facts from the XBRL instance document,
+/// enriched with the concept labels and presentation structure.
+#[derive(Debug)]
 pub struct Report {
+    /// The file path of the report, used for persistence..
+    pub path: PathBuf,
+    /// The report status for lifecycle management.
+    pub status: ReportStatus,
     /// The sections in the order they appear in the presentation linkbase.
     pub sections: Vec<ReportSection>,
     /// Role URIs for sections that could not be mapped to a known report
@@ -46,6 +52,15 @@ pub struct Report {
 }
 
 impl Report {
+    pub fn new(path: PathBuf) -> Self {
+        Self {
+            path,
+            status: ReportStatus::Draft,
+            sections: Vec::new(),
+            role_mapping_errors: Vec::new(),
+        }
+    }
+
     /// Populates the fact table by traversing the document view and collecting
     /// facts from the tree nodes.
     pub fn populate(&mut self, view: DocumentView, item_facts: &[&ItemFact]) {

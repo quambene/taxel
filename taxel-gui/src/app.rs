@@ -76,7 +76,7 @@ pub struct TaxelApp {
     /// Search state.
     pub search: Search,
     /// Receives the result of a background XML load, if one is in progress.
-    pub loading: Option<Receiver<anyhow::Result<(TaxonomySet, InstanceDocument)>>>,
+    pub loading: Option<Receiver<anyhow::Result<(TaxonomySet, InstanceDocument, Report)>>>,
     /// Some while the value column of that section is being edited, None
     /// otherwise.
     pub editing_section: Option<usize>,
@@ -421,28 +421,22 @@ impl App for TaxelApp {
 fn load_fact_table(app: &mut TaxelApp) {
     if let Some(rx) = &app.loading {
         match rx.try_recv() {
-            Ok(Ok((taxonomy, report))) => {
-                let view = report.view(&taxonomy);
-                let item_facts = report.item_facts();
-                let mut table = Report::default();
-
-                table.populate(view, &item_facts);
-
-                for missing_role in &table.role_mapping_errors {
+            Ok(Ok((taxonomy, instance, report))) => {
+                for missing_role in &report.role_mapping_errors {
                     app.diagnostics.push(AppDiagnostic::new_warning(
                         DiagnosticCategory::Import,
                         format!("Missing report-element mapping for role URI: {missing_role}"),
                     ));
                 }
 
-                app.section_states = table
+                app.section_states = report
                     .sections
                     .iter()
                     .map(|_| SectionState::default())
                     .collect();
-                app.report = Some(table);
+                app.report = Some(report);
                 app.taxonomy = Some(taxonomy);
-                app.instance_document = Some(report);
+                app.instance_document = Some(instance);
                 app.show_error_panel = !app.diagnostics.is_empty();
                 app.loading = None;
             }
