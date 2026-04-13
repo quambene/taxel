@@ -15,5 +15,6 @@
   - Add toggle for light/dark mode
   - Add diagnostics panel
   - Persist app settings
+  - Persist report list
   - Add loading spinner for import report
   - Display report list
