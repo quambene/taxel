@@ -1,12 +1,14 @@
-use super::Search;
-use crate::{app::table::collapsed_at_depth, widgets::draw_dark_button};
+use crate::{
+    app::Search,
+    domain::{FactRow, Report},
+    ui::{report_view::table::collapsed_at_depth, widgets::draw_dark_button},
+};
 use eframe::egui::{Align, Layout, TextEdit, Ui};
 use std::collections::HashSet;
-use taxel_gui::{FactRow, FactTable};
 
 /// Action returned by [`draw_toolbar`] when the user clicks an edit-mode
 /// button.
-pub(super) enum EditAction {
+pub enum EditAction {
     None,
     Start,
     Save,
@@ -16,14 +18,14 @@ pub(super) enum EditAction {
 /// Draw the toolbar above the fact table, including the level filter, search
 /// bar, and edit-mode buttons.
 #[allow(clippy::too_many_arguments)]
-pub(super) fn draw_toolbar(
+pub fn draw_toolbar(
     ui: &mut Ui,
     max_available: usize,
     max_depth: &mut Option<usize>,
     collapsed: &mut HashSet<usize>,
     rows: &[FactRow],
     search: &mut Search,
-    table: &FactTable,
+    table: &Report,
     lang: &str,
     editing: bool,
 ) -> EditAction {
@@ -76,7 +78,7 @@ fn draw_level_toolbar(
 fn draw_search_bar(
     ui: &mut Ui,
     search: &mut Search,
-    table: &FactTable,
+    report: &Report,
     lang: &str,
     total_width: f32,
 ) {
@@ -92,18 +94,10 @@ fn draw_search_bar(
             .hint_text("Search ID, name, value ..."),
     );
 
-    let query = search.query.trim();
-
-    if response.changed() {
-        if query.is_empty() {
-            search.results.clear();
-        } else {
-            search.results = table.search(query, lang);
-        }
-    } else if (response.gained_focus() || response.clicked()) && !query.is_empty() {
-        // Re-open results for the existing query when the user returns focus
-        // to the search field.
-        search.results = table.search(query, lang);
+    // Re-open results for the existing query when the user returns focus
+    // to the search field.
+    if response.changed() || response.gained_focus() || response.clicked() {
+        search.search(&report.sections, lang);
     }
 }
 

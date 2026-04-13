@@ -1,62 +1,12 @@
-use crate::widgets;
+use crate::{domain::FactRow, ui::widgets};
 use eframe::egui::{Align, TextStyle, Ui};
 use egui_extras::{Column, TableBuilder};
 use std::collections::HashSet;
-use taxel_gui::FactRow;
-
-/// Compute which visible-list indices should be collapsed to show only rows up
-/// to `max_depth` levels.
-pub(super) fn collapsed_at_depth(rows: &[FactRow], max_depth: usize) -> HashSet<usize> {
-    rows.iter()
-        .enumerate()
-        .filter(|(_, row)| row.has_children && row.depth + 1 >= max_depth)
-        .map(|(i, _)| i)
-        .collect()
-}
-
-/// Returns the raw indices of visible rows (positions in `rows`).
-/// `collapsed` stores raw indices, which are stable across expand/collapse
-/// operations.
-pub(super) fn visible_rows(rows: &[FactRow], collapsed: &HashSet<usize>) -> Vec<usize> {
-    let mut visible = Vec::new();
-    let mut hidden_above_depth: Option<usize> = None;
-
-    for (raw_idx, row) in rows.iter().enumerate() {
-        if let Some(hide_depth) = hidden_above_depth {
-            if row.depth > hide_depth {
-                continue;
-            }
-            hidden_above_depth = None;
-        }
-        visible.push(raw_idx);
-        if row.has_children && collapsed.contains(&raw_idx) {
-            hidden_above_depth = Some(row.depth);
-        }
-    }
-
-    visible
-}
-
-/// Ensures that a given row is visible by expanding (uncollapsing) all its
-/// ancestors in the tree.
-pub(super) fn ensure_row_visible(row_idx: usize, rows: &[FactRow], collapsed: &mut HashSet<usize>) {
-    let target_depth = rows[row_idx].depth;
-    let mut depth = target_depth;
-    for i in (0..row_idx).rev() {
-        if rows[i].depth < depth && rows[i].has_children {
-            collapsed.remove(&i);
-            depth = rows[i].depth;
-            if depth == 0 {
-                break;
-            }
-        }
-    }
-}
 
 /// Draw the fact table in the main panel, showing only the rows that are not
 /// collapsed. Handles the toggle logic for expanding/collapsing rows with
 /// children.
-pub(super) fn draw_table(
+pub fn draw_table(
     rows: &mut [FactRow],
     collapsed: &mut HashSet<usize>,
     lang: &str,
@@ -198,6 +148,55 @@ pub(super) fn draw_table(
             }
         } else {
             collapsed.insert(raw_idx);
+        }
+    }
+}
+
+/// Compute which visible-list indices should be collapsed to show only rows up
+/// to `max_depth` levels.
+pub fn collapsed_at_depth(rows: &[FactRow], max_depth: usize) -> HashSet<usize> {
+    rows.iter()
+        .enumerate()
+        .filter(|(_, row)| row.has_children && row.depth + 1 >= max_depth)
+        .map(|(i, _)| i)
+        .collect()
+}
+
+/// Returns the raw indices of visible rows (positions in `rows`).
+/// `collapsed` stores raw indices, which are stable across expand/collapse
+/// operations.
+pub fn visible_rows(rows: &[FactRow], collapsed: &HashSet<usize>) -> Vec<usize> {
+    let mut visible = Vec::new();
+    let mut hidden_above_depth: Option<usize> = None;
+
+    for (raw_idx, row) in rows.iter().enumerate() {
+        if let Some(hide_depth) = hidden_above_depth {
+            if row.depth > hide_depth {
+                continue;
+            }
+            hidden_above_depth = None;
+        }
+        visible.push(raw_idx);
+        if row.has_children && collapsed.contains(&raw_idx) {
+            hidden_above_depth = Some(row.depth);
+        }
+    }
+
+    visible
+}
+
+/// Ensures that a given row is visible by expanding (uncollapsing) all its
+/// ancestors in the tree.
+pub fn ensure_row_visible(row_idx: usize, rows: &[FactRow], collapsed: &mut HashSet<usize>) {
+    let target_depth = rows[row_idx].depth;
+    let mut depth = target_depth;
+    for i in (0..row_idx).rev() {
+        if rows[i].depth < depth && rows[i].has_children {
+            collapsed.remove(&i);
+            depth = rows[i].depth;
+            if depth == 0 {
+                break;
+            }
         }
     }
 }

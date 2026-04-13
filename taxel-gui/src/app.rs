@@ -1,132 +1,88 @@
-mod diagnostics_panel;
-mod header;
+mod diagnostics;
+mod report;
 mod report_list;
-mod search_overlay;
+mod search;
 mod settings;
-mod sidebar;
-mod table;
-mod toolbar;
 
-use self::{
-    diagnostics_panel::draw_error_panel,
-    header::{draw_header, load_report},
-    report_list::ReportList,
-    search_overlay::{draw_search_results_overlay, highlight_row},
-    settings::Settings,
-    sidebar::draw_sidebar,
-    table::draw_table,
-    toolbar::{draw_toolbar, EditAction},
-};
 use crate::{
-    app::diagnostics_panel::{AppDiagnostic, DiagnosticCategory},
-    widgets::draw_unsaved_changes_modal,
+    app::{report_list::ReportList, settings::Settings},
+    domain::{Report, ReportStatus},
+    ui::{
+        diagnostic_panel::draw_error_panel,
+        header::draw_header,
+        report_list_view::draw_report_list,
+        report_view::{
+            search_overlay::{draw_search_results_overlay, highlight_row},
+            sidebar::draw_sidebar,
+            table::draw_table,
+            toolbar::{draw_toolbar, EditAction},
+        },
+        widgets::draw_unsaved_changes_modal,
+    },
 };
+pub use diagnostics::{AppDiagnostic, DiagnosticCategory, DiagnosticLevel};
 use dioxus_devtools::subsecond;
 use eframe::{
-    egui::{
-        self, CentralPanel, CursorIcon, Key, KeyboardShortcut, Label, Modifiers, Panel, RichText,
-        Sense, Ui, Visuals,
-    },
+    egui::{self, CentralPanel, Key, KeyboardShortcut, Modifiers, Panel, Ui, Visuals},
     App, CreationContext, Frame,
 };
 use eric_sdk::Eric;
+pub use report::{load_report, send_report, validate_report};
+pub use report_list::ReportOverview;
+pub use search::{RowHighlight, Search};
 use std::{
     collections::HashSet,
     fs,
-    path::PathBuf,
+    path::Path,
     sync::mpsc::{self, Receiver},
-    time::{Duration, Instant},
 };
-use taxel_gui::{populate_fact_table, report_store::ReportSummary, FactTable, SearchHit};
 use xbrl_rs::{InstanceDocument, TaxonomySet};
-
-const JUMP_HIGHLIGHT_DURATION: Duration = Duration::from_millis(1400);
-
-/// Transient highlight for a row that was jumped to via search results, cleared
-/// after a short duration.
-struct RowHighlight {
-    section_idx: usize,
-    row_idx: usize,
-    until: Instant,
-}
-
-/// Grouped search state.
-#[derive(Default)]
-struct Search {
-    /// The current search query text.
-    query: String,
-    /// Cached search results, updated when the query or language changes.
-    results: Vec<SearchHit>,
-    /// Visible row index to scroll to after a search result click. Consumed
-    /// after one frame.
-    scroll_to_row: Option<usize>,
-    /// Transient highlight for the row selected via search results.
-    row_highlight: Option<RowHighlight>,
-}
 
 /// Per-section UI state (collapse state and depth filter).
 #[derive(Default)]
-struct SectionState {
+pub struct SectionState {
     /// Row indices whose children are collapsed.
-    collapsed: HashSet<usize>,
+    pub collapsed: HashSet<usize>,
     /// Maximum depth to display. None means show all depths.
-    max_depth: Option<usize>,
-}
-
-/// The status of the currently open report, used to control validation and
-/// sending.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub(super) enum ReportStatus {
-    /// The report has not been validated yet, either because it was just loaded or because it has unsaved edits.
-    Draft,
-    /// The report has been validated and no issues were found.
-    Validated,
-    /// The report has been submitted without errors.
-    Sent,
+    pub max_depth: Option<usize>,
 }
 
 /// Main application struct for the Taxel GUI, managing the state of the app.
 pub struct TaxelApp {
     /// The taxonomy set for the currently loaded XBRL instance document, if
     /// any.
-    taxonomy: Option<TaxonomySet>,
+    pub taxonomy: Option<TaxonomySet>,
     /// The instance document currently loaded in the app, if any.
-    report: Option<InstanceDocument>,
-    /// The fact table containing the extracted facts from the XBRL instance
-    /// document, enriched with the concept labels and presentation structure
-    /// for display in the UI.
-    table: Option<FactTable>,
+    pub instance_document: Option<InstanceDocument>,
+    /// The currently loaded report.
+    pub report: Option<Report>,
+    /// Imported reports and creation date bookkeeping.
+    pub report_list: ReportList,
     /// The index of the currently selected section tab in the sidebar.
-    selected_tab: usize,
-    /// Per-section UI state, indexed analogous to `table.sections`.
-    section_states: Vec<SectionState>,
+    pub selected_tab: usize,
+    /// Per-section UI state, indexed analogous to `report.sections`.
+    pub section_states: Vec<SectionState>,
     /// Persisted UI settings (language, zoom, theme).
-    settings: Settings,
+    pub settings: Settings,
     /// Structured diagnostics for non-blocking and blocking issues.
-    issues: Vec<AppDiagnostic>,
+    pub diagnostics: Vec<AppDiagnostic>,
     /// Controls whether the detailed diagnostics panel is visible.
-    show_error_panel: bool,
+    pub show_error_panel: bool,
     /// Search state.
-    search: Search,
+    pub search: Search,
     /// Receives the result of a background XML load, if one is in progress.
-    loading: Option<Receiver<anyhow::Result<(TaxonomySet, InstanceDocument)>>>,
+    pub loading: Option<Receiver<anyhow::Result<(TaxonomySet, InstanceDocument, Report)>>>,
     /// Some while the value column of that section is being edited, None
     /// otherwise.
-    editing_section: Option<usize>,
+    pub editing_section: Option<usize>,
     /// Snapshot of `row.value` for every row in the edited section at the
     /// moment editing started, indexed by raw row index. Used to restore values
     /// if editing is canceled.
-    edit_snapshot: Vec<String>,
+    pub edit_snapshot: Vec<String>,
     /// Eric instance to validate XBRL instance documents and provide
     /// diagnostics. Initialized on app start if the data directory can be
     /// determined, otherwise skipped with a warning.
-    eric: Option<Eric>,
-    /// Path of the currently imported report, if any.
-    report_path: Option<PathBuf>,
-    /// Imported reports and creation date bookkeeping.
-    report_list: ReportList,
-    /// The validation and submission status of the currently open report.
-    report_status: ReportStatus,
+    pub eric: Option<Eric>,
 }
 
 impl TaxelApp {
@@ -136,7 +92,7 @@ impl TaxelApp {
     /// available.
     pub fn new(
         ctx: &CreationContext<'_>,
-        table: Option<FactTable>,
+        table: Option<Report>,
         error_message: Option<String>,
     ) -> TaxelApp {
         let section_states = table
@@ -149,10 +105,10 @@ impl TaxelApp {
                     .collect()
             })
             .unwrap_or_default();
-        let mut issues = Vec::new();
+        let mut diagnostics = Vec::new();
 
         if let Some(message) = error_message {
-            issues.push(AppDiagnostic::new_error(DiagnosticCategory::App, message));
+            diagnostics.push(AppDiagnostic::new_error(DiagnosticCategory::App, message));
         }
 
         let settings = Settings::load(ctx.storage);
@@ -161,7 +117,7 @@ impl TaxelApp {
         let eric =
             if let Some(log_path) = dirs::data_dir().map(|dir| dir.join("taxel").join("logs")) {
                 if let Err(err) = fs::create_dir_all(&log_path) {
-                    issues.push(AppDiagnostic::new_error(
+                    diagnostics.push(AppDiagnostic::new_error(
                         DiagnosticCategory::App,
                         format!("Failed to create log directory: {err}"),
                     ));
@@ -170,7 +126,7 @@ impl TaxelApp {
                 match Eric::new(&log_path) {
                     Ok(eric) => Some(eric),
                     Err(err) => {
-                        issues.push(AppDiagnostic::new_error(
+                        diagnostics.push(AppDiagnostic::new_error(
                             DiagnosticCategory::App,
                             format!("Failed to initialize Eric: {err}"),
                         ));
@@ -178,7 +134,7 @@ impl TaxelApp {
                     }
                 }
             } else {
-                issues.push(AppDiagnostic::new_warning(
+                diagnostics.push(AppDiagnostic::new_warning(
                     DiagnosticCategory::App,
                     "Could not determine data directory, skipping Eric initialization".to_string(),
                 ));
@@ -188,8 +144,9 @@ impl TaxelApp {
         let show_error_panel = true;
 
         let mut report_list = ReportList::new();
+
         if let Err(err) = report_list.refresh() {
-            issues.push(AppDiagnostic::new_warning(
+            diagnostics.push(AppDiagnostic::new_warning(
                 DiagnosticCategory::App,
                 format!("Failed to list imported reports: {err}"),
             ));
@@ -197,39 +154,38 @@ impl TaxelApp {
 
         Self {
             taxonomy: None,
-            report: None,
-            table,
+            instance_document: None,
+            report: table,
             selected_tab: 0,
             section_states,
             settings,
-            issues,
+            diagnostics,
             show_error_panel,
             loading: None,
             search: Search::default(),
-            report_path: None,
             report_list,
             editing_section: None,
             edit_snapshot: Vec::new(),
             eric,
-            report_status: ReportStatus::Draft,
         }
     }
 
-    fn refresh_imported_reports(&mut self) {
+    pub fn register_report(&mut self, path: &Path) {
+        self.report_list.register_report(path)
+    }
+
+    /// Registers a newly imported report by adding it to the report list.
+    pub fn refresh_reports(&mut self) {
         match self.report_list.refresh() {
             Ok(()) => {}
             Err(err) => {
-                self.issues.push(AppDiagnostic::new_warning(
+                self.diagnostics.push(AppDiagnostic::new_warning(
                     DiagnosticCategory::App,
                     format!("Failed to refresh imported reports: {err}"),
                 ));
                 self.show_error_panel = true;
             }
         }
-    }
-
-    fn register_imported_report(&mut self, report_path: &std::path::Path) {
-        self.report_list.register_imported_report(report_path);
     }
 }
 
@@ -255,14 +211,14 @@ impl App for TaxelApp {
             });
 
             let sections = self
-                .table
+                .report
                 .as_ref()
                 .map(|table| table.sections.as_slice())
                 .unwrap_or(&[]);
             draw_sidebar(ctx, sections, &mut self.selected_tab, &self.settings.lang);
 
             if self.show_error_panel {
-                draw_error_panel(ctx, &self.issues, &mut self.show_error_panel);
+                draw_error_panel(ctx, &self.diagnostics, &mut self.show_error_panel);
             }
 
             let lang = self.settings.lang.clone();
@@ -278,11 +234,11 @@ impl App for TaxelApp {
             CentralPanel::default()
                 .frame(central_frame)
                 .show_inside(ctx, |ui| {
-                    if self.table.is_none() {
+                    if self.report.is_none() {
                         if let Some(path) =
                             draw_report_list(ui, self.report_list.reports(), self.loading.is_some())
                         {
-                            load_report(self, path, ui.ctx().clone());
+                            report::load_report(self, path, ui.ctx().clone());
                         }
                         return;
                     }
@@ -299,7 +255,7 @@ impl App for TaxelApp {
 
                     // Toolbar block: immutable borrow for read-only access to table
                     // data.
-                    let mut action = if let Some(table) = &self.table {
+                    let mut action = if let Some(table) = &self.report {
                         if let Some(section) = table.sections.get(content_tab) {
                             let max_depth =
                                 section.rows.iter().map(|row| row.depth).max().unwrap_or(0) + 1;
@@ -347,14 +303,23 @@ impl App for TaxelApp {
                     // Handle toolbar edit actions.
                     match action {
                         EditAction::Start => {
-                            if let Some(table) = &self.table {
+                            if let Some(table) = &self.report {
                                 if let Some(section) = table.sections.get(self.selected_tab) {
                                     self.edit_snapshot =
                                         section.rows.iter().map(|r| r.value.clone()).collect();
                                 }
                             }
                             self.editing_section = Some(self.selected_tab);
-                            self.report_status = ReportStatus::Draft;
+
+                            // If the report was previously validated, mark it
+                            // as draft again since it has unsaved changes now.
+                            if let Some(report) = &self.report {
+                                self.report_list.set_report_status(
+                                    &report.path,
+                                    ReportStatus::Draft,
+                                    &mut self.diagnostics,
+                                );
+                            }
                         }
                         EditAction::Save => {
                             self.editing_section = None;
@@ -363,7 +328,7 @@ impl App for TaxelApp {
                         EditAction::Cancel => {
                             let editing_tab = self.editing_section.unwrap_or(self.selected_tab);
 
-                            if let Some(table) = &mut self.table {
+                            if let Some(table) = &mut self.report {
                                 if let Some(section) = table.sections.get_mut(editing_tab) {
                                     for (row, value) in
                                         section.rows.iter_mut().zip(self.edit_snapshot.iter())
@@ -379,7 +344,7 @@ impl App for TaxelApp {
                     }
 
                     // Table block: mutable borrow for in-place editing.
-                    if let Some(table) = self.table.as_mut() {
+                    if let Some(table) = self.report.as_mut() {
                         let tab = content_tab;
                         let table_rect = ui.available_rect_before_wrap();
 
@@ -426,7 +391,7 @@ impl App for TaxelApp {
                         }
                         if continue_nav {
                             let editing_tab = self.editing_section.unwrap();
-                            if let Some(table) = &mut self.table {
+                            if let Some(table) = &mut self.report {
                                 if let Some(section) = table.sections.get_mut(editing_tab) {
                                     for (row, value) in
                                         section.rows.iter_mut().zip(self.edit_snapshot.iter())
@@ -448,34 +413,27 @@ impl App for TaxelApp {
 fn load_fact_table(app: &mut TaxelApp) {
     if let Some(rx) = &app.loading {
         match rx.try_recv() {
-            Ok(Ok((taxonomy, report))) => {
-                let view = report.view(&taxonomy);
-                let item_facts = report.item_facts();
-                let mut table = FactTable::default();
-
-                populate_fact_table(view, &item_facts, &mut table);
-
-                for missing_role in &table.role_mapping_errors {
-                    app.issues.push(AppDiagnostic::new_warning(
+            Ok(Ok((taxonomy, instance, report))) => {
+                for missing_role in &report.role_mapping_errors {
+                    app.diagnostics.push(AppDiagnostic::new_warning(
                         DiagnosticCategory::Import,
                         format!("Missing report-element mapping for role URI: {missing_role}"),
                     ));
                 }
 
-                app.section_states = table
+                app.section_states = report
                     .sections
                     .iter()
                     .map(|_| SectionState::default())
                     .collect();
-                app.table = Some(table);
-                app.taxonomy = Some(taxonomy);
                 app.report = Some(report);
-                app.report_status = ReportStatus::Draft;
-                app.show_error_panel = !app.issues.is_empty();
+                app.taxonomy = Some(taxonomy);
+                app.instance_document = Some(instance);
+                app.show_error_panel = !app.diagnostics.is_empty();
                 app.loading = None;
             }
             Ok(Err(err)) => {
-                app.issues.push(AppDiagnostic::new_error(
+                app.diagnostics.push(AppDiagnostic::new_error(
                     DiagnosticCategory::Import,
                     err.to_string(),
                 ));
@@ -488,81 +446,4 @@ fn load_fact_table(app: &mut TaxelApp) {
             }
         }
     }
-}
-
-/// Draws the report list view, showing imported reports and allowing the user
-/// to select one to open.
-fn draw_report_list(ui: &mut Ui, reports: &[ReportSummary], loading: bool) -> Option<PathBuf> {
-    let list_width = ui.available_width().min(560.0);
-
-    ui.vertical_centered(|ui| {
-        ui.heading("Your Reports");
-        ui.add_space(6.0);
-    });
-
-    if reports.is_empty() {
-        ui.vertical_centered(|ui| {
-            ui.label("No imported reports yet. Use Import report to add an XML file.");
-        });
-        return None;
-    }
-
-    ui.vertical_centered(|ui| {
-        ui.label(format!("{} report(s)", reports.len()));
-    });
-    ui.add_space(4.0);
-
-    let mut selected = None;
-
-    ui.vertical_centered(|ui| {
-        ui.set_max_width(list_width);
-        ui.set_width(list_width);
-        ui.horizontal(|ui| {
-            ui.add_sized([120.0, 18.0], egui::Label::new(RichText::new("Created")));
-            ui.label(RichText::new("Report"));
-        });
-        ui.separator();
-
-        for (idx, report) in reports.iter().enumerate() {
-            let row = egui::Frame::new()
-                .fill(egui::Color32::TRANSPARENT)
-                .inner_margin(egui::Margin::symmetric(6, 6))
-                .show(ui, |ui| {
-                    ui.set_width(list_width);
-                    ui.horizontal(|ui| {
-                        ui.add_sized([120.0, 18.0], Label::new(&report.created_date));
-                        ui.label(&report.display_name);
-                    });
-                });
-
-            let response = ui.interact(
-                row.response.rect,
-                ui.id().with(("report_row", idx)),
-                if loading {
-                    Sense::hover()
-                } else {
-                    Sense::click()
-                },
-            );
-            let response = if loading {
-                response
-            } else {
-                response.on_hover_cursor(CursorIcon::PointingHand)
-            };
-
-            if response.hovered() && !loading {
-                ui.painter().rect_filled(
-                    row.response.rect,
-                    2.0,
-                    ui.visuals().widgets.hovered.bg_fill.gamma_multiply(0.25),
-                );
-            }
-
-            if response.clicked() {
-                selected = Some(report.path.clone());
-            }
-        }
-    });
-
-    selected
 }

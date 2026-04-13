@@ -1,22 +1,8 @@
+use crate::domain::ReportStatus;
 use log::debug;
-use std::collections::HashMap;
+use std::{collections::HashMap, path::PathBuf};
 use taxel::{GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
 use xbrl_rs::{DocumentView, ItemFact, TreeNode, ROLE_LABEL, ROLE_TERSE};
-
-/// A single search result pointing to a specific row in a specific section.
-#[derive(Debug, Clone)]
-pub struct SearchHit {
-    /// Index into `FactTable::sections`.
-    pub section_idx: usize,
-    /// Raw index into `FactSection::rows`.
-    pub row_idx: usize,
-    /// The concept name of the matched row.
-    pub concept: String,
-    /// The resolved label of the matched row.
-    pub label: String,
-    /// The section role (short name) for display.
-    pub section_name: String,
-}
 
 /// A row in the fact table, representing a single fact or a concept without
 /// facts.
@@ -40,7 +26,7 @@ pub struct FactRow {
 
 /// One presentation section with its rows.
 #[derive(Debug, Default, Clone)]
-pub struct FactSection {
+pub struct ReportSection {
     /// The full extended link role URI, e.g. `http://example.com/role/BalanceSheet`.
     pub role: String,
     /// Sidebar display labels resolved from taxonomy concepts, keyed by
@@ -50,99 +36,75 @@ pub struct FactSection {
     pub rows: Vec<FactRow>,
 }
 
-/// A collection of fact sections, one per presentation section in the XBRL document.
-#[derive(Debug, Default)]
-pub struct FactTable {
+/// The report containing the extracted facts from the XBRL instance document,
+/// enriched with the concept labels and presentation structure.
+#[derive(Debug)]
+pub struct Report {
+    /// The file path of the report, used for persistence.
+    pub path: PathBuf,
+    /// The report status for lifecycle management.
+    pub status: ReportStatus,
     /// The sections in the order they appear in the presentation linkbase.
-    pub sections: Vec<FactSection>,
+    pub sections: Vec<ReportSection>,
     /// Role URIs for sections that could not be mapped to a known report
     /// element concept.
     pub role_mapping_errors: Vec<String>,
 }
 
-impl FactTable {
-    /// Search all sections for rows matching `query` (case-insensitive substring
-    /// match on concept, label, or value).
-    pub fn search(&self, query: &str, lang: &str) -> Vec<SearchHit> {
-        let query_lower = query.to_lowercase();
-        let mut hits = Vec::new();
-
-        for (section_idx, section) in self.sections.iter().enumerate() {
-            let section_name = section
-                .labels
-                .get(lang)
-                .map(|lang| lang.as_str())
-                .unwrap_or_else(|| section.role.rsplit('/').next().unwrap_or(&section.role));
-
-            for (row_idx, row) in section.rows.iter().enumerate() {
-                let label = row
-                    .labels
-                    .get(lang)
-                    .map(|label| label.as_str())
-                    .unwrap_or("");
-
-                if row.concept.to_lowercase().contains(&query_lower)
-                    || label.to_lowercase().contains(&query_lower)
-                    || row.value.to_lowercase().contains(&query_lower)
-                {
-                    hits.push(SearchHit {
-                        section_idx,
-                        row_idx,
-                        concept: row.concept.clone(),
-                        label: label.to_string(),
-                        section_name: section_name.to_owned(),
-                    });
-                }
-            }
+impl Report {
+    pub fn new(path: PathBuf) -> Self {
+        Self {
+            path,
+            status: ReportStatus::Draft,
+            sections: Vec::new(),
+            role_mapping_errors: Vec::new(),
         }
-
-        hits
     }
-}
 
-/// Populates the fact table by traversing the document view and collecting
-/// facts from the tree nodes.
-pub fn populate_fact_table(view: DocumentView, item_facts: &[&ItemFact], table: &mut FactTable) {
-    table.sections.clear();
-    table.role_mapping_errors.clear();
+    /// Populates the fact table by traversing the document view and collecting
+    /// facts from the tree nodes.
+    pub fn populate(&mut self, view: DocumentView, item_facts: &[&ItemFact]) {
+        self.sections.clear();
+        self.role_mapping_errors.clear();
 
-    // Labels for report elements are sourced from the dedicated GCD section.
-    let gcd_nodes = view
-        .sections
-        .iter()
-        .find(|section| section.role == GCD_ROLE_URI)
-        .map(|section| section.nodes.as_slice())
-        .unwrap_or(&[]);
-    let labels_map = build_labels_map(gcd_nodes);
+        // Labels for report elements are sourced from the dedicated GCD section.
+        let gcd_nodes = view
+            .sections
+            .iter()
+            .find(|section| section.role == GCD_ROLE_URI)
+            .map(|section| section.nodes.as_slice())
+            .unwrap_or(&[]);
+        let labels_map = build_labels_map(gcd_nodes);
 
-    for section in &view.sections {
-        let role_uri = section.role;
+        for section in &view.sections {
+            let role_uri = section.role;
 
-        let labels = if role_uri == GCD_ROLE_URI {
-            // The GCD section itself is a special case: we use the same label
-            // for all languages since it doesn't represent a report element.
-            Some(HashMap::from([
-                ("en".to_owned(), GCD_LABEL.to_string()),
-                ("de".to_owned(), GCD_LABEL.to_string()),
-            ]))
-        } else if let Some(concept_name) = ROLE_URI_TO_REPORT_ELEMENT.get(role_uri) {
-            labels_map.get(concept_name).cloned()
-        } else {
-            table.role_mapping_errors.push(role_uri.to_owned());
-            None
-        };
+            let labels = if role_uri == GCD_ROLE_URI {
+                // The GCD section itself is a special case: we use the same label
+                // for all languages since it doesn't represent a report element.
+                Some(HashMap::from([
+                    ("en".to_owned(), GCD_LABEL.to_string()),
+                    ("de".to_owned(), GCD_LABEL.to_string()),
+                ]))
+            } else if let Some(concept_name) = ROLE_URI_TO_REPORT_ELEMENT.get(role_uri) {
+                labels_map.get(concept_name).cloned()
+            } else {
+                self.role_mapping_errors.push(role_uri.to_owned());
+                None
+            };
 
-        let mut fact_section = FactSection {
-            role: role_uri.to_owned(),
-            labels: labels.unwrap_or_default(),
-            rows: Vec::new(),
-        };
+            let mut fact_section = ReportSection {
+                role: role_uri.to_owned(),
+                labels: labels.unwrap_or_default(),
+                rows: Vec::new(),
+            };
 
-        for node in &section.nodes {
-            collect_node(node, item_facts, &mut fact_section.rows);
+            for node in &section.nodes {
+                collect_node(node, item_facts, &mut fact_section.rows);
+            }
+
+            self.sections.push(fact_section);
         }
-
-        table.sections.push(fact_section);
     }
 }
 
