@@ -40,7 +40,7 @@ pub struct ReportSection {
 /// enriched with the concept labels and presentation structure.
 #[derive(Debug)]
 pub struct Report {
-    /// The file path of the report, used for persistence..
+    /// The file path of the report, used for persistence.
     pub path: PathBuf,
     /// The report status for lifecycle management.
     pub status: ReportStatus,
