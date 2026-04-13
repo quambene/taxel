@@ -31,7 +31,7 @@ pub fn load_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context) {
     app.loading = Some(rx);
 
     thread::spawn(move || {
-        let report = load_xml(&path);
+        let report = load_instance_document(&path);
         let _ = tx.send(report);
         ctx.request_repaint();
     });
@@ -40,7 +40,9 @@ pub fn load_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context) {
 /// Loads an XBRL instance document from the specified path, discovers the
 /// referenced taxonomies, and populates the fact table with the extracted
 /// facts.
-pub fn load_xml(path: &Path) -> Result<(TaxonomySet, InstanceDocument, Report), anyhow::Error> {
+fn load_instance_document(
+    path: &Path,
+) -> Result<(TaxonomySet, InstanceDocument, Report), anyhow::Error> {
     debug!("Read xml file: {}", path.display());
 
     let instance = InstanceDocument::from_file(path)?;
