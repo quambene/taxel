@@ -180,9 +180,7 @@ pub fn draw_send_modal(ui: &mut Ui, app: &mut TaxelApp) {
 
     if confirm {
         app.show_send_modal = false;
-        if let Some(path) = app.send_certificate_path.clone() {
-            app::send_report(app, path, app.send_password.clone());
-        }
+        app::send_report(app);
     }
 }
 
