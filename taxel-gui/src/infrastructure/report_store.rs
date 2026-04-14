@@ -51,19 +51,6 @@ impl ReportStore {
     }
 }
 
-pub fn create_reports_dir_if_not_exists(reports_dir: &Path) -> Result<()> {
-    if !reports_dir.exists() {
-        fs::create_dir_all(reports_dir).with_context(|| {
-            format!(
-                "Failed to create reports directory: {}",
-                reports_dir.display()
-            )
-        })?;
-    }
-
-    Ok(())
-}
-
 /// Copies a report file to the application's reports directory, assigning it a
 /// unique name based on a UUID. This is used when importing a report, ensuring
 /// that the original file remains unchanged and that the imported report is
@@ -149,6 +136,21 @@ pub fn save_report_manifest(manifest: &HashMap<String, ReportManifestEntry>) -> 
     Ok(())
 }
 
+pub fn create_reports_dir_if_not_exists(reports_dir: &Path) -> Result<()> {
+    if !reports_dir.exists() {
+        fs::create_dir_all(reports_dir).with_context(|| {
+            format!(
+                "Failed to create reports directory: {}",
+                reports_dir.display()
+            )
+        })?;
+    }
+
+    Ok(())
+}
+
+/// Determines the path to the application's reports directory, which is
+/// typically located in the user's data directory.
 fn reports_dir() -> Result<PathBuf> {
     dirs::data_dir()
         .map(|dir| dir.join("taxel").join("reports"))

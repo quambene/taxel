@@ -16,7 +16,7 @@ use std::{
     thread,
 };
 use taxel::TAXONOMY_YEAR_TO_VERSION;
-use xbrl_rs::{InstanceDocument, TaxonomySet};
+use xbrl_rs::{InstanceDocument, TaxonomyLoader, TaxonomySet};
 
 /// Loads an XBRL instance document from the specified path and updates the app
 /// state. The load runs on a background thread to keep the UI responsive.
@@ -47,11 +47,21 @@ fn load_instance_document(
 
     let instance = InstanceDocument::from_file(path)?;
     let schema_refs: Vec<String> = instance.schema_refs().to_vec();
-    let entry_point = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .parent()
-        .context("missing path to taxonomies")?
-        .join("test_data/taxonomies");
-    let taxonomy = TaxonomySet::discover(schema_refs, entry_point)?;
+    let taxonomy_dir = taxonomy_dir()?;
+    let loader = TaxonomyLoader::new()?;
+
+    if !taxonomy_dir.exists() {
+        fs::create_dir_all(&taxonomy_dir).with_context(|| {
+            format!(
+                "Failed to create taxonomy directory: {}",
+                taxonomy_dir.display()
+            )
+        })?;
+    }
+
+    loader.download_all(&schema_refs, &taxonomy_dir)?;
+
+    let taxonomy = TaxonomySet::discover(schema_refs, taxonomy_dir)?;
     let view = instance.view(&taxonomy);
     let item_facts = instance.item_facts();
     let mut report = Report::new(path.to_path_buf());
@@ -324,4 +334,12 @@ fn extract_taxonomy_version(taxonomy: &Option<TaxonomySet>) -> Option<&&str> {
         .and_then(|taxonomy| taxonomy.version())
         .map(|date| date.split('-').next().unwrap_or(date))
         .and_then(|version| TAXONOMY_YEAR_TO_VERSION.get(version))
+}
+
+/// Returns the path to the application's taxonomy directory, which is located
+/// in the user's data directory.
+fn taxonomy_dir() -> Result<PathBuf, anyhow::Error> {
+    dirs::data_dir()
+        .map(|dir| dir.join("taxel").join("taxonomies"))
+        .context("Could not determine data directory")
 }
