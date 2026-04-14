@@ -202,6 +202,40 @@ pub fn send_report(app: &mut TaxelApp) {
     app.show_error_panel = true;
 }
 
+/// Moves the currently loaded report to the operating system trash and resets
+/// the app state to the home screen.
+pub fn delete_report(app: &mut TaxelApp) {
+    let Some(report) = &app.report else {
+        return;
+    };
+    let path = report.path.clone();
+
+    match trash::delete(&path) {
+        Ok(()) => {
+            app.report_list.remove_report(&path, &mut app.diagnostics);
+            app.report = None;
+            app.taxonomy = None;
+            app.instance_document = None;
+            app.selected_tab = 0;
+            app.search.results.clear();
+            app.search.scroll_to_row = None;
+            app.search.row_highlight = None;
+            app.loading = None;
+            app.diagnostics.clear();
+            app.show_error_panel = true;
+            app.editing_section = None;
+            app.edit_snapshot.clear();
+        }
+        Err(err) => {
+            app.diagnostics.push(AppDiagnostic::new_error(
+                DiagnosticCategory::App,
+                format!("Failed to move report to trash: {err}"),
+            ));
+            app.show_error_panel = true;
+        }
+    }
+}
+
 /// Clears all diagnostics of the specified category from the app state. This is
 /// used to clear old validation errors when re-validating, or to clear old send
 /// errors when re-sending the report, while keeping other diagnostics (like app

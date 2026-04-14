@@ -9,7 +9,7 @@ use crate::{
     domain::{Report, ReportStatus},
     ui::{
         diagnostic_panel::draw_error_panel,
-        header::draw_header,
+        header::{draw_delete_modal, draw_header},
         report_list_view::draw_report_list,
         report_view::{
             search_overlay::{draw_search_results_overlay, highlight_row},
@@ -27,7 +27,7 @@ use eframe::{
     App, CreationContext, Frame,
 };
 use eric_sdk::Eric;
-pub use report::{load_report, send_report, validate_report};
+pub use report::{delete_report, load_report, send_report, validate_report};
 pub use report_list::ReportOverview;
 pub use search::{RowHighlight, Search};
 use std::{
@@ -54,6 +54,10 @@ pub struct TaxelApp {
     pub taxonomy: Option<TaxonomySet>,
     /// The instance document currently loaded in the app, if any.
     pub instance_document: Option<InstanceDocument>,
+    /// Eric instance to validate XBRL instance documents and provide
+    /// diagnostics. Initialized on app start if the data directory can be
+    /// determined, otherwise skipped with a warning.
+    pub eric: Option<Eric>,
     /// The currently loaded report.
     pub report: Option<Report>,
     /// Imported reports and creation date bookkeeping.
@@ -79,10 +83,8 @@ pub struct TaxelApp {
     /// moment editing started, indexed by raw row index. Used to restore values
     /// if editing is canceled.
     pub edit_snapshot: Vec<String>,
-    /// Eric instance to validate XBRL instance documents and provide
-    /// diagnostics. Initialized on app start if the data directory can be
-    /// determined, otherwise skipped with a warning.
-    pub eric: Option<Eric>,
+    /// Controls whether the delete-report confirmation modal is visible.
+    pub show_delete_modal: bool,
 }
 
 impl TaxelApp {
@@ -167,6 +169,7 @@ impl TaxelApp {
             editing_section: None,
             edit_snapshot: Vec::new(),
             eric,
+            show_delete_modal: false,
         }
     }
 
@@ -207,7 +210,7 @@ impl App for TaxelApp {
         // TODO: remove hot reloading support for release builds
         subsecond::call(|| {
             Panel::top("header").min_size(32.0).show_inside(ctx, |ui| {
-                draw_header(self, ui);
+                draw_header(ui, self);
             });
 
             let sections = self
@@ -404,7 +407,11 @@ impl App for TaxelApp {
                             self.edit_snapshot.clear();
                         }
                     }
-                })
+                });
+
+            if self.show_delete_modal {
+                draw_delete_modal(ctx, self);
+            }
         });
     }
 }

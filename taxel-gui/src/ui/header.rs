@@ -5,14 +5,15 @@ use crate::{
     TaxelApp,
 };
 use eframe::egui::{
-    text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui,
+    text::LayoutJob, vec2, Align, Button, Color32, Id, Layout, Modal, Shape, TextEdit, TextFormat,
+    Ui,
 };
 use rfd::FileDialog;
 
 /// Draws the header panel of the application, including the "Import report"
 /// button, the "Close report" button, any error messages, and the language
 /// selector tabs.
-pub fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
+pub fn draw_header(ui: &mut Ui, app: &mut TaxelApp) {
     ui.horizontal_centered(|ui| {
         if app.report.is_none() && app.loading.is_none() && ui.button("Import report").clicked() {
             if let Some(path) = FileDialog::new()
@@ -57,6 +58,10 @@ pub fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
             app.edit_snapshot.clear();
         }
 
+        if app.report.is_some() && ui.button("Delete report").clicked() {
+            app.show_delete_modal = true;
+        }
+
         if app.report.is_some() && ui.button("Validate report").clicked() {
             app::validate_report(app);
         }
@@ -79,6 +84,43 @@ pub fn draw_header(app: &mut TaxelApp, ui: &mut Ui) {
             draw_zoom_toolbar(ui, &mut app.settings.zoom_input);
         });
     });
+}
+
+/// Draws the delete confirmation modal when the user clicks "Delete report".
+pub fn draw_delete_modal(ui: &mut Ui, app: &mut TaxelApp) {
+    let filename = app
+        .report
+        .as_ref()
+        .and_then(|report| report.path.file_name())
+        .and_then(|file_name| file_name.to_str())
+        .unwrap_or("this report");
+
+    let mut cancel = false;
+    let mut confirm = false;
+
+    let modal = Modal::new(Id::new("delete_report_modal")).show(ui.ctx(), |ui| {
+        ui.heading("Move report to Trash?");
+        ui.add_space(4.0);
+        ui.label(filename);
+        ui.add_space(8.0);
+        ui.horizontal(|ui| {
+            if ui.button("Cancel").clicked() {
+                cancel = true;
+            }
+            if ui.button("Move to Trash").clicked() {
+                confirm = true;
+            }
+        });
+    });
+
+    if modal.should_close() || cancel {
+        app.show_delete_modal = false;
+    }
+
+    if confirm {
+        app.show_delete_modal = false;
+        app::delete_report(app);
+    }
 }
 
 /// Draws a summary of errors and warnings in the header. Clicking on the
