@@ -172,7 +172,8 @@ impl TaxelApp {
     }
 
     pub fn register_report(&mut self, path: &Path) {
-        self.report_list.register_report(path)
+        self.report_list
+            .register_report(path, &mut self.diagnostics)
     }
 
     /// Registers a newly imported report by adding it to the report list.
