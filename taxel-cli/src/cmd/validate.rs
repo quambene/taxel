@@ -38,7 +38,7 @@ pub fn validate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let xml_path = Path::new(xml_file);
     let xml = fs::read_to_string(xml_path)?;
 
-    let eric = Eric::new(&log_path)?;
+    let eric = Eric::new(Some(&log_path), None)?;
 
     let response = eric.validate(xml, tax_type, tax_version, print_config)?;
 

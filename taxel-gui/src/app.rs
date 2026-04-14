@@ -114,7 +114,7 @@ impl TaxelApp {
                     ));
                 }
 
-                match Eric::new(&log_path) {
+                match Eric::new(Some(&log_path), None) {
                     Ok(eric) => Some(eric),
                     Err(err) => {
                         diagnostics.push(AppDiagnostic::new_error(

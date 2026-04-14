@@ -166,7 +166,17 @@ pub fn send_report(app: &mut TaxelApp) {
         return;
     };
 
-    match eric.send(xml, "Bilanz", taxonomy_version, None) {
+    let certificate_path = todo!();
+    let password = todo!();
+
+    match eric.send(
+        xml,
+        "Bilanz",
+        taxonomy_version,
+        certificate_path,
+        password,
+        None,
+    ) {
         Ok(response) => {
             if response.error_code == ErrorCode::ERIC_OK as i32 {
                 report.status = ReportStatus::Sent;
