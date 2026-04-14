@@ -16,14 +16,14 @@ use eframe::{
     App, CreationContext,
 };
 use eric_sdk::Eric;
-pub use report::{delete_report, load_report, send_report, validate_report};
+pub use report::{delete_report, load_report, poll_load_result, send_report, validate_report};
 pub use report_list::ReportOverview;
 pub use search::{RowHighlight, Search};
 use std::{
     collections::HashSet,
     fs,
     path::{Path, PathBuf},
-    sync::mpsc::{self, Receiver},
+    sync::mpsc::Receiver,
 };
 use xbrl_rs::{InstanceDocument, TaxonomySet};
 
@@ -204,7 +204,7 @@ impl App for TaxelApp {
             Visuals::light()
         });
 
-        load_fact_table(self);
+        app::poll_load_result(self);
 
         // TODO: remove hot reloading support for release builds
         subsecond::call(|| {
@@ -418,44 +418,5 @@ impl App for TaxelApp {
                 ui::draw_send_modal(ctx, self);
             }
         });
-    }
-}
-
-/// Polls the background XML load result and updates the app state accordingly.
-fn load_fact_table(app: &mut TaxelApp) {
-    if let Some(rx) = &app.loading {
-        match rx.try_recv() {
-            Ok(Ok((taxonomy, instance, report))) => {
-                for missing_role in &report.role_mapping_errors {
-                    app.diagnostics.push(AppDiagnostic::new_warning(
-                        DiagnosticCategory::Import,
-                        format!("Missing report-element mapping for role URI: {missing_role}"),
-                    ));
-                }
-
-                app.section_states = report
-                    .sections
-                    .iter()
-                    .map(|_| SectionState::default())
-                    .collect();
-                app.report = Some(report);
-                app.taxonomy = Some(taxonomy);
-                app.instance_document = Some(instance);
-                app.show_error_panel = !app.diagnostics.is_empty();
-                app.loading = None;
-            }
-            Ok(Err(err)) => {
-                app.diagnostics.push(AppDiagnostic::new_error(
-                    DiagnosticCategory::Import,
-                    err.to_string(),
-                ));
-                app.show_error_panel = true;
-                app.loading = None;
-            }
-            Err(mpsc::TryRecvError::Empty) => {}
-            Err(mpsc::TryRecvError::Disconnected) => {
-                app.loading = None;
-            }
-        }
     }
 }

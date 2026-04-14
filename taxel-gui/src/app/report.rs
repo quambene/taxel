@@ -1,7 +1,7 @@
 use crate::{
     app::{
         diagnostics::{AppDiagnostic, DiagnosticCategory},
-        TaxelApp,
+        SectionState, TaxelApp,
     },
     domain::{Report, ReportStatus},
 };
@@ -59,6 +59,45 @@ fn load_instance_document(
     report.populate(view, &item_facts);
 
     Ok((taxonomy, instance, report))
+}
+
+/// Polls the background XML load result and updates the app state accordingly.
+pub fn poll_load_result(app: &mut TaxelApp) {
+    if let Some(rx) = &app.loading {
+        match rx.try_recv() {
+            Ok(Ok((taxonomy, instance, report))) => {
+                for missing_role in &report.role_mapping_errors {
+                    app.diagnostics.push(AppDiagnostic::new_warning(
+                        DiagnosticCategory::Import,
+                        format!("Missing report-element mapping for role URI: {missing_role}"),
+                    ));
+                }
+
+                app.section_states = report
+                    .sections
+                    .iter()
+                    .map(|_| SectionState::default())
+                    .collect();
+                app.report = Some(report);
+                app.taxonomy = Some(taxonomy);
+                app.instance_document = Some(instance);
+                app.show_error_panel = !app.diagnostics.is_empty();
+                app.loading = None;
+            }
+            Ok(Err(err)) => {
+                app.diagnostics.push(AppDiagnostic::new_error(
+                    DiagnosticCategory::Import,
+                    err.to_string(),
+                ));
+                app.show_error_panel = true;
+                app.loading = None;
+            }
+            Err(mpsc::TryRecvError::Empty) => {}
+            Err(mpsc::TryRecvError::Disconnected) => {
+                app.loading = None;
+            }
+        }
+    }
 }
 
 /// Validates the imported report and reports any issues in the diagnostics
