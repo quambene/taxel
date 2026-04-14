@@ -35,8 +35,8 @@ The app is structured as follows:
 src/
   main.rs
   lib.rs
+  app.rs
   app/
-    mod.rs
     ...
   domain/
     mod.rs
@@ -61,7 +61,7 @@ infrastructure (load + parse XML)
    ↓
 domain (validate report)
    ↓
-app returns result
+app updates state
    ↓
-ui updates state
+ui draws widgets
 ```
