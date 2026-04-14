@@ -5,26 +5,15 @@ mod search;
 mod settings;
 
 use crate::{
-    app::{report_list::ReportList, settings::Settings},
+    app::{self, report_list::ReportList, settings::Settings},
     domain::{Report, ReportStatus},
-    ui::{
-        diagnostic_panel::draw_error_panel,
-        header::{draw_delete_modal, draw_header},
-        report_list_view::draw_report_list,
-        report_view::{
-            search_overlay::{draw_search_results_overlay, highlight_row},
-            sidebar::draw_sidebar,
-            table::draw_table,
-            toolbar::{draw_toolbar, EditAction},
-        },
-        widgets::draw_unsaved_changes_modal,
-    },
+    ui::{self, EditAction},
 };
 pub use diagnostics::{AppDiagnostic, DiagnosticCategory, DiagnosticLevel};
 use dioxus_devtools::subsecond;
 use eframe::{
-    egui::{self, CentralPanel, Key, KeyboardShortcut, Modifiers, Panel, Ui, Visuals},
-    App, CreationContext, Frame,
+    egui::{CentralPanel, Frame, Key, KeyboardShortcut, Modifiers, Panel, Ui, Visuals},
+    App, CreationContext,
 };
 use eric_sdk::Eric;
 pub use report::{delete_report, load_report, send_report, validate_report};
@@ -198,7 +187,7 @@ impl App for TaxelApp {
     }
 
     /// The main UI drawing function for the app, called on each frame.
-    fn ui(&mut self, ctx: &mut Ui, _: &mut Frame) {
+    fn ui(&mut self, ctx: &mut Ui, _: &mut eframe::Frame) {
         ctx.ctx().set_visuals(if self.settings.dark_mode {
             Visuals::dark()
         } else {
@@ -210,7 +199,7 @@ impl App for TaxelApp {
         // TODO: remove hot reloading support for release builds
         subsecond::call(|| {
             Panel::top("header").min_size(32.0).show_inside(ctx, |ui| {
-                draw_header(ui, self);
+                ui::draw_header(ui, self);
             });
 
             let sections = self
@@ -218,16 +207,16 @@ impl App for TaxelApp {
                 .as_ref()
                 .map(|table| table.sections.as_slice())
                 .unwrap_or(&[]);
-            draw_sidebar(ctx, sections, &mut self.selected_tab, &self.settings.lang);
+            ui::draw_sidebar(ctx, sections, &mut self.selected_tab, &self.settings.lang);
 
             if self.show_error_panel {
-                draw_error_panel(ctx, &self.diagnostics, &mut self.show_error_panel);
+                ui::draw_error_panel(ctx, &self.diagnostics, &mut self.show_error_panel);
             }
 
             let lang = self.settings.lang.clone();
 
             let central_frame = {
-                let mut frame = egui::Frame::central_panel(ctx.style());
+                let mut frame = Frame::central_panel(ctx.style());
                 if self.show_error_panel {
                     frame.inner_margin.bottom = 0;
                 }
@@ -238,10 +227,12 @@ impl App for TaxelApp {
                 .frame(central_frame)
                 .show_inside(ctx, |ui| {
                     if self.report.is_none() {
-                        if let Some(path) =
-                            draw_report_list(ui, self.report_list.reports(), self.loading.is_some())
-                        {
-                            report::load_report(self, path, ui.ctx().clone());
+                        if let Some(path) = ui::draw_report_list(
+                            ui,
+                            self.report_list.reports(),
+                            self.loading.is_some(),
+                        ) {
+                            app::load_report(self, path, ui.ctx().clone());
                         }
                         return;
                     }
@@ -264,7 +255,7 @@ impl App for TaxelApp {
                                 section.rows.iter().map(|row| row.depth).max().unwrap_or(0) + 1;
                             let state = &mut self.section_states[content_tab];
 
-                            draw_toolbar(
+                            ui::draw_toolbar(
                                 ui,
                                 max_depth,
                                 &mut state.max_depth,
@@ -352,11 +343,11 @@ impl App for TaxelApp {
                         let table_rect = ui.available_rect_before_wrap();
 
                         if let Some(section) = table.sections.get_mut(tab) {
-                            let highlighted_row = highlight_row(&mut self.search, tab, ui);
+                            let highlighted_row = ui::highlight_row(&mut self.search, tab, ui);
                             let state = &mut self.section_states[tab];
                             let scroll_to = self.search.scroll_to_row.take();
 
-                            draw_table(
+                            ui::draw_table(
                                 &mut section.rows,
                                 &mut state.collapsed,
                                 &lang,
@@ -368,7 +359,7 @@ impl App for TaxelApp {
                         }
 
                         if !self.search.results.is_empty() {
-                            draw_search_results_overlay(
+                            ui::draw_search_results_overlay(
                                 ui.ctx(),
                                 table_rect,
                                 &mut self.search,
@@ -387,7 +378,7 @@ impl App for TaxelApp {
                         let mut stay = false;
                         let mut continue_nav = false;
 
-                        draw_unsaved_changes_modal(ui, &mut stay, &mut continue_nav);
+                        ui::draw_unsaved_changes_modal(ui, &mut stay, &mut continue_nav);
 
                         if stay {
                             self.selected_tab = self.editing_section.unwrap();
@@ -410,7 +401,7 @@ impl App for TaxelApp {
                 });
 
             if self.show_delete_modal {
-                draw_delete_modal(ctx, self);
+                ui::draw_delete_modal(ctx, self);
             }
         });
     }
