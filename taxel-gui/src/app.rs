@@ -22,7 +22,7 @@ pub use search::{RowHighlight, Search};
 use std::{
     collections::HashSet,
     fs,
-    path::Path,
+    path::{Path, PathBuf},
     sync::mpsc::{self, Receiver},
 };
 use xbrl_rs::{InstanceDocument, TaxonomySet};
@@ -74,6 +74,12 @@ pub struct TaxelApp {
     pub edit_snapshot: Vec<String>,
     /// Controls whether the delete-report confirmation modal is visible.
     pub show_delete_modal: bool,
+    /// Controls whether the send-report modal is visible.
+    pub show_send_modal: bool,
+    /// Certificate file path selected in the send modal, persisted across opens.
+    pub send_certificate_path: Option<PathBuf>,
+    /// Password entered in the send modal, persisted across opens (in-memory only).
+    pub send_password: String,
 }
 
 impl TaxelApp {
@@ -114,7 +120,7 @@ impl TaxelApp {
                     ));
                 }
 
-                match Eric::new(&log_path) {
+                match Eric::new(Some(&log_path), None) {
                     Ok(eric) => Some(eric),
                     Err(err) => {
                         diagnostics.push(AppDiagnostic::new_error(
@@ -159,11 +165,15 @@ impl TaxelApp {
             edit_snapshot: Vec::new(),
             eric,
             show_delete_modal: false,
+            show_send_modal: false,
+            send_certificate_path: None,
+            send_password: String::new(),
         }
     }
 
     pub fn register_report(&mut self, path: &Path) {
-        self.report_list.register_report(path)
+        self.report_list
+            .register_report(path, &mut self.diagnostics)
     }
 
     /// Registers a newly imported report by adding it to the report list.
@@ -402,6 +412,10 @@ impl App for TaxelApp {
 
             if self.show_delete_modal {
                 ui::draw_delete_modal(ctx, self);
+            }
+
+            if self.show_send_modal {
+                ui::draw_send_modal(ctx, self);
             }
         });
     }

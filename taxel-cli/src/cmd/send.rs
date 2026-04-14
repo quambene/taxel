@@ -6,7 +6,7 @@ use crate::arg;
 use clap::{Arg, ArgMatches};
 use eric_sdk::Eric;
 use std::{
-    env::current_dir,
+    env::{self, current_dir},
     fs,
     path::{Path, PathBuf},
 };
@@ -22,6 +22,10 @@ pub fn send_args() -> [Arg<'static>; 5] {
 }
 
 pub fn send(matches: &ArgMatches) -> Result<(), anyhow::Error> {
+    let certificate_path = env::var("CERTIFICATE_PATH").unwrap();
+    let certificate_path = Path::new(&certificate_path);
+    let certificate_password = env::var("CERTIFICATE_PASSWORD").unwrap();
+
     let xml_file = arg::get_one(matches, arg::XML_FILE)?;
     let tax_type = arg::get_one(matches, arg::TAX_TYPE)?;
     let tax_version = arg::get_one(matches, arg::TAX_VERSION)?;
@@ -39,9 +43,16 @@ pub fn send(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let xml_path = Path::new(xml_file);
     let xml = fs::read_to_string(xml_path)?;
 
-    let eric = Eric::new(&log_path)?;
+    let eric = Eric::new(Some(&log_path), None)?;
 
-    let response = eric.send(xml, tax_type, tax_version, print_config)?;
+    let response = eric.send(
+        xml,
+        tax_type,
+        tax_version,
+        certificate_path,
+        &certificate_password,
+        print_config,
+    )?;
 
     utils::log_response(&log_path, &response)?;
 

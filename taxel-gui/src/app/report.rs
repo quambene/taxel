@@ -134,6 +134,11 @@ pub fn validate_report(app: &mut TaxelApp) {
 pub fn send_report(app: &mut TaxelApp) {
     clear_diagnostics_by_category(app, DiagnosticCategory::Send);
 
+    let Some(certificate_path) = &app.send_certificate_path else {
+        return;
+    };
+    let password = &app.send_password;
+
     let Some(report) = &mut app.report else {
         return;
     };
@@ -166,7 +171,14 @@ pub fn send_report(app: &mut TaxelApp) {
         return;
     };
 
-    match eric.send(xml, "Bilanz", taxonomy_version, None) {
+    match eric.send(
+        xml,
+        "Bilanz",
+        taxonomy_version,
+        certificate_path,
+        password,
+        None,
+    ) {
         Ok(response) => {
             if response.error_code == ErrorCode::ERIC_OK as i32 {
                 report.status = ReportStatus::Sent;

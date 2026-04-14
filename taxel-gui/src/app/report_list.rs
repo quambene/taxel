@@ -84,11 +84,9 @@ impl ReportList {
         Ok(())
     }
 
-    /// Registers a created or imported report by storing its creation date.
-    /// This ensures that the creation date is preserved even if the report list
-    /// is refreshed from the filesystem, which may not retain the original
-    /// creation date metadata.
-    pub fn register_report(&mut self, report_path: &Path) {
+    /// Registers a created or imported report. Persists the updated manifest to
+    /// disk.
+    pub fn register_report(&mut self, report_path: &Path, diagnostics: &mut Vec<AppDiagnostic>) {
         let now = SystemTime::now();
         let unix_seconds = system_time_to_unix_seconds(now);
         let display_name = report_path
@@ -104,6 +102,15 @@ impl ReportList {
             created_date: format_date(unix_seconds),
             report_status: ReportStatus::Draft,
         });
+
+        let manifest = &self.build_manifest();
+
+        if let Err(err) = report_store::save_report_manifest(manifest) {
+            diagnostics.push(AppDiagnostic::new_error(
+                DiagnosticCategory::App,
+                format!("Failed to save report manifest: {err}"),
+            ));
+        }
     }
 
     /// Removes a report from the list and persists the updated manifest.
