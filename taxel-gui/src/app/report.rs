@@ -131,7 +131,7 @@ pub fn validate_report(app: &mut TaxelApp) {
 // TODO: provide certifcate path and password
 /// Sends the imported report and reports the server response in the diagnostics
 /// panel.
-pub fn send_report(app: &mut TaxelApp) {
+pub fn send_report(app: &mut TaxelApp, certificate_path: PathBuf, password: String) {
     clear_diagnostics_by_category(app, DiagnosticCategory::Send);
 
     let Some(report) = &mut app.report else {
@@ -166,15 +166,12 @@ pub fn send_report(app: &mut TaxelApp) {
         return;
     };
 
-    let certificate_path = todo!();
-    let password = todo!();
-
     match eric.send(
         xml,
         "Bilanz",
         taxonomy_version,
-        certificate_path,
-        password,
+        &certificate_path,
+        &password,
         None,
     ) {
         Ok(response) => {
