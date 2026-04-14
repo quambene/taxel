@@ -5,8 +5,9 @@
 - added
   - Import and display report
   - Display report sections in sidebar
-  - Close report
   - Edit and save report
+  - Close report
+  - Delete report
   - Send and validate report
   - Select display level
   - Select label language

@@ -12,7 +12,6 @@ name = "taxel-gui"
 taxel = { path = "../taxel" }
 anyhow = { workspace = true }
 log = { workspace = true }
-dirs = { workspace = true }
 uuid = { workspace = true }
 chrono = { workspace = true }
 serde = { workspace = true }
@@ -20,6 +19,8 @@ serde_json = { workspace = true }
 quick-xml = { workspace = true }
 xbrl-rs = { workspace = true }
 eric-sdk = { workspace = true }
+dirs = { workspace = true }
+trash = { workspace = true }
 eframe = { workspace = true }
 egui_extras = { workspace = true }
 rfd = { workspace = true }

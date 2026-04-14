@@ -1,6 +1,6 @@
 mod app;
 mod domain;
 mod infrastructure;
-pub mod ui;
+mod ui;
 
 pub use app::TaxelApp;

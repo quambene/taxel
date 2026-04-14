@@ -106,6 +106,20 @@ impl ReportList {
         });
     }
 
+    /// Removes a report from the list and persists the updated manifest.
+    pub fn remove_report(&mut self, report_path: &Path, diagnostics: &mut Vec<AppDiagnostic>) {
+        self.reports.retain(|report| report.path != report_path);
+
+        let manifest = &self.build_manifest();
+
+        if let Err(err) = report_store::save_report_manifest(manifest) {
+            diagnostics.push(AppDiagnostic::new_error(
+                DiagnosticCategory::App,
+                format!("Failed to save report manifest: {err}"),
+            ));
+        }
+    }
+
     pub fn set_report_status(
         &mut self,
         report_path: &Path,
