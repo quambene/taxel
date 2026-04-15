@@ -22,9 +22,9 @@ chrono = "0.4"
 serde = { version = "1.0.164", features = ["derive"] }
 serde_json = "1"
 quick-xml = "0.29.0"
+roxmltree = "0.14.1"
 csv = "1.2.2"
 spreadsheet-ods = "0.22.0"
-roxmltree = "0.14.1"
 clap = { version = "3.2.14", default-features = false, features = ["std", "cargo"] }
 dirs = "5"
 trash = "3"
