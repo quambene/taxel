@@ -1,9 +1,6 @@
 use eframe::{
     self,
-    egui::{
-        vec2, Align2, Button, Color32, Response, RichText, Sense, Shape, Stroke, StrokeKind, Ui,
-        Vec2, Window,
-    },
+    egui::{vec2, Button, Color32, Response, RichText, Sense, Shape, Stroke, StrokeKind, Ui},
 };
 
 /// A small clickable triangle button: points right when collapsed, down when expanded.
@@ -55,25 +52,4 @@ pub fn draw_dark_button(ui: &mut Ui, label: &str) -> Response {
     }
 
     response
-}
-
-/// Draws a modal dialog warning about unsaved changes, with "Stay" and
-/// "Continue" buttons.
-pub fn draw_unsaved_changes_modal(ui: &mut Ui, stay: &mut bool, continue_nav: &mut bool) {
-    Window::new("Unsaved changes")
-        .collapsible(false)
-        .resizable(false)
-        .anchor(Align2::CENTER_CENTER, Vec2::ZERO)
-        .show(ui.ctx(), |ui| {
-            ui.label("Switching sections will discard unsaved changes.");
-            ui.add_space(8.0);
-            ui.horizontal(|ui| {
-                if ui.button("Stay").clicked() {
-                    *stay = true;
-                }
-                if ui.button("Continue").clicked() {
-                    *continue_nav = true;
-                }
-            });
-        });
 }

@@ -1,0 +1,144 @@
+use crate::{app, TaxelApp};
+use eframe::egui::{Align2, Button, Id, Modal, TextEdit, Ui, Vec2, Widget, Window};
+use rfd::FileDialog;
+
+/// Draws the delete confirmation modal when the user clicks "Delete report".
+pub fn draw_delete_modal(ui: &mut Ui, app: &mut TaxelApp) {
+    let filename = app
+        .report
+        .as_ref()
+        .and_then(|report| report.path.file_name())
+        .and_then(|file_name| file_name.to_str())
+        .unwrap_or("this report");
+
+    let mut cancel = false;
+    let mut confirm = false;
+
+    let modal = Modal::new(Id::new("delete_report_modal")).show(ui.ctx(), |ui| {
+        ui.heading("Move report to Trash?");
+        ui.add_space(4.0);
+        ui.label(filename);
+        ui.add_space(8.0);
+        ui.horizontal(|ui| {
+            if ui.button("Cancel").clicked() {
+                cancel = true;
+            }
+            if ui.button("Move to Trash").clicked() {
+                confirm = true;
+            }
+        });
+    });
+
+    if modal.should_close() || cancel {
+        app.show_delete_modal = false;
+    }
+
+    if confirm {
+        app.show_delete_modal = false;
+        app::delete_report(app);
+    }
+}
+
+/// Draws the send report modal when the user clicks "Send report".
+pub fn draw_send_modal(ui: &mut Ui, app: &mut TaxelApp) {
+    let mut cancel = false;
+    let mut confirm = false;
+
+    let modal = Modal::new(Id::new("send_report_modal")).show(ui.ctx(), |ui| {
+        ui.heading("Send report");
+        ui.add_space(8.0);
+
+        ui.horizontal(|ui| {
+            ui.label("Certificate");
+            let path_label = app
+                .send_certificate_path
+                .as_deref()
+                .and_then(|p| p.to_str())
+                .unwrap_or("No file selected");
+            ui.label(path_label);
+            if ui.button("Browse…").clicked() {
+                if let Some(path) = FileDialog::new()
+                    .add_filter("PFX certificate", &["pfx", "p12"])
+                    .add_filter("All", &["*"])
+                    .pick_file()
+                {
+                    app.send_certificate_path = Some(path);
+                }
+            }
+        });
+
+        ui.add_space(4.0);
+
+        ui.horizontal(|ui| {
+            ui.label("Password");
+            TextEdit::singleline(&mut app.send_password)
+                .password(true)
+                .desired_width(180.0)
+                .ui(ui);
+        });
+
+        ui.add_space(8.0);
+
+        ui.horizontal(|ui| {
+            if ui.button("Cancel").clicked() {
+                cancel = true;
+            }
+            let can_send = app.send_certificate_path.is_some() && !app.send_password.is_empty();
+            if ui.add_enabled(can_send, Button::new("Send")).clicked() {
+                confirm = true;
+            }
+        });
+    });
+
+    if modal.should_close() || cancel {
+        app.show_send_modal = false;
+    }
+
+    if confirm {
+        app.show_send_modal = false;
+        app::send_report(app);
+    }
+}
+
+/// Draws a modal dialog asking the user to confirm downloading missing
+/// taxonomies, with "Download" and "Cancel" buttons.
+pub fn draw_download_modal(ui: &mut Ui, confirm: &mut bool, cancel: &mut bool) {
+    Window::new("Download taxonomies")
+        .collapsible(false)
+        .resizable(false)
+        .anchor(Align2::CENTER_CENTER, Vec2::ZERO)
+        .show(ui.ctx(), |ui| {
+            ui.label("The required taxonomies are not yet downloaded.");
+            ui.label("Do you want to download them now?");
+            ui.add_space(8.0);
+            ui.horizontal(|ui| {
+                if ui.button("Download").clicked() {
+                    *confirm = true;
+                }
+                if ui.button("Cancel").clicked() {
+                    *cancel = true;
+                }
+            });
+        });
+}
+
+/// Draws a modal dialog warning about unsaved changes, with "Stay" and
+/// "Continue" buttons.
+pub fn draw_unsaved_changes_modal(ui: &mut Ui, stay: &mut bool, continue_nav: &mut bool) {
+    Window::new("Unsaved changes")
+        .collapsible(false)
+        .resizable(false)
+        .anchor(Align2::CENTER_CENTER, Vec2::ZERO)
+        .show(ui.ctx(), |ui| {
+            ui.label("Switching sections will discard unsaved changes.");
+            ui.add_space(8.0);
+            ui.horizontal(|ui| {
+                if ui.button("Stay").clicked() {
+                    *stay = true;
+                }
+                if ui.button("Continue").clicked() {
+                    *continue_nav = true;
+                }
+            });
+        });
+}

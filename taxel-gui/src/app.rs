@@ -16,6 +16,7 @@ use eframe::{
     App, CreationContext,
 };
 use eric_sdk::Eric;
+use report::LoadOutcome;
 pub use report::{delete_report, load_report, poll_load_result, send_report, validate_report};
 pub use report_list::ReportOverview;
 pub use search::{RowHighlight, Search};
@@ -64,7 +65,12 @@ pub struct TaxelApp {
     /// Search state.
     pub search: Search,
     /// Receives the result of a background XML load, if one is in progress.
-    pub loading: Option<Receiver<anyhow::Result<(TaxonomySet, InstanceDocument, Report)>>>,
+    pub loading: Option<Receiver<anyhow::Result<LoadOutcome>>>,
+    /// Controls whether the taxonomy download confirmation modal is visible.
+    pub show_download_modal: bool,
+    /// Path of the report pending load, retained so the load can be re-triggered
+    /// after the user confirms the taxonomy download.
+    pub pending_download_path: Option<PathBuf>,
     /// Some while the value column of that section is being edited, None
     /// otherwise.
     pub editing_section: Option<usize>,
@@ -166,6 +172,8 @@ impl TaxelApp {
             eric,
             show_delete_modal: false,
             show_send_modal: false,
+            show_download_modal: false,
+            pending_download_path: None,
             send_certificate_path: None,
             send_password: String::new(),
         }
@@ -242,7 +250,7 @@ impl App for TaxelApp {
                             self.report_list.reports(),
                             self.loading.is_some(),
                         ) {
-                            app::load_report(self, path, ui.ctx().clone());
+                            app::load_report(self, path, ui.ctx().clone(), false);
                         }
                         return;
                     }
@@ -416,6 +424,22 @@ impl App for TaxelApp {
 
             if self.show_send_modal {
                 ui::draw_send_modal(ctx, self);
+            }
+
+            if self.show_download_modal {
+                let mut confirm = false;
+                let mut cancel = false;
+                ui::draw_download_modal(ctx, &mut confirm, &mut cancel);
+
+                if confirm {
+                    self.show_download_modal = false;
+                    if let Some(path) = self.pending_download_path.take() {
+                        app::load_report(self, path, ctx.ctx().clone(), true);
+                    }
+                } else if cancel {
+                    self.show_download_modal = false;
+                    self.pending_download_path = None;
+                }
             }
         });
     }
