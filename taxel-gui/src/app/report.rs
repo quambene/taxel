@@ -16,23 +16,38 @@ use std::{
     thread,
 };
 use taxel::TAXONOMY_YEAR_TO_VERSION;
-use xbrl_rs::{InstanceDocument, TaxonomySet};
+use xbrl_rs::{InstanceDocument, TaxonomyLoader, TaxonomySet};
+
+/// The result of a background load operation.
+#[allow(clippy::large_enum_variant)]
+pub enum LoadOutcome {
+    Ready(TaxonomySet, InstanceDocument, Report),
+    /// Taxonomies are missing from disk; the user must confirm before downloading.
+    NeedsDownload,
+}
 
 /// Loads an XBRL instance document from the specified path and updates the app
 /// state. The load runs on a background thread to keep the UI responsive.
-pub fn load_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context) {
+/// If `allow_download` is false and the required taxonomies are missing,
+/// `app.show_download_modal` is set so the UI can ask for confirmation.
+pub fn load_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context, allow_download: bool) {
     app.selected_tab = 0;
     app.report = None;
     app.diagnostics.clear();
     app.editing_section = None;
     app.edit_snapshot.clear();
+    app.pending_download_path = Some(path.clone());
 
+    spawn_load_thread(app, path, ctx, allow_download);
+}
+
+fn spawn_load_thread(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context, allow_download: bool) {
     let (tx, rx) = mpsc::channel();
     app.loading = Some(rx);
 
     thread::spawn(move || {
-        let report = load_instance_document(&path);
-        let _ = tx.send(report);
+        let result = load_instance_document(&path, allow_download);
+        let _ = tx.send(result);
         ctx.request_repaint();
     });
 }
@@ -40,32 +55,51 @@ pub fn load_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context) {
 /// Loads an XBRL instance document from the specified path, discovers the
 /// referenced taxonomies, and populates the fact table with the extracted
 /// facts.
-fn load_instance_document(
-    path: &Path,
-) -> Result<(TaxonomySet, InstanceDocument, Report), anyhow::Error> {
+fn load_instance_document(path: &Path, allow_download: bool) -> Result<LoadOutcome, anyhow::Error> {
     debug!("Read xml file: {}", path.display());
 
     let instance = InstanceDocument::from_file(path)?;
     let schema_refs: Vec<String> = instance.schema_refs().to_vec();
-    let entry_point = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .parent()
-        .context("missing path to taxonomies")?
-        .join("test_data/taxonomies");
-    let taxonomy = TaxonomySet::discover(schema_refs, entry_point)?;
+    let schema_ref_paths = instance.schema_ref_paths();
+    let taxonomy_dir = taxonomy_dir()?;
+    let loader = TaxonomyLoader::new()?;
+
+    let taxonomies_missing = schema_ref_paths
+        .iter()
+        .any(|path| !taxonomy_dir.join(path).exists());
+
+    if taxonomies_missing {
+        if !allow_download {
+            return Ok(LoadOutcome::NeedsDownload);
+        }
+
+        if !taxonomy_dir.exists() {
+            fs::create_dir_all(&taxonomy_dir).with_context(|| {
+                format!(
+                    "Failed to create taxonomy directory: {}",
+                    taxonomy_dir.display()
+                )
+            })?;
+        }
+
+        loader.download_all(&schema_refs, &taxonomy_dir)?;
+    }
+
+    let taxonomy = TaxonomySet::discover(schema_refs, taxonomy_dir)?;
     let view = instance.view(&taxonomy);
     let item_facts = instance.item_facts();
     let mut report = Report::new(path.to_path_buf());
 
     report.populate(view, &item_facts);
 
-    Ok((taxonomy, instance, report))
+    Ok(LoadOutcome::Ready(taxonomy, instance, report))
 }
 
 /// Polls the background XML load result and updates the app state accordingly.
 pub fn poll_load_result(app: &mut TaxelApp) {
     if let Some(rx) = &app.loading {
         match rx.try_recv() {
-            Ok(Ok((taxonomy, instance, report))) => {
+            Ok(Ok(LoadOutcome::Ready(taxonomy, instance, report))) => {
                 for missing_role in &report.role_mapping_errors {
                     app.diagnostics.push(AppDiagnostic::new_warning(
                         DiagnosticCategory::Import,
@@ -82,6 +116,10 @@ pub fn poll_load_result(app: &mut TaxelApp) {
                 app.taxonomy = Some(taxonomy);
                 app.instance_document = Some(instance);
                 app.show_error_panel = !app.diagnostics.is_empty();
+                app.loading = None;
+            }
+            Ok(Ok(LoadOutcome::NeedsDownload)) => {
+                app.show_download_modal = true;
                 app.loading = None;
             }
             Ok(Err(err)) => {
@@ -324,4 +362,12 @@ fn extract_taxonomy_version(taxonomy: &Option<TaxonomySet>) -> Option<&&str> {
         .and_then(|taxonomy| taxonomy.version())
         .map(|date| date.split('-').next().unwrap_or(date))
         .and_then(|version| TAXONOMY_YEAR_TO_VERSION.get(version))
+}
+
+/// Returns the path to the application's taxonomy directory, which is located
+/// in the user's data directory.
+fn taxonomy_dir() -> Result<PathBuf, anyhow::Error> {
+    dirs::data_dir()
+        .map(|dir| dir.join("taxel").join("taxonomies"))
+        .context("Could not determine data directory")
 }

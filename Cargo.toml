@@ -12,7 +12,7 @@ edition = "2021"
 version = "0.1.0"
 
 [workspace.dependencies]
-xbrl-rs = "0.2.0"
+xbrl-rs = { version = "0.2.0", features = ["download"] }
 eric-sdk = "0.5.0"
 anyhow = "1.0.71"
 log = "0.4.19"
