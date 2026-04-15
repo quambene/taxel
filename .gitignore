@@ -20,6 +20,7 @@ server_response.xml
 # Test data
 test_data/taxonomies
 test_data/instances
+test_data/schemas
 
 # csv
 .~lock.**.csv#
