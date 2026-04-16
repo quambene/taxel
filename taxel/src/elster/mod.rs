@@ -565,8 +565,6 @@ fn write_payload<W: std::io::Write>(
     Ok(())
 }
 
-// ===== Helpers =====
-
 /// Read the first matching attribute value by local name.
 fn get_attr(e: &BytesStart<'_>, name: &[u8]) -> Option<String> {
     e.attributes()
