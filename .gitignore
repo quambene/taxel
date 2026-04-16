@@ -16,12 +16,11 @@ eric.log
 validation_response.xml
 server_response.xml
 *.pdf
-test_data/schema/ebilanz
-test_data/schema/elster
 
 # Test data
 test_data/taxonomies
 test_data/instances
+test_data/schemas
 
 # csv
 .~lock.**.csv#
