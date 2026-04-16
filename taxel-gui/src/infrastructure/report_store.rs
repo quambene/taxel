@@ -1,11 +1,15 @@
-use crate::domain::{ReportMeta, ReportStatus};
+use crate::{
+    app::{APP_NAME, APP_VERSION},
+    domain::{ReportMeta, ReportStatus},
+};
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
-    fs,
+    env, fs,
     path::{Path, PathBuf},
 };
+use taxel::{ElsterReport, TEST_MARKER};
 use uuid::Uuid;
 
 /// The file name of the manifest that stores report metadata. This manifest is
@@ -51,27 +55,47 @@ impl ReportStore {
     }
 }
 
-/// Copies a report file to the application's reports directory, assigning it a
-/// unique name based on a UUID. This is used when importing a report, ensuring
-/// that the original file remains unchanged and that the imported report is
-/// stored in a consistent location for the application to manage.
+/// Imports a report file into the application's reports directory.
+///
+/// The source XML is parsed as an [`taxel::elster::ElsterReport`], modified,
+/// and serialized back to XML. The original file is never modified.
 pub fn copy_report(path: &Path) -> Result<PathBuf> {
     let reports_dir = reports_dir()?;
 
     create_reports_dir_if_not_exists(&reports_dir)?;
 
+    let xml = fs::read_to_string(path)
+        .with_context(|| format!("Failed to read report from {}", path.display()))?;
+
+    let mut report = ElsterReport::parse(&xml)
+        .with_context(|| format!("Failed to parse ElsterReport from {}", path.display()))?;
+
+    if let Ok(vendor_id) = env::var("VENDOR_ID") {
+        report.transfer_header.manufacturer_id = vendor_id;
+    }
+
+    if report.transfer_header.test_marker.is_none() {
+        report.transfer_header.test_marker = Some(TEST_MARKER.to_string());
+    }
+
+    if let Some(payload_block) = report.data_section.payload_blocks.get_mut(0) {
+        if let Some(manufacturer) = payload_block.payload_header.manufacturer.as_mut() {
+            manufacturer.product_name = APP_NAME.to_owned();
+            manufacturer.product_version = APP_VERSION.to_owned();
+        }
+    }
+
+    let serialized = report
+        .to_xml()
+        .context("Failed to serialize ElsterReport")?;
+
     let uuid = Uuid::new_v4();
-    let copied_path = reports_dir.join(format!("ebilanz_{uuid}.xml"));
+    let dest = reports_dir.join(format!("ebilanz_{uuid}.xml"));
 
-    fs::copy(path, &copied_path).with_context(|| {
-        format!(
-            "Failed to copy report from {} to {}",
-            path.display(),
-            copied_path.display()
-        )
-    })?;
+    fs::write(&dest, serialized)
+        .with_context(|| format!("Failed to write report to {}", dest.display()))?;
 
-    Ok(copied_path)
+    Ok(dest)
 }
 
 /// Loads the report manifest. Supports both the current object format and the

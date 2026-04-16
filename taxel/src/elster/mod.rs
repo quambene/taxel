@@ -6,6 +6,10 @@ use quick_xml::{
 };
 use std::{io::Cursor, str};
 
+/// Marker value for the `Testmerker` field in the Elster transfer header,
+/// indicating a non-production submission.
+pub const TEST_MARKER: &str = "700000004";
+
 /// Typed representation of an Elster eBilanz XML report, including the transfer
 /// header and one or more payload blocks containing eBilanz data. The
 /// `xbrli:xbrl` subtree within each payload block is captured verbatim as raw

@@ -13,7 +13,7 @@ pub use crate::{
     ebilanz::{
         EBilanz, GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT, TAXONOMY_YEAR_TO_VERSION,
     },
-    elster::ElsterReport,
+    elster::{ElsterReport, TEST_MARKER},
 };
 use log::warn;
 pub use quick_xml::{Reader, Writer};

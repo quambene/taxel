@@ -14,28 +14,7 @@ use rfd::FileDialog;
 /// selector tabs.
 pub fn draw_header(ui: &mut Ui, app: &mut TaxelApp) {
     ui.horizontal_centered(|ui| {
-        if app.report.is_none() && app.loading.is_none() && ui.button("Import report").clicked() {
-            if let Some(path) = FileDialog::new()
-                .add_filter("XML", &["xml"])
-                .add_filter("All", &["*"])
-                .pick_file()
-            {
-                match report_store::copy_report(&path) {
-                    Ok(copied_path) => {
-                        app.register_report(&copied_path);
-                        app.refresh_reports();
-                        app::load_report(app, copied_path, ui.ctx().clone(), false);
-                    }
-                    Err(err) => {
-                        app.diagnostics.push(AppDiagnostic::new_error(
-                            DiagnosticCategory::App,
-                            format!("Failed to import report: {err}"),
-                        ));
-                        app.show_error_panel = true;
-                    }
-                }
-            }
-        }
+        draw_import_button(ui, app);
 
         if app.loading.is_some() {
             ui.spinner();
@@ -83,6 +62,33 @@ pub fn draw_header(ui: &mut Ui, app: &mut TaxelApp) {
             draw_zoom_toolbar(ui, &mut app.settings.zoom_input);
         });
     });
+}
+
+/// Draws the "Import report" button. Clicking the button opens a file dialog to
+/// select an XML file.
+fn draw_import_button(ui: &mut Ui, app: &mut TaxelApp) {
+    if app.report.is_none() && app.loading.is_none() && ui.button("Import report").clicked() {
+        if let Some(path) = FileDialog::new()
+            .add_filter("XML", &["xml"])
+            .add_filter("All", &["*"])
+            .pick_file()
+        {
+            match report_store::copy_report(&path) {
+                Ok(copied_path) => {
+                    app.register_report(&copied_path);
+                    app.refresh_reports();
+                    app::load_report(app, copied_path, ui.ctx().clone(), false);
+                }
+                Err(err) => {
+                    app.diagnostics.push(AppDiagnostic::new_error(
+                        DiagnosticCategory::App,
+                        format!("Failed to import report: {err}"),
+                    ));
+                    app.show_error_panel = true;
+                }
+            }
+        }
+    }
 }
 
 /// Draws a summary of errors and warnings in the header. Clicking on the

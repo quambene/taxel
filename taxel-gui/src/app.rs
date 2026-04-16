@@ -28,6 +28,11 @@ use std::{
 };
 use xbrl_rs::{InstanceDocument, TaxonomySet};
 
+/// The name of the application.
+pub const APP_NAME: &str = "Taxel";
+/// The version of the application, derived from Cargo.toml.
+pub const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
+
 /// Per-section UI state (collapse state and depth filter).
 #[derive(Default)]
 pub struct SectionState {
