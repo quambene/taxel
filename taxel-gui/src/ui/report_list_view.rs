@@ -19,7 +19,7 @@ pub fn draw_report_list(ui: &mut Ui, reports: &[ReportOverview], loading: bool) 
 
     if reports.is_empty() {
         ui.vertical_centered(|ui| {
-            ui.label("No imported reports yet. Use Import report to add an XML file.");
+            ui.label("No imported reports yet. Import report to add an XML file.");
         });
         return None;
     }
