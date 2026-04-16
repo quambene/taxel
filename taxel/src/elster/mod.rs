@@ -219,7 +219,7 @@ impl ElsterReport {
                             value: recipient_value.into(),
                         },
                         manufacturer: Some(Manufacturer {
-                            product_name: env!("CARGO_PKG_NAME").to_string(),
+                            product_name: "Taxel".to_string(),
                             product_version: env!("CARGO_PKG_VERSION").to_string(),
                         }),
                         submitter: Some(submitter),
