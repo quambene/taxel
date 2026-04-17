@@ -6,7 +6,7 @@ mod settings;
 
 use crate::{
     app::{self, report_list::ReportList, settings::Settings},
-    domain::{Report, ReportStatus},
+    domain::Report,
     ui::{self, EditAction},
 };
 pub use diagnostics::{AppDiagnostic, DiagnosticCategory, DiagnosticLevel};
@@ -17,7 +17,10 @@ use eframe::{
 };
 use eric_sdk::Eric;
 use report::LoadOutcome;
-pub use report::{delete_report, load_report, poll_load_result, send_report, validate_report};
+pub use report::{
+    cancel_edit, delete_report, edit_report, load_report, poll_load_result, save_report,
+    send_report, validate_report,
+};
 pub use report_list::ReportOverview;
 pub use search::{RowHighlight, Search};
 use std::{
@@ -308,9 +311,6 @@ impl App for TaxelApp {
                         let cancel_pressed = ui.ctx().input(|input| input.key_pressed(Key::Escape));
 
                         if save_pressed {
-                            // TODO: Save changes to XBRL instance document.
-                            // Currently, edits are only stored in the app state and
-                            // will be lost on reload.
                             action = EditAction::Save;
                         } else if cancel_pressed {
                             action = EditAction::Cancel;
@@ -320,42 +320,13 @@ impl App for TaxelApp {
                     // Handle toolbar edit actions.
                     match action {
                         EditAction::Start => {
-                            if let Some(table) = &self.report {
-                                if let Some(section) = table.sections.get(self.selected_tab) {
-                                    self.edit_snapshot =
-                                        section.rows.iter().map(|r| r.value.clone()).collect();
-                                }
-                            }
-                            self.editing_section = Some(self.selected_tab);
-
-                            // If the report was previously validated, mark it
-                            // as draft again since it has unsaved changes now.
-                            if let Some(report) = &self.report {
-                                self.report_list.set_report_status(
-                                    &report.path,
-                                    ReportStatus::Draft,
-                                    &mut self.diagnostics,
-                                );
-                            }
+                            app::edit_report(self);
                         }
                         EditAction::Save => {
-                            self.editing_section = None;
-                            self.edit_snapshot.clear();
+                            app::save_report(self);
                         }
                         EditAction::Cancel => {
-                            let editing_tab = self.editing_section.unwrap_or(self.selected_tab);
-
-                            if let Some(table) = &mut self.report {
-                                if let Some(section) = table.sections.get_mut(editing_tab) {
-                                    for (row, value) in
-                                        section.rows.iter_mut().zip(self.edit_snapshot.iter())
-                                    {
-                                        row.value = value.clone();
-                                    }
-                                }
-                            }
-                            self.editing_section = None;
-                            self.edit_snapshot.clear();
+                            app::cancel_edit(self);
                         }
                         EditAction::None => {}
                     }

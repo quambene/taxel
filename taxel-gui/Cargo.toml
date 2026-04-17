@@ -12,6 +12,7 @@ name = "taxel-gui"
 taxel = { path = "../taxel" }
 anyhow = { workspace = true }
 log = { workspace = true }
+env_logger = { workspace = true }
 uuid = { workspace = true }
 chrono = { workspace = true }
 serde = { workspace = true }
