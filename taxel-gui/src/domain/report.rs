@@ -1,5 +1,4 @@
 use crate::domain::ReportStatus;
-use log::debug;
 use std::{collections::HashMap, path::PathBuf};
 use taxel::{GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
 use xbrl_rs::{DocumentView, ItemFact, TreeNode, ROLE_LABEL, ROLE_TERSE};

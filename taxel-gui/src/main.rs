@@ -1,6 +1,6 @@
 use eframe::egui::ViewportBuilder;
 use env_logger::{Builder, Env};
-use log::{debug, info, warn};
+use log::{info, warn};
 use taxel_gui::TaxelApp;
 
 fn main() -> Result<(), anyhow::Error> {
