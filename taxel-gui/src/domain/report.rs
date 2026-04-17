@@ -22,6 +22,10 @@ pub struct FactRow {
     pub value: String,
     /// Whether this concept has child concepts in the presentation tree.
     pub has_children: bool,
+    /// Depth-first index into `InstanceDocument`, used to write back edits via
+    /// `InstanceDocument::set_fact_value`. `None` for concept-only rows that
+    /// have no associated fact.
+    pub fact_index: Option<usize>,
 }
 
 /// One presentation section with its rows.
@@ -155,6 +159,7 @@ fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<FactRow>) {
             unit: None,
             value: String::new(),
             has_children,
+            fact_index: None,
         });
     } else {
         for &idx in &node.fact_indices {
@@ -172,6 +177,7 @@ fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<FactRow>) {
                     unit: fact.unit_ref().map(|u| u.to_string()),
                     value: fact.value().to_string(),
                     has_children,
+                    fact_index: Some(idx),
                 });
             }
         }

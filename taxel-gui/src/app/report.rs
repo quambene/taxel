@@ -15,7 +15,7 @@ use std::{
     sync::mpsc,
     thread,
 };
-use taxel::TAXONOMY_YEAR_TO_VERSION;
+use taxel::{ElsterReport, TAXONOMY_YEAR_TO_VERSION};
 use xbrl_rs::{InstanceDocument, TaxonomyLoader, TaxonomySet};
 
 /// The result of a background load operation.
@@ -136,6 +136,108 @@ pub fn poll_load_result(app: &mut TaxelApp) {
             }
         }
     }
+}
+
+/// Edits the currently loaded report by enabling edit mode for the selected
+/// section and taking a snapshot of the current values for that section.
+pub fn edit_report(app: &mut TaxelApp) {
+    if let Some(table) = &app.report {
+        if let Some(section) = table.sections.get(app.selected_tab) {
+            app.edit_snapshot = section.rows.iter().map(|r| r.value.clone()).collect();
+        }
+    }
+    app.editing_section = Some(app.selected_tab);
+
+    // If the report was previously validated, mark it
+    // as draft again since it has unsaved changes now.
+    if let Some(report) = &app.report {
+        app.report_list
+            .set_report_status(&report.path, ReportStatus::Draft, &mut app.diagnostics);
+    }
+}
+
+/// Cancels the edit by restoring the values from the snapshot and exiting edit
+/// mode.
+pub fn cancel_edit(app: &mut TaxelApp) {
+    let editing_tab = app.editing_section.unwrap_or(app.selected_tab);
+
+    if let Some(table) = &mut app.report {
+        if let Some(section) = table.sections.get_mut(editing_tab) {
+            for (row, value) in section.rows.iter_mut().zip(app.edit_snapshot.iter()) {
+                row.value = value.clone();
+            }
+        }
+    }
+    app.editing_section = None;
+    app.edit_snapshot.clear();
+}
+
+/// Saves the currently loaded report by writing the modified XBRL instance
+/// document back to the original file path.
+pub fn save_report(app: &mut TaxelApp) {
+    let editing_tab = app.editing_section.unwrap_or(app.selected_tab);
+
+    if let (Some(report), Some(instance)) = (&app.report, &mut app.instance_document) {
+        if let Some(section) = report.sections.get(editing_tab) {
+            // Only write back rows whose value differs from the pre-edit
+            // snapshot. The same fact can appear in multiple rows (same concept
+            // at multiple positions in the presentation tree) but we only need
+            // to update it once.
+            for (i, row) in section.rows.iter().enumerate() {
+                let unchanged = app
+                    .edit_snapshot
+                    .get(i)
+                    .is_some_and(|snapshot| snapshot == &row.value);
+
+                if unchanged {
+                    continue;
+                }
+
+                if let Some(idx) = row.fact_index {
+                    instance.set_fact_value(idx, row.value.clone());
+                }
+            }
+        }
+
+        // Serialize the updated InstanceDocument to bytes.
+        let mut xbrl_bytes: Vec<u8> = Vec::new();
+        let serialize_result = instance.to_writer(&mut xbrl_bytes);
+
+        match serialize_result {
+            Err(err) => {
+                app.diagnostics.push(AppDiagnostic::new_error(
+                    DiagnosticCategory::App,
+                    format!("Failed to serialize XBRL instance: {err}"),
+                ));
+            }
+            Ok(()) => {
+                // Re-read the stored Elster XML, inject the new XBRL bytes, and
+                // write the full envelope back so the Elster wrapper is preserved.
+                let result = fs::read_to_string(&report.path)
+                    .context("Failed to read report file")
+                    .and_then(|xml| {
+                        ElsterReport::parse(&xml).context("Failed to parse Elster report")
+                    })
+                    .and_then(|mut elster| {
+                        elster.set_payload_xbrl(xbrl_bytes);
+                        elster.to_xml().context("Failed to serialize Elster report")
+                    })
+                    .and_then(|xml| {
+                        fs::write(&report.path, xml).context("Failed to write report to disk")
+                    });
+
+                if let Err(err) = result {
+                    app.diagnostics.push(AppDiagnostic::new_error(
+                        DiagnosticCategory::App,
+                        format!("Failed to save report: {err}"),
+                    ));
+                }
+            }
+        }
+    }
+
+    app.editing_section = None;
+    app.edit_snapshot.clear();
 }
 
 /// Validates the imported report and reports any issues in the diagnostics

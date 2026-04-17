@@ -103,4 +103,9 @@ impl EBilanz {
             xbrl_raw: Vec::new(),
         }
     }
+
+    /// Replace the raw `<xbrli:xbrl>` bytes.
+    pub fn set_xbrl_raw(&mut self, bytes: Vec<u8>) {
+        self.xbrl_raw = bytes;
+    }
 }

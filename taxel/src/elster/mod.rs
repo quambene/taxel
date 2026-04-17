@@ -234,6 +234,13 @@ impl ElsterReport {
         }
     }
 
+    /// Replaces the raw `<xbrli:xbrl>` bytes in the first payload block.
+    pub fn set_payload_xbrl(&mut self, xbrl_bytes: Vec<u8>) {
+        if let Some(block) = self.data_section.payload_blocks.get_mut(0) {
+            block.ebilanz.set_xbrl_raw(xbrl_bytes);
+        }
+    }
+
     /// Parse an Elster eBilanz XML string into a typed `ElsterReport`.
     ///
     /// The `xbrli:xbrl` subtree is captured verbatim and stored in
