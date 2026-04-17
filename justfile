@@ -9,6 +9,9 @@ run:
 run-dev:
     cd taxel-gui && dx serve --hotpatch
 
+run-dev-debug:
+    RUST_LOG="taxel_gui=debug" cargo run -p taxel-gui
+
 # Run tests
 test:
     cargo test
