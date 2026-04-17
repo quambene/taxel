@@ -163,8 +163,6 @@ fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<FactRow>) {
         });
     } else {
         for &idx in &node.fact_indices {
-            debug!("Fact index: {idx}");
-
             if let Some(fact) = facts.get(idx) {
                 if fact.is_nil() {
                     continue;

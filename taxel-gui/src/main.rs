@@ -1,6 +1,6 @@
 use eframe::egui::ViewportBuilder;
 use env_logger::{Builder, Env};
-use log::debug;
+use log::{debug, info, warn};
 use taxel_gui::TaxelApp;
 
 fn main() -> Result<(), anyhow::Error> {
@@ -14,13 +14,19 @@ fn main() -> Result<(), anyhow::Error> {
 
     let persistence_path = dirs::config_dir().map(|path| path.join("taxel").join("settings.ron"));
 
+    if let Some(path) = &persistence_path {
+        info!("Persist settings at: {}", path.display());
+    } else {
+        warn!("No config directory found, settings will not be persisted");
+    }
+
     let options = eframe::NativeOptions {
         viewport: ViewportBuilder::default().with_maximized(true),
         persistence_path,
         ..Default::default()
     };
 
-    debug!("Run app");
+    info!("Run app");
 
     eframe::run_native(
         "Taxel",
