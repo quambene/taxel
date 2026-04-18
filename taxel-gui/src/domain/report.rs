@@ -163,9 +163,6 @@ fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<FactRow>) {
     } else {
         for &idx in &node.fact_indices {
             if let Some(fact) = facts.get(idx) {
-                if fact.is_nil() {
-                    continue;
-                }
                 rows.push(FactRow {
                     concept: node.concept_name.to_string(),
                     labels: labels.clone(),
