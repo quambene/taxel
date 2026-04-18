@@ -1,5 +1,8 @@
 use crate::domain::ReportStatus;
-use std::{collections::HashMap, path::PathBuf};
+use std::{
+    collections::{HashMap, HashSet},
+    path::PathBuf,
+};
 use taxel::{GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
 use xbrl_rs::{DocumentView, ItemFact, TreeNode, ROLE_LABEL, ROLE_TERSE};
 
@@ -78,9 +81,14 @@ impl Report {
             .map(|section| section.nodes.as_slice())
             .unwrap_or(&[]);
         let labels_map = build_labels_map(gcd_nodes);
+        let announced_roles = collect_announced_roles(gcd_nodes);
 
         for section in &view.sections {
             let role_uri = section.role;
+
+            if role_uri != GCD_ROLE_URI && !announced_roles.contains(role_uri) {
+                continue;
+            }
 
             let labels = if role_uri == GCD_ROLE_URI {
                 // The GCD section itself is a special case: we use the same label
@@ -141,6 +149,41 @@ fn resolve_labels(node: &TreeNode) -> HashMap<String, String> {
             resolve_label(node, lang).map(|label| (lang.to_string(), label.to_string()))
         })
         .collect()
+}
+
+/// Returns the set of role URIs announced as `genInfo.report.id.reportElement`
+/// in the GCD section of the instance document.
+fn collect_announced_roles<'a>(nodes: &[TreeNode<'_>]) -> HashSet<&'a str> {
+    let concept_to_role: HashMap<&'static str, &'static str> = ROLE_URI_TO_REPORT_ELEMENT
+        .iter()
+        .map(|(&role, &concept)| (concept, role))
+        .collect();
+
+    let mut announced = HashSet::new();
+
+    for node in nodes {
+        collect_announced_roles_node(node, &concept_to_role, &mut announced);
+    }
+
+    announced
+}
+
+/// Recursively traverses the GCD tree nodes to find concepts that are announced
+/// as report elements and collects their corresponding role URIs.
+fn collect_announced_roles_node(
+    node: &TreeNode<'_>,
+    concept_to_role: &HashMap<&'static str, &'static str>,
+    announced: &mut HashSet<&'static str>,
+) {
+    if let Some(&role) = concept_to_role.get(node.concept_name) {
+        if !node.fact_indices.is_empty() {
+            announced.insert(role);
+        }
+    }
+
+    for child in &node.children {
+        collect_announced_roles_node(child, concept_to_role, announced);
+    }
 }
 
 /// Recursively collects facts from the tree nodes and populates the fact table
