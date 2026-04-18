@@ -1,7 +1,16 @@
 use crate::domain::ReportStatus;
 use std::{collections::HashMap, path::PathBuf};
 use taxel::{GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
-use xbrl_rs::{DocumentView, ItemFact, TreeNode, ROLE_LABEL, ROLE_TERSE};
+use xbrl_rs::{DocumentView, ItemFact, Particle, TaxonomySet, TreeNode, ROLE_LABEL, ROLE_TERSE};
+
+/// Which selection widget to render in the selection column for this row.
+#[derive(Debug, Clone, PartialEq)]
+pub enum SelectionWidget {
+    /// Child of a Choice with maxOccurs=None or >1.
+    Checkbox,
+    /// Child of a Choice with maxOccurs=Some(1).
+    Radio,
+}
 
 /// A row in the fact table, representing a single fact or a concept without
 /// facts.
@@ -25,6 +34,11 @@ pub struct FactRow {
     /// `InstanceDocument::set_fact_value`. `None` for concept-only rows that
     /// have no associated fact.
     pub fact_index: Option<usize>,
+    /// Whether the underlying ItemFact has xsi:nil="true". Always false for
+    /// concept-only rows without facts.
+    pub is_nil: bool,
+    /// Selection widget for this row if it is a direct child of a Particle::Choice.
+    pub selection: Option<SelectionWidget>,
 }
 
 /// One presentation section with its rows.
@@ -66,9 +80,16 @@ impl Report {
 
     /// Populates the fact table by traversing the document view and collecting
     /// facts from the tree nodes.
-    pub fn populate(&mut self, view: DocumentView, item_facts: &[&ItemFact]) {
+    pub fn populate(
+        &mut self,
+        view: DocumentView,
+        item_facts: &[&ItemFact],
+        taxonomy: &TaxonomySet,
+    ) {
         self.sections.clear();
         self.role_mapping_errors.clear();
+
+        let selection_map = build_selection_map(taxonomy);
 
         // Labels for report elements are sourced from the dedicated GCD section.
         let gcd_nodes = view
@@ -103,7 +124,13 @@ impl Report {
             };
 
             for node in &section.nodes {
-                collect_node(node, item_facts, &mut fact_section.rows);
+                collect_node(
+                    node,
+                    item_facts,
+                    &mut fact_section.rows,
+                    &selection_map,
+                    None,
+                );
             }
 
             self.sections.push(fact_section);
@@ -145,7 +172,13 @@ fn resolve_labels(node: &TreeNode) -> HashMap<String, String> {
 
 /// Recursively collects facts from the tree nodes and populates the fact table
 /// rows.
-fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<FactRow>) {
+fn collect_node(
+    node: &TreeNode,
+    facts: &[&ItemFact],
+    rows: &mut Vec<FactRow>,
+    selection_map: &HashMap<String, SelectionWidget>,
+    my_selection: Option<SelectionWidget>,
+) {
     let labels = resolve_labels(node);
     let has_children = !node.children.is_empty();
 
@@ -159,6 +192,8 @@ fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<FactRow>) {
             value: String::new(),
             has_children,
             fact_index: None,
+            is_nil: false,
+            selection: my_selection,
         });
     } else {
         for &idx in &node.fact_indices {
@@ -172,14 +207,36 @@ fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<FactRow>) {
                     value: fact.value().to_string(),
                     has_children,
                     fact_index: Some(idx),
+                    is_nil: fact.is_nil(),
+                    selection: my_selection.clone(),
                 });
             }
         }
     }
 
+    let child_selection = selection_map.get(node.concept_name).cloned();
+
     for child in &node.children {
-        collect_node(child, facts, rows);
+        collect_node(child, facts, rows, selection_map, child_selection.clone());
     }
+}
+
+/// Builds a map of concept local_name → SelectionWidget for all tuple concepts
+/// whose content model is a Particle::Choice.
+fn build_selection_map(taxonomy: &TaxonomySet) -> HashMap<String, SelectionWidget> {
+    let mut map = HashMap::new();
+
+    for concept in taxonomy.elements() {
+        if let Some(Particle::Choice { occurs, .. }) = &concept.content_model {
+            let widget = if occurs.max.map_or(true, |m| m > 1) {
+                SelectionWidget::Checkbox
+            } else {
+                SelectionWidget::Radio
+            };
+            map.insert(concept.name.local_name.clone(), widget);
+        }
+    }
+    map
 }
 
 /// Recursively collects labels for a given concept name from the GCD nodes.

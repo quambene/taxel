@@ -1,6 +1,6 @@
 use eframe::{
     self,
-    egui::{vec2, Button, Color32, Response, RichText, Sense, Shape, Stroke, StrokeKind, Ui},
+    egui::{vec2, Button, Checkbox, Color32, RadioButton, Response, RichText, Sense, Shape, Stroke, StrokeKind, Ui},
 };
 
 /// A small clickable triangle button: points right when collapsed, down when expanded.
@@ -31,6 +31,17 @@ pub fn triangle_button(ui: &mut Ui, collapsed: bool) -> Response {
     }
 
     response
+}
+
+/// A checkbox for a selection column. Disabled when `enabled` is false (read-only mode).
+pub fn selection_checkbox(ui: &mut Ui, checked: bool, enabled: bool) -> Response {
+    let mut val = checked;
+    ui.add_enabled(enabled, Checkbox::without_text(&mut val))
+}
+
+/// A radio button for a selection column. Disabled when `enabled` is false (read-only mode).
+pub fn selection_radio(ui: &mut Ui, checked: bool, enabled: bool) -> Response {
+    ui.add_enabled(enabled, RadioButton::new(checked, ""))
 }
 
 /// A custom button style with a dark background and white text, which also has a hover effect.

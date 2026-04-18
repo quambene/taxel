@@ -1,5 +1,5 @@
-use crate::{domain::FactRow, ui::widgets};
-use eframe::egui::{Align, TextStyle, Ui};
+use crate::{domain::{FactRow, SelectionWidget}, ui::widgets};
+use eframe::egui::{Align, Label, TextStyle, Ui};
 use egui_extras::{Column, TableBuilder};
 use std::collections::HashSet;
 
@@ -18,6 +18,7 @@ pub fn draw_table(
     let row_height = ui.text_style_height(&TextStyle::Body) + ui.spacing().item_spacing.y;
     let visible = visible_rows(rows, collapsed);
     let mut toggle: Option<usize> = None;
+    let mut radio_select: Option<usize> = None;
 
     let mut builder = TableBuilder::new(ui)
         .resizable(true)
@@ -26,7 +27,8 @@ pub fn draw_table(
         .column(Column::initial(500.0).clip(true))
         .column(Column::initial(120.0).clip(true))
         .column(Column::initial(60.0).clip(true))
-        .column(Column::remainder().clip(true));
+        .column(Column::initial(120.0).clip(true))
+        .column(Column::remainder());
 
     if let Some(row) = scroll_to_row {
         builder = builder.scroll_to_row(row, Some(Align::Center));
@@ -49,6 +51,7 @@ pub fn draw_table(
             header.col(|ui| {
                 ui.label("Value");
             });
+            header.col(|_ui| {});
         })
         .body(|body| {
             body.rows(row_height, visible.len(), |mut row| {
@@ -127,11 +130,44 @@ pub fn draw_table(
                     if editing {
                         ui.text_edit_singleline(&mut rows[raw_idx].value);
                     } else {
-                        ui.label(&rows[raw_idx].value);
+                        ui.add(Label::new(&rows[raw_idx].value));
+                    }
+                });
+                row.col(|ui| {
+                    let checked =
+                        rows[raw_idx].fact_index.is_some() && !rows[raw_idx].is_nil;
+                    match rows[raw_idx].selection {
+                        Some(SelectionWidget::Checkbox) => {
+                            if widgets::selection_checkbox(ui, checked, editing).changed() {
+                                rows[raw_idx].is_nil = checked;
+                                if !rows[raw_idx].is_nil {
+                                    rows[raw_idx].value = String::new();
+                                }
+                            }
+                        }
+                        Some(SelectionWidget::Radio) => {
+                            if widgets::selection_radio(ui, checked, editing).clicked()
+                                && !checked
+                            {
+                                radio_select = Some(raw_idx);
+                            }
+                        }
+                        None => {}
                     }
                 });
             });
         });
+
+    if let Some(raw_idx) = radio_select {
+        let target_depth = rows[raw_idx].depth;
+        for row in rows.iter_mut() {
+            if row.depth == target_depth && row.selection == Some(SelectionWidget::Radio) {
+                row.is_nil = true;
+            }
+        }
+        rows[raw_idx].is_nil = false;
+        rows[raw_idx].value = String::new();
+    }
 
     if let Some(raw_idx) = toggle {
         if collapsed.contains(&raw_idx) {

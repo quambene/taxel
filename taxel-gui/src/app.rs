@@ -86,6 +86,9 @@ pub struct TaxelApp {
     /// moment editing started, indexed by raw row index. Used to restore values
     /// if editing is canceled.
     pub edit_snapshot: Vec<String>,
+    /// Snapshot of `row.is_nil` for every row in the edited section, parallel
+    /// to `edit_snapshot`. Used to restore nil state if editing is canceled.
+    pub edit_nil_snapshot: Vec<bool>,
     /// Controls whether the delete-report confirmation modal is visible.
     pub show_delete_modal: bool,
     /// Controls whether the send-report modal is visible.
@@ -177,6 +180,7 @@ impl TaxelApp {
             report_list,
             editing_section: None,
             edit_snapshot: Vec::new(),
+            edit_nil_snapshot: Vec::new(),
             eric,
             show_delete_modal: false,
             show_send_modal: false,

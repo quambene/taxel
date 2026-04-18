@@ -90,7 +90,7 @@ fn load_instance_document(path: &Path, allow_download: bool) -> Result<LoadOutco
     let item_facts = instance.item_facts();
     let mut report = Report::new(path.to_path_buf());
 
-    report.populate(view, &item_facts);
+    report.populate(view, &item_facts, &taxonomy);
 
     Ok(LoadOutcome::Ready(taxonomy, instance, report))
 }
@@ -144,6 +144,7 @@ pub fn edit_report(app: &mut TaxelApp) {
     if let Some(table) = &app.report {
         if let Some(section) = table.sections.get(app.selected_tab) {
             app.edit_snapshot = section.rows.iter().map(|r| r.value.clone()).collect();
+        app.edit_nil_snapshot = section.rows.iter().map(|r| r.is_nil).collect();
         }
     }
     app.editing_section = Some(app.selected_tab);
@@ -163,13 +164,19 @@ pub fn cancel_edit(app: &mut TaxelApp) {
 
     if let Some(table) = &mut app.report {
         if let Some(section) = table.sections.get_mut(editing_tab) {
-            for (row, value) in section.rows.iter_mut().zip(app.edit_snapshot.iter()) {
+            for (row, (value, is_nil)) in section
+                .rows
+                .iter_mut()
+                .zip(app.edit_snapshot.iter().zip(app.edit_nil_snapshot.iter()))
+            {
                 row.value = value.clone();
+                row.is_nil = *is_nil;
             }
         }
     }
     app.editing_section = None;
     app.edit_snapshot.clear();
+    app.edit_nil_snapshot.clear();
 }
 
 /// Saves the currently loaded report by writing the modified XBRL instance
@@ -179,22 +186,25 @@ pub fn save_report(app: &mut TaxelApp) {
 
     if let (Some(report), Some(instance)) = (&app.report, &mut app.instance_document) {
         if let Some(section) = report.sections.get(editing_tab) {
-            // Only write back rows whose value differs from the pre-edit
-            // snapshot. The same fact can appear in multiple rows (same concept
-            // at multiple positions in the presentation tree) but we only need
-            // to update it once.
+            // Only write back rows whose value or nil state differs from the
+            // pre-edit snapshot. The same fact can appear in multiple rows but
+            // we only need to update it once.
             for (i, row) in section.rows.iter().enumerate() {
-                let unchanged = app
+                let value_unchanged = app
                     .edit_snapshot
                     .get(i)
                     .is_some_and(|snapshot| snapshot == &row.value);
-
-                if unchanged {
-                    continue;
-                }
+                let nil_unchanged = app
+                    .edit_nil_snapshot
+                    .get(i)
+                    .is_some_and(|snap| *snap == row.is_nil);
 
                 if let Some(idx) = row.fact_index {
-                    instance.set_fact_value(idx, row.value.clone());
+                    if !nil_unchanged {
+                        instance.set_fact_nil(idx, row.is_nil);
+                    } else if !value_unchanged {
+                        instance.set_fact_value(idx, row.value.clone());
+                    }
                 }
             }
         }
@@ -238,6 +248,7 @@ pub fn save_report(app: &mut TaxelApp) {
 
     app.editing_section = None;
     app.edit_snapshot.clear();
+    app.edit_nil_snapshot.clear();
 }
 
 /// Validates the imported report and reports any issues in the diagnostics
