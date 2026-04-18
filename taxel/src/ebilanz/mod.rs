@@ -76,6 +76,18 @@ pub static ROLE_URI_TO_REPORT_ELEMENT: LazyLock<HashMap<&'static str, &'static s
                 "http://www.xbrl.de/taxonomies/de-gaap-ci/role/transfersTaxAssets",
                 "genInfo.report.id.reportElement.reportElements.BVV",
             ),
+            (
+                "http://www.xbrl.de/taxonomies/de-gaap-ci/role/appropriationProfits",
+                "genInfo.report.id.reportElement.reportElements.EV",
+            ),
+            (
+                "http://www.xbrl.de/taxonomies/de-gaap-ci/role/detailedInformation",
+                "genInfo.report.id.reportElement.reportElements.KS",
+            ),
+            (
+                "http://www.xbrl.de/taxonomies/de-gaap-ci/role/transfersCommercialCodeToTax",
+                "genInfo.report.id.reportElement.reportElements.STU",
+            ),
         ])
     });
 
