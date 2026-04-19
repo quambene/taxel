@@ -30,7 +30,7 @@ pub fn draw_table(
         .column(Column::initial(500.0).clip(true))
         .column(Column::initial(120.0).clip(true))
         .column(Column::initial(60.0).clip(true))
-        .column(Column::initial(120.0).clip(true))
+        .column(Column::initial(15.0).clip(true))
         .column(Column::remainder());
 
     if let Some(row) = scroll_to_row {
@@ -51,10 +51,10 @@ pub fn draw_table(
             header.col(|ui| {
                 ui.label("Unit");
             });
+            header.col(|_ui| {});
             header.col(|ui| {
                 ui.label("Value");
             });
-            header.col(|_ui| {});
         })
         .body(|body| {
             body.rows(row_height, visible.len(), |mut row| {
@@ -123,20 +123,6 @@ pub fn draw_table(
                     ui.label(rows[raw_idx].unit.as_deref().unwrap_or("-"));
                 });
                 row.col(|ui| {
-                    if is_highlighted {
-                        ui.painter().rect_filled(
-                            ui.max_rect(),
-                            0.0,
-                            ui.visuals().selection.bg_fill.gamma_multiply(0.35),
-                        );
-                    }
-                    if editing {
-                        ui.text_edit_singleline(&mut rows[raw_idx].value);
-                    } else {
-                        ui.add(Label::new(&rows[raw_idx].value));
-                    }
-                });
-                row.col(|ui| {
                     let checked = rows[raw_idx].fact_index.is_some() && !rows[raw_idx].is_nil;
                     match rows[raw_idx].selection {
                         Some(SelectionWidget::Checkbox) => {
@@ -154,6 +140,20 @@ pub fn draw_table(
                             }
                         }
                         None => {}
+                    }
+                });
+                row.col(|ui| {
+                    if is_highlighted {
+                        ui.painter().rect_filled(
+                            ui.max_rect(),
+                            0.0,
+                            ui.visuals().selection.bg_fill.gamma_multiply(0.35),
+                        );
+                    }
+                    if editing {
+                        ui.text_edit_singleline(&mut rows[raw_idx].value);
+                    } else {
+                        ui.add(Label::new(&rows[raw_idx].value));
                     }
                 });
             });
