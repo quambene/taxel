@@ -20,3 +20,4 @@
   - Add loading spinner for import report
   - Display report list
   - Replace app and vendor data in imported report
+  - Display choice as radio button or checkbox
