@@ -315,6 +315,15 @@ impl App for TaxelApp {
                         } else if cancel_pressed {
                             action = EditAction::Cancel;
                         }
+                    } else if !editing && self.report.is_some() {
+                        let edit_shortcut = KeyboardShortcut::new(Modifiers::COMMAND, Key::E);
+                        let edit_pressed = ui
+                            .ctx()
+                            .input_mut(|input| input.consume_shortcut(&edit_shortcut));
+
+                        if edit_pressed {
+                            action = EditAction::Start;
+                        }
                     }
 
                     // Handle toolbar edit actions.
