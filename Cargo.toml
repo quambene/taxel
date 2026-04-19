@@ -35,7 +35,6 @@ dioxus-devtools = "0.7.4"
 
 [patch.crates-io]
 # TODO: remove patch after 0.2.1 is published
-# xbrl-rs = { git = 'https://github.com/quambene/xbrl-rs.git' }
-xbrl-rs = { path = "../xbrl-rs" }
+xbrl-rs = { git = 'https://github.com/quambene/xbrl-rs.git' }
 # TODO: remove patch after 0.5.1 is published
 eric-sdk = { git = 'https://github.com/quambene/eric-rs.git' }
