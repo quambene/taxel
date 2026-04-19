@@ -152,7 +152,7 @@ pub fn edit_report(app: &mut TaxelApp) {
     if let Some(table) = &app.report {
         if let Some(section) = table.sections.get(app.selected_tab) {
             app.edit_snapshot = section.rows.iter().map(|r| r.value.clone()).collect();
-        app.edit_nil_snapshot = section.rows.iter().map(|r| r.is_nil).collect();
+            app.edit_nil_snapshot = section.rows.iter().map(|row| row.is_nil).collect();
         }
     }
     app.editing_section = Some(app.selected_tab);

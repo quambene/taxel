@@ -295,7 +295,7 @@ fn build_selection_map(taxonomy: &TaxonomySet) -> HashMap<String, SelectionWidge
 
     for concept in taxonomy.elements() {
         if let Some(Particle::Choice { occurs, .. }) = &concept.content_model {
-            let widget = if occurs.max.map_or(true, |m| m > 1) {
+            let widget = if occurs.max.is_none_or(|m| m > 1) {
                 SelectionWidget::Checkbox
             } else {
                 SelectionWidget::Radio

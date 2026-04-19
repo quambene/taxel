@@ -1,6 +1,9 @@
 use eframe::{
     self,
-    egui::{vec2, Button, Checkbox, Color32, RadioButton, Response, RichText, Sense, Shape, Stroke, StrokeKind, Ui},
+    egui::{
+        vec2, Button, Checkbox, Color32, RadioButton, Response, RichText, Sense, Shape, Stroke,
+        StrokeKind, Ui,
+    },
 };
 
 /// A small clickable triangle button: points right when collapsed, down when expanded.

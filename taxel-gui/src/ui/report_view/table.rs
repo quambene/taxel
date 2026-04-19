@@ -1,4 +1,7 @@
-use crate::{domain::{FactRow, SelectionWidget}, ui::widgets};
+use crate::{
+    domain::{FactRow, SelectionWidget},
+    ui::widgets,
+};
 use eframe::egui::{Align, Label, TextStyle, Ui};
 use egui_extras::{Column, TableBuilder};
 use std::collections::HashSet;
@@ -134,8 +137,7 @@ pub fn draw_table(
                     }
                 });
                 row.col(|ui| {
-                    let checked =
-                        rows[raw_idx].fact_index.is_some() && !rows[raw_idx].is_nil;
+                    let checked = rows[raw_idx].fact_index.is_some() && !rows[raw_idx].is_nil;
                     match rows[raw_idx].selection {
                         Some(SelectionWidget::Checkbox) => {
                             if widgets::selection_checkbox(ui, checked, editing).changed() {
@@ -146,8 +148,7 @@ pub fn draw_table(
                             }
                         }
                         Some(SelectionWidget::Radio) => {
-                            if widgets::selection_radio(ui, checked, editing).clicked()
-                                && !checked
+                            if widgets::selection_radio(ui, checked, editing).clicked() && !checked
                             {
                                 radio_select = Some(raw_idx);
                             }
