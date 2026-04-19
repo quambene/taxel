@@ -115,7 +115,6 @@ pub fn poll_load_result(app: &mut TaxelApp) {
                 app.report = Some(report);
                 app.taxonomy = Some(taxonomy);
                 app.instance_document = Some(instance);
-                app.show_error_panel = !app.diagnostics.is_empty();
                 app.loading = None;
             }
             Ok(Ok(LoadOutcome::NeedsDownload)) => {
