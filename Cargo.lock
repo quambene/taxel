@@ -4941,9 +4941,9 @@ checksum = "bc7d623258602320d5c55d1bc22793b57daff0ec7efc270ea7d55ce1d5f5471c"
 
 [[package]]
 name = "typenum"
-version = "1.19.0"
+version = "1.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "562d481066bde0658276a35467c4af00bdc6ee726305698a55b86e61d7ad82bb"
+checksum = "40ce102ab67701b8526c123c1bab5cbe42d7040ccfd0f64af1a385808d2f43de"
 
 [[package]]
 name = "uds_windows"
@@ -6214,7 +6214,7 @@ checksum = "ea6fc2961e4ef194dcbfe56bb845534d0dc8098940c7e5c012a258bfec6701bd"
 [[package]]
 name = "xbrl-rs"
 version = "0.2.1"
-source = "git+https://github.com/quambene/xbrl-rs.git#2e3ddb4ed2e8a5b26d5c0956e54b58198f6c577d"
+source = "git+https://github.com/quambene/xbrl-rs.git#243f65f3386a09e622cec83c7c626d49f53608eb"
 dependencies = [
  "chrono",
  "indexmap 2.14.0",
