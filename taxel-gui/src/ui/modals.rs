@@ -1,5 +1,5 @@
 use crate::{app, TaxelApp};
-use eframe::egui::{Align2, Button, Id, Modal, TextEdit, Ui, Vec2, Widget, Window};
+use eframe::egui::{Align2, Button, Grid, Id, Modal, TextEdit, Ui, Vec2, Widget, Window};
 use rfd::FileDialog;
 
 /// Draws the delete confirmation modal when the user clicks "Delete report".
@@ -120,6 +120,41 @@ pub fn draw_download_modal(ui: &mut Ui, confirm: &mut bool, cancel: &mut bool) {
                 }
             });
         });
+}
+
+/// Draws the keyboard shortcuts info modal.
+pub fn draw_shortcuts_modal(ui: &mut Ui, app: &mut TaxelApp) {
+    let modal = Modal::new(Id::new("shortcuts_modal")).show(ui.ctx(), |ui| {
+        ui.heading("Keyboard shortcuts");
+        ui.add_space(8.0);
+
+        Grid::new("shortcuts_grid")
+            .num_columns(2)
+            .spacing([24.0, 4.0])
+            .show(ui, |ui| {
+                ui.strong("Ctrl+E");
+                ui.label("Start editing the current report section");
+                ui.end_row();
+
+                ui.strong("Ctrl+S");
+                ui.label("Save changes");
+                ui.end_row();
+
+                ui.strong("Esc");
+                ui.label("Cancel editing");
+                ui.end_row();
+            });
+
+        ui.add_space(8.0);
+
+        if ui.button("Close").clicked() {
+            app.show_shortcuts_modal = false;
+        }
+    });
+
+    if modal.should_close() {
+        app.show_shortcuts_modal = false;
+    }
 }
 
 /// Draws a modal dialog warning about unsaved changes, with "Stay" and
