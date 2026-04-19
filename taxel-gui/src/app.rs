@@ -368,6 +368,8 @@ impl App for TaxelApp {
                             );
                         }
 
+                        table.sync_section_disabled_from_gcd();
+
                         if !self.search.results.is_empty() {
                             ui::draw_search_results_overlay(
                                 ui.ctx(),

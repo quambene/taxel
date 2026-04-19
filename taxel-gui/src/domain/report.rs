@@ -1,6 +1,6 @@
 use crate::domain::ReportStatus;
 use std::{collections::HashMap, path::PathBuf};
-use taxel::{GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
+use taxel::{GCD_LABEL, GCD_ROLE_URI, REPORT_ELEMENT_TO_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
 use xbrl_rs::{DocumentView, ItemFact, Particle, TaxonomySet, TreeNode, ROLE_LABEL, ROLE_TERSE};
 
 /// Which selection widget to render in the selection column for this row.
@@ -158,6 +158,32 @@ impl Report {
         // relative order within each group is determined by the original order
         // in the presentation linkbase.
         self.sections.sort_by_key(|section| section.disabled);
+    }
+
+    /// Updates `disabled` on each section based on the current `is_nil` state
+    /// of GCD announcement rows. Called every frame after the table is drawn so
+    /// that toggling a checkbox in the GCD section is immediately reflected in
+    /// the sidebar.
+    pub fn sync_section_disabled_from_gcd(&mut self) {
+        let mut role_enabled: HashMap<&'static str, bool> = HashMap::new();
+
+        if let Some(gcd) = self.sections.iter().find(|s| s.role == GCD_ROLE_URI) {
+            for row in &gcd.rows {
+                if let Some(&role_uri) = REPORT_ELEMENT_TO_ROLE_URI.get(row.concept.as_str()) {
+                    let enabled = row.fact_index.is_some() && !row.is_nil;
+                    role_enabled
+                        .entry(role_uri)
+                        .and_modify(|entry| *entry |= enabled)
+                        .or_insert(enabled);
+                }
+            }
+        }
+
+        for section in &mut self.sections {
+            if let Some(&enabled) = role_enabled.get(section.role.as_str()) {
+                section.disabled = !enabled;
+            }
+        }
     }
 }
 
