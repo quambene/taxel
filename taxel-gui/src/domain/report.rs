@@ -1,8 +1,5 @@
 use crate::domain::ReportStatus;
-use std::{
-    collections::{HashMap, HashSet},
-    path::PathBuf,
-};
+use std::{collections::HashMap, path::PathBuf};
 use taxel::{GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
 use xbrl_rs::{DocumentView, ItemFact, TreeNode, ROLE_LABEL, ROLE_TERSE};
 
@@ -40,6 +37,13 @@ pub struct ReportSection {
     pub labels: HashMap<String, String>,
     /// The rows for this section.
     pub rows: Vec<FactRow>,
+    /// Whether this section is disabled.
+    ///
+    /// A report section is disabled if the corresponding report element from
+    /// the GCD section is announced but has no value (i.e. `xsi:nil="true"`).
+    /// Disabled sections are still displayed in the sidebar but are visually
+    /// de-emphasized and can't be edited.
+    pub disabled: bool,
 }
 
 /// The report containing the extracted facts from the XBRL instance document,
@@ -81,14 +85,19 @@ impl Report {
             .map(|section| section.nodes.as_slice())
             .unwrap_or(&[]);
         let labels_map = build_labels_map(gcd_nodes);
-        let announced_roles = collect_announced_roles(gcd_nodes);
+        let announced_roles = collect_announced_roles(gcd_nodes, item_facts);
 
         for section in &view.sections {
             let role_uri = section.role;
 
-            if role_uri != GCD_ROLE_URI && !announced_roles.contains(role_uri) {
-                continue;
-            }
+            let disabled = if role_uri == GCD_ROLE_URI {
+                false
+            } else {
+                match announced_roles.get(role_uri) {
+                    None => continue,
+                    Some(&enabled) => !enabled,
+                }
+            };
 
             let labels = if role_uri == GCD_ROLE_URI {
                 // The GCD section itself is a special case: we use the same label
@@ -108,6 +117,7 @@ impl Report {
                 role: role_uri.to_owned(),
                 labels: labels.unwrap_or_default(),
                 rows: Vec::new(),
+                disabled,
             };
 
             for node in &section.nodes {
@@ -116,6 +126,11 @@ impl Report {
 
             self.sections.push(fact_section);
         }
+
+        // Enabled sections are shown first, followed by disabled sections. The
+        // relative order within each group is determined by the original order
+        // in the presentation linkbase.
+        self.sections.sort_by_key(|section| section.disabled);
     }
 }
 
@@ -151,18 +166,22 @@ fn resolve_labels(node: &TreeNode) -> HashMap<String, String> {
         .collect()
 }
 
-/// Returns the set of role URIs announced as `genInfo.report.id.reportElement`
-/// in the GCD section of the instance document.
-fn collect_announced_roles<'a>(nodes: &[TreeNode<'_>]) -> HashSet<&'a str> {
+/// Returns a map from role URI to enabled state for all announced report
+/// elements in the GCD section. `true` means the fact has a non-nil value
+/// (section is active); `false` means it was declared with `xsi:nil="true"`.
+fn collect_announced_roles(
+    nodes: &[TreeNode<'_>],
+    facts: &[&ItemFact],
+) -> HashMap<&'static str, bool> {
     let concept_to_role: HashMap<&'static str, &'static str> = ROLE_URI_TO_REPORT_ELEMENT
         .iter()
         .map(|(&role, &concept)| (concept, role))
         .collect();
 
-    let mut announced = HashSet::new();
+    let mut announced = HashMap::new();
 
     for node in nodes {
-        collect_announced_roles_node(node, &concept_to_role, &mut announced);
+        collect_announced_roles_node(node, facts, &concept_to_role, &mut announced);
     }
 
     announced
@@ -172,17 +191,22 @@ fn collect_announced_roles<'a>(nodes: &[TreeNode<'_>]) -> HashSet<&'a str> {
 /// as report elements and collects their corresponding role URIs.
 fn collect_announced_roles_node(
     node: &TreeNode<'_>,
+    facts: &[&ItemFact],
     concept_to_role: &HashMap<&'static str, &'static str>,
-    announced: &mut HashSet<&'static str>,
+    announced: &mut HashMap<&'static str, bool>,
 ) {
     if let Some(&role) = concept_to_role.get(node.concept_name) {
         if !node.fact_indices.is_empty() {
-            announced.insert(role);
+            let enabled = node
+                .fact_indices
+                .iter()
+                .any(|&idx| facts.get(idx).is_some_and(|fact| !fact.is_nil()));
+            announced.insert(role, enabled);
         }
     }
 
     for child in &node.children {
-        collect_announced_roles_node(child, concept_to_role, announced);
+        collect_announced_roles_node(child, facts, concept_to_role, announced);
     }
 }
 

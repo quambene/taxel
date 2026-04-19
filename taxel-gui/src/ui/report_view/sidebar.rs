@@ -34,7 +34,7 @@ pub fn draw_sidebar(ctx: &mut Ui, sections: &[ReportSection], selected: &mut usi
                             section.role.rsplit('/').next().unwrap_or(&section.role)
                         });
 
-                    draw_row(ui, title, i, selected);
+                    draw_row(ui, title, i, selected, section.disabled);
                 }
             });
         });
@@ -42,11 +42,11 @@ pub fn draw_sidebar(ctx: &mut Ui, sections: &[ReportSection], selected: &mut usi
 
 /// Draw a single row in the sidebar for a report section. Highlights the row if
 /// it is selected, and handles click interactions to select the section.
-fn draw_row(ui: &mut Ui, title: &str, i: usize, selected: &mut usize) {
+fn draw_row(ui: &mut Ui, title: &str, i: usize, selected: &mut usize, disabled: bool) {
     let is_selected = *selected == i;
 
     let row = Frame::new()
-        .fill(if is_selected {
+        .fill(if is_selected && !disabled {
             ui.visuals().selection.bg_fill
         } else {
             Color32::TRANSPARENT
@@ -55,13 +55,19 @@ fn draw_row(ui: &mut Ui, title: &str, i: usize, selected: &mut usize) {
         .inner_margin(Margin::symmetric(4, 2))
         .show(ui, |ui| {
             ui.set_width(ui.available_width());
-            let text = if is_selected {
+            let text = if disabled {
+                RichText::new(title).color(ui.visuals().weak_text_color())
+            } else if is_selected {
                 RichText::new(title).color(ui.visuals().selection.stroke.color)
             } else {
                 RichText::new(title)
             };
             ui.add(Label::new(text).wrap());
         });
+
+    if disabled {
+        return;
+    }
 
     let response = ui
         .interact(
