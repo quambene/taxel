@@ -99,12 +99,21 @@ fn load_instance_document(path: &Path, allow_download: bool) -> Result<LoadOutco
 pub fn poll_load_result(app: &mut TaxelApp) {
     if let Some(rx) = &app.loading {
         match rx.try_recv() {
-            Ok(Ok(LoadOutcome::Ready(taxonomy, instance, report))) => {
+            Ok(Ok(LoadOutcome::Ready(taxonomy, instance, mut report))) => {
                 for missing_role in &report.role_mapping_errors {
                     app.diagnostics.push(AppDiagnostic::new_warning(
                         DiagnosticCategory::Import,
                         format!("Missing report-element mapping for role URI: {missing_role}"),
                     ));
+                }
+
+                if let Some(overview) = app
+                    .report_list
+                    .reports()
+                    .iter()
+                    .find(|report_overview| report_overview.path == report.path)
+                {
+                    report.status = overview.report_status;
                 }
 
                 app.section_states = report
@@ -115,7 +124,6 @@ pub fn poll_load_result(app: &mut TaxelApp) {
                 app.report = Some(report);
                 app.taxonomy = Some(taxonomy);
                 app.instance_document = Some(instance);
-                app.show_error_panel = !app.diagnostics.is_empty();
                 app.loading = None;
             }
             Ok(Ok(LoadOutcome::NeedsDownload)) => {

@@ -5,7 +5,8 @@ use crate::{
     TaxelApp,
 };
 use eframe::egui::{
-    text::LayoutJob, vec2, Align, Button, Color32, Layout, Shape, TextEdit, TextFormat, Ui,
+    text::LayoutJob, vec2, Align, Button, Color32, Layout, Response, Shape, TextEdit, TextFormat,
+    Ui,
 };
 use rfd::FileDialog;
 
@@ -60,8 +61,20 @@ pub fn draw_header(ui: &mut Ui, app: &mut TaxelApp) {
             ui.separator();
 
             draw_zoom_toolbar(ui, &mut app.settings.zoom_input);
+
+            ui.separator();
+
+            if draw_info_button(ui).clicked() {
+                app.show_shortcuts_modal = true;
+            }
         });
     });
+}
+
+/// Draws the "?" info button that opens the keyboard shortcuts modal.
+fn draw_info_button(ui: &mut Ui) -> Response {
+    ui.add(Button::new("?").min_size(vec2(24.0, 24.0)))
+        .on_hover_text("Keyboard shortcuts")
 }
 
 /// Draws the "Import report" button. Clicking the button opens a file dialog to

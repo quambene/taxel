@@ -93,6 +93,8 @@ pub struct TaxelApp {
     pub show_delete_modal: bool,
     /// Controls whether the send-report modal is visible.
     pub show_send_modal: bool,
+    /// Controls whether the keyboard shortcuts info modal is visible.
+    pub show_shortcuts_modal: bool,
     /// Certificate file path selected in the send modal, persisted across opens.
     pub send_certificate_path: Option<PathBuf>,
     /// Password entered in the send modal, persisted across opens (in-memory only).
@@ -184,6 +186,7 @@ impl TaxelApp {
             eric,
             show_delete_modal: false,
             show_send_modal: false,
+            show_shortcuts_modal: false,
             show_download_modal: false,
             pending_download_path: None,
             send_certificate_path: None,
@@ -319,6 +322,15 @@ impl App for TaxelApp {
                         } else if cancel_pressed {
                             action = EditAction::Cancel;
                         }
+                    } else if !editing && self.report.is_some() {
+                        let edit_shortcut = KeyboardShortcut::new(Modifiers::COMMAND, Key::E);
+                        let edit_pressed = ui
+                            .ctx()
+                            .input_mut(|input| input.consume_shortcut(&edit_shortcut));
+
+                        if edit_pressed {
+                            action = EditAction::Start;
+                        }
                     }
 
                     // Handle toolbar edit actions.
@@ -404,6 +416,10 @@ impl App for TaxelApp {
 
             if self.show_send_modal {
                 ui::draw_send_modal(ctx, self);
+            }
+
+            if self.show_shortcuts_modal {
+                ui::draw_shortcuts_modal(ctx, self);
             }
 
             if self.show_download_modal {

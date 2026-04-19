@@ -8,7 +8,8 @@ mod widgets;
 pub use diagnostic_panel::draw_error_panel;
 pub use header::draw_header;
 pub use modals::{
-    draw_delete_modal, draw_download_modal, draw_send_modal, draw_unsaved_changes_modal,
+    draw_delete_modal, draw_download_modal, draw_send_modal, draw_shortcuts_modal,
+    draw_unsaved_changes_modal,
 };
 pub use report_list_view::draw_report_list;
 pub use report_view::{

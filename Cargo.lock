@@ -6214,6 +6214,7 @@ checksum = "ea6fc2961e4ef194dcbfe56bb845534d0dc8098940c7e5c012a258bfec6701bd"
 [[package]]
 name = "xbrl-rs"
 version = "0.2.1"
+source = "git+https://github.com/quambene/xbrl-rs.git#2e3ddb4ed2e8a5b26d5c0956e54b58198f6c577d"
 dependencies = [
  "chrono",
  "indexmap 2.14.0",
