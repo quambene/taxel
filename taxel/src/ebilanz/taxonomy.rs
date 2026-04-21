@@ -116,11 +116,11 @@ static TAXONOMY_TYPE_LABELS: LazyLock<HashMap<(&TaxonomyType, &str), &'static st
         HashMap::from([
             (
                 (&TaxonomyType::CoreFiscal, "de"),
-                "Kerntaxonomie (de-gaap-ci)",
+                "Kerntaxonomie für gewerbliche Unternehmen (de-gaap-ci)",
             ),
             (
                 (&TaxonomyType::CoreFiscal, "en"),
-                "Core taxonomy (de-gaap-ci)",
+                "Core taxonomy for commercial/industrial entities (de-gaap-ci)",
             ),
             (
                 (&TaxonomyType::CoreFiscalMicroBilG, "de"),
