@@ -95,7 +95,6 @@ impl TaxonomyType {
     ///
     /// Labels are sourced from the `TAXONOMY_TYPE_LABELS` static mapping, which
     /// is populated with known combinations of taxonomy type and language.
-
     pub fn label(&self, language: &str) -> Option<&'static str> {
         TAXONOMY_TYPE_LABELS.get(&(self, language)).copied()
     }
