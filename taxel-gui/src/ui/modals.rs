@@ -134,7 +134,7 @@ pub fn draw_shortcuts_modal(ui: &mut Ui, app: &mut TaxelApp) {
             .spacing([24.0, 4.0])
             .show(ui, |ui| {
                 ui.strong("Ctrl+E");
-                ui.label("Start editing the current report section");
+                ui.label("Start editing the report section");
                 ui.end_row();
 
                 ui.strong("Ctrl+S");
