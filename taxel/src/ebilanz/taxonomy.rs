@@ -101,6 +101,16 @@ impl TaxonomyType {
     }
 }
 
+pub const TAXONOMY_TYPES: [TaxonomyType; 7] = [
+    TaxonomyType::CoreFiscal,
+    TaxonomyType::CoreFiscalMicroBilG,
+    TaxonomyType::SupplementaryFiscal,
+    TaxonomyType::SupplementaryFiscalMicroBilG,
+    TaxonomyType::CreditInstitution,
+    TaxonomyType::PaymentInstitution,
+    TaxonomyType::Insurance,
+];
+
 /// Mapping from (taxonomy type, language) to the human-readable label for that taxonomy.
 static TAXONOMY_TYPE_LABELS: LazyLock<HashMap<(&TaxonomyType, &str), &'static str>> =
     LazyLock::new(|| {

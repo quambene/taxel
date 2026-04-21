@@ -3,7 +3,8 @@ mod taxonomy;
 
 pub use report_elements::{REPORT_ELEMENT_TO_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
 pub use taxonomy::{
-    TaxonomyType, GCD_LABEL, GCD_ROLE_URI, TAXONOMY_VERSION_TO_DATE, TAXONOMY_YEAR_TO_VERSION,
+    TaxonomyType, GCD_LABEL, GCD_ROLE_URI, TAXONOMY_TYPES, TAXONOMY_VERSION_TO_DATE,
+    TAXONOMY_YEAR_TO_VERSION,
 };
 
 /// The eBilanz payload header within a Nutzdatenblock.

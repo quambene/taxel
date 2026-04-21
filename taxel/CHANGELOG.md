@@ -4,4 +4,4 @@
 
 - added
   - Parse `ElsterReport` and `EBilanz`
-  - Add `TaxonomyType` and `TAXONOMY_VERSION_TO_DATE`
+  - Add `TaxonomyType`, `TAXONOMY_TYPES`, and `TAXONOMY_VERSION_TO_DATE`
