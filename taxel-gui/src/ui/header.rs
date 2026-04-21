@@ -15,6 +15,7 @@ use rfd::FileDialog;
 /// selector tabs.
 pub fn draw_header(ui: &mut Ui, app: &mut TaxelApp) {
     ui.horizontal_centered(|ui| {
+        draw_new_report_button(ui, app);
         draw_import_button(ui, app);
 
         if app.loading.is_some() {
@@ -75,6 +76,13 @@ pub fn draw_header(ui: &mut Ui, app: &mut TaxelApp) {
 fn draw_info_button(ui: &mut Ui) -> Response {
     ui.add(Button::new("?").min_size(vec2(24.0, 24.0)))
         .on_hover_text("Keyboard shortcuts")
+}
+
+/// Draws the "New report" button. Clicking opens the report creation modal.
+fn draw_new_report_button(ui: &mut Ui, app: &mut TaxelApp) {
+    if app.report.is_none() && app.loading.is_none() && ui.button("New report").clicked() {
+        app.show_new_report_modal = true;
+    }
 }
 
 /// Draws the "Import report" button. Clicking the button opens a file dialog to
