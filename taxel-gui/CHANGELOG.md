@@ -3,11 +3,13 @@
 ## v0.1.0 (unreleased)
 
 - added
-  - Import and display report
+  - Import report
+  - Display report
   - Display report sections in sidebar
   - Edit and save report
   - Close report
   - Delete report
+  - Create report
   - Send and validate report
   - Select display level
   - Select label language

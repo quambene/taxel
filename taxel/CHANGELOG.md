@@ -3,4 +3,5 @@
 ## v0.1.0 (unreleased)
 
 - added
-  - Parse `ElsterReport`
+  - Parse `ElsterReport` and `EBilanz`
+  - Add `TaxonomyType`, `TAXONOMY_TYPES`, and `TAXONOMY_VERSION_TO_DATE`

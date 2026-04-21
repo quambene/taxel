@@ -1,7 +1,7 @@
 use crate::{
     app::{AppDiagnostic, DiagnosticCategory},
     domain::{ReportMeta, ReportStatus},
-    infrastructure::report_store::{self, ReportManifestEntry, ReportStore},
+    infrastructure::report_store::{self, ReportManifestEntry},
 };
 use anyhow::Result;
 use chrono::{DateTime, Local, Utc};
@@ -70,7 +70,7 @@ impl ReportList {
     /// filesystem. This is called when the application starts and whenever the
     /// report list is refreshed.
     pub fn refresh(&mut self) -> Result<()> {
-        let report_meta = ReportStore::load()?;
+        let report_meta = report_store::load_report_meta()?;
 
         let mut report_overiews = report_meta
             .into_iter()

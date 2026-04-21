@@ -284,12 +284,12 @@ impl ElsterReport {
 
         loop {
             match reader.read_event_into(&mut buf) {
-                Ok(Event::Start(ref e)) => {
-                    let local = str::from_utf8(e.local_name().as_ref())?.to_string();
+                Ok(Event::Start(ref event)) => {
+                    let local = str::from_utf8(event.local_name().as_ref())?.to_string();
 
                     // xbrl: capture the full subtree verbatim before pushing to path
                     if local == "xbrl" {
-                        let owned_start = e.clone().into_owned();
+                        let owned_start = event.clone().into_owned();
                         // e is no longer referenced — borrow on buf ends here (NLL)
                         buf.clear();
                         xbrl_raw = capture_xbrl(&mut reader, owned_start, &mut buf)?;
@@ -300,20 +300,20 @@ impl ElsterReport {
                     // Read attributes for elements that carry them
                     match local.as_str() {
                         "TransferHeader" => {
-                            th_version = get_attr(e, b"version").unwrap_or_default();
+                            th_version = get_attr(event, b"version").unwrap_or_default();
                         }
                         "NutzdatenHeader" => {
-                            payload_version = get_attr(e, b"version").unwrap_or_default();
+                            payload_version = get_attr(event, b"version").unwrap_or_default();
                         }
                         "Empfaenger" => {
                             // Only the NutzdatenHeader/Empfaenger has text content + id attr.
                             // TransferHeader/Empfaenger (rare, id="L") is ignored.
                             if path.last().map(|s| s.as_str()) == Some("NutzdatenHeader") {
-                                recipient_id = get_attr(e, b"id").unwrap_or_default();
+                                recipient_id = get_attr(event, b"id").unwrap_or_default();
                             }
                         }
                         "EBilanz" => {
-                            ebilanz_version = get_attr(e, b"version").unwrap_or_default();
+                            ebilanz_version = get_attr(event, b"version").unwrap_or_default();
                         }
                         _ => {}
                     }
@@ -321,8 +321,8 @@ impl ElsterReport {
                     path.push(local);
                 }
 
-                Ok(Event::End(ref e)) => {
-                    let local = str::from_utf8(e.local_name().as_ref())?.to_string();
+                Ok(Event::End(ref event)) => {
+                    let local = str::from_utf8(event.local_name().as_ref())?.to_string();
 
                     if local == "Nutzdatenblock" {
                         let manufacturer = match (product_name.take(), product_version.take()) {

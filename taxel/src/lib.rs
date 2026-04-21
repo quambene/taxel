@@ -11,7 +11,8 @@ pub use crate::{
         Writer as CsvWriter, WriterBuilder as CsvWriterBuilder,
     },
     ebilanz::{
-        EBilanz, GCD_LABEL, GCD_ROLE_URI, REPORT_ELEMENT_TO_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT,
+        TaxonomyType, GCD_LABEL, GCD_ROLE_URI, REPORT_ELEMENT_TO_ROLE_URI,
+        ROLE_URI_TO_REPORT_ELEMENT, TAXONOMY_TYPES, TAXONOMY_VERSION_TO_DATE,
         TAXONOMY_YEAR_TO_VERSION,
     },
     elster::{ElsterReport, TEST_MARKER},

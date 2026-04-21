@@ -1,6 +1,7 @@
 use crate::{app, TaxelApp};
-use eframe::egui::{Align2, Button, Grid, Id, Modal, TextEdit, Ui, Vec2, Widget, Window};
+use eframe::egui::{Align2, Button, ComboBox, Grid, Id, Modal, TextEdit, Ui, Vec2, Widget, Window};
 use rfd::FileDialog;
+use taxel::{TAXONOMY_TYPES, TAXONOMY_VERSION_TO_DATE};
 
 /// Draws the delete confirmation modal when the user clicks "Delete report".
 pub fn draw_delete_modal(ui: &mut Ui, app: &mut TaxelApp) {
@@ -154,6 +155,99 @@ pub fn draw_shortcuts_modal(ui: &mut Ui, app: &mut TaxelApp) {
 
     if modal.should_close() {
         app.show_shortcuts_modal = false;
+    }
+}
+
+/// Draws the report creation modal.
+pub fn draw_new_report_modal(ui: &mut Ui, app: &mut TaxelApp) {
+    let mut cancel = false;
+    let mut confirm = false;
+
+    let mut available_versions: Vec<&str> = TAXONOMY_VERSION_TO_DATE.keys().copied().collect();
+    available_versions.sort_unstable_by(|a, b| b.cmp(a));
+
+    let taxonomy_label = app
+        .new_report_form
+        .taxonomy_type
+        .label(&app.settings.lang)
+        .unwrap_or("Unknown");
+
+    let modal = Modal::new(Id::new("new_report_modal")).show(ui.ctx(), |ui| {
+        ui.heading("Create new report");
+        ui.add_space(8.0);
+
+        Grid::new("new_report_grid")
+            .num_columns(2)
+            .spacing([8.0, 4.0])
+            .show(ui, |ui| {
+                ui.label("Start date");
+                TextEdit::singleline(&mut app.new_report_form.start_date)
+                    .hint_text("YYYY-MM-DD")
+                    .desired_width(120.0)
+                    .ui(ui);
+                ui.end_row();
+
+                ui.label("End date");
+                TextEdit::singleline(&mut app.new_report_form.end_date)
+                    .hint_text("YYYY-MM-DD")
+                    .desired_width(120.0)
+                    .ui(ui);
+                ui.end_row();
+
+                ui.label("Taxonomy version");
+                ComboBox::from_id_salt("new_report_taxonomy_version")
+                    .selected_text(&app.new_report_form.taxonomy_version)
+                    .show_ui(ui, |ui| {
+                        for &version in &available_versions {
+                            ui.selectable_value(
+                                &mut app.new_report_form.taxonomy_version,
+                                version.to_string(),
+                                version,
+                            );
+                        }
+                    });
+                ui.end_row();
+
+                ui.label("Taxonomy type");
+                ComboBox::from_id_salt("new_report_taxonomy_type")
+                    .selected_text(taxonomy_label)
+                    .show_ui(ui, |ui| {
+                        for taxonomy_type in &TAXONOMY_TYPES {
+                            ui.selectable_value(
+                                &mut app.new_report_form.taxonomy_type,
+                                taxonomy_type.clone(),
+                                taxonomy_type.label(&app.settings.lang).unwrap_or("Unknown"),
+                            );
+                        }
+                    });
+                ui.end_row();
+            });
+
+        ui.add_space(8.0);
+
+        ui.horizontal(|ui| {
+            if ui.button("Cancel").clicked() {
+                cancel = true;
+            }
+
+            let can_create = !app.new_report_form.selected_elements.is_empty();
+
+            if ui.add_enabled(can_create, Button::new("Create")).clicked() {
+                confirm = true;
+            }
+        });
+    });
+
+    if modal.should_close() || cancel {
+        app.show_new_report_modal = false;
+    }
+
+    if confirm {
+        app.show_new_report_modal = false;
+        let form = app.new_report_form.clone();
+        let ctx = ui.ctx().clone();
+
+        app::create_report(app, form, ctx, false);
     }
 }
 

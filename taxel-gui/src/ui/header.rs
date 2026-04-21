@@ -1,6 +1,5 @@
 use crate::{
-    app::{self, AppDiagnostic, DiagnosticCategory, DiagnosticLevel},
-    infrastructure::report_store,
+    app::{self, DiagnosticLevel},
     ui::diagnostic_panel::{SUCCESS_COLOR, WARNING_COLOR},
     TaxelApp,
 };
@@ -15,6 +14,7 @@ use rfd::FileDialog;
 /// selector tabs.
 pub fn draw_header(ui: &mut Ui, app: &mut TaxelApp) {
     ui.horizontal_centered(|ui| {
+        draw_new_report_button(ui, app);
         draw_import_button(ui, app);
 
         if app.loading.is_some() {
@@ -77,6 +77,13 @@ fn draw_info_button(ui: &mut Ui) -> Response {
         .on_hover_text("Keyboard shortcuts")
 }
 
+/// Draws the "New report" button. Clicking opens the report creation modal.
+fn draw_new_report_button(ui: &mut Ui, app: &mut TaxelApp) {
+    if app.report.is_none() && app.loading.is_none() && ui.button("New report").clicked() {
+        app.show_new_report_modal = true;
+    }
+}
+
 /// Draws the "Import report" button. Clicking the button opens a file dialog to
 /// select an XML file.
 fn draw_import_button(ui: &mut Ui, app: &mut TaxelApp) {
@@ -86,20 +93,7 @@ fn draw_import_button(ui: &mut Ui, app: &mut TaxelApp) {
             .add_filter("All", &["*"])
             .pick_file()
         {
-            match report_store::copy_report(&path) {
-                Ok(copied_path) => {
-                    app.register_report(&copied_path);
-                    app.refresh_reports();
-                    app::load_report(app, copied_path, ui.ctx().clone(), false);
-                }
-                Err(err) => {
-                    app.diagnostics.push(AppDiagnostic::new_error(
-                        DiagnosticCategory::App,
-                        format!("Failed to import report: {err}"),
-                    ));
-                    app.show_error_panel = true;
-                }
-            }
+            app::import_report(app, path, ui.ctx());
         }
     }
 }
