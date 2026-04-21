@@ -5,7 +5,7 @@ mod search;
 mod settings;
 
 use crate::{
-    app::{self, report_list::ReportList, settings::Settings},
+    app::{self, report::NewReportForm, report_list::ReportList, settings::Settings},
     domain::Report,
     ui::{self, EditAction},
 };
@@ -18,8 +18,8 @@ use eframe::{
 use eric_sdk::Eric;
 use report::LoadOutcome;
 pub use report::{
-    cancel_edit, delete_report, edit_report, load_report, poll_load_result, save_report,
-    send_report, validate_report,
+    cancel_edit, create_report, delete_report, edit_report, import_report, load_report,
+    poll_load_result, save_report, send_report, validate_report,
 };
 pub use report_list::ReportOverview;
 pub use search::{RowHighlight, Search};
@@ -96,6 +96,13 @@ pub struct TaxelApp {
     pub send_certificate_path: Option<PathBuf>,
     /// Password entered in the send modal, persisted across opens (in-memory only).
     pub send_password: String,
+    /// Controls whether the new-report creation modal is visible.
+    pub show_new_report_modal: bool,
+    /// Form state for the new-report dialog, preserved across opens.
+    pub new_report_form: NewReportForm,
+    /// Holds the form from the most recent `create_report` call while waiting
+    /// for the user to confirm a taxonomy download. Cleared on cancel or retry.
+    pub pending_new_report_form: Option<NewReportForm>,
 }
 
 impl TaxelApp {
@@ -187,6 +194,9 @@ impl TaxelApp {
             pending_download_path: None,
             send_certificate_path: None,
             send_password: String::new(),
+            show_new_report_modal: false,
+            new_report_form: NewReportForm::default(),
+            pending_new_report_form: None,
         }
     }
 
@@ -418,6 +428,10 @@ impl App for TaxelApp {
                 ui::draw_shortcuts_modal(ctx, self);
             }
 
+            if self.show_new_report_modal {
+                ui::draw_new_report_modal(ctx, self);
+            }
+
             if self.show_download_modal {
                 let mut confirm = false;
                 let mut cancel = false;
@@ -427,10 +441,13 @@ impl App for TaxelApp {
                     self.show_download_modal = false;
                     if let Some(path) = self.pending_download_path.take() {
                         app::load_report(self, path, ctx.ctx().clone(), true);
+                    } else if let Some(form) = self.pending_new_report_form.take() {
+                        app::create_report(self, form, ctx.ctx().clone(), true);
                     }
                 } else if cancel {
                     self.show_download_modal = false;
                     self.pending_download_path = None;
+                    self.pending_new_report_form = None;
                 }
             }
         });

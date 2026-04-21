@@ -1,6 +1,5 @@
 use crate::{
-    app::{self, AppDiagnostic, DiagnosticCategory, DiagnosticLevel},
-    infrastructure::report_store,
+    app::{self, DiagnosticLevel},
     ui::diagnostic_panel::{SUCCESS_COLOR, WARNING_COLOR},
     TaxelApp,
 };
@@ -94,20 +93,7 @@ fn draw_import_button(ui: &mut Ui, app: &mut TaxelApp) {
             .add_filter("All", &["*"])
             .pick_file()
         {
-            match report_store::copy_report(&path) {
-                Ok(copied_path) => {
-                    app.register_report(&copied_path);
-                    app.refresh_reports();
-                    app::load_report(app, copied_path, ui.ctx().clone(), false);
-                }
-                Err(err) => {
-                    app.diagnostics.push(AppDiagnostic::new_error(
-                        DiagnosticCategory::App,
-                        format!("Failed to import report: {err}"),
-                    ));
-                    app.show_error_panel = true;
-                }
-            }
+            app::import_report(app, path, ui.ctx());
         }
     }
 }
