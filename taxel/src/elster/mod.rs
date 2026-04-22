@@ -305,12 +305,12 @@ impl ElsterReport {
                         "NutzdatenHeader" => {
                             payload_version = get_attr(event, b"version").unwrap_or_default();
                         }
-                        "Empfaenger" => {
-                            // Only the NutzdatenHeader/Empfaenger has text content + id attr.
-                            // TransferHeader/Empfaenger (rare, id="L") is ignored.
-                            if path.last().map(|s| s.as_str()) == Some("NutzdatenHeader") {
-                                recipient_id = get_attr(event, b"id").unwrap_or_default();
-                            }
+                        // Only the NutzdatenHeader/Empfaenger has text content + id attr.
+                        // TransferHeader/Empfaenger (rare, id="L") is ignored.
+                        "Empfaenger"
+                            if path.last().map(|s| s.as_str()) == Some("NutzdatenHeader") =>
+                        {
+                            recipient_id = get_attr(event, b"id").unwrap_or_default();
                         }
                         "EBilanz" => {
                             ebilanz_version = get_attr(event, b"version").unwrap_or_default();
