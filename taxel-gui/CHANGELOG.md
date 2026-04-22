@@ -2,6 +2,8 @@
 
 ## v0.1.0 (unreleased)
 
+- fixed
+  - Fix non-nil facts with empty string as value
 - added
   - Import report
   - Display report

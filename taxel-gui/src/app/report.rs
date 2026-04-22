@@ -562,7 +562,11 @@ pub fn save_report(app: &mut TaxelApp) {
                 }
 
                 if let Some(idx) = row.fact_index {
-                    instance.set_fact_value(idx, row.value.clone());
+                    if row.value.is_empty() {
+                        instance.set_fact_nil(idx, true);
+                    } else {
+                        instance.set_fact_value(idx, row.value.clone());
+                    }
                 }
             }
         }
