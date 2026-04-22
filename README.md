@@ -2,13 +2,13 @@
 
 [![build status](https://github.com/quambene/taxel/actions/workflows/ci.yml/badge.svg)](https://github.com/quambene/taxel/actions/workflows/ci.yml)
 
-Taxel provides a command line interface (CLI) to generate the electronic balance
+Taxel provides a GUI and command line interface (CLI) to generate the electronic balance
 sheet (eBilanz) in the XBRL format.
 
 ![Taxel mockup](/mockup.png)
 
-Generate an XML file in the XBRL standard from a CSV file with tax and accounting
-data; validate and send the XBRL document to tax authorities.
+Generate a report in the XBRL standard with tax and accounting data; validate
+and send the XBRL document to the tax authorities.
 
 Supported features:
 
@@ -17,16 +17,28 @@ Supported features:
 ---
 
 - [What is eBilanz?](#what-is-ebilanz)
-- [Install Taxel](#install-taxel)
-- [Usage](#usage)
-- [Testing](#testing)
+- [Taxel GUI](#taxel-gui)
+  - [Install Taxel GUI](#install-taxel-gui)
+- [Taxel CLI](#taxel-cli)
+  - [Install Taxel CLI](#install-taxel-cli)
+  - [Usage](#usage)
+  - [Testing](#testing)
 - [Rust bindings and SDK for the ELSTER Rich Client (ERiC)](#rust-bindings-and-sdk-for-the-elster-rich-client-eric)
+- [Changelog](#changelog)
 
 ## What is eBilanz?
 
 eBilanz (short for _Elektronische Bilanz_) is the electronic transmission of the company balance sheet and P&L in a standardized format (XBRL) to the tax authorities in the context of tax declaration.
 
-## Install Taxel
+## Taxel GUI
+
+### Install Taxel GUI
+
+To be released
+
+## Taxel CLI
+
+### Install Taxel CLI
 
 ``` bash
 git clone git@github.com:quambene/taxel.git
@@ -38,7 +50,7 @@ cargo install --path ./taxel-cli
 
 _Note:_ Run `cargo install --path ./taxel-cli` again to update to the latest version. Uninstall the binary with `cargo uninstall taxel`.
 
-## Usage
+### Usage
 
 ``` bash
 # Extract values from xml file
@@ -79,7 +91,7 @@ taxel send \
     --print "my_eBilanz.pdf"
 ```
 
-## Testing
+### Testing
 
 ``` bash
 # Run unit tests for taxel-cli
@@ -102,3 +114,11 @@ pytest -v -m unit
 ## Rust bindings and SDK for the ELSTER Rich Client (ERiC)
 
 Rust bindings and SDK for ERiC were moved to <https://github.com/quambene/eric-rs>.
+
+## Changelog
+
+The `taxel` repository contains multiple crates with separate changelogs:
+
+- `taxel`: [view changelog](https://github.com/quambene/taxel/blob/main/taxel/CHANGELOG.md)
+- `taxel-cli`: [view changelog](https://github.com/quambene/taxel/blob/main/taxel-cli/CHANGELOG.md)
+- `taxel-gui`: [view changelog](https://github.com/quambene/taxel/blob/main/taxel-gui/CHANGELOG.md)
