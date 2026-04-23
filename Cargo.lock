@@ -4576,7 +4576,6 @@ dependencies = [
  "egui_extras",
  "env_logger",
  "eric-sdk",
- "futures-channel",
  "log",
  "quick-xml 0.29.0",
  "rfd",

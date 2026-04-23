@@ -26,6 +26,3 @@ eframe = { workspace = true }
 egui_extras = { workspace = true }
 rfd = { workspace = true }
 dioxus-devtools = { workspace = true }
-# TODO: remove workaround after fix for dioxus-devtools is published
-# Workaround for <https://github.com/DioxusLabs/dioxus/issues/5433>.
-futures-channel = "0.3.32"
