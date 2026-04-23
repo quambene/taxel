@@ -1025,15 +1025,15 @@ dependencies = [
 
 [[package]]
 name = "dioxus-cli-config"
-version = "0.7.4"
+version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "86a13d42c5defcea333bdbae1dc5d64d078acd0fda1d8a1441c37e06be5146e3"
+checksum = "d4ad73f0ff638cd27466d389cd57f0975f909b66130dc1c25d5212d4041e5352"
 
 [[package]]
 name = "dioxus-core"
-version = "0.7.4"
+version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fb3dd61889e6a09daec93d44db86047fb8e6603beedcf9351b8528582254e075"
+checksum = "247ed8d679a13232641f1c84ba22246623fae01320b4c22db225c0b4f2fa7398"
 dependencies = [
  "anyhow",
  "const_format",
@@ -1053,15 +1053,15 @@ dependencies = [
 
 [[package]]
 name = "dioxus-core-types"
-version = "0.7.4"
+version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b99d7d199aad72431b549759550002e7d72c8a257eba500dca9fbdb2122de103"
+checksum = "cbfea5c8946e0745b254b5c33c515d81b3ba638f33c2a532ed06730392394d4d"
 
 [[package]]
 name = "dioxus-devtools"
-version = "0.7.4"
+version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d27e7212436a581ce058d7554f1383916bd18a68ebd6015b0b4c2e9ecb0d5535"
+checksum = "08d30370fa78266aed3f3d9119dea2de9e92a0348941dbfa777f7a669f2ea375"
 dependencies = [
  "dioxus-cli-config",
  "dioxus-core",
@@ -1077,9 +1077,9 @@ dependencies = [
 
 [[package]]
 name = "dioxus-devtools-types"
-version = "0.7.4"
+version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6aa24ed651b97e0b423270bf07a0f1b7dc0e0fa1f1dc26407cd2a118d6bf9de5"
+checksum = "3907a2b61cf56039f047da6a37317a03d9e15411753bc40e5e34a27e405ac320"
 dependencies = [
  "dioxus-core",
  "serde",
@@ -1088,9 +1088,9 @@ dependencies = [
 
 [[package]]
 name = "dioxus-signals"
-version = "0.7.4"
+version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "409bf65d243443416650945f22cd6caf2a6bb13ae0347a50ec5852adb1961072"
+checksum = "5393fd579f42c6547bf47ec0a2dedf2a366cd541d31deedc1059a096e6c35798"
 dependencies = [
  "dioxus-core",
  "futures-channel",
@@ -1447,7 +1447,7 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 [[package]]
 name = "eric-bindings"
 version = "0.5.1"
-source = "git+https://github.com/quambene/eric-rs.git#69caeda376b2dd952333f8fab621e96d4acab90d"
+source = "git+https://github.com/quambene/eric-rs.git#f93cf2b52e3c21297fc12a505e80ce0fef82ab07"
 dependencies = [
  "anyhow",
 ]
@@ -1455,7 +1455,7 @@ dependencies = [
 [[package]]
 name = "eric-sdk"
 version = "0.5.0"
-source = "git+https://github.com/quambene/eric-rs.git#69caeda376b2dd952333f8fab621e96d4acab90d"
+source = "git+https://github.com/quambene/eric-rs.git#f93cf2b52e3c21297fc12a505e80ce0fef82ab07"
 dependencies = [
  "anyhow",
  "eric-bindings",
@@ -1709,9 +1709,9 @@ dependencies = [
 
 [[package]]
 name = "generational-box"
-version = "0.7.4"
+version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4ede46ff252793f9b6ef752c506ba8600c69d73cad2ef9bbf2e6dee85019a3bc"
+checksum = "c68d74be1fbe3bba37604bdfd61403f26af9f6324cf325053abd89d60c22e799"
 dependencies = [
  "parking_lot",
  "tracing",
@@ -4056,9 +4056,9 @@ dependencies = [
 
 [[package]]
 name = "rustls"
-version = "0.23.38"
+version = "0.23.39"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69f9466fb2c14ea04357e91413efb882e2a6d4a406e625449bc0a5d360d53a21"
+checksum = "7c2c118cb077cca2822033836dfb1b975355dfb784b5e8da48f7b6c5db74e60e"
 dependencies = [
  "once_cell",
  "ring",
@@ -4080,9 +4080,9 @@ dependencies = [
 
 [[package]]
 name = "rustls-webpki"
-version = "0.103.12"
+version = "0.103.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8279bb85272c9f10811ae6a6c547ff594d6a7f3c6c6b02ee9726d1d0dcfcdd06"
+checksum = "61c429a8649f110dddef65e2a5ad240f747e85f7758a6bccc7e5777bd33f756e"
 dependencies = [
  "ring",
  "rustls-pki-types",
@@ -4459,9 +4459,9 @@ dependencies = [
 
 [[package]]
 name = "subsecond"
-version = "0.7.4"
+version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5dbb9f2928b6654ccc28d4ddfef5213e97ed66afed4907774d049b376c62a838"
+checksum = "feae81a4a7ca6d0bcf70c385a43b7dbacbff527f0805cb0a4043ce2c2c559a2c"
 dependencies = [
  "js-sys",
  "libc",
@@ -4478,9 +4478,9 @@ dependencies = [
 
 [[package]]
 name = "subsecond-types"
-version = "0.7.4"
+version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "388bb28e6ddbee717745963b8932d9a6e24a5d3c93350655f733e938de04d81f"
+checksum = "85256ee192cbdf00473e48e6133863b125dd4f772fddfbc97287ec7a61458c25"
 dependencies = [
  "serde",
 ]
@@ -4790,7 +4790,7 @@ dependencies = [
  "indexmap 2.14.0",
  "toml_datetime",
  "toml_parser",
- "winnow 1.0.1",
+ "winnow 1.0.2",
 ]
 
 [[package]]
@@ -4799,7 +4799,7 @@ version = "1.1.2+spec-1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2abe9b86193656635d2411dc43050282ca48aa31c2451210f4202550afb7526"
 dependencies = [
- "winnow 1.0.1",
+ "winnow 1.0.2",
 ]
 
 [[package]]
@@ -6057,9 +6057,9 @@ dependencies = [
 
 [[package]]
 name = "winnow"
-version = "1.0.1"
+version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "09dac053f1cd375980747450bfc7250c264eaae0583872e845c0c7cd578872b5"
+checksum = "2ee1708bef14716a11bae175f579062d4554d95be2c6829f518df847b7b3fdd0"
 dependencies = [
  "memchr",
 ]
@@ -6214,7 +6214,7 @@ checksum = "ea6fc2961e4ef194dcbfe56bb845534d0dc8098940c7e5c012a258bfec6701bd"
 [[package]]
 name = "xbrl-rs"
 version = "0.2.1"
-source = "git+https://github.com/quambene/xbrl-rs.git#243f65f3386a09e622cec83c7c626d49f53608eb"
+source = "git+https://github.com/quambene/xbrl-rs.git#eaf18e2f5c6999d9e94b98b1412e6bd0b2fd41e1"
 dependencies = [
  "chrono",
  "indexmap 2.14.0",
