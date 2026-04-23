@@ -69,10 +69,10 @@ impl Default for NewReportForm {
 #[allow(clippy::large_enum_variant)]
 pub enum LoadOutcome {
     /// The report was loaded successfully and is ready to be displayed.
-    Ready(TaxonomySet, InstanceDocument, Report),
+    Ready(TaxonomySet, InstanceDocument, Report, ElsterReport),
     /// Like `Ready`, but the report was freshly created or imported and must be
     /// registered in the manifest before it appears in the report list.
-    Created(TaxonomySet, InstanceDocument, Report),
+    Created(TaxonomySet, InstanceDocument, Report, ElsterReport),
     /// Taxonomies are missing from disk; the user must confirm before downloading.
     NeedsDownload,
 }
@@ -206,7 +206,17 @@ fn load_instance_document(path: &Path, allow_download: bool) -> Result<LoadOutco
 
     report.populate(view, &item_facts);
 
-    Ok(LoadOutcome::Ready(taxonomy, instance, report))
+    let xml = fs::read_to_string(path)
+        .with_context(|| format!("Failed to read Elster XML from {}", path.display()))?;
+    let elster_report = ElsterReport::parse(&xml)
+        .with_context(|| format!("Failed to parse ElsterReport from {}", path.display()))?;
+
+    Ok(LoadOutcome::Ready(
+        taxonomy,
+        instance,
+        report,
+        elster_report,
+    ))
 }
 
 /// Creates a new blank report from a taxonomy for the given form parameters.
@@ -421,19 +431,19 @@ fn create_instance_document(
     fs::write(&dest, &xml)
         .with_context(|| format!("Failed to write new report to {}", dest.display()))?;
 
-    Ok(LoadOutcome::Created(taxonomy, instance, report))
+    Ok(LoadOutcome::Created(taxonomy, instance, report, elster))
 }
 
 /// Polls the background XML load result and updates the app state accordingly.
 pub fn poll_load_result(app: &mut TaxelApp) {
     if let Some(rx) = &app.loading {
         match rx.try_recv() {
-            Ok(Ok(LoadOutcome::Ready(taxonomy, instance, report))) => {
-                finish_load(app, taxonomy, instance, report);
+            Ok(Ok(LoadOutcome::Ready(taxonomy, instance, report, elster_report))) => {
+                finish_load(app, taxonomy, instance, report, elster_report);
             }
-            Ok(Ok(LoadOutcome::Created(taxonomy, instance, report))) => {
+            Ok(Ok(LoadOutcome::Created(taxonomy, instance, report, elster_report))) => {
                 app.register_report(&report.path);
-                finish_load(app, taxonomy, instance, report);
+                finish_load(app, taxonomy, instance, report, elster_report);
             }
             Ok(Ok(LoadOutcome::NeedsDownload)) => {
                 app.show_download_modal = true;
@@ -461,6 +471,7 @@ fn finish_load(
     taxonomy: TaxonomySet,
     instance: InstanceDocument,
     mut report: Report,
+    elster_report: ElsterReport,
 ) {
     for missing_role in &report.role_mapping_errors {
         app.diagnostics.push(AppDiagnostic::new_warning(
@@ -486,6 +497,7 @@ fn finish_load(
     app.report = Some(report);
     app.taxonomy = Some(taxonomy);
     app.instance_document = Some(instance);
+    app.elster_report = Some(elster_report);
     app.loading = None;
 }
 
@@ -583,14 +595,11 @@ pub fn save_report(app: &mut TaxelApp) {
                 ));
             }
             Ok(()) => {
-                // Re-read the stored Elster XML, inject the new XBRL bytes, and
-                // write the full envelope back so the Elster wrapper is preserved.
-                let result = fs::read_to_string(&report.path)
-                    .context("Failed to read report file")
-                    .and_then(|xml| {
-                        ElsterReport::parse(&xml).context("Failed to parse Elster report")
-                    })
-                    .and_then(|mut elster| {
+                let result = app
+                    .elster_report
+                    .as_mut()
+                    .context("No Elster report in app state")
+                    .and_then(|elster| {
                         elster.set_payload_xbrl(xbrl_bytes);
                         elster.to_xml().context("Failed to serialize Elster report")
                     })
@@ -625,21 +634,49 @@ pub fn validate_report(app: &mut TaxelApp) {
     app.report_list
         .set_report_status(&report.path, ReportStatus::Draft, &mut app.diagnostics);
 
-    let Some(xml) = read_report(
-        &report.path,
-        &mut app.diagnostics,
-        &mut app.show_error_panel,
-    ) else {
-        return;
-    };
-    let Some(eric) = &app.eric else { return };
+    serialize_and_validate_report(app)
+        .map_err(|err| {
+            app.diagnostics.push(AppDiagnostic::new_error(
+                DiagnosticCategory::Validation,
+                err.to_string(),
+            ));
+        })
+        .ok();
+}
+
+/// Serializes the current XBRL instance document, wraps it in an Elster
+/// envelope, and sends it to ERiC for validation.
+fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error> {
+    let instance = app
+        .instance_document
+        .as_ref()
+        .context("Failed to get instance document from app state")?;
+    let mut xbrl_bytes = Vec::new();
+
+    instance
+        .to_writer(&mut xbrl_bytes)
+        .context("Failed to serialize XBRL instance")?;
+
     let Some(taxonomy_version) = extract_taxonomy_version(&app.taxonomy) else {
         app.diagnostics.push(AppDiagnostic::taxonomy_version_error(
             DiagnosticCategory::Validation,
         ));
         app.show_error_panel = true;
-        return;
+        return Ok(());
     };
+
+    let elster = app
+        .elster_report
+        .as_mut()
+        .context("No Elster report in app state")?;
+
+    elster.set_payload_xbrl(xbrl_bytes);
+
+    let xml = elster
+        .to_xml()
+        .context("Failed to serialize Elster report")?;
+
+    let eric = app.eric.as_ref().context("Failed to get Eric")?;
 
     match eric.validate(xml, "Bilanz", taxonomy_version, None) {
         Ok(response) => {
@@ -676,7 +713,7 @@ pub fn validate_report(app: &mut TaxelApp) {
         )),
     }
 
-    app.show_error_panel = true;
+    Ok(())
 }
 
 // TODO: provide certifcate path and password
@@ -779,6 +816,7 @@ pub fn delete_report(app: &mut TaxelApp) {
             app.report = None;
             app.taxonomy = None;
             app.instance_document = None;
+            app.elster_report = None;
             app.selected_tab = 0;
             app.search.results.clear();
             app.search.scroll_to_row = None;

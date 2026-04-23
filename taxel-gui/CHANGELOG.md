@@ -4,6 +4,7 @@
 
 - fixed
   - Fix non-nil facts with empty string as value
+  - Fix unsanitized xml for `Eric::validate`
 - added
   - Import report
   - Display report

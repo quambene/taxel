@@ -29,6 +29,7 @@ use std::{
     path::{Path, PathBuf},
     sync::mpsc::Receiver,
 };
+use taxel::ElsterReport;
 use xbrl_rs::{InstanceDocument, TaxonomySet};
 
 /// The name of the application.
@@ -52,6 +53,8 @@ pub struct TaxelApp {
     pub taxonomy: Option<TaxonomySet>,
     /// The instance document currently loaded in the app, if any.
     pub instance_document: Option<InstanceDocument>,
+    /// The Elster envelope for the currently loaded report, if any.
+    pub elster_report: Option<ElsterReport>,
     /// Eric instance to validate XBRL instance documents and provide
     /// diagnostics. Initialized on app start if the data directory can be
     /// determined, otherwise skipped with a warning.
@@ -175,6 +178,7 @@ impl TaxelApp {
         Self {
             taxonomy: None,
             instance_document: None,
+            elster_report: None,
             report: table,
             selected_tab: 0,
             section_states,
