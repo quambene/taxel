@@ -5,6 +5,16 @@ version = "0.2.0"
 authors = [
     {name = "quambene", email = "contact.quambene@gmail.com"},
 ]
+requires-python = ">=3.10"
+dependencies = [
+    "lxml>=6.1.0",
+    "xmlschema>=3.3.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.1",
+]
 
 [tool.pytest.ini_options]
 markers = ["unit", "integration"]
@@ -15,18 +25,3 @@ testpaths = "src/xsd_to_xml.py"
 addopts = [
     "--import-mode=importlib",
 ]
-
-[tool.poetry]
-name = "taxel-py"
-version = "0.2.0"
-description = "Convert xsd to xml"
-authors = ["quambene <contact.quambene@gmail.com>"]
-package-mode = false
-
-[tool.poetry.dependencies]
-python = "^3.10"
-lxml = "^5.2.2"
-xmlschema = "^3.3.1"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3.1"
