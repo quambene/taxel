@@ -71,17 +71,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - name: Install Poetry
-        run: pip install poetry
-        working-directory: taxel-py
+      - uses: astral-sh/setup-uv@v5
       - name: Install dependencies
-        run: |
-          poetry lock
-          poetry install --with dev --no-interaction --no-ansi
+        run: uv sync
         working-directory: taxel-py
       - name: Run tests
-        run: poetry run pytest -v -m unit
+        run: uv run pytest -v -m unit
         working-directory: taxel-py
