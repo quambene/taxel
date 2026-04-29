@@ -1,6 +1,7 @@
 use crate::domain::ReportStatus;
 use std::{collections::HashMap, path::PathBuf};
 use taxel::{GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
+use taxel::TaxonomyType;
 use xbrl_rs::{DocumentView, ItemFact, TreeNode, ROLE_LABEL, ROLE_TERSE};
 
 /// A row in the fact table, representing a single fact or a concept without
@@ -30,7 +31,8 @@ pub struct FactRow {
 /// One presentation section with its rows.
 #[derive(Debug, Default, Clone)]
 pub struct ReportSection {
-    /// The full extended link role URI, e.g. `http://example.com/role/BalanceSheet`.
+    /// The full extended link role URI, e.g.
+    /// `http://www.xbrl.de/taxonomies/de-gaap-ci/role/balanceSheet`.
     pub role: String,
     /// Sidebar display labels resolved from taxonomy concepts, keyed by
     /// language code (e.g. "en", "de").
@@ -52,6 +54,8 @@ pub struct ReportSection {
 pub struct Report {
     /// The file path of the report, used for persistence.
     pub path: PathBuf,
+    /// The taxonomy type, derived from the schema ref URLs in the instance document.
+    pub taxonomy_type: TaxonomyType,
     /// The report status for lifecycle management.
     pub status: ReportStatus,
     /// The sections in the order they appear in the presentation linkbase.
@@ -62,9 +66,10 @@ pub struct Report {
 }
 
 impl Report {
-    pub fn new(path: PathBuf) -> Self {
+    pub fn new(path: PathBuf, taxonomy_type: TaxonomyType) -> Self {
         Self {
             path,
+            taxonomy_type,
             status: ReportStatus::Draft,
             sections: Vec::new(),
             role_mapping_errors: Vec::new(),

@@ -202,7 +202,9 @@ fn load_instance_document(path: &Path, allow_download: bool) -> Result<LoadOutco
     let taxonomy = TaxonomySet::discover(schema_refs, taxonomy_dir)?;
     let view = instance.view(&taxonomy);
     let item_facts = instance.item_facts();
-    let mut report = Report::new(path.to_path_buf());
+    let taxonomy_type = TaxonomyType::from_schema_refs(&instance.schema_refs().to_vec())
+        .unwrap_or_default();
+    let mut report = Report::new(path.to_path_buf(), taxonomy_type);
 
     report.populate(view, &item_facts);
 
@@ -390,7 +392,7 @@ fn create_instance_document(
     let view = instance.view(&taxonomy);
     let item_facts = instance.item_facts();
     let dest = new_report_path()?;
-    let mut report = Report::new(dest.clone());
+    let mut report = Report::new(dest.clone(), form.taxonomy_type.clone());
 
     report.populate(view, &item_facts);
 

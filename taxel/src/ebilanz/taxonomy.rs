@@ -57,6 +57,30 @@ impl TaxonomyType {
         vec![gcd, domain]
     }
 
+    /// Determines the taxonomy type from a set of schema ref URLs as embedded
+    /// in an XBRL instance document.
+    pub fn from_schema_refs(schema_refs: &[String]) -> Option<Self> {
+        schema_refs.iter().find_map(|schema_ref| {
+            if schema_ref.contains("de-gaap-ci") && schema_ref.contains("microbilg") {
+                Some(TaxonomyType::CoreFiscalMicroBilG)
+            } else if schema_ref.contains("de-gaap-ci") {
+                Some(TaxonomyType::CoreFiscal)
+            } else if schema_ref.contains("de-bra") && schema_ref.contains("microbilg") {
+                Some(TaxonomyType::SupplementaryFiscalMicroBilG)
+            } else if schema_ref.contains("de-bra") {
+                Some(TaxonomyType::SupplementaryFiscal)
+            } else if schema_ref.contains("de-fi") {
+                Some(TaxonomyType::CreditInstitution)
+            } else if schema_ref.contains("de-pi") {
+                Some(TaxonomyType::PaymentInstitution)
+            } else if schema_ref.contains("de-ins") {
+                Some(TaxonomyType::Insurance)
+            } else {
+                None
+            }
+        })
+    }
+
     /// Returns the XML namespace prefix for the given taxonomy date and type.
     pub fn namespace_prefix(&self) -> &'static str {
         match self {
