@@ -196,13 +196,22 @@ pub fn draw_new_report_modal(ui: &mut Ui, app: &mut TaxelApp) {
 
                 ui.label("Taxonomy version");
                 ComboBox::from_id_salt("new_report_taxonomy_version")
-                    .selected_text(&app.new_report_form.taxonomy_version)
+                    .selected_text(format!(
+                        "{} ({})",
+                        app.new_report_form.taxonomy_version,
+                        TAXONOMY_VERSION_TO_DATE
+                            .get(app.new_report_form.taxonomy_version.as_str())
+                            .unwrap_or(&"unknown")
+                    ))
                     .show_ui(ui, |ui| {
                         for &version in &available_versions {
                             ui.selectable_value(
                                 &mut app.new_report_form.taxonomy_version,
                                 version.to_string(),
-                                version,
+                                format!(
+                                    "{version} ({})",
+                                    TAXONOMY_VERSION_TO_DATE.get(version).unwrap_or(&"unknown")
+                                ),
                             );
                         }
                     });
