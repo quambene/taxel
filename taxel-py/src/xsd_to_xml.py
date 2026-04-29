@@ -88,7 +88,7 @@ def test_generate_xml_simple():
     actual_xml = ET.tostring(root, encoding="UTF-8", xml_declaration=True)
 
     with open(output_path, 'r', encoding="UTF-8") as file:
-        expected_xml = file.read()
+        expected_xml = file.read().rstrip()
 
     assert actual_xml.decode("UTF-8") == expected_xml
 
@@ -128,7 +128,7 @@ def test_generate_xml_substitution_group():
     actual_xml = ET.tostring(root, encoding="UTF-8", xml_declaration=True)
 
     with open(output_path, 'r', encoding="UTF-8") as file:
-        expected_xml = file.read()
+        expected_xml = file.read().rstrip()
 
     assert actual_xml.decode("UTF-8") == expected_xml
 
