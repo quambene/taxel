@@ -17,7 +17,7 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-markers = ["unit", "integration"]
+markers = ["unit", "integration", "ignore"]
 pythonpath = [
   "src/"
 ]
