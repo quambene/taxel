@@ -149,6 +149,7 @@ pub fn load_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context, allow_
     app.editing_section = None;
     app.edit_snapshot.clear();
     app.pending_download_path = Some(path.clone());
+    app.pending_new_report_form = None;
 
     spawn_load_thread(app, path, ctx, allow_download);
 }
@@ -232,6 +233,7 @@ pub fn create_report(
     app.diagnostics.clear();
     app.editing_section = None;
     app.edit_snapshot.clear();
+    app.pending_download_path = None;
     app.pending_new_report_form = Some(form.clone());
 
     let (tx, rx) = mpsc::channel();
@@ -527,6 +529,8 @@ fn finish_load(
     app.instance_document = Some(instance);
     app.elster_report = Some(elster_report);
     app.loading = None;
+    app.pending_download_path = None;
+    app.pending_new_report_form = None;
 }
 
 fn new_report_path() -> Result<PathBuf, anyhow::Error> {
