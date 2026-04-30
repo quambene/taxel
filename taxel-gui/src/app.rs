@@ -204,9 +204,24 @@ impl TaxelApp {
         }
     }
 
-    pub fn register_report(&mut self, path: &Path) {
-        self.report_list
-            .register_report(path, &mut self.diagnostics)
+    /// Registers a newly loaded report by adding it to the report list, or
+    /// updating it if already present, and persists the updated manifest.
+    pub fn upsert_report(
+        &mut self,
+        path: &Path,
+        taxonomy_type: Option<taxel::TaxonomyType>,
+        taxonomy_version: Option<String>,
+        start_date: Option<String>,
+        end_date: Option<String>,
+    ) {
+        self.report_list.upsert_report(
+            path,
+            taxonomy_type,
+            taxonomy_version,
+            start_date,
+            end_date,
+            &mut self.diagnostics,
+        )
     }
 
     /// Registers a newly imported report by adding it to the report list.
@@ -274,6 +289,7 @@ impl App for TaxelApp {
                             ui,
                             self.report_list.reports(),
                             self.loading.is_some(),
+                            &self.settings.lang,
                         ) {
                             app::load_report(self, path, ui.ctx().clone(), false);
                         }

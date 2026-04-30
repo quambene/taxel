@@ -6,6 +6,7 @@ use std::{
     fs,
     path::{Path, PathBuf},
 };
+use taxel::TaxonomyType;
 
 /// The file name of the manifest that stores report metadata. This manifest is
 /// stored in the application's directory.
@@ -16,9 +17,18 @@ const CREATION_MANIFEST_FILE: &str = "reports.json";
 pub struct ReportManifestEntry {
     /// The creation date as a unix timestamp.
     pub created: i64,
+    /// The last change date as a unix timestamp.
+    pub changed: i64,
     /// The lifecycle status of the report.
-    #[serde(default)]
     pub status: ReportStatus,
+    /// The eBilanz taxonomy type.
+    pub taxonomy_type: Option<TaxonomyType>,
+    /// The eBilanz taxonomy version.
+    pub taxonomy_version: Option<String>,
+    /// The reporting period start date in `YYYYMMDD` format.
+    pub start_date: Option<String>,
+    /// The reporting period end date in `YYYYMMDD` format.
+    pub end_date: Option<String>,
 }
 
 /// Loads the list of imported reports from the filesystem, extracting metadata
@@ -37,7 +47,12 @@ pub fn load_report_meta() -> Result<Vec<ReportMeta>> {
         .map(|(path, entry)| ReportMeta {
             path: PathBuf::from(path),
             created: entry.created,
+            changed: entry.changed,
             status: entry.status,
+            taxonomy_type: entry.taxonomy_type,
+            taxonomy_version: entry.taxonomy_version,
+            start_date: entry.start_date,
+            end_date: entry.end_date,
         })
         .collect();
 

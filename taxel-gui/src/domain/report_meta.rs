@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
+use taxel::TaxonomyType;
 
 /// The lifecycle status of a report.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
@@ -23,10 +24,20 @@ impl ReportStatus {
 /// Metadata about a report.
 #[derive(Clone, Debug)]
 pub struct ReportMeta {
-    /// The file path to the report file.
+    /// The file path of the report.
     pub path: PathBuf,
     /// The creation date as a unix timestamp.
     pub created: i64,
+    /// The last change date as a unix timestamp.
+    pub changed: i64,
     /// The lifecycle status of the report.
     pub status: ReportStatus,
+    /// The eBilanz taxonomy type.
+    pub taxonomy_type: Option<TaxonomyType>,
+    /// The eBilanz taxonomy version.
+    pub taxonomy_version: Option<String>,
+    /// The reporting period start date in `YYYYMMDD` format.
+    pub start_date: Option<String>,
+    /// The reporting period end date in `YYYYMMDD` format.
+    pub end_date: Option<String>,
 }

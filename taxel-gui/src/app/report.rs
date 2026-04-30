@@ -18,10 +18,11 @@ use std::{
     path::{Path, PathBuf},
     sync::mpsc,
     thread,
+    time::SystemTime,
 };
 use taxel::{
     elster::Submitter, ElsterReport, TaxonomyType, GCD_ROLE_URI, REPORT_ELEMENT_TO_ROLE_URI,
-    TAXONOMY_VERSION_TO_DATE, TAXONOMY_YEAR_TO_VERSION, TEST_MARKER,
+    TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE, TEST_MARKER,
 };
 use uuid::Uuid;
 use xbrl_rs::{
@@ -68,10 +69,10 @@ impl Default for NewReportForm {
 /// The result of a background load operation.
 #[allow(clippy::large_enum_variant)]
 pub enum LoadOutcome {
-    /// The report was loaded successfully and is ready to be displayed.
+    /// The report was loaded successfully. Already registered in the manifest.
     Ready(TaxonomySet, InstanceDocument, Report, ElsterReport),
-    /// Like `Ready`, but the report was freshly created or imported and must be
-    /// registered in the manifest before it appears in the report list.
+    /// Like `Ready`, but the report was freshly created or imported. The taxonomy
+    /// type is taken directly from the report rather than inferred from schema refs.
     Created(TaxonomySet, InstanceDocument, Report, ElsterReport),
     /// Taxonomies are missing from disk; the user must confirm before downloading.
     NeedsDownload,
@@ -84,9 +85,6 @@ pub enum LoadOutcome {
 pub fn import_report(app: &mut TaxelApp, path: PathBuf, ctx: &egui::Context) {
     match parse_and_copy_report(&path) {
         Ok(copied_path) => {
-            app.register_report(&copied_path);
-            app.refresh_reports();
-
             load_report(app, copied_path, ctx.clone(), false);
         }
         Err(err) => {
@@ -202,8 +200,7 @@ fn load_instance_document(path: &Path, allow_download: bool) -> Result<LoadOutco
     let taxonomy = TaxonomySet::discover(schema_refs, taxonomy_dir)?;
     let view = instance.view(&taxonomy);
     let item_facts = instance.item_facts();
-    let taxonomy_type = TaxonomyType::from_schema_refs(&instance.schema_refs().to_vec())
-        .unwrap_or_default();
+    let taxonomy_type = TaxonomyType::from_schema_refs(instance.schema_refs()).unwrap_or_default();
     let mut report = Report::new(path.to_path_buf(), taxonomy_type);
 
     report.populate(view, &item_facts);
@@ -436,6 +433,22 @@ fn create_instance_document(
     Ok(LoadOutcome::Created(taxonomy, instance, report, elster))
 }
 
+/// Extracts the fiscal year begin and end dates from the GCD facts of an
+/// instance document.
+fn extract_period(instance: &InstanceDocument) -> (Option<String>, Option<String>) {
+    let mut start = None;
+    let mut end = None;
+
+    for fact in instance.item_facts() {
+        match fact.concept_name().local_name.as_str() {
+            "genInfo.report.period.fiscalYearBegin" => start = Some(fact.value().to_owned()),
+            "genInfo.report.period.fiscalYearEnd" => end = Some(fact.value().to_owned()),
+            _ => {}
+        }
+    }
+    (start, end)
+}
+
 /// Polls the background XML load result and updates the app state accordingly.
 pub fn poll_load_result(app: &mut TaxelApp) {
     if let Some(rx) = &app.loading {
@@ -444,7 +457,20 @@ pub fn poll_load_result(app: &mut TaxelApp) {
                 finish_load(app, taxonomy, instance, report, elster_report);
             }
             Ok(Ok(LoadOutcome::Created(taxonomy, instance, report, elster_report))) => {
-                app.register_report(&report.path);
+                let (start_date, end_date) = extract_period(&instance);
+                let taxonomy_version =
+                    extract_taxonomy_version_from_schema_refs(instance.schema_refs())
+                        .map(|v| v.to_owned());
+
+                app.upsert_report(
+                    &report.path,
+                    Some(report.taxonomy_type.clone()),
+                    taxonomy_version,
+                    start_date,
+                    end_date,
+                );
+                app.refresh_reports();
+
                 finish_load(app, taxonomy, instance, report, elster_report);
             }
             Ok(Ok(LoadOutcome::NeedsDownload)) => {
@@ -534,7 +560,8 @@ pub fn edit_report(app: &mut TaxelApp) {
     // as draft again since it has unsaved changes now.
     if let Some(report) = &app.report {
         app.report_list
-            .set_report_status(&report.path, ReportStatus::Draft, &mut app.diagnostics);
+            .set_report_status(&report.path, ReportStatus::Draft);
+        app.report_list.save(&mut app.diagnostics);
     }
 }
 
@@ -609,11 +636,18 @@ pub fn save_report(app: &mut TaxelApp) {
                         fs::write(&report.path, xml).context("Failed to write report to disk")
                     });
 
-                if let Err(err) = result {
-                    app.diagnostics.push(AppDiagnostic::new_error(
-                        DiagnosticCategory::App,
-                        format!("Failed to save report: {err}"),
-                    ));
+                match result {
+                    Ok(()) => {
+                        let now = SystemTime::now();
+                        app.report_list.set_timestamp(&report.path, now);
+                        app.report_list.save(&mut app.diagnostics);
+                    }
+                    Err(err) => {
+                        app.diagnostics.push(AppDiagnostic::new_error(
+                            DiagnosticCategory::App,
+                            format!("Failed to save report: {err}"),
+                        ));
+                    }
                 }
             }
         }
@@ -634,7 +668,8 @@ pub fn validate_report(app: &mut TaxelApp) {
 
     report.status = ReportStatus::Draft;
     app.report_list
-        .set_report_status(&report.path, ReportStatus::Draft, &mut app.diagnostics);
+        .set_report_status(&report.path, ReportStatus::Draft);
+    app.report_list.save(&mut app.diagnostics);
 
     serialize_and_validate_report(app)
         .map_err(|err| {
@@ -685,12 +720,11 @@ fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error
             if response.error_code == ErrorCode::ERIC_OK as i32 {
                 if let Some(report) = &mut app.report {
                     report.status = ReportStatus::Validated;
-                    app.report_list.set_report_status(
-                        &report.path,
-                        ReportStatus::Validated,
-                        &mut app.diagnostics,
-                    );
+                    app.report_list
+                        .set_report_status(&report.path, ReportStatus::Validated);
+                    app.report_list.save(&mut app.diagnostics);
                 }
+
                 app.diagnostics.push(AppDiagnostic::new_success(
                     DiagnosticCategory::Validation,
                     format!(
@@ -774,12 +808,11 @@ pub fn send_report(app: &mut TaxelApp) {
                 report.status = ReportStatus::Sent;
 
                 if let Some(report) = &app.report {
-                    app.report_list.set_report_status(
-                        &report.path,
-                        ReportStatus::Sent,
-                        &mut app.diagnostics,
-                    );
+                    app.report_list
+                        .set_report_status(&report.path, ReportStatus::Sent);
+                    app.report_list.save(&mut app.diagnostics);
                 }
+
                 app.diagnostics.push(AppDiagnostic::new_success(
                     DiagnosticCategory::Send,
                     format!("Send completed successfully\n{}", response.server_response),
@@ -868,14 +901,24 @@ fn read_report(
 }
 
 /// The taxonomy version is derived from the schemaRef URLs, which
-/// contain a date like "2024-06-30". We extract the year and map it to
+/// contain a date like "2024-06-30". We extract the date and map it to
 /// the corresponding version string expected by ERiC.
 fn extract_taxonomy_version(taxonomy: &Option<TaxonomySet>) -> Option<&&str> {
     taxonomy
         .as_ref()
-        .and_then(|taxonomy| taxonomy.version())
-        .map(|date| date.split('-').next().unwrap_or(date))
-        .and_then(|version| TAXONOMY_YEAR_TO_VERSION.get(version))
+        .and_then(|taxonomy| taxonomy.date())
+        .and_then(|date| TAXONOMY_DATE_TO_VERSION.get(date))
+}
+
+/// Determines the taxonomy version string (e.g. `"6.8"`) from a set of
+/// schema ref URLs by reverse-looking up the date embedded in the URL.
+pub fn extract_taxonomy_version_from_schema_refs(schema_refs: &[String]) -> Option<&'static str> {
+    schema_refs.iter().find_map(|schema_ref| {
+        TAXONOMY_VERSION_TO_DATE
+            .iter()
+            .find(|(_, date)| schema_ref.contains(*date))
+            .map(|(version, _)| *version)
+    })
 }
 
 /// Returns the path to the application's taxonomy directory, which is located

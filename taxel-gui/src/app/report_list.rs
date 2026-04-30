@@ -4,12 +4,13 @@ use crate::{
     infrastructure::report_store::{self, ReportManifestEntry},
 };
 use anyhow::Result;
-use chrono::{DateTime, Local, Utc};
 use std::{
+    cmp,
     collections::HashMap,
     path::{Path, PathBuf},
     time::SystemTime,
 };
+use taxel::TaxonomyType;
 
 /// The `ReportSummary` struct represents a summary of a created or imported
 /// report.
@@ -19,12 +20,20 @@ pub struct ReportOverview {
     /// The display name of the report, typically derived from the file name.
     pub display_name: String,
     /// The creation date as a unix timestamp.
-    pub unix_seconds: i64,
-    /// The creation date as a formatted string for display in the UI.
-    pub created_date: String,
+    pub created_date: i64,
+    /// The last change date as a unix timestamp.
+    pub changed: i64,
     /// The lifecycle status of the report, used for display and filtering in
     /// the UI.
     pub report_status: ReportStatus,
+    /// The eBilanz taxonomy type, if known from the manifest.
+    pub taxonomy_type: Option<TaxonomyType>,
+    /// The eBilanz taxonomy version, if known from the manifest.
+    pub taxonomy_version: Option<String>,
+    /// The reporting period start date in `YYYYMMDD` format, if known from the
+    /// manifest.
+    pub start_date: Option<String>,
+    pub end_date: Option<String>,
 }
 
 impl TryFrom<ReportMeta> for ReportOverview {
@@ -41,9 +50,13 @@ impl TryFrom<ReportMeta> for ReportOverview {
         Ok(Self {
             path: meta.path,
             display_name,
-            unix_seconds: meta.created,
-            created_date: format_date(meta.created),
+            created_date: meta.created,
+            changed: meta.changed,
             report_status: meta.status,
+            taxonomy_type: meta.taxonomy_type,
+            taxonomy_version: meta.taxonomy_version,
+            start_date: meta.start_date,
+            end_date: meta.end_date,
         })
     }
 }
@@ -77,35 +90,70 @@ impl ReportList {
             .map(ReportOverview::try_from)
             .collect::<Result<Vec<_>>>()?;
 
-        report_overiews.sort_by(|a, b| b.created_date.cmp(&a.created_date));
+        report_overiews.sort_by_key(|b| cmp::Reverse(b.created_date));
 
         self.reports = report_overiews;
 
         Ok(())
     }
 
-    /// Registers a created or imported report. Persists the updated manifest to
-    /// disk.
-    pub fn register_report(&mut self, report_path: &Path, diagnostics: &mut Vec<AppDiagnostic>) {
+    /// Adds a new report or updates an existing one in the list and persists
+    /// the updated manifest.
+    pub fn upsert_report(
+        &mut self,
+        report_path: &Path,
+        taxonomy_type: Option<TaxonomyType>,
+        taxonomy_version: Option<String>,
+        start_date: Option<String>,
+        end_date: Option<String>,
+        diagnostics: &mut Vec<AppDiagnostic>,
+    ) {
         let now = SystemTime::now();
-        let unix_seconds = system_time_to_unix_seconds(now);
+        let now = system_time_to_unix_seconds(now);
         let display_name = report_path
             .file_name()
             .and_then(|name| name.to_str())
             .unwrap_or("unknown.xml")
             .to_string();
 
+        if let Some(existing) = self
+            .reports
+            .iter_mut()
+            .find(|report| report.path == report_path)
+        {
+            existing.taxonomy_type = taxonomy_type;
+            existing.taxonomy_version = taxonomy_version;
+            existing.start_date = start_date;
+            existing.end_date = end_date;
+            existing.changed = now;
+
+            let manifest = self.build_manifest();
+
+            if let Err(err) = report_store::save_report_manifest(&manifest) {
+                diagnostics.push(AppDiagnostic::new_error(
+                    DiagnosticCategory::App,
+                    format!("Failed to save report manifest: {err}"),
+                ));
+            }
+
+            return;
+        }
+
         self.reports.push(ReportOverview {
             path: report_path.to_path_buf(),
             display_name,
-            unix_seconds,
-            created_date: format_date(unix_seconds),
+            created_date: now,
+            changed: now,
             report_status: ReportStatus::Draft,
+            taxonomy_type,
+            taxonomy_version,
+            start_date,
+            end_date,
         });
 
-        let manifest = &self.build_manifest();
+        let manifest = self.build_manifest();
 
-        if let Err(err) = report_store::save_report_manifest(manifest) {
+        if let Err(err) = report_store::save_report_manifest(&manifest) {
             diagnostics.push(AppDiagnostic::new_error(
                 DiagnosticCategory::App,
                 format!("Failed to save report manifest: {err}"),
@@ -127,27 +175,38 @@ impl ReportList {
         }
     }
 
-    pub fn set_report_status(
-        &mut self,
-        report_path: &Path,
-        status: ReportStatus,
-        diagnostics: &mut Vec<AppDiagnostic>,
-    ) {
+    /// Persists the current report list to the manifest on disk.
+    pub fn save(&self, diagnostics: &mut Vec<AppDiagnostic>) {
+        let manifest = self.build_manifest();
+
+        if let Err(err) = report_store::save_report_manifest(&manifest) {
+            diagnostics.push(AppDiagnostic::new_error(
+                DiagnosticCategory::App,
+                format!("Failed to save report manifest: {err}"),
+            ));
+        }
+    }
+
+    /// Updates the `changed` timestamp of a report in memory.
+    pub fn set_timestamp(&mut self, report_path: &Path, now: SystemTime) {
+        let now = system_time_to_unix_seconds(now);
+
+        if let Some(report) = self
+            .reports
+            .iter_mut()
+            .find(|report| report.path == report_path)
+        {
+            report.changed = now;
+        }
+    }
+
+    pub fn set_report_status(&mut self, report_path: &Path, status: ReportStatus) {
         if let Some(report) = self
             .reports
             .iter_mut()
             .find(|report| report.path == report_path)
         {
             report.report_status = status;
-        }
-
-        let manifest = &self.build_manifest();
-
-        if let Err(err) = report_store::save_report_manifest(manifest) {
-            diagnostics.push(AppDiagnostic::new_error(
-                DiagnosticCategory::App,
-                format!("Failed to save report manifest: {err}"),
-            ));
         }
     }
 
@@ -159,19 +218,18 @@ impl ReportList {
                 (
                     key,
                     ReportManifestEntry {
-                        created: report.unix_seconds,
+                        created: report.created_date,
+                        changed: report.changed,
                         status: report.report_status,
+                        taxonomy_type: report.taxonomy_type.clone(),
+                        taxonomy_version: report.taxonomy_version.clone(),
+                        start_date: report.start_date.clone(),
+                        end_date: report.end_date.clone(),
                     },
                 )
             })
             .collect()
     }
-}
-
-fn format_date(unix_seconds: i64) -> String {
-    DateTime::<Utc>::from_timestamp(unix_seconds, 0)
-        .map(|utc| utc.with_timezone(&Local).format("%Y-%m-%d").to_string())
-        .unwrap_or_else(|| "unknown".to_string())
 }
 
 fn system_time_to_unix_seconds(time: SystemTime) -> i64 {

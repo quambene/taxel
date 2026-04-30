@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, sync::LazyLock};
 
 pub const GCD_ROLE_URI: &str = "http://www.xbrl.de/taxonomies/de-gcd/role/gcd";
@@ -6,7 +7,7 @@ pub const GCD_LABEL: &str = "GCD (Global Common Document)";
 /// The eBilanz taxonomy module to use for a new report. Each variant
 /// corresponds to a specific set of schema ref URLs (plus the always-included
 /// GCD module).
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
 pub enum TaxonomyType {
     /// The core taxonomy for commercial/industrial entities (de-gaap-ci)
     #[default]
@@ -219,25 +220,24 @@ pub static TAXONOMY_VERSION_TO_DATE: LazyLock<HashMap<&'static str, &'static str
         ])
     });
 
-/// Maps each eBilanz taxonomy year to the corresponding version number.
-pub static TAXONOMY_YEAR_TO_VERSION: LazyLock<HashMap<&'static str, &'static str>> =
+/// Maps each eBilanz taxonomy date to the corresponding version number.
+pub static TAXONOMY_DATE_TO_VERSION: LazyLock<HashMap<&'static str, &'static str>> =
     LazyLock::new(|| {
         HashMap::from([
-            ("2011", "5.0"),
-            ("2012", "5.1"),
-            ("2013", "5.2"),
-            ("2014", "5.3"),
-            ("2015", "5.4"),
-            ("2016", "6.0"),
-            ("2017", "6.1"),
-            ("2018", "6.2"),
-            ("2019", "6.3"),
-            ("2020", "6.4"),
-            ("2021", "6.5"),
-            ("2022", "6.6"),
-            ("2023", "6.7"),
-            ("2024", "6.8"),
-            ("2025", "6.9"),
-            ("2026", "6.10"),
+            ("2011-04-14", "5.0"),
+            ("2012-06-01", "5.1"),
+            ("2013-04-30", "5.2"),
+            ("2014-04-02", "5.3"),
+            ("2015-04-03", "5.4"),
+            ("2016-04-01", "6.0"),
+            ("2017-04-01", "6.1"),
+            ("2018-04-01", "6.2"),
+            ("2019-04-01", "6.3"),
+            ("2020-04-01", "6.4"),
+            ("2021-04-14", "6.5"),
+            ("2022-05-02", "6.6"),
+            ("2023-04-01", "6.7"),
+            ("2024-04-01", "6.8"),
+            ("2025-04-01", "6.9"),
         ])
     });
