@@ -66,8 +66,14 @@ impl Search {
                     .unwrap_or("");
 
                 let value_str = match &row.value {
-                    FactValue::Text(s) => s.as_str(),
-                    FactValue::Checkbox(b) => if *b { "true" } else { "" },
+                    FactValue::Text(text) => text.as_str(),
+                    FactValue::Checkbox(checkbox) => {
+                        if *checkbox {
+                            "true"
+                        } else {
+                            ""
+                        }
+                    }
                     FactValue::Dropdown { selected, .. } => selected.as_str(),
                 };
                 if row.concept.to_lowercase().contains(&query)
