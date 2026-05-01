@@ -1,7 +1,31 @@
 use crate::domain::ReportStatus;
 use std::{collections::HashMap, path::PathBuf};
 use taxel::{TaxonomyType, GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
-use xbrl_rs::{DocumentView, ItemFact, TreeNode, ROLE_LABEL, ROLE_TERSE};
+use xbrl_rs::{
+    Concept, DocumentView, ItemFact, Particle, TaxonomySet, TreeNode, ROLE_LABEL, ROLE_TERSE,
+};
+
+/// The value of a fact, determining both its display widget and write-back behaviour.
+#[derive(Debug, Clone, PartialEq)]
+pub enum FactValue {
+    /// Plain text — rendered as a text input.
+    Text(String),
+    /// Boolean presence — rendered as a checkbox. `true` means the fact is non-nil.
+    Checkbox(bool),
+    /// Single-select choice — rendered as a dropdown. `selected` is the local concept
+    /// name of the active option; `options` are `(key, lang→label)` pairs sourced from
+    /// the presentation children of the parent tuple.
+    Dropdown {
+        selected: String,
+        options: Vec<(String, HashMap<String, String>)>,
+    },
+}
+
+impl Default for FactValue {
+    fn default() -> Self {
+        FactValue::Text(String::new())
+    }
+}
 
 /// A row in the fact table, representing a single fact or a concept without
 /// facts.
@@ -17,8 +41,8 @@ pub struct FactRow {
     pub context: String,
     /// The unit reference for the fact, if applicable.
     pub unit: Option<String>,
-    /// The value of the fact, or an empty string for concepts without facts.
-    pub value: String,
+    /// The value of the fact. `Text("")` for concepts without facts.
+    pub value: FactValue,
     /// Whether this concept has child concepts in the presentation tree.
     pub has_children: bool,
     /// Depth-first index into `InstanceDocument`, used to write back edits via
@@ -77,9 +101,20 @@ impl Report {
 
     /// Populates the fact table by traversing the document view and collecting
     /// facts from the tree nodes.
-    pub fn populate(&mut self, view: DocumentView, item_facts: &[&ItemFact]) {
+    pub fn populate(
+        &mut self,
+        view: DocumentView,
+        item_facts: &[&ItemFact],
+        taxonomy: &TaxonomySet,
+    ) {
         self.sections.clear();
         self.role_mapping_errors.clear();
+
+        let concept_map: HashMap<&str, &Concept> = taxonomy
+            .elements()
+            .into_iter()
+            .map(|concept| (concept.name.local_name.as_str(), concept))
+            .collect();
 
         // Labels for report elements are sourced from the dedicated GCD section.
         let gcd_nodes = view
@@ -125,7 +160,13 @@ impl Report {
             };
 
             for node in &section.nodes {
-                collect_node(node, item_facts, &mut fact_section.rows);
+                collect_node(
+                    node,
+                    item_facts,
+                    &concept_map,
+                    &mut fact_section.rows,
+                    false,
+                );
             }
 
             self.sections.push(fact_section);
@@ -135,6 +176,42 @@ impl Report {
         // relative order within each group is determined by the original order
         // in the presentation linkbase.
         self.sections.sort_by_key(|section| section.disabled);
+    }
+
+    /// Recomputes `disabled` on every non-GCD section from the current in-memory
+    /// GCD checkbox rows, without touching `InstanceDocument`. Called during
+    /// editing so that toggling a `reportElements` checkbox immediately enables or
+    /// disables the corresponding sidebar section.
+    pub fn update_disabled_states(&mut self) {
+        let concept_to_role: HashMap<&str, &'static str> = ROLE_URI_TO_REPORT_ELEMENT
+            .iter()
+            .map(|(&role, &concept)| (concept, role))
+            .collect();
+
+        let enabled_roles: HashMap<&str, bool> = self
+            .sections
+            .iter()
+            .find(|section| section.role == GCD_ROLE_URI)
+            .map(|gcd| {
+                gcd.rows
+                    .iter()
+                    .filter_map(|row| {
+                        concept_to_role
+                            .get(row.concept.as_str())
+                            .map(|&role| (role, matches!(row.value, FactValue::Checkbox(true))))
+                    })
+                    .collect()
+            })
+            .unwrap_or_default();
+
+        for section in &mut self.sections {
+            if section.role == GCD_ROLE_URI {
+                continue;
+            }
+            if let Some(&enabled) = enabled_roles.get(section.role.as_str()) {
+                section.disabled = !enabled;
+            }
+        }
     }
 }
 
@@ -216,10 +293,83 @@ fn collect_announced_roles_node(
 
 /// Recursively collects facts from the tree nodes and populates the fact table
 /// rows.
-fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<FactRow>) {
+///
+/// `is_in_multi_choice` is `true` when this node is a direct child of a tuple
+/// whose content model is a multi-select Choice particle; those children are
+/// rendered as checkboxes.
+fn collect_node(
+    node: &TreeNode,
+    facts: &[&ItemFact],
+    concept_map: &HashMap<&str, &Concept>,
+    rows: &mut Vec<FactRow>,
+    is_in_multi_choice: bool,
+) {
     let labels = resolve_labels(node);
     let has_children = !node.children.is_empty();
 
+    // Detect Choice content model on the current concept (only relevant for tuples).
+    let choice_max = if !is_in_multi_choice {
+        concept_map
+            .get(node.concept_name)
+            .and_then(|concept| concept.content_model.as_ref())
+            .and_then(|particle| match particle {
+                Particle::Choice { occurs, .. } => Some(occurs.max),
+                _ => None,
+            })
+    } else {
+        None
+    };
+
+    if let Some(max) = choice_max {
+        if max == Some(1) {
+            // Single-select choice → Dropdown row; children are the options.
+            let options = node
+                .children
+                .iter()
+                .map(|child| (child.concept_name.to_string(), resolve_labels(child)))
+                .collect();
+            let selected = node
+                .children
+                .iter()
+                .find(|child| !child.fact_indices.is_empty())
+                .map(|child| child.concept_name.to_string())
+                .unwrap_or_default();
+
+            rows.push(FactRow {
+                concept: node.concept_name.to_string(),
+                labels,
+                depth: node.depth,
+                context: String::new(),
+                unit: None,
+                value: FactValue::Dropdown { selected, options },
+                has_children: false,
+                fact_index: None,
+            });
+
+            // Children are represented inside the dropdown; don't recurse.
+            return;
+        } else {
+            // Multi-select choice → concept-only parent row, then recurse as checkboxes.
+            rows.push(FactRow {
+                concept: node.concept_name.to_string(),
+                labels,
+                depth: node.depth,
+                context: String::new(),
+                unit: None,
+                value: FactValue::default(),
+                has_children,
+                fact_index: None,
+            });
+
+            for child in &node.children {
+                collect_node(child, facts, concept_map, rows, true);
+            }
+
+            return;
+        }
+    }
+
+    // Normal item fact, or checkbox item inside a multi-select choice.
     if node.fact_indices.is_empty() {
         rows.push(FactRow {
             concept: node.concept_name.to_string(),
@@ -227,7 +377,11 @@ fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<FactRow>) {
             depth: node.depth,
             context: String::new(),
             unit: None,
-            value: String::new(),
+            value: if is_in_multi_choice {
+                FactValue::Checkbox(false)
+            } else {
+                FactValue::default()
+            },
             has_children,
             fact_index: None,
         });
@@ -239,8 +393,12 @@ fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<FactRow>) {
                     labels: labels.clone(),
                     depth: node.depth,
                     context: fact.context_ref().to_string(),
-                    unit: fact.unit_ref().map(|u| u.to_string()),
-                    value: fact.value().to_string(),
+                    unit: fact.unit_ref().map(|unit| unit.to_string()),
+                    value: if is_in_multi_choice {
+                        FactValue::Checkbox(!fact.is_nil())
+                    } else {
+                        FactValue::Text(fact.value().to_string())
+                    },
                     has_children,
                     fact_index: Some(idx),
                 });
@@ -249,7 +407,7 @@ fn collect_node(node: &TreeNode, facts: &[&ItemFact], rows: &mut Vec<FactRow>) {
     }
 
     for child in &node.children {
-        collect_node(child, facts, rows);
+        collect_node(child, facts, concept_map, rows, is_in_multi_choice);
     }
 }
 

@@ -3,7 +3,7 @@ use crate::{
         diagnostics::{AppDiagnostic, DiagnosticCategory},
         SectionState, TaxelApp, APP_NAME, APP_VERSION,
     },
-    domain::{Report, ReportStatus},
+    domain::{update_instance_document, FactValue, Report, ReportStatus, UpdateOutcome},
     infrastructure::report_store::reports_dir,
 };
 use anyhow::Context;
@@ -204,7 +204,7 @@ fn load_instance_document(path: &Path, allow_download: bool) -> Result<LoadOutco
     let taxonomy_type = TaxonomyType::from_schema_refs(instance.schema_refs()).unwrap_or_default();
     let mut report = Report::new(path.to_path_buf(), taxonomy_type);
 
-    report.populate(view, &item_facts);
+    report.populate(view, &item_facts, &taxonomy);
 
     let xml = fs::read_to_string(path)
         .with_context(|| format!("Failed to read Elster XML from {}", path.display()))?;
@@ -393,7 +393,7 @@ fn create_instance_document(
     let dest = new_report_path()?;
     let mut report = Report::new(dest.clone(), form.taxonomy_type.clone());
 
-    report.populate(view, &item_facts);
+    report.populate(view, &item_facts, &taxonomy);
 
     // Serialize and wrap in an Elster envelope, then write to disk.
     let mut xbrl_bytes: Vec<u8> = Vec::new();
@@ -576,6 +576,8 @@ pub fn cancel_edit(app: &mut TaxelApp) {
 pub fn save_report(app: &mut TaxelApp) {
     let editing_tab = app.editing_section.unwrap_or(app.selected_tab);
 
+    let mut update_outcome = UpdateOutcome::NoChange;
+
     if let (Some(report), Some(instance)) = (&app.report, &mut app.instance_document) {
         if let Some(section) = report.sections.get(editing_tab) {
             // Only write back rows whose value differs from the pre-edit
@@ -592,11 +594,22 @@ pub fn save_report(app: &mut TaxelApp) {
                     continue;
                 }
 
-                if let Some(idx) = row.fact_index {
-                    if row.value.is_empty() {
-                        instance.set_fact_nil(idx, true);
-                    } else {
-                        instance.set_fact_value(idx, row.value.clone());
+                let snapshot = app.edit_snapshot.get(i).map(|s| s as &FactValue);
+
+                match update_instance_document(
+                    instance,
+                    &row.value,
+                    snapshot,
+                    row.fact_index,
+                    &row.concept,
+                    app.taxonomy.as_ref(),
+                ) {
+                    Ok(outcome) => update_outcome = outcome,
+                    Err(err) => {
+                        app.diagnostics.push(AppDiagnostic::new_error(
+                            DiagnosticCategory::App,
+                            format!("{err}"),
+                        ));
                     }
                 }
             }
@@ -640,6 +653,18 @@ pub fn save_report(app: &mut TaxelApp) {
                     }
                 }
             }
+        }
+    }
+
+    // Rebuild the fact table after a tuple child switch so the new element
+    // names and row structure are reflected in the UI.
+    if update_outcome == UpdateOutcome::Rebuild {
+        if let (Some(taxonomy), Some(instance), Some(report)) =
+            (&app.taxonomy, &app.instance_document, &mut app.report)
+        {
+            let view = instance.view(taxonomy);
+            let item_facts = instance.item_facts();
+            report.populate(view, &item_facts, taxonomy);
         }
     }
 
