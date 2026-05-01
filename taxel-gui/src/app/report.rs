@@ -21,8 +21,8 @@ use std::{
     time::SystemTime,
 };
 use taxel::{
-    elster::Submitter, ElsterReport, TaxonomyType, GCD_ROLE_URI, REPORT_ELEMENT_TO_ROLE_URI,
-    TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE, TEST_MARKER,
+    elster::Submitter, ElsterReport, TaxonomyType, TAXONOMY_DATE_TO_VERSION,
+    TAXONOMY_VERSION_TO_DATE, TEST_MARKER,
 };
 use uuid::Uuid;
 use xbrl_rs::{
@@ -394,20 +394,6 @@ fn create_instance_document(
     let mut report = Report::new(dest.clone(), form.taxonomy_type.clone());
 
     report.populate(view, &item_facts);
-
-    // Filter sections to GCD + the report elements chosen by the user.
-    let chosen_role_uris: HashSet<&'static str> = form
-        .selected_elements
-        .iter()
-        .filter_map(|code| {
-            let concept = format!("genInfo.report.id.reportElement.reportElements.{code}");
-            REPORT_ELEMENT_TO_ROLE_URI.get(concept.as_str()).copied()
-        })
-        .collect();
-
-    report.sections.retain(|section| {
-        section.role == GCD_ROLE_URI || chosen_role_uris.contains(section.role.as_str())
-    });
 
     // Serialize and wrap in an Elster envelope, then write to disk.
     let mut xbrl_bytes: Vec<u8> = Vec::new();
