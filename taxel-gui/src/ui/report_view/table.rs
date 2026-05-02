@@ -27,7 +27,7 @@ pub fn draw_table(
         .striped(true)
         .column(Column::initial(250.0).clip(true))
         .column(Column::initial(500.0).clip(true))
-        .column(Column::initial(120.0).clip(true))
+        .column(Column::initial(250.0).clip(true))
         .column(Column::initial(60.0).clip(true))
         .column(Column::remainder().clip(true));
 
@@ -44,13 +44,13 @@ pub fn draw_table(
                 ui.label("Name");
             });
             header.col(|ui| {
-                ui.label("Context");
+                ui.label("Value");
             });
             header.col(|ui| {
                 ui.label("Unit");
             });
             header.col(|ui| {
-                ui.label("Value");
+                ui.label("Context");
             });
         })
         .body(|body| {
@@ -107,26 +107,6 @@ pub fn draw_table(
                             ui.visuals().selection.bg_fill.gamma_multiply(0.35),
                         );
                     }
-                    ui.label(&rows[raw_idx].context);
-                });
-                row.col(|ui| {
-                    if is_highlighted {
-                        ui.painter().rect_filled(
-                            ui.max_rect(),
-                            0.0,
-                            ui.visuals().selection.bg_fill.gamma_multiply(0.35),
-                        );
-                    }
-                    ui.label(rows[raw_idx].unit.as_deref().unwrap_or("-"));
-                });
-                row.col(|ui| {
-                    if is_highlighted {
-                        ui.painter().rect_filled(
-                            ui.max_rect(),
-                            0.0,
-                            ui.visuals().selection.bg_fill.gamma_multiply(0.35),
-                        );
-                    }
                     match &mut rows[raw_idx].value {
                         FactValue::Text(text) => {
                             if editing {
@@ -172,6 +152,26 @@ pub fn draw_table(
                             }
                         }
                     }
+                });
+                row.col(|ui| {
+                    if is_highlighted {
+                        ui.painter().rect_filled(
+                            ui.max_rect(),
+                            0.0,
+                            ui.visuals().selection.bg_fill.gamma_multiply(0.35),
+                        );
+                    }
+                    ui.label(rows[raw_idx].unit.as_deref().unwrap_or("-"));
+                });
+                row.col(|ui| {
+                    if is_highlighted {
+                        ui.painter().rect_filled(
+                            ui.max_rect(),
+                            0.0,
+                            ui.visuals().selection.bg_fill.gamma_multiply(0.35),
+                        );
+                    }
+                    ui.label(&rows[raw_idx].context);
                 });
             });
         });
