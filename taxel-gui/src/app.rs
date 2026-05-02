@@ -25,7 +25,7 @@ pub use report_list::ReportOverview;
 pub use search::{RowHighlight, Search};
 use std::{
     collections::HashSet,
-    fs,
+    env, fs,
     path::{Path, PathBuf},
     sync::mpsc::Receiver,
 };
@@ -36,6 +36,8 @@ use xbrl_rs::{InstanceDocument, TaxonomySet};
 pub const APP_NAME: &str = "Taxel";
 /// The version of the application, derived from Cargo.toml.
 pub const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
+/// The vendor ID to use in generated reports.
+pub const VENDOR_ID: &str = env!("VENDOR_ID");
 
 /// Per-section UI state (collapse state and depth filter).
 #[derive(Default)]
@@ -465,6 +467,7 @@ impl App for TaxelApp {
 
                 if confirm {
                     self.show_download_modal = false;
+
                     if let Some(path) = self.pending_download_path.take() {
                         app::load_report(self, path, ctx.ctx().clone(), true);
                     } else if let Some(form) = self.pending_new_report_form.take() {

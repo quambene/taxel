@@ -1,7 +1,7 @@
 use crate::{
     app::{
         diagnostics::{AppDiagnostic, DiagnosticCategory},
-        SectionState, TaxelApp, APP_NAME, APP_VERSION,
+        SectionState, TaxelApp, APP_NAME, APP_VERSION, VENDOR_ID,
     },
     domain::{update_instance_document, FactValue, Report, ReportStatus, UpdateOutcome},
     infrastructure::report_store::reports_dir,
@@ -83,7 +83,9 @@ pub enum LoadOutcome {
 /// the app has full control over the report file and can reliably persist
 /// changes.
 pub fn import_report(app: &mut TaxelApp, path: PathBuf, ctx: &egui::Context) {
-    match parse_and_copy_report(&path) {
+    let vendor_id = env::var("VENDOR_ID").unwrap_or_else(|_| VENDOR_ID.to_string());
+
+    match parse_and_copy_report(&path, vendor_id) {
         Ok(copied_path) => {
             load_report(app, copied_path, ctx.clone(), false);
         }
@@ -101,7 +103,7 @@ pub fn import_report(app: &mut TaxelApp, path: PathBuf, ctx: &egui::Context) {
 ///
 /// The source XML is parsed as an [`taxel::elster::ElsterReport`], modified,
 /// and serialized back to XML. The original file is never modified.
-fn parse_and_copy_report(path: &Path) -> Result<PathBuf, anyhow::Error> {
+fn parse_and_copy_report(path: &Path, vendor_id: String) -> Result<PathBuf, anyhow::Error> {
     let reports_dir = reports_dir()?;
 
     let xml = fs::read_to_string(path)
@@ -110,13 +112,7 @@ fn parse_and_copy_report(path: &Path) -> Result<PathBuf, anyhow::Error> {
     let mut report = ElsterReport::parse(&xml)
         .with_context(|| format!("Failed to parse ElsterReport from {}", path.display()))?;
 
-    if let Ok(vendor_id) = env::var("VENDOR_ID") {
-        report.transfer_header.manufacturer_id = vendor_id;
-    }
-
-    if report.transfer_header.test_marker.is_none() {
-        report.transfer_header.test_marker = Some(TEST_MARKER.to_string());
-    }
+    report.transfer_header.manufacturer_id = vendor_id;
 
     if let Some(payload_block) = report.data_section.payload_blocks.get_mut(0) {
         if let Some(manufacturer) = payload_block.payload_header.manufacturer.as_mut() {
@@ -240,7 +236,8 @@ pub fn create_report(
     app.loading = Some(rx);
 
     thread::spawn(move || {
-        let result = create_instance_document(form, allow_download);
+        let vendor_id = env::var("VENDOR_ID").unwrap_or_else(|_| VENDOR_ID.to_string());
+        let result = create_instance_document(form, vendor_id, allow_download);
         let _ = tx.send(result);
         ctx.request_repaint();
     });
@@ -253,6 +250,7 @@ pub fn create_report(
 /// before downloading.
 fn create_instance_document(
     form: NewReportForm,
+    vendor_id: String,
     allow_download: bool,
 ) -> Result<LoadOutcome, anyhow::Error> {
     let date = TAXONOMY_VERSION_TO_DATE
@@ -401,7 +399,7 @@ fn create_instance_document(
     // TODO: overwrite manufacturer id, recipient id, recipient value,
     // ebilanz_version, and test_marker.
     let mut elster = ElsterReport::new(
-        "",
+        vendor_id,
         Submitter::default(),
         "",
         "",
