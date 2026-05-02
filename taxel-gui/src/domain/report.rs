@@ -432,7 +432,12 @@ fn collect_node(
             let selected = node
                 .children
                 .iter()
-                .find(|child| !child.fact_indices.is_empty())
+                .find(|child| {
+                    child
+                        .fact_indices
+                        .iter()
+                        .any(|&idx| facts.get(idx).is_some_and(|fact| !fact.is_nil()))
+                })
                 .map(|child| child.concept_name.to_string())
                 .unwrap_or_default();
 
