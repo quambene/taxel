@@ -228,6 +228,9 @@ impl Report {
                 section.disabled = !enabled;
             }
         }
+
+        // Enabled sections are shown first, followed by disabled sections.
+        self.sections.sort_by_key(|section| section.disabled);
     }
 }
 
