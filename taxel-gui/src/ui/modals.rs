@@ -1,4 +1,7 @@
-use crate::{app, TaxelApp};
+use crate::{
+    app::{self, LoadKind},
+    TaxelApp,
+};
 use eframe::egui::{Align2, Button, ComboBox, Grid, Id, Modal, TextEdit, Ui, Vec2, Widget, Window};
 use rfd::FileDialog;
 use taxel::{TAXONOMY_TYPES, TAXONOMY_VERSION_TO_DATE};
@@ -256,7 +259,7 @@ pub fn draw_new_report_modal(ui: &mut Ui, app: &mut TaxelApp) {
         let form = app.new_report_form.clone();
         let ctx = ui.ctx().clone();
 
-        app::create_report(app, form, ctx, false);
+        app::start_load(app, LoadKind::Create(form), ctx, false);
     }
 }
 

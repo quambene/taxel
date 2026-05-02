@@ -30,6 +30,33 @@ use taxel::{
 use uuid::Uuid;
 use xbrl_rs::{InstanceDocument, TaxonomyLoader, TaxonomySet};
 
+/// Discriminates how a report reaches the background load thread.
+#[derive(Clone)]
+pub enum LoadKind {
+    /// Re-opening an already-registered report from the manifest. Produces
+    /// `LoadOutcome::Ready`.
+    Open(PathBuf),
+    /// A freshly copied-in import. Produces `LoadOutcome::Created` so it gets
+    /// registered.
+    Import(PathBuf),
+    /// A freshly created blank report. Produces `LoadOutcome::Created` so it gets
+    /// registered.
+    Create(NewReportForm),
+}
+
+/// The result of a background load operation.
+#[allow(clippy::large_enum_variant)]
+pub enum LoadOutcome {
+    /// The report was loaded successfully. Already registered in the manifest.
+    Ready(TaxonomySet, InstanceDocument, Report, ElsterReport),
+    /// Like `Ready`, but the report was freshly imported.
+    Imported(TaxonomySet, InstanceDocument, Report, ElsterReport),
+    /// Like `Ready`, but the report was freshly created.
+    Created(TaxonomySet, InstanceDocument, Report, ElsterReport),
+    /// Taxonomies are missing from disk; the user must confirm before downloading.
+    NeedsDownload,
+}
+
 /// Form data for creating a new blank report.
 #[derive(Debug, Clone)]
 pub struct NewReportForm {
@@ -66,16 +93,89 @@ impl Default for NewReportForm {
     }
 }
 
-/// The result of a background load operation.
-#[allow(clippy::large_enum_variant)]
-pub enum LoadOutcome {
-    /// The report was loaded successfully. Already registered in the manifest.
-    Ready(TaxonomySet, InstanceDocument, Report, ElsterReport),
-    /// Like `Ready`, but the report was freshly created or imported. The taxonomy
-    /// type is taken directly from the report rather than inferred from schema refs.
-    Created(TaxonomySet, InstanceDocument, Report, ElsterReport),
-    /// Taxonomies are missing from disk; the user must confirm before downloading.
-    NeedsDownload,
+/// Starts a background load based on `kind`, updating app state and spawning
+/// the worker thread. `pending_load_kind` is retained so the load can be
+/// re-triggered after the user confirms a taxonomy download.
+pub fn start_load(app: &mut TaxelApp, kind: LoadKind, ctx: egui::Context, allow_download: bool) {
+    app.selected_tab = 0;
+    app.diagnostics.clear();
+    app.editing_section = None;
+    app.edit_snapshot.clear();
+    app.pending_load_kind = Some(kind.clone());
+
+    let (tx, rx) = mpsc::channel();
+    app.loading = Some(rx);
+
+    thread::spawn(move || {
+        let _ = tx.send(load_report(kind, allow_download));
+        ctx.request_repaint();
+    });
+}
+
+/// Dispatches the background work based on `LoadKind`. For imports,
+/// `LoadOutcome::Imported` is returned so the caller can distinguish it from a
+/// regular open and register the report in the manifest.
+fn load_report(kind: LoadKind, allow_download: bool) -> Result<LoadOutcome, anyhow::Error> {
+    match kind {
+        LoadKind::Open(path) => load_instance_document_and_taxonomy(&path, allow_download),
+        LoadKind::Import(path) => {
+            match load_instance_document_and_taxonomy(&path, allow_download)? {
+                LoadOutcome::Ready(taxonomy, instance, report, elster_report) => Ok(
+                    LoadOutcome::Imported(taxonomy, instance, report, elster_report),
+                ),
+                other => Ok(other),
+            }
+        }
+        LoadKind::Create(form) => load_taxonomy_and_create_instance_document(form, allow_download),
+    }
+}
+
+/// Polls the background XML load result and updates the app state accordingly.
+pub fn poll_load_result(app: &mut TaxelApp) {
+    if let Some(rx) = &app.loading {
+        match rx.try_recv() {
+            Ok(Ok(LoadOutcome::Ready(taxonomy, instance, report, elster_report))) => {
+                finish_load(app, taxonomy, instance, report, elster_report);
+            }
+            Ok(Ok(LoadOutcome::Created(taxonomy, instance, report, elster_report)))
+            | Ok(Ok(LoadOutcome::Imported(taxonomy, instance, report, elster_report))) => {
+                let (start_date, end_date) = extract_period(&instance)
+                    .map(|(start, end)| (Some(start), Some(end)))
+                    .unwrap_or((None, None));
+                let taxonomy_version =
+                    extract_taxonomy_version_from_schema_refs(instance.schema_refs())
+                        .map(|v| v.to_owned());
+
+                app.upsert_report(
+                    &report.path,
+                    Some(report.taxonomy_type.clone()),
+                    taxonomy_version,
+                    start_date,
+                    end_date,
+                );
+                app.refresh_reports();
+
+                finish_load(app, taxonomy, instance, report, elster_report);
+            }
+            Ok(Ok(LoadOutcome::NeedsDownload)) => {
+                app.show_download_modal = true;
+                app.loading = None;
+            }
+            Ok(Err(err)) => {
+                app.diagnostics.push(AppDiagnostic::new_error(
+                    DiagnosticCategory::Import,
+                    err.to_string(),
+                ));
+                app.show_error_panel = true;
+                app.loading = None;
+                app.pending_load_kind = None;
+            }
+            Err(mpsc::TryRecvError::Empty) => {}
+            Err(mpsc::TryRecvError::Disconnected) => {
+                app.loading = None;
+            }
+        }
+    }
 }
 
 /// Imports a report from an arbitrary file path by copying it to the app's
@@ -87,7 +187,7 @@ pub fn import_report(app: &mut TaxelApp, path: PathBuf, ctx: &egui::Context) {
 
     match parse_and_copy_report(&path, vendor_id) {
         Ok(copied_path) => {
-            load_report(app, copied_path, ctx.clone(), false);
+            start_load(app, LoadKind::Import(copied_path), ctx.clone(), false);
         }
         Err(err) => {
             app.diagnostics.push(AppDiagnostic::new_error(
@@ -134,67 +234,23 @@ fn parse_and_copy_report(path: &Path, vendor_id: String) -> Result<PathBuf, anyh
     Ok(dest)
 }
 
-/// Loads an XBRL instance document from the specified path and updates the app
-/// state. The load runs on a background thread to keep the UI responsive.
-/// If `allow_download` is false and the required taxonomies are missing,
-/// `app.show_download_modal` is set so the UI can ask for confirmation.
-pub fn load_report(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context, allow_download: bool) {
-    app.selected_tab = 0;
-    app.report = None;
-    app.diagnostics.clear();
-    app.editing_section = None;
-    app.edit_snapshot.clear();
-    app.pending_download_path = Some(path.clone());
-    app.pending_new_report_form = None;
-
-    spawn_load_thread(app, path, ctx, allow_download);
-}
-
-fn spawn_load_thread(app: &mut TaxelApp, path: PathBuf, ctx: egui::Context, allow_download: bool) {
-    let (tx, rx) = mpsc::channel();
-    app.loading = Some(rx);
-
-    thread::spawn(move || {
-        let result = load_instance_document(&path, allow_download);
-        let _ = tx.send(result);
-        ctx.request_repaint();
-    });
-}
-
 /// Loads an XBRL instance document from the specified path, discovers the
 /// referenced taxonomies, and populates the fact table with the extracted
 /// facts.
-fn load_instance_document(path: &Path, allow_download: bool) -> Result<LoadOutcome, anyhow::Error> {
+fn load_instance_document_and_taxonomy(
+    path: &Path,
+    allow_download: bool,
+) -> Result<LoadOutcome, anyhow::Error> {
     debug!("Read xml file: {}", path.display());
 
     let instance = InstanceDocument::from_file(path)?;
     let schema_refs: Vec<String> = instance.schema_refs().to_vec();
     let schema_ref_paths = instance.schema_ref_paths();
-    let taxonomy_dir = taxonomy_dir()?;
-    let loader = TaxonomyLoader::new()?;
 
-    let taxonomies_missing = schema_ref_paths
-        .iter()
-        .any(|path| !taxonomy_dir.join(path).exists());
+    let Some(taxonomy) = load_taxonomies(schema_refs, &schema_ref_paths, allow_download)? else {
+        return Ok(LoadOutcome::NeedsDownload);
+    };
 
-    if taxonomies_missing {
-        if !allow_download {
-            return Ok(LoadOutcome::NeedsDownload);
-        }
-
-        if !taxonomy_dir.exists() {
-            fs::create_dir_all(&taxonomy_dir).with_context(|| {
-                format!(
-                    "Failed to create taxonomy directory: {}",
-                    taxonomy_dir.display()
-                )
-            })?;
-        }
-
-        loader.download_all(&schema_refs, &taxonomy_dir)?;
-    }
-
-    let taxonomy = TaxonomySet::discover(schema_refs, taxonomy_dir)?;
     let view = instance.view(&taxonomy);
     let item_facts = instance.item_facts();
     let taxonomy_type = TaxonomyType::from_schema_refs(instance.schema_refs()).unwrap_or_default();
@@ -215,44 +271,16 @@ fn load_instance_document(path: &Path, allow_download: bool) -> Result<LoadOutco
     ))
 }
 
-/// Creates a new blank report from a taxonomy for the given form parameters.
-/// The creation runs on a background thread; results are polled via
-/// `poll_load_result`.
-pub fn create_report(
-    app: &mut TaxelApp,
-    form: NewReportForm,
-    ctx: egui::Context,
-    allow_download: bool,
-) {
-    app.selected_tab = 0;
-    app.report = None;
-    app.diagnostics.clear();
-    app.editing_section = None;
-    app.edit_snapshot.clear();
-    app.pending_download_path = None;
-    app.pending_new_report_form = Some(form.clone());
-
-    let (tx, rx) = mpsc::channel();
-    app.loading = Some(rx);
-
-    thread::spawn(move || {
-        let vendor_id = env::var("VENDOR_ID").unwrap_or_else(|_| VENDOR_ID.to_string());
-        let result = create_report_and_instance_document(form, vendor_id, allow_download);
-        let _ = tx.send(result);
-        ctx.request_repaint();
-    });
-}
-
 /// Creates a new XBRL instance document based on the provided form data,
 /// populates the fact table, and writes the report to disk. If `allow_download`
 /// is false and the required taxonomies are missing,
 /// `LoadOutcome::NeedsDownload` is returned so the UI can ask for confirmation
 /// before downloading.
-fn create_report_and_instance_document(
+fn load_taxonomy_and_create_instance_document(
     form: NewReportForm,
-    vendor_id: String,
     allow_download: bool,
 ) -> Result<LoadOutcome, anyhow::Error> {
+    let vendor_id = env::var("VENDOR_ID").unwrap_or_else(|_| VENDOR_ID.to_string());
     let taxonomy_date = TAXONOMY_VERSION_TO_DATE
         .get(form.taxonomy_version.as_str())
         .with_context(|| {
@@ -265,37 +293,22 @@ fn create_report_and_instance_document(
     let schema_refs = form.taxonomy_type.schema_refs(taxonomy_date);
     let namespace_prefix = form.taxonomy_type.namespace_prefix();
     let namespace_uri = form.taxonomy_type.namespace_uri(taxonomy_date);
-
-    let taxonomy_dir = taxonomy_dir()?;
-    let loader = TaxonomyLoader::new()?;
-
     let schema_ref_paths: Vec<String> = schema_refs
         .iter()
         .filter_map(|url| url.split("/taxonomies/").nth(1).map(str::to_string))
         .collect();
 
-    let taxonomies_missing = schema_ref_paths
-        .iter()
-        .any(|p| !taxonomy_dir.join(p).exists());
-
-    if taxonomies_missing {
-        if !allow_download {
-            return Ok(LoadOutcome::NeedsDownload);
-        }
-
-        if !taxonomy_dir.exists() {
-            fs::create_dir_all(&taxonomy_dir).with_context(|| {
-                format!(
-                    "Failed to create taxonomy directory: {}",
-                    taxonomy_dir.display()
-                )
-            })?;
-        }
-
-        loader.download_all(&schema_refs, &taxonomy_dir)?;
-    }
-
-    let taxonomy = TaxonomySet::discover(schema_refs, taxonomy_dir)?;
+    let Some(taxonomy) = load_taxonomies(
+        schema_refs,
+        &schema_ref_paths
+            .iter()
+            .map(|path| path.as_str())
+            .collect::<Vec<&str>>(),
+        allow_download,
+    )?
+    else {
+        return Ok(LoadOutcome::NeedsDownload);
+    };
 
     let instance = create_instance_document(
         &form.start_date,
@@ -338,50 +351,41 @@ fn create_report_and_instance_document(
     Ok(LoadOutcome::Created(taxonomy, instance, report, elster))
 }
 
-/// Polls the background XML load result and updates the app state accordingly.
-pub fn poll_load_result(app: &mut TaxelApp) {
-    if let Some(rx) = &app.loading {
-        match rx.try_recv() {
-            Ok(Ok(LoadOutcome::Ready(taxonomy, instance, report, elster_report))) => {
-                finish_load(app, taxonomy, instance, report, elster_report);
-            }
-            Ok(Ok(LoadOutcome::Created(taxonomy, instance, report, elster_report))) => {
-                let (start_date, end_date) = extract_period(&instance)
-                    .map(|(start, end)| (Some(start), Some(end)))
-                    .unwrap_or((None, None));
-                let taxonomy_version =
-                    extract_taxonomy_version_from_schema_refs(instance.schema_refs())
-                        .map(|v| v.to_owned());
+/// Loads the taxonomies required for the given schema refs. If they are missing
+/// and `allow_download` is false, returns Ok(None) so the UI can ask for
+/// confirmation before downloading.
+fn load_taxonomies(
+    schema_refs: Vec<String>,
+    schema_ref_paths: &[&str],
+    allow_download: bool,
+) -> Result<Option<TaxonomySet>, anyhow::Error> {
+    let taxonomy_dir = taxonomy_dir()?;
+    let loader = TaxonomyLoader::new()?;
 
-                app.upsert_report(
-                    &report.path,
-                    Some(report.taxonomy_type.clone()),
-                    taxonomy_version,
-                    start_date,
-                    end_date,
-                );
-                app.refresh_reports();
+    let taxonomies_missing = schema_ref_paths
+        .iter()
+        .any(|path| !taxonomy_dir.join(path).exists());
 
-                finish_load(app, taxonomy, instance, report, elster_report);
-            }
-            Ok(Ok(LoadOutcome::NeedsDownload)) => {
-                app.show_download_modal = true;
-                app.loading = None;
-            }
-            Ok(Err(err)) => {
-                app.diagnostics.push(AppDiagnostic::new_error(
-                    DiagnosticCategory::Import,
-                    err.to_string(),
-                ));
-                app.show_error_panel = true;
-                app.loading = None;
-            }
-            Err(mpsc::TryRecvError::Empty) => {}
-            Err(mpsc::TryRecvError::Disconnected) => {
-                app.loading = None;
-            }
+    if taxonomies_missing {
+        if !allow_download {
+            return Ok(None);
         }
+
+        if !taxonomy_dir.exists() {
+            fs::create_dir_all(&taxonomy_dir).with_context(|| {
+                format!(
+                    "Failed to create taxonomy directory: {}",
+                    taxonomy_dir.display()
+                )
+            })?;
+        }
+
+        loader.download_all(&schema_refs, &taxonomy_dir)?;
     }
+
+    let taxonomy = TaxonomySet::discover(schema_refs, taxonomy_dir)?;
+
+    Ok(Some(taxonomy))
 }
 
 /// Applies a successfully loaded or created report to the app state.
@@ -418,8 +422,7 @@ fn finish_load(
     app.instance_document = Some(instance);
     app.elster_report = Some(elster_report);
     app.loading = None;
-    app.pending_download_path = None;
-    app.pending_new_report_form = None;
+    app.pending_load_kind = None;
 }
 
 fn new_report_path() -> Result<PathBuf, anyhow::Error> {

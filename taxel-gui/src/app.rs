@@ -18,8 +18,8 @@ use eframe::{
 use eric_sdk::Eric;
 use report::LoadOutcome;
 pub use report::{
-    cancel_edit, create_report, delete_report, edit_report, import_report, load_report,
-    poll_load_result, save_report, send_report, validate_report,
+    cancel_edit, delete_report, edit_report, import_report, poll_load_result, save_report,
+    send_report, start_load, validate_report, LoadKind,
 };
 pub use report_list::ReportOverview;
 pub use search::{RowHighlight, Search};
@@ -81,9 +81,8 @@ pub struct TaxelApp {
     pub loading: Option<Receiver<anyhow::Result<LoadOutcome>>>,
     /// Controls whether the taxonomy download confirmation modal is visible.
     pub show_download_modal: bool,
-    /// Path of the report pending load, retained so the load can be re-triggered
-    /// after the user confirms the taxonomy download.
-    pub pending_download_path: Option<PathBuf>,
+    /// The load kind pending retry after the user confirms a taxonomy download.
+    pub pending_load_kind: Option<LoadKind>,
     /// Some while the value column of that section is being edited, None
     /// otherwise.
     pub editing_section: Option<usize>,
@@ -105,9 +104,6 @@ pub struct TaxelApp {
     pub show_new_report_modal: bool,
     /// Form state for the new-report dialog, preserved across opens.
     pub new_report_form: NewReportForm,
-    /// Holds the form from the most recent `create_report` call while waiting
-    /// for the user to confirm a taxonomy download. Cleared on cancel or retry.
-    pub pending_new_report_form: Option<NewReportForm>,
 }
 
 impl TaxelApp {
@@ -197,12 +193,11 @@ impl TaxelApp {
             show_send_modal: false,
             show_shortcuts_modal: false,
             show_download_modal: false,
-            pending_download_path: None,
+            pending_load_kind: None,
             send_certificate_path: None,
             send_password: String::new(),
             show_new_report_modal: false,
             new_report_form: NewReportForm::default(),
-            pending_new_report_form: None,
         }
     }
 
@@ -293,7 +288,7 @@ impl App for TaxelApp {
                             self.loading.is_some(),
                             &self.settings.lang,
                         ) {
-                            app::load_report(self, path, ui.ctx().clone(), false);
+                            app::start_load(self, LoadKind::Open(path), ui.ctx().clone(), false);
                         }
                         return;
                     }
@@ -468,15 +463,12 @@ impl App for TaxelApp {
                 if confirm {
                     self.show_download_modal = false;
 
-                    if let Some(path) = self.pending_download_path.take() {
-                        app::load_report(self, path, ctx.ctx().clone(), true);
-                    } else if let Some(form) = self.pending_new_report_form.take() {
-                        app::create_report(self, form, ctx.ctx().clone(), true);
+                    if let Some(kind) = self.pending_load_kind.take() {
+                        app::start_load(self, kind, ctx.ctx().clone(), true);
                     }
                 } else if cancel {
                     self.show_download_modal = false;
-                    self.pending_download_path = None;
-                    self.pending_new_report_form = None;
+                    self.pending_load_kind = None;
                 }
             }
         });
