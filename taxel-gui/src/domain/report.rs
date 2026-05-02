@@ -2,7 +2,8 @@ use crate::domain::ReportStatus;
 use std::{collections::HashMap, path::PathBuf};
 use taxel::{TaxonomyType, GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
 use xbrl_rs::{
-    Concept, DocumentView, ItemFact, Particle, TaxonomySet, TreeNode, ROLE_LABEL, ROLE_TERSE,
+    Concept, ConceptView, DocumentView, ItemFact, Label, Particle, TaxonomySet, TreeNode,
+    TupleParticleView, ROLE_LABEL, ROLE_TERSE,
 };
 
 /// The value of a fact, determining both its display widget and write-back behaviour.
@@ -116,6 +117,19 @@ impl Report {
             .map(|concept| (concept.name.local_name.as_str(), concept))
             .collect();
 
+        // Maps each substitution-group head's local name to all non-abstract
+        // concepts that directly substitute for it. Built once here so
+        // collect_choice_options can do O(1) lookups instead of scanning all
+        // taxonomy elements per abstract head.
+        let mut substitution_map: HashMap<&str, Vec<&Concept>> = HashMap::new();
+
+        for concept in taxonomy.elements() {
+            if !concept.is_abstract {
+                let head = concept.substitution_group.original.local_name.as_str();
+                substitution_map.entry(head).or_default().push(concept);
+            }
+        }
+
         // Labels for report elements are sourced from the dedicated GCD section.
         let gcd_nodes = view
             .sections
@@ -164,6 +178,8 @@ impl Report {
                     node,
                     item_facts,
                     &concept_map,
+                    &substitution_map,
+                    taxonomy,
                     &mut fact_section.rows,
                     false,
                 );
@@ -291,6 +307,74 @@ fn collect_announced_roles_node(
     }
 }
 
+/// Resolves labels from a raw label slice using the same terse-then-standard
+/// fallback as `resolve_label`.
+fn resolve_labels_from_labels(labels: &[Label]) -> HashMap<String, String> {
+    ["en", "de"]
+        .iter()
+        .filter_map(|&lang| {
+            labels
+                .iter()
+                .find(|label| label.lang == lang && label.role == ROLE_TERSE)
+                .or_else(|| {
+                    labels
+                        .iter()
+                        .find(|label| label.lang == lang && label.role == ROLE_LABEL)
+                })
+                .map(|label| (lang.to_string(), label.text.clone()))
+        })
+        .collect()
+}
+
+/// Recursively walks a `TupleParticleView` and appends every leaf `Element` as
+/// a `(local_name, labels)` option pair.
+fn collect_choice_options(
+    particle: &TupleParticleView,
+    subst_map: &HashMap<&str, Vec<&Concept>>,
+    taxonomy: &TaxonomySet,
+    out: &mut Vec<(String, HashMap<String, String>)>,
+) {
+    match particle {
+        TupleParticleView::Element { element, .. } => {
+            if element
+                .concept
+                .map(|concept| concept.is_abstract)
+                .unwrap_or(false)
+            {
+                // Abstract head: expand to all direct concrete substitutions via
+                // the pre-built map (O(1) vs. scanning all taxonomy elements).
+                if let Some(concepts) = subst_map.get(element.local_name) {
+                    for concept in concepts {
+                        let labels = resolve_labels_from_labels(
+                            ConceptView::build(concept, taxonomy).labels,
+                        );
+                        out.push((concept.name.local_name.clone(), labels));
+                    }
+                }
+            } else {
+                let labels = element
+                    .concept
+                    .map(|concept| {
+                        resolve_labels_from_labels(ConceptView::build(concept, taxonomy).labels)
+                    })
+                    .unwrap_or_default();
+
+                out.push((element.local_name.to_string(), labels));
+            }
+        }
+        TupleParticleView::Choice { children, .. }
+        | TupleParticleView::Sequence { children, .. } => {
+            for child in children {
+                collect_choice_options(child, subst_map, taxonomy, out);
+            }
+        }
+        TupleParticleView::GroupDef { particle, .. } => {
+            collect_choice_options(particle, subst_map, taxonomy, out);
+        }
+        TupleParticleView::GroupRef { .. } => {}
+    }
+}
+
 /// Recursively collects facts from the tree nodes and populates the fact table
 /// rows.
 ///
@@ -301,6 +385,8 @@ fn collect_node(
     node: &TreeNode,
     facts: &[&ItemFact],
     concept_map: &HashMap<&str, &Concept>,
+    substitution_map: &HashMap<&str, Vec<&Concept>>,
+    taxonomy: &TaxonomySet,
     rows: &mut Vec<FactRow>,
     is_in_multi_choice: bool,
 ) {
@@ -322,12 +408,27 @@ fn collect_node(
 
     if let Some(max) = choice_max {
         if max == Some(1) {
-            // Single-select choice → Dropdown row; children are the options.
-            let options = node
-                .children
-                .iter()
-                .map(|child| (child.concept_name.to_string(), resolve_labels(child)))
-                .collect();
+            // Single-select choice → Dropdown row; options come from the
+            // taxonomy schema so all declared choices are shown as dropdown
+            // options even when only one child is present in the instance
+            // document.
+            let options = {
+                let mut opts = vec![(
+                    String::new(),
+                    HashMap::from([
+                        ("en".to_owned(), "—".to_owned()),
+                        ("de".to_owned(), "—".to_owned()),
+                    ]),
+                )];
+                if let Some(concept) = concept_map.get(node.concept_name) {
+                    let concept_view = ConceptView::build(concept, taxonomy);
+
+                    if let Some(particle) = &concept_view.tuple_content {
+                        collect_choice_options(particle, substitution_map, taxonomy, &mut opts);
+                    }
+                }
+                opts
+            };
             let selected = node
                 .children
                 .iter()
@@ -362,7 +463,15 @@ fn collect_node(
             });
 
             for child in &node.children {
-                collect_node(child, facts, concept_map, rows, true);
+                collect_node(
+                    child,
+                    facts,
+                    concept_map,
+                    substitution_map,
+                    taxonomy,
+                    rows,
+                    true,
+                );
             }
 
             return;
@@ -407,7 +516,15 @@ fn collect_node(
     }
 
     for child in &node.children {
-        collect_node(child, facts, concept_map, rows, is_in_multi_choice);
+        collect_node(
+            child,
+            facts,
+            concept_map,
+            substitution_map,
+            taxonomy,
+            rows,
+            is_in_multi_choice,
+        );
     }
 }
 

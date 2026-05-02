@@ -55,66 +55,76 @@ pub fn update_instance_document(
                 return Ok(UpdateOutcome::NoChange);
             }
 
-            // Copy namespace + context from the old sibling so the new child
-            // inherits the same document context.
-            let sibling_info = instance
-                .item_facts()
-                .into_iter()
-                .find(|fact| {
-                    if !old.is_empty() {
-                        fact.concept_name().local_name == old
-                    } else {
-                        fact.concept_name().local_name.starts_with(concept)
-                    }
-                })
-                .map(|fact| {
-                    (
-                        fact.concept_name().namespace_uri.clone(),
-                        fact.context_ref().to_owned(),
-                    )
-                });
-
-            let (namespace_uri, context_ref) = sibling_info.unwrap_or_else(|| {
-                let namespace_uri = taxonomy
-                    .and_then(|tax| {
-                        tax.elements()
-                            .into_iter()
-                            .find(|concept| concept.name.local_name == selected.as_str())
-                    })
-                    .map(|concept| concept.name.namespace_uri.clone())
-                    .unwrap_or_else(|| NamespaceUri::from(""));
-                (namespace_uri, String::new())
-            });
-
-            let new_child = ItemFact::new(
-                None,
-                ExpandedName::new(namespace_uri, selected.clone()),
-                context_ref,
-                None,
-                String::new(),
-                false,
-                None,
-                None,
-            );
-
             if !old.is_empty() {
                 instance
                     .remove_tuple_child(concept, old)
                     .with_context(|| format!("Failed to remove tuple child '{old}'"))?;
             }
 
-            match instance
-                .add_tuple_child(concept, &new_child)
-                .with_context(|| format!("Failed to add tuple child '{selected}'"))?
-            {
-                0 => {
-                    // Child already exists as nil; activate it.
-                    instance
-                        .set_tuple_child_nil(concept, selected, false)
-                        .with_context(|| format!("Failed to activate tuple child '{selected}'"))?;
-                }
-                _ => {
-                    debug!("Added tuple child '{}' for concept '{}'", selected, concept);
+            if selected.is_empty() {
+                instance
+                    .set_tuple_fact_nil(concept, true)
+                    .with_context(|| format!("Failed to nil tuple '{concept}'"))?;
+            }
+
+            if !selected.is_empty() {
+                // Copy namespace + context from the old sibling so the new child
+                // inherits the same document context.
+                let sibling_info = instance
+                    .item_facts()
+                    .into_iter()
+                    .find(|fact| {
+                        if !old.is_empty() {
+                            fact.concept_name().local_name == old
+                        } else {
+                            fact.concept_name().local_name.starts_with(concept)
+                        }
+                    })
+                    .map(|fact| {
+                        (
+                            fact.concept_name().namespace_uri.clone(),
+                            fact.context_ref().to_owned(),
+                        )
+                    });
+
+                let (namespace_uri, context_ref) = sibling_info.unwrap_or_else(|| {
+                    let namespace_uri = taxonomy
+                        .and_then(|tax| {
+                            tax.elements()
+                                .into_iter()
+                                .find(|concept| concept.name.local_name == selected.as_str())
+                        })
+                        .map(|concept| concept.name.namespace_uri.clone())
+                        .unwrap_or_else(|| NamespaceUri::from(""));
+                    (namespace_uri, String::new())
+                });
+
+                let new_child = ItemFact::new(
+                    None,
+                    ExpandedName::new(namespace_uri, selected.clone()),
+                    context_ref,
+                    None,
+                    String::new(),
+                    false,
+                    None,
+                    None,
+                );
+
+                match instance
+                    .add_tuple_child(concept, &new_child)
+                    .with_context(|| format!("Failed to add tuple child '{selected}'"))?
+                {
+                    0 => {
+                        // Child already exists as nil; activate it.
+                        instance
+                            .set_tuple_child_nil(concept, selected, false)
+                            .with_context(|| {
+                                format!("Failed to activate tuple child '{selected}'")
+                            })?;
+                    }
+                    _ => {
+                        debug!("Added tuple child '{}' for concept '{}'", selected, concept);
+                    }
                 }
             }
 
