@@ -1,7 +1,11 @@
 use crate::domain::FactValue;
 use anyhow::Context;
 use log::debug;
-use xbrl_rs::{ExpandedName, InstanceDocument, ItemFact, NamespaceUri, TaxonomySet};
+use std::collections::HashMap;
+use xbrl_rs::{
+    Context as XbrlContext, ContextId, EntityIdentifier, ExpandedName, InstanceDocument, ItemFact,
+    NamespacePrefix, NamespaceUri, Period, TaxonomySet, Unit, UnitId,
+};
 
 /// The outcome of [`update_instance_document`].
 #[derive(Debug, PartialEq, Eq)]
@@ -10,6 +14,104 @@ pub enum UpdateOutcome {
     NoChange,
     /// A tuple child was switched; the caller must rebuild the DocumentView.
     Rebuild,
+}
+
+/// Creates a new instance document with the given parameters.
+pub fn create_instance_document(
+    start_date: &str,
+    end_date: &str,
+    namespace_prefix: &str,
+    namespace_uri: &str,
+    taxonomy_date: &str,
+    taxonomy: &TaxonomySet,
+) -> Result<InstanceDocument, anyhow::Error> {
+    let mut namespaces: HashMap<NamespacePrefix, NamespaceUri> = [
+        (
+            "de-gcd",
+            format!("http://www.xbrl.de/taxonomies/de-gcd-{taxonomy_date}"),
+        ),
+        ("link", "http://www.xbrl.org/2003/linkbase".to_string()),
+        ("hgbref", "http://www.xbrl.de/2008/ref".to_string()),
+        ("xhtml", "http://www.w3.org/1999/xhtml".to_string()),
+        (
+            "xsi",
+            "http://www.w3.org/2001/XMLSchema-instance".to_string(),
+        ),
+        ("xbrli", "http://www.xbrl.org/2003/instance".to_string()),
+        ("xbrldi", "http://xbrl.org/2006/xbrldi".to_string()),
+        ("iso4217", "http://www.xbrl.org/2003/iso4217".to_string()),
+        ("xlink", "http://www.w3.org/1999/xlink".to_string()),
+        ("ref", "http://www.xbrl.org/2024/ref".to_string()),
+    ]
+    .into_iter()
+    .map(|(k, v)| (NamespacePrefix::from(k), NamespaceUri::from(v)))
+    .collect();
+
+    namespaces.insert(
+        NamespacePrefix::from(namespace_prefix),
+        NamespaceUri::from(namespace_uri),
+    );
+
+    let entity = EntityIdentifier {
+        scheme: "http://www.rzf-nrw.de/Steuernummer".to_string(),
+        value: String::new(),
+    };
+
+    let instant_context = XbrlContext::new(
+        ContextId::from("I"),
+        entity.clone(),
+        Period::Instant {
+            date: end_date.to_string(),
+        },
+    );
+
+    let duration_context = XbrlContext::new(
+        ContextId::from("D"),
+        entity,
+        Period::Duration {
+            start: start_date.to_string(),
+            end: end_date.to_string(),
+        },
+    );
+
+    let units = [
+        Unit::new(
+            UnitId::from("EUR"),
+            vec![ExpandedName::new(
+                NamespaceUri::from("http://www.xbrl.org/2003/iso4217"),
+                "EUR".to_string(),
+            )],
+            vec![],
+        ),
+        Unit::new(
+            UnitId::from("pure"),
+            vec![ExpandedName::new(
+                NamespaceUri::from("http://www.xbrl.org/2003/instance"),
+                "pure".to_string(),
+            )],
+            vec![],
+        ),
+        Unit::new(
+            UnitId::from("shares"),
+            vec![ExpandedName::new(
+                NamespaceUri::from("http://www.xbrl.org/2003/instance"),
+                "shares".to_string(),
+            )],
+            vec![],
+        ),
+    ];
+
+    // TODO: build instance selectively for chosen sections only.
+    // Currently builds the full instance from all sections in the taxonomy.
+    let instance = InstanceDocument::from_taxonomy(
+        taxonomy,
+        namespaces,
+        instant_context,
+        duration_context,
+        &units,
+    );
+
+    Ok(instance)
 }
 
 /// Writes one edited fact value back into the instance document.

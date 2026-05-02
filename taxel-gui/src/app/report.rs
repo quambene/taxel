@@ -3,7 +3,10 @@ use crate::{
         diagnostics::{AppDiagnostic, DiagnosticCategory},
         SectionState, TaxelApp, APP_NAME, APP_VERSION, VENDOR_ID,
     },
-    domain::{update_instance_document, FactValue, Report, ReportStatus, UpdateOutcome},
+    domain::{
+        create_instance_document, update_instance_document, FactValue, Report, ReportStatus,
+        UpdateOutcome,
+    },
     infrastructure::report_store::reports_dir,
 };
 use anyhow::Context;
@@ -12,7 +15,7 @@ use eframe::egui::{self};
 use eric_sdk::ErrorCode;
 use log::debug;
 use std::{
-    collections::{HashMap, HashSet},
+    collections::HashSet,
     env,
     fs::{self},
     path::{Path, PathBuf},
@@ -25,10 +28,7 @@ use taxel::{
     TAXONOMY_VERSION_TO_DATE, TEST_MARKER,
 };
 use uuid::Uuid;
-use xbrl_rs::{
-    Context as XbrlContext, ContextId, EntityIdentifier, ExpandedName, InstanceDocument,
-    NamespacePrefix, NamespaceUri, Period, TaxonomyLoader, TaxonomySet, Unit, UnitId,
-};
+use xbrl_rs::{InstanceDocument, TaxonomyLoader, TaxonomySet};
 
 /// Form data for creating a new blank report.
 #[derive(Debug, Clone)]
@@ -237,7 +237,7 @@ pub fn create_report(
 
     thread::spawn(move || {
         let vendor_id = env::var("VENDOR_ID").unwrap_or_else(|_| VENDOR_ID.to_string());
-        let result = create_instance_document(form, vendor_id, allow_download);
+        let result = create_report_and_instance_document(form, vendor_id, allow_download);
         let _ = tx.send(result);
         ctx.request_repaint();
     });
@@ -248,12 +248,12 @@ pub fn create_report(
 /// is false and the required taxonomies are missing,
 /// `LoadOutcome::NeedsDownload` is returned so the UI can ask for confirmation
 /// before downloading.
-fn create_instance_document(
+fn create_report_and_instance_document(
     form: NewReportForm,
     vendor_id: String,
     allow_download: bool,
 ) -> Result<LoadOutcome, anyhow::Error> {
-    let date = TAXONOMY_VERSION_TO_DATE
+    let taxonomy_date = TAXONOMY_VERSION_TO_DATE
         .get(form.taxonomy_version.as_str())
         .with_context(|| {
             format!(
@@ -262,9 +262,9 @@ fn create_instance_document(
             )
         })?;
 
-    let schema_refs = form.taxonomy_type.schema_refs(date);
+    let schema_refs = form.taxonomy_type.schema_refs(taxonomy_date);
     let namespace_prefix = form.taxonomy_type.namespace_prefix();
-    let namespace_uri = form.taxonomy_type.namespace_uri(date);
+    let namespace_uri = form.taxonomy_type.namespace_uri(taxonomy_date);
 
     let taxonomy_dir = taxonomy_dir()?;
     let loader = TaxonomyLoader::new()?;
@@ -297,91 +297,14 @@ fn create_instance_document(
 
     let taxonomy = TaxonomySet::discover(schema_refs, taxonomy_dir)?;
 
-    let mut namespaces: HashMap<NamespacePrefix, NamespaceUri> = [
-        (
-            "de-gcd",
-            format!("http://www.xbrl.de/taxonomies/de-gcd-{date}"),
-        ),
-        ("link", "http://www.xbrl.org/2003/linkbase".to_string()),
-        ("hgbref", "http://www.xbrl.de/2008/ref".to_string()),
-        ("xhtml", "http://www.w3.org/1999/xhtml".to_string()),
-        (
-            "xsi",
-            "http://www.w3.org/2001/XMLSchema-instance".to_string(),
-        ),
-        ("xbrli", "http://www.xbrl.org/2003/instance".to_string()),
-        ("xbrldi", "http://xbrl.org/2006/xbrldi".to_string()),
-        ("iso4217", "http://www.xbrl.org/2003/iso4217".to_string()),
-        ("xlink", "http://www.w3.org/1999/xlink".to_string()),
-        ("ref", "http://www.xbrl.org/2024/ref".to_string()),
-    ]
-    .into_iter()
-    .map(|(k, v)| (NamespacePrefix::from(k), NamespaceUri::from(v)))
-    .collect();
-
-    namespaces.insert(
-        NamespacePrefix::from(namespace_prefix),
-        NamespaceUri::from(namespace_uri),
-    );
-
-    let entity = EntityIdentifier {
-        scheme: "http://www.rzf-nrw.de/Steuernummer".to_string(),
-        value: String::new(),
-    };
-
-    let instant_context = XbrlContext::new(
-        ContextId::from("I"),
-        entity.clone(),
-        Period::Instant {
-            date: form.end_date.clone(),
-        },
-    );
-
-    let duration_context = XbrlContext::new(
-        ContextId::from("D"),
-        entity,
-        Period::Duration {
-            start: form.start_date.clone(),
-            end: form.end_date.clone(),
-        },
-    );
-
-    let units = [
-        Unit::new(
-            UnitId::from("EUR"),
-            vec![ExpandedName::new(
-                NamespaceUri::from("http://www.xbrl.org/2003/iso4217"),
-                "EUR".to_string(),
-            )],
-            vec![],
-        ),
-        Unit::new(
-            UnitId::from("pure"),
-            vec![ExpandedName::new(
-                NamespaceUri::from("http://www.xbrl.org/2003/instance"),
-                "pure".to_string(),
-            )],
-            vec![],
-        ),
-        Unit::new(
-            UnitId::from("shares"),
-            vec![ExpandedName::new(
-                NamespaceUri::from("http://www.xbrl.org/2003/instance"),
-                "shares".to_string(),
-            )],
-            vec![],
-        ),
-    ];
-
-    // TODO: build instance selectively for chosen sections only.
-    // Currently builds the full instance from all sections in the taxonomy.
-    let instance = InstanceDocument::from_taxonomy(
+    let instance = create_instance_document(
+        &form.start_date,
+        &form.end_date,
+        namespace_prefix,
+        &namespace_uri,
+        taxonomy_date,
         &taxonomy,
-        namespaces,
-        instant_context,
-        duration_context,
-        &units,
-    );
+    )?;
 
     let view = instance.view(&taxonomy);
     let item_facts = instance.item_facts();
