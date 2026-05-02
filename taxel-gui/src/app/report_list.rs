@@ -30,9 +30,11 @@ pub struct ReportOverview {
     pub taxonomy_type: Option<TaxonomyType>,
     /// The eBilanz taxonomy version, if known from the manifest.
     pub taxonomy_version: Option<String>,
-    /// The reporting period start date in `YYYYMMDD` format, if known from the
+    /// The reporting period start date in `YYYY-MM-DD` format, if known from the
     /// manifest.
     pub start_date: Option<String>,
+    /// The reporting period end date in `YYYY-MM-DD` format, if known from the
+    /// manifest.
     pub end_date: Option<String>,
 }
 
@@ -197,6 +199,22 @@ impl ReportList {
             .find(|report| report.path == report_path)
         {
             report.changed = now;
+        }
+    }
+
+    pub fn set_period(
+        &mut self,
+        report_path: &Path,
+        start_date: Option<String>,
+        end_date: Option<String>,
+    ) {
+        if let Some(report) = self
+            .reports
+            .iter_mut()
+            .find(|report| report.path == report_path)
+        {
+            report.start_date = start_date;
+            report.end_date = end_date;
         }
     }
 

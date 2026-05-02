@@ -36,8 +36,8 @@ pub struct ReportMeta {
     pub taxonomy_type: Option<TaxonomyType>,
     /// The eBilanz taxonomy version.
     pub taxonomy_version: Option<String>,
-    /// The reporting period start date in `YYYYMMDD` format.
+    /// The reporting period start date in `YYYY-MM-DD` format.
     pub start_date: Option<String>,
-    /// The reporting period end date in `YYYYMMDD` format.
+    /// The reporting period end date in `YYYY-MM-DD` format.
     pub end_date: Option<String>,
 }

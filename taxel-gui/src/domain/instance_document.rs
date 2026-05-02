@@ -234,3 +234,14 @@ pub fn update_instance_document(
         }
     }
 }
+
+/// Extracts the reporting period from the instance document, if available.
+pub fn extract_period(instance: &InstanceDocument) -> Option<(String, String)> {
+    instance
+        .contexts()
+        .values()
+        .find_map(|ctx| match &ctx.period {
+            Period::Duration { start, end } => Some((start.clone(), end.clone())),
+            _ => None,
+        })
+}

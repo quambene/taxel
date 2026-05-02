@@ -4,8 +4,8 @@ use crate::{
         SectionState, TaxelApp, APP_NAME, APP_VERSION, VENDOR_ID,
     },
     domain::{
-        create_instance_document, update_instance_document, FactValue, Report, ReportStatus,
-        UpdateOutcome,
+        create_instance_document, extract_period, update_instance_document, FactValue, Report,
+        ReportStatus, UpdateOutcome,
     },
     infrastructure::report_store::reports_dir,
 };
@@ -338,22 +338,6 @@ fn create_report_and_instance_document(
     Ok(LoadOutcome::Created(taxonomy, instance, report, elster))
 }
 
-/// Extracts the fiscal year begin and end dates from the GCD facts of an
-/// instance document.
-fn extract_period(instance: &InstanceDocument) -> (Option<String>, Option<String>) {
-    let mut start = None;
-    let mut end = None;
-
-    for fact in instance.item_facts() {
-        match fact.concept_name().local_name.as_str() {
-            "genInfo.report.period.fiscalYearBegin" => start = Some(fact.value().to_owned()),
-            "genInfo.report.period.fiscalYearEnd" => end = Some(fact.value().to_owned()),
-            _ => {}
-        }
-    }
-    (start, end)
-}
-
 /// Polls the background XML load result and updates the app state accordingly.
 pub fn poll_load_result(app: &mut TaxelApp) {
     if let Some(rx) = &app.loading {
@@ -362,7 +346,9 @@ pub fn poll_load_result(app: &mut TaxelApp) {
                 finish_load(app, taxonomy, instance, report, elster_report);
             }
             Ok(Ok(LoadOutcome::Created(taxonomy, instance, report, elster_report))) => {
-                let (start_date, end_date) = extract_period(&instance);
+                let (start_date, end_date) = extract_period(&instance)
+                    .map(|(start, end)| (Some(start), Some(end)))
+                    .unwrap_or((None, None));
                 let taxonomy_version =
                     extract_taxonomy_version_from_schema_refs(instance.schema_refs())
                         .map(|v| v.to_owned());
@@ -564,6 +550,15 @@ pub fn save_report(app: &mut TaxelApp) {
                 match result {
                     Ok(()) => {
                         let now = SystemTime::now();
+
+                        if let Some((start_date, end_date)) = extract_period(instance) {
+                            app.report_list.set_period(
+                                &report.path,
+                                Some(start_date),
+                                Some(end_date),
+                            );
+                        }
+
                         app.report_list.set_timestamp(&report.path, now);
                         app.report_list.save(&mut app.diagnostics);
                     }
