@@ -1,5 +1,8 @@
-use crate::{domain::FactRow, ui::widgets};
-use eframe::egui::{Align, TextStyle, Ui};
+use crate::{
+    domain::{FactRow, FactValue},
+    ui::widgets,
+};
+use eframe::egui::{self, Align, ComboBox, TextStyle, Ui};
 use egui_extras::{Column, TableBuilder};
 use std::collections::HashSet;
 
@@ -124,10 +127,50 @@ pub fn draw_table(
                             ui.visuals().selection.bg_fill.gamma_multiply(0.35),
                         );
                     }
-                    if editing {
-                        ui.text_edit_singleline(&mut rows[raw_idx].value);
-                    } else {
-                        ui.label(&rows[raw_idx].value);
+                    match &mut rows[raw_idx].value {
+                        FactValue::Text(text) => {
+                            if editing {
+                                ui.text_edit_singleline(text);
+                            } else {
+                                ui.label(text.as_str());
+                            }
+                        }
+                        FactValue::Checkbox(checked) => {
+                            if editing {
+                                ui.checkbox(checked, "");
+                            } else {
+                                ui.add_enabled(false, egui::Checkbox::new(checked, ""));
+                            }
+                        }
+                        FactValue::Dropdown { selected, options } => {
+                            let display_label = options
+                                .iter()
+                                .find(|(k, _)| k == selected)
+                                .and_then(|(_, labels)| labels.get(lang))
+                                .map(String::as_str)
+                                .unwrap_or(if selected.is_empty() {
+                                    "—"
+                                } else {
+                                    selected.as_str()
+                                });
+
+                            if editing {
+                                ComboBox::from_id_salt(raw_idx)
+                                    .selected_text(display_label)
+                                    .show_ui(ui, |ui| {
+                                        for (key, labels) in options.iter() {
+                                            let label = labels
+                                                .get(lang)
+                                                .map(String::as_str)
+                                                .unwrap_or(key.as_str());
+
+                                            ui.selectable_value(selected, key.clone(), label);
+                                        }
+                                    });
+                            } else {
+                                ui.label(display_label);
+                            }
+                        }
                     }
                 });
             });

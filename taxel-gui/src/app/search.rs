@@ -1,4 +1,4 @@
-use crate::domain::ReportSection;
+use crate::domain::{FactValue, ReportSection};
 use std::time::Instant;
 
 /// Transient highlight for a row that was jumped to via search results, cleared
@@ -65,9 +65,20 @@ impl Search {
                     .map(|label| label.as_str())
                     .unwrap_or("");
 
+                let value_str = match &row.value {
+                    FactValue::Text(text) => text.as_str(),
+                    FactValue::Checkbox(checkbox) => {
+                        if *checkbox {
+                            "true"
+                        } else {
+                            ""
+                        }
+                    }
+                    FactValue::Dropdown { selected, .. } => selected.as_str(),
+                };
                 if row.concept.to_lowercase().contains(&query)
                     || label.to_lowercase().contains(&query)
-                    || row.value.to_lowercase().contains(&query)
+                    || value_str.to_lowercase().contains(&query)
                 {
                     hits.push(SearchHit {
                         section_idx,

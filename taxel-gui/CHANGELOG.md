@@ -8,6 +8,8 @@
 - added
   - Import report
   - Display report
+  - Display single-choice tuples as dropdown
+  - Display multiple-choice tuples as checkbox
   - Display report sections in sidebar
   - Edit and save report
   - Close report

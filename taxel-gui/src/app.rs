@@ -6,7 +6,7 @@ mod settings;
 
 use crate::{
     app::{self, report::NewReportForm, report_list::ReportList, settings::Settings},
-    domain::Report,
+    domain::{FactValue, Report},
     ui::{self, EditAction},
 };
 pub use diagnostics::{AppDiagnostic, DiagnosticCategory, DiagnosticLevel};
@@ -88,7 +88,7 @@ pub struct TaxelApp {
     /// Snapshot of `row.value` for every row in the edited section at the
     /// moment editing started, indexed by raw row index. Used to restore values
     /// if editing is canceled.
-    pub edit_snapshot: Vec<String>,
+    pub edit_snapshot: Vec<FactValue>,
     /// Controls whether the delete-report confirmation modal is visible.
     pub show_delete_modal: bool,
     /// Controls whether the send-report modal is visible.
@@ -392,6 +392,12 @@ impl App for TaxelApp {
                                 editing,
                                 ui,
                             );
+                        }
+
+                        // Keep sidebar enabled/disabled states in sync with
+                        // reportElements checkboxes while editing.
+                        if editing {
+                            table.update_disabled_states();
                         }
 
                         if !self.search.results.is_empty() {
