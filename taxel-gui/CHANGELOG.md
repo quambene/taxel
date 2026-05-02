@@ -27,3 +27,4 @@
   - Add loading spinner for import report
   - Display report list
   - Replace app and vendor data in imported report
+  - Sync GCD section with `ElsterReport` and XBRL `Period`

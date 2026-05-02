@@ -194,7 +194,6 @@ impl ElsterReport {
         recipient_id: impl Into<String>,
         recipient_value: impl Into<String>,
         balance_date: u32,
-        ebilanz_version: impl Into<String>,
         test_marker: Option<impl Into<String>>,
     ) -> Self {
         Self {
@@ -228,7 +227,7 @@ impl ElsterReport {
                         }),
                         submitter: Some(submitter),
                     },
-                    ebilanz: EBilanz::new(ebilanz_version, balance_date),
+                    ebilanz: EBilanz::new("000002", balance_date),
                 }],
             },
         }

@@ -326,16 +326,13 @@ fn create_instance_document(
         NamespaceUri::from(namespace_uri),
     );
 
-    // TODO: update by tax number from GCD.
     let entity = EntityIdentifier {
         scheme: "http://www.rzf-nrw.de/Steuernummer".to_string(),
-        value: "0000000000000".to_string(),
+        value: String::new(),
     };
 
-    let year = form.end_date.split('-').next().unwrap_or("");
-
     let instant_context = XbrlContext::new(
-        ContextId::from(format!("I-{year}")),
+        ContextId::from("I"),
         entity.clone(),
         Period::Instant {
             date: form.end_date.clone(),
@@ -343,7 +340,7 @@ fn create_instance_document(
     );
 
     let duration_context = XbrlContext::new(
-        ContextId::from(format!("D-{year}")),
+        ContextId::from("D"),
         entity,
         Period::Duration {
             start: form.start_date.clone(),
@@ -401,7 +398,7 @@ fn create_instance_document(
 
     let balance_date: u32 = form.end_date.replace('-', "").parse()?;
 
-    // TODO: overwirte manufacturer id, recipient id, recipient value,
+    // TODO: overwrite manufacturer id, recipient id, recipient value,
     // ebilanz_version, and test_marker.
     let mut elster = ElsterReport::new(
         "",
@@ -409,7 +406,6 @@ fn create_instance_document(
         "",
         "",
         balance_date,
-        "",
         Some(TEST_MARKER),
     );
     elster.set_payload_xbrl(xbrl_bytes);
@@ -613,6 +609,11 @@ pub fn save_report(app: &mut TaxelApp) {
                     }
                 }
             }
+        }
+
+        // Sync GCD facts to ElsterReport metadata and XBRL contexts.
+        if let Some(elster) = &mut app.elster_report {
+            report.sync_gcd_to_elster(instance, elster);
         }
 
         // Serialize the updated InstanceDocument to bytes.

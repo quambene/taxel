@@ -1,9 +1,9 @@
 use crate::domain::ReportStatus;
 use std::{collections::HashMap, path::PathBuf};
-use taxel::{TaxonomyType, GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
+use taxel::{ElsterReport, TaxonomyType, GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
 use xbrl_rs::{
-    Concept, ConceptView, DocumentView, ItemFact, Label, Particle, TaxonomySet, TreeNode,
-    TupleParticleView, ROLE_LABEL, ROLE_TERSE,
+    Concept, ConceptView, DocumentView, InstanceDocument, ItemFact, Label, Particle, Period,
+    TaxonomySet, TreeNode, TupleParticleView, ROLE_LABEL, ROLE_TERSE,
 };
 
 /// The value of a fact, determining both its display widget and write-back behaviour.
@@ -231,6 +231,103 @@ impl Report {
 
         // Enabled sections are shown first, followed by disabled sections.
         self.sections.sort_by_key(|section| section.disabled);
+    }
+
+    /// Returns the text value of the first fact matching `concept` in the
+    /// section identified by `role`. Returns `None` if not found or empty.
+    pub fn find_in_section(&self, role: &str, concept: &str) -> Option<&str> {
+        self.sections
+            .iter()
+            .find(|section| section.role == role)
+            .and_then(|section| {
+                section
+                    .rows
+                    .iter()
+                    .find(|row| row.concept == concept)
+                    .and_then(|row| match &row.value {
+                        FactValue::Text(text) if !text.is_empty() => Some(text.as_str()),
+                        _ => None,
+                    })
+            })
+    }
+
+    /// Propagates GCD fact values into the ElsterReport envelope and all XBRL
+    /// contexts so that the saved file stays consistent with what the user entered.
+    pub fn sync_gcd_to_elster(&self, instance: &mut InstanceDocument, elster: &mut ElsterReport) {
+        let fiscal_year_begin =
+            self.find_in_section(GCD_ROLE_URI, "genInfo.report.period.fiscalYearBegin");
+        let fiscal_year_end =
+            self.find_in_section(GCD_ROLE_URI, "genInfo.report.period.fiscalYearEnd");
+        let closing_date =
+            self.find_in_section(GCD_ROLE_URI, "genInfo.report.period.balSheetClosingDate");
+        let company_id =
+            self.find_in_section(GCD_ROLE_URI, "genInfo.company.id.idNo.type.companyId.ST13");
+        let company_name = self.find_in_section(GCD_ROLE_URI, "genInfo.company.id.name");
+        let street = self.find_in_section(GCD_ROLE_URI, "genInfo.company.id.location.street");
+        let house_no = self.find_in_section(GCD_ROLE_URI, "genInfo.company.id.location.houseNo");
+        let zip_code = self.find_in_section(GCD_ROLE_URI, "genInfo.company.id.location.zipCode");
+        let city = self.find_in_section(GCD_ROLE_URI, "genInfo.company.id.location.city");
+        let country = self.find_in_section(GCD_ROLE_URI, "genInfo.company.id.location.country");
+
+        // Update Submitter (transfer header; payload header if present).
+        let street_full = match (street, house_no) {
+            (Some(street), Some(house_no)) => Some(format!("{street} {house_no}")),
+            (Some(street), None) => Some(street.to_string()),
+            (None, Some(house_no)) => Some(house_no.to_string()),
+            (None, None) => None,
+        };
+
+        if let Some(payload_block) = elster.data_section.payload_blocks.first_mut() {
+            if let Some(submitter) = payload_block.payload_header.submitter.as_mut() {
+                if let Some(company_name) = company_name {
+                    submitter.name = company_name.to_string();
+                }
+
+                submitter.street = street_full.clone();
+                submitter.postal_code = zip_code.map(str::to_string);
+                submitter.city = city.map(str::to_string);
+                submitter.country = country.map(str::to_string);
+            }
+        }
+
+        // Update Recipient (first 4 digits of ST13 = BUFA code) and balance date.
+        if let Some(payload_block) = elster.data_section.payload_blocks.first_mut() {
+            if let Some(bufa) = company_id.and_then(|s| s.get(..4)) {
+                payload_block.payload_header.recipient.id = "F".to_string();
+                payload_block.payload_header.recipient.value = bufa.to_string();
+            }
+
+            if let Some(closing_date) = closing_date {
+                if let Ok(date_u32) = closing_date.replace('-', "").parse::<u32>() {
+                    payload_block.ebilanz.balance_date = date_u32;
+                }
+            }
+        }
+
+        // Update all XBRL contexts: entity identifier and period dates.
+        for ctx in instance.contexts_mut().values_mut() {
+            if let Some(company_id) = company_id {
+                ctx.entity.value = company_id.to_string();
+            }
+
+            match &mut ctx.period {
+                Period::Instant { date } => {
+                    if let Some(end) = fiscal_year_end {
+                        *date = end.to_string();
+                    }
+                }
+                Period::Duration { start, end } => {
+                    if let Some(begin) = fiscal_year_begin {
+                        *start = begin.to_string();
+                    }
+
+                    if let Some(end_date) = fiscal_year_end {
+                        *end = end_date.to_string();
+                    }
+                }
+                Period::Forever => {}
+            }
+        }
     }
 }
 
