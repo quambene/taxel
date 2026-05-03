@@ -28,12 +28,20 @@ pub fn draw_toolbar(
     table: &Report,
     lang: &str,
     editing: bool,
+    show_required_only: &mut bool,
 ) -> EditAction {
     let total_width = ui.available_width();
     let mut action = EditAction::None;
 
     ui.horizontal(|ui| {
-        draw_level_toolbar(ui, max_available, max_depth, collapsed, rows);
+        draw_level_toolbar(
+            ui,
+            max_available,
+            max_depth,
+            collapsed,
+            rows,
+            show_required_only,
+        );
         draw_search_bar(ui, search, table, lang, total_width);
 
         ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
@@ -53,6 +61,7 @@ fn draw_level_toolbar(
     max_depth: &mut Option<usize>,
     collapsed: &mut HashSet<usize>,
     rows: &[FactRow],
+    show_required_only: &mut bool,
 ) {
     ui.label("Level:");
 
@@ -69,6 +78,15 @@ fn draw_level_toolbar(
             *max_depth = Some(depth);
             *collapsed = collapsed_at_depth(rows, depth);
         }
+    }
+
+    ui.separator();
+
+    if ui
+        .selectable_label(*show_required_only, "Required")
+        .clicked()
+    {
+        *show_required_only = !*show_required_only;
     }
 }
 

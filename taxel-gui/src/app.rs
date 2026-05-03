@@ -46,6 +46,8 @@ pub struct SectionState {
     pub collapsed: HashSet<usize>,
     /// Maximum depth to display. None means show all depths.
     pub max_depth: Option<usize>,
+    /// When true, only rows with `is_required = true` are shown.
+    pub show_required_only: bool,
 }
 
 /// Main application struct for the Taxel GUI, managing the state of the app.
@@ -335,6 +337,7 @@ impl App for TaxelApp {
                                 table,
                                 &lang,
                                 editing,
+                                &mut state.show_required_only,
                             )
                         } else {
                             EditAction::None
@@ -402,6 +405,7 @@ impl App for TaxelApp {
                                 highlighted_row,
                                 editing,
                                 ui,
+                                state.show_required_only,
                             );
                         }
 

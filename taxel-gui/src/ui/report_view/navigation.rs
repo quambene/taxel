@@ -41,7 +41,16 @@ pub fn navigate_to_fact(
     ) {
         ensure_row_visible(row_idx, &section.rows, &mut state.collapsed);
 
-        let visible = visible_rows(&section.rows, &state.collapsed);
+        if state.show_required_only
+            && section
+                .rows
+                .get(row_idx)
+                .is_some_and(|row| !row.is_required)
+        {
+            state.show_required_only = false;
+        }
+
+        let visible = visible_rows(&section.rows, &state.collapsed, state.show_required_only);
 
         if let Some(vis_idx) = visible.iter().position(|&raw| raw == row_idx) {
             search.scroll_to_row = Some(vis_idx);

@@ -111,17 +111,31 @@ pub fn draw_search_results_overlay(
 
                                 if let Some(section) = report.sections.get(section_idx) {
                                     let state = &mut section_states[section_idx];
+
                                     ensure_row_visible(
                                         row_idx,
                                         &section.rows,
                                         &mut state.collapsed,
                                     );
 
-                                    let visible = visible_rows(&section.rows, &state.collapsed);
-                                    if let Some(vis_idx) =
+                                    if state.show_required_only
+                                        && section
+                                            .rows
+                                            .get(row_idx)
+                                            .is_some_and(|row| !row.is_required)
+                                    {
+                                        state.show_required_only = false;
+                                    }
+
+                                    let visible = visible_rows(
+                                        &section.rows,
+                                        &state.collapsed,
+                                        state.show_required_only,
+                                    );
+                                    if let Some(visible_idx) =
                                         visible.iter().position(|&raw| raw == row_idx)
                                     {
-                                        search.scroll_to_row = Some(vis_idx);
+                                        search.scroll_to_row = Some(visible_idx);
                                     }
                                 }
 

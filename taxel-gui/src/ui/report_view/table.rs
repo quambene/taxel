@@ -9,6 +9,7 @@ use std::collections::HashSet;
 /// Draw the fact table in the main panel, showing only the rows that are not
 /// collapsed. Handles the toggle logic for expanding/collapsing rows with
 /// children.
+#[allow(clippy::too_many_arguments)]
 pub fn draw_table(
     rows: &mut [FactRow],
     collapsed: &mut HashSet<usize>,
@@ -17,9 +18,10 @@ pub fn draw_table(
     highlight_row: Option<usize>,
     editing: bool,
     ui: &mut Ui,
+    show_required_only: bool,
 ) {
     let row_height = ui.text_style_height(&TextStyle::Body) + ui.spacing().item_spacing.y;
-    let visible = visible_rows(rows, collapsed);
+    let visible = visible_rows(rows, collapsed, show_required_only);
     let mut toggle: Option<usize> = None;
 
     let mut builder = TableBuilder::new(ui)
@@ -207,8 +209,13 @@ pub fn collapsed_at_depth(rows: &[FactRow], max_depth: usize) -> HashSet<usize> 
 
 /// Returns the raw indices of visible rows (positions in `rows`).
 /// `collapsed` stores raw indices, which are stable across expand/collapse
-/// operations.
-pub fn visible_rows(rows: &[FactRow], collapsed: &HashSet<usize>) -> Vec<usize> {
+/// operations. When `show_required_only` is true, only rows with
+/// `is_required = true` are included.
+pub fn visible_rows(
+    rows: &[FactRow],
+    collapsed: &HashSet<usize>,
+    show_required_only: bool,
+) -> Vec<usize> {
     let mut visible = Vec::new();
     let mut hidden_above_depth: Option<usize> = None;
 
@@ -219,6 +226,14 @@ pub fn visible_rows(rows: &[FactRow], collapsed: &HashSet<usize>) -> Vec<usize> 
             }
             hidden_above_depth = None;
         }
+
+        if show_required_only && !row.is_required {
+            if row.has_children && collapsed.contains(&raw_idx) {
+                hidden_above_depth = Some(row.depth);
+            }
+            continue;
+        }
+
         visible.push(raw_idx);
         if row.has_children && collapsed.contains(&raw_idx) {
             hidden_above_depth = Some(row.depth);
@@ -237,6 +252,7 @@ pub fn ensure_row_visible(row_idx: usize, rows: &[FactRow], collapsed: &mut Hash
         if rows[i].depth < depth && rows[i].has_children {
             collapsed.remove(&i);
             depth = rows[i].depth;
+
             if depth == 0 {
                 break;
             }
