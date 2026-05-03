@@ -29,6 +29,8 @@ pub struct AppDiagnostic {
     pub level: DiagnosticLevel,
     pub category: DiagnosticCategory,
     pub message: String,
+    /// The fact local name this diagnostic refers to, if any.
+    pub fact: Option<String>,
 }
 
 impl AppDiagnostic {
@@ -37,6 +39,7 @@ impl AppDiagnostic {
             level: DiagnosticLevel::Warning,
             category,
             message,
+            fact: None,
         }
     }
 
@@ -45,6 +48,7 @@ impl AppDiagnostic {
             level: DiagnosticLevel::Error,
             category,
             message,
+            fact: None,
         }
     }
 
@@ -53,6 +57,16 @@ impl AppDiagnostic {
             level: DiagnosticLevel::Success,
             category,
             message,
+            fact: None,
+        }
+    }
+
+    pub fn new_missing_fact(category: DiagnosticCategory, fact: impl Into<String>) -> Self {
+        AppDiagnostic {
+            level: DiagnosticLevel::Error,
+            category,
+            message: "Required field is missing".to_string(),
+            fact: Some(fact.into()),
         }
     }
 

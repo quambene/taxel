@@ -4,6 +4,19 @@ use std::{collections::HashMap, sync::LazyLock};
 pub const GCD_ROLE_URI: &str = "http://www.xbrl.de/taxonomies/de-gcd/role/gcd";
 pub const GCD_LABEL: &str = "GCD (Global Common Document)";
 
+/// The set of facts that must be present in a valid instance document.
+pub const REQUIRED_GCD_FACTS: &[&str] = &[
+    "genInfo.report.period.fiscalYearBegin",
+    "genInfo.report.period.fiscalYearEnd",
+    "genInfo.report.period.balSheetClosingDate",
+    "genInfo.company.id.idNo.type.companyId.ST13",
+    "genInfo.company.id.location.street",
+    "genInfo.company.id.location.houseNo",
+    "genInfo.company.id.location.zipCode",
+    "genInfo.company.id.location.city",
+    "genInfo.company.id.location.country",
+];
+
 /// The eBilanz taxonomy module to use for a new report. Each variant
 /// corresponds to a specific set of schema ref URLs (plus the always-included
 /// GCD module).

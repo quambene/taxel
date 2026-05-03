@@ -24,8 +24,8 @@ use std::{
     time::SystemTime,
 };
 use taxel::{
-    elster::Submitter, ElsterReport, TaxonomyType, TAXONOMY_DATE_TO_VERSION,
-    TAXONOMY_VERSION_TO_DATE, TEST_MARKER,
+    elster::Submitter, ElsterReport, TaxonomyType, GCD_ROLE_URI, REQUIRED_GCD_FACTS,
+    TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE, TEST_MARKER,
 };
 use uuid::Uuid;
 use xbrl_rs::{InstanceDocument, TaxonomyLoader, TaxonomySet};
@@ -648,6 +648,23 @@ fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error
         .to_xml()
         .context("Failed to serialize Elster report")?;
 
+    if let Some(report) = &app.report {
+        for &concept in REQUIRED_GCD_FACTS {
+            if report.find_in_section(GCD_ROLE_URI, concept).is_none() {
+                app.diagnostics.push(AppDiagnostic::new_missing_fact(
+                    DiagnosticCategory::Validation,
+                    concept,
+                ));
+            }
+        }
+    }
+
+    if app.diagnostics.iter().any(|diagnostic| {
+        diagnostic.category == DiagnosticCategory::Validation && diagnostic.fact.is_some()
+    }) {
+        return Ok(());
+    }
+
     let eric = app.eric.as_ref().context("Failed to get Eric")?;
 
     match eric.validate(xml, "Bilanz", taxonomy_version, None) {
@@ -668,7 +685,6 @@ fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error
                     ),
                 ));
             } else {
-                // TODO: parse `validation_response` for better error messages
                 app.diagnostics.push(AppDiagnostic::new_error(
                     DiagnosticCategory::Validation,
                     format!(

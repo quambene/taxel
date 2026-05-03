@@ -38,7 +38,12 @@ pub fn draw_error_panel(ctx: &mut Ui, diagnostics: &[AppDiagnostic], show_error_
 
                             ui.horizontal_wrapped(|ui| {
                                 ui.colored_label(color, format!("[{tag}]"));
-                                ui.label(&diagnostic.message);
+
+                                if let Some(fact) = &diagnostic.fact {
+                                    ui.label(format!("{}: {}", diagnostic.message, fact));
+                                } else {
+                                    ui.label(&diagnostic.message);
+                                }
                             });
                         }
                     });
