@@ -29,3 +29,4 @@
   - Replace app and vendor data in imported report
   - Sync GCD section with `ElsterReport` and XBRL `Period`
   - Validate required facts
+  - Make error message clickable and jump to relevant fact

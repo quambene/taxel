@@ -651,7 +651,7 @@ fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error
     if let Some(report) = &app.report {
         for &concept in REQUIRED_GCD_FACTS {
             if report.find_in_section(GCD_ROLE_URI, concept).is_none() {
-                app.diagnostics.push(AppDiagnostic::new_missing_fact(
+                app.diagnostics.push(AppDiagnostic::new_missing_fact_value(
                     DiagnosticCategory::Validation,
                     concept,
                 ));

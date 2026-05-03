@@ -1,15 +1,16 @@
 use crate::{
     app::{RowHighlight, Search, SectionState},
     domain::Report,
-    ui::report_view::table::{ensure_row_visible, visible_rows},
+    ui::report_view::{
+        table::{ensure_row_visible, visible_rows},
+        JUMP_HIGHLIGHT_DURATION,
+    },
 };
 use eframe::egui::{
     pos2, Area, Context, Frame, Id, Key, Label, Margin, Order, Rect, RichText, ScrollArea, Sense,
     Stroke, Ui,
 };
-use std::time::{Duration, Instant};
-
-const JUMP_HIGHLIGHT_DURATION: Duration = Duration::from_millis(1400);
+use std::time::Instant;
 
 /// Draw search results in a foreground overlay above the fact table. Clicking
 /// a result jumps to that row in the table.

@@ -264,8 +264,22 @@ impl App for TaxelApp {
                 .unwrap_or(&[]);
             ui::draw_sidebar(ctx, sections, &mut self.selected_tab, &self.settings.lang);
 
-            if self.show_error_panel {
-                ui::draw_error_panel(ctx, &self.diagnostics, &mut self.show_error_panel);
+            let fact_clicked = if self.show_error_panel {
+                ui::draw_error_panel(ctx, &self.diagnostics, &mut self.show_error_panel)
+            } else {
+                None
+            };
+
+            if let Some(fact) = fact_clicked {
+                if let Some(report) = &self.report {
+                    ui::navigate_to_fact(
+                        &fact,
+                        report,
+                        &mut self.selected_tab,
+                        &mut self.section_states,
+                        &mut self.search,
+                    );
+                }
             }
 
             let lang = self.settings.lang.clone();

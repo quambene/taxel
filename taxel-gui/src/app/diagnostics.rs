@@ -61,11 +61,11 @@ impl AppDiagnostic {
         }
     }
 
-    pub fn new_missing_fact(category: DiagnosticCategory, fact: impl Into<String>) -> Self {
+    pub fn new_missing_fact_value(category: DiagnosticCategory, fact: impl Into<String>) -> Self {
         AppDiagnostic {
             level: DiagnosticLevel::Error,
             category,
-            message: "Required field is missing".to_string(),
+            message: "Required value is missing".to_string(),
             fact: Some(fact.into()),
         }
     }

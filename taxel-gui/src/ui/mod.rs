@@ -13,6 +13,7 @@ pub use modals::{
 };
 pub use report_list_view::draw_report_list;
 pub use report_view::{
+    navigation::navigate_to_fact,
     search_overlay::{draw_search_results_overlay, highlight_row},
     sidebar::draw_sidebar,
     table::draw_table,
