@@ -632,7 +632,9 @@ fn collect_node(
                     substitution_map,
                     taxonomy,
                     rows,
-                    is_in_multi_choice,
+                    // Children of a multi-select choice are rendered as
+                    // checkboxes, so we set this flag to true.
+                    true,
                     Some(node.concept_name),
                 );
             }
