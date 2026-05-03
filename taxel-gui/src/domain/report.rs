@@ -61,6 +61,8 @@ pub struct FactRow {
     pub is_required: bool,
     /// Whether this concept is abstract in the taxonomy schema.
     pub is_abstract: bool,
+    /// Whether this row represents a tuple-origin concept in the tree.
+    pub is_tuple: bool,
 }
 
 /// One presentation section with its rows.
@@ -535,11 +537,14 @@ fn collect_node(
 ) {
     let labels = resolve_labels(node);
     let has_children = !node.children.is_empty();
+    let concept = concept_map.get(node.concept_name).copied();
+    let is_tuple_concept = concept
+        .and_then(|concept| concept.content_model.as_ref())
+        .is_some();
 
     // Detect Choice content model on the current concept (only relevant for tuples).
     let choice_max = if !is_in_multi_choice {
-        concept_map
-            .get(node.concept_name)
+        concept
             .and_then(|concept| concept.content_model.as_ref())
             .and_then(|particle| match particle {
                 Particle::Choice { occurs, .. } => Some(occurs.max),
@@ -551,7 +556,6 @@ fn collect_node(
 
     if let Some(max) = choice_max {
         if max == Some(1) {
-            let concept = concept_map.get(node.concept_name).copied();
             // Single-select choice → Dropdown row; options come from the
             // taxonomy schema so all declared choices are shown as dropdown
             // options even when only one child is present in the instance
@@ -598,13 +602,12 @@ fn collect_node(
                 fact_index: None,
                 is_required: is_required(concept, taxonomy),
                 is_abstract: concept.is_some_and(|concept| concept.is_abstract),
+                is_tuple: is_tuple_concept,
             });
 
             // Children are represented inside the dropdown; don't recurse.
             return;
         } else {
-            let concept = concept_map.get(node.concept_name).copied();
-
             // Multi-select choice → concept-only parent row, then recurse as checkboxes.
             rows.push(FactRow {
                 concept: node.concept_name.to_string(),
@@ -618,6 +621,7 @@ fn collect_node(
                 fact_index: None,
                 is_required: is_required(concept, taxonomy),
                 is_abstract: concept.is_some_and(|concept| concept.is_abstract),
+                is_tuple: is_tuple_concept,
             });
 
             for child in &node.children {
@@ -628,7 +632,7 @@ fn collect_node(
                     substitution_map,
                     taxonomy,
                     rows,
-                    true,
+                    is_in_multi_choice,
                     Some(node.concept_name),
                 );
             }
@@ -639,8 +643,6 @@ fn collect_node(
 
     // Normal item fact, or checkbox item inside a multi-select choice.
     if node.fact_indices.is_empty() {
-        let concept = concept_map.get(node.concept_name).copied();
-
         rows.push(FactRow {
             concept: node.concept_name.to_string(),
             parent_concept: parent_concept.map(str::to_string),
@@ -657,12 +659,11 @@ fn collect_node(
             fact_index: None,
             is_required: is_required(concept, taxonomy),
             is_abstract: concept.is_some_and(|concept| concept.is_abstract),
+            is_tuple: is_tuple_concept,
         });
     } else {
         for &idx in &node.fact_indices {
             if let Some(fact) = facts.get(idx) {
-                let concept = concept_map.get(node.concept_name).copied();
-
                 rows.push(FactRow {
                     concept: node.concept_name.to_string(),
                     parent_concept: parent_concept.map(str::to_string),
@@ -679,6 +680,7 @@ fn collect_node(
                     fact_index: Some(idx),
                     is_required: is_required(concept, taxonomy),
                     is_abstract: concept.is_some_and(|concept| concept.is_abstract),
+                    is_tuple: is_tuple_concept,
                 });
             }
         }

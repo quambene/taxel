@@ -113,7 +113,7 @@ pub fn draw_table(
 
                     match &mut rows[raw_idx].value {
                         FactValue::Text(text) => {
-                            if row_editing {
+                            if row_editing && !rows[raw_idx].is_tuple {
                                 ui.text_edit_singleline(text);
                             } else {
                                 ui.label(text.as_str());
