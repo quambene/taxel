@@ -1,6 +1,10 @@
 use crate::domain::ReportStatus;
 use std::{collections::HashMap, path::PathBuf};
-use taxel::{ElsterReport, TaxonomyType, GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT};
+use taxel::{
+    ElsterReport, TaxonomyType, CLOSING_DATE, COMPANY_CITY, COMPANY_COUNTRY, COMPANY_HOUSE_NO,
+    COMPANY_NAME, COMPANY_STREET, COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, COMPANY_ZIP_CODE,
+    FISCAL_YEAR_BEGIN, FISCAL_YEAR_END, GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT,
+};
 use xbrl_rs::{
     Concept, ConceptView, DocumentView, InstanceDocument, ItemFact, Label, Particle, Period,
     TaxonomySet, TreeNode, TupleParticleView, ROLE_LABEL, ROLE_TERSE,
@@ -34,6 +38,8 @@ impl Default for FactValue {
 pub struct FactRow {
     /// The concept name, e.g. "bs.ass.fixAss".
     pub concept: String,
+    /// Immediate parent concept in the presentation tree, if any.
+    pub parent_concept: Option<String>,
     /// Labels resolved at load time, keyed by language code (e.g. "en", "de").
     pub labels: HashMap<String, String>,
     /// The depth of the node in the tree, used for indentation.
@@ -187,6 +193,7 @@ impl Report {
                     taxonomy,
                     &mut fact_section.rows,
                     false,
+                    None,
                 );
             }
 
@@ -238,9 +245,15 @@ impl Report {
         self.sections.sort_by_key(|section| section.disabled);
     }
 
-    /// Returns the text value of the first fact matching `concept` in the
-    /// section identified by `role`. Returns `None` if not found or empty.
-    pub fn find_in_section(&self, role: &str, concept: &str) -> Option<&str> {
+    /// Returns the text value of the first fact matching `concept` (and
+    /// optionally `parent_concept`) in the section identified by `role`.
+    /// Returns `None` if not found or empty.
+    pub fn find_in_section(
+        &self,
+        role: &str,
+        concept: &str,
+        parent_concept: Option<&str>,
+    ) -> Option<&str> {
         self.sections
             .iter()
             .find(|section| section.role == role)
@@ -248,7 +261,11 @@ impl Report {
                 section
                     .rows
                     .iter()
-                    .find(|row| row.concept == concept)
+                    .find(|row| {
+                        row.concept == concept
+                            && parent_concept
+                                .is_none_or(|parent| row.parent_concept.as_deref() == Some(parent))
+                    })
                     .and_then(|row| match &row.value {
                         FactValue::Text(text) if !text.is_empty() => Some(text.as_str()),
                         _ => None,
@@ -259,20 +276,20 @@ impl Report {
     /// Propagates GCD fact values into the ElsterReport envelope and all XBRL
     /// contexts so that the saved file stays consistent with what the user entered.
     pub fn sync_gcd_to_elster(&self, instance: &mut InstanceDocument, elster: &mut ElsterReport) {
-        let fiscal_year_begin =
-            self.find_in_section(GCD_ROLE_URI, "genInfo.report.period.fiscalYearBegin");
-        let fiscal_year_end =
-            self.find_in_section(GCD_ROLE_URI, "genInfo.report.period.fiscalYearEnd");
-        let closing_date =
-            self.find_in_section(GCD_ROLE_URI, "genInfo.report.period.balSheetClosingDate");
-        let company_id =
-            self.find_in_section(GCD_ROLE_URI, "genInfo.company.id.idNo.type.companyId.ST13");
-        let company_name = self.find_in_section(GCD_ROLE_URI, "genInfo.company.id.name");
-        let street = self.find_in_section(GCD_ROLE_URI, "genInfo.company.id.location.street");
-        let house_no = self.find_in_section(GCD_ROLE_URI, "genInfo.company.id.location.houseNo");
-        let zip_code = self.find_in_section(GCD_ROLE_URI, "genInfo.company.id.location.zipCode");
-        let city = self.find_in_section(GCD_ROLE_URI, "genInfo.company.id.location.city");
-        let country = self.find_in_section(GCD_ROLE_URI, "genInfo.company.id.location.country");
+        let fiscal_year_begin = self.find_in_section(GCD_ROLE_URI, FISCAL_YEAR_BEGIN, None);
+        let fiscal_year_end = self.find_in_section(GCD_ROLE_URI, FISCAL_YEAR_END, None);
+        let closing_date = self.find_in_section(GCD_ROLE_URI, CLOSING_DATE, None);
+        let tax_number = self.find_in_section(
+            GCD_ROLE_URI,
+            COMPANY_TAX_NUMBER,
+            Some(COMPANY_TAX_NUMBER_PARENT),
+        );
+        let company_name = self.find_in_section(GCD_ROLE_URI, COMPANY_NAME, None);
+        let street = self.find_in_section(GCD_ROLE_URI, COMPANY_STREET, None);
+        let house_no = self.find_in_section(GCD_ROLE_URI, COMPANY_HOUSE_NO, None);
+        let zip_code = self.find_in_section(GCD_ROLE_URI, COMPANY_ZIP_CODE, None);
+        let city = self.find_in_section(GCD_ROLE_URI, COMPANY_CITY, None);
+        let country = self.find_in_section(GCD_ROLE_URI, COMPANY_COUNTRY, None);
 
         // Update Submitter (transfer header; payload header if present).
         let street_full = match (street, house_no) {
@@ -297,7 +314,7 @@ impl Report {
 
         // Update Recipient (first 4 digits of ST13 = BUFA code) and balance date.
         if let Some(payload_block) = elster.data_section.payload_blocks.first_mut() {
-            if let Some(bufa) = company_id.and_then(|s| s.get(..4)) {
+            if let Some(bufa) = tax_number.and_then(|s| s.get(..4)) {
                 payload_block.payload_header.recipient.id = "F".to_string();
                 payload_block.payload_header.recipient.value = bufa.to_string();
             }
@@ -311,8 +328,8 @@ impl Report {
 
         // Update all XBRL contexts: entity identifier and period dates.
         for ctx in instance.contexts_mut().values_mut() {
-            if let Some(company_id) = company_id {
-                ctx.entity.value = company_id.to_string();
+            if let Some(tax_number) = tax_number {
+                ctx.entity.value = tax_number.to_string();
             }
 
             match &mut ctx.period {
@@ -505,6 +522,7 @@ fn is_required(concept: Option<&Concept>, taxonomy: &TaxonomySet) -> bool {
 /// `is_in_multi_choice` is `true` when this node is a direct child of a tuple
 /// whose content model is a multi-select Choice particle; those children are
 /// rendered as checkboxes.
+#[allow(clippy::too_many_arguments)]
 fn collect_node(
     node: &TreeNode,
     facts: &[&ItemFact],
@@ -513,6 +531,7 @@ fn collect_node(
     taxonomy: &TaxonomySet,
     rows: &mut Vec<FactRow>,
     is_in_multi_choice: bool,
+    parent_concept: Option<&str>,
 ) {
     let labels = resolve_labels(node);
     let has_children = !node.children.is_empty();
@@ -569,6 +588,7 @@ fn collect_node(
 
             rows.push(FactRow {
                 concept: node.concept_name.to_string(),
+                parent_concept: parent_concept.map(str::to_string),
                 labels,
                 depth: node.depth,
                 context: String::new(),
@@ -588,6 +608,7 @@ fn collect_node(
             // Multi-select choice → concept-only parent row, then recurse as checkboxes.
             rows.push(FactRow {
                 concept: node.concept_name.to_string(),
+                parent_concept: parent_concept.map(str::to_string),
                 labels,
                 depth: node.depth,
                 context: String::new(),
@@ -608,6 +629,7 @@ fn collect_node(
                     taxonomy,
                     rows,
                     true,
+                    Some(node.concept_name),
                 );
             }
 
@@ -621,6 +643,7 @@ fn collect_node(
 
         rows.push(FactRow {
             concept: node.concept_name.to_string(),
+            parent_concept: parent_concept.map(str::to_string),
             labels,
             depth: node.depth,
             context: String::new(),
@@ -642,6 +665,7 @@ fn collect_node(
 
                 rows.push(FactRow {
                     concept: node.concept_name.to_string(),
+                    parent_concept: parent_concept.map(str::to_string),
                     labels: labels.clone(),
                     depth: node.depth,
                     context: fact.context_ref().to_string(),
@@ -669,6 +693,7 @@ fn collect_node(
             taxonomy,
             rows,
             is_in_multi_choice,
+            Some(node.concept_name),
         );
     }
 }

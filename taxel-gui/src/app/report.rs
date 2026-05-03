@@ -24,8 +24,9 @@ use std::{
     time::SystemTime,
 };
 use taxel::{
-    elster::Submitter, ElsterReport, TaxonomyType, GCD_ROLE_URI, REQUIRED_GCD_FACTS,
-    TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE, TEST_MARKER,
+    elster::Submitter, ElsterReport, TaxonomyType, COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT,
+    GCD_ROLE_URI, REQUIRED_GCD_FACTS, TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE,
+    TEST_MARKER,
 };
 use uuid::Uuid;
 use xbrl_rs::{InstanceDocument, TaxonomyLoader, TaxonomySet};
@@ -650,7 +651,19 @@ fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error
 
     if let Some(report) = &app.report {
         for &concept in REQUIRED_GCD_FACTS {
-            if report.find_in_section(GCD_ROLE_URI, concept).is_none() {
+            // The "companyId.ST13" concept can occur multiple times in the
+            // report under different parent concepts. We only want to check for
+            // its existence once.
+            let parent = if concept == COMPANY_TAX_NUMBER {
+                Some(COMPANY_TAX_NUMBER_PARENT)
+            } else {
+                None
+            };
+
+            if report
+                .find_in_section(GCD_ROLE_URI, concept, parent)
+                .is_none()
+            {
                 app.diagnostics.push(AppDiagnostic::new_missing_fact_value(
                     DiagnosticCategory::Validation,
                     concept,

@@ -4,18 +4,32 @@ use std::{collections::HashMap, sync::LazyLock};
 pub const GCD_ROLE_URI: &str = "http://www.xbrl.de/taxonomies/de-gcd/role/gcd";
 pub const GCD_LABEL: &str = "GCD (Global Common Document)";
 
-/// The set of facts that must be present in a valid instance document.
+/// The set of facts that must be present in `ElsterReport` and `EBilanz`.
 pub const REQUIRED_GCD_FACTS: &[&str] = &[
-    "genInfo.report.period.fiscalYearBegin",
-    "genInfo.report.period.fiscalYearEnd",
-    "genInfo.report.period.balSheetClosingDate",
-    "genInfo.company.id.idNo.type.companyId.ST13",
-    "genInfo.company.id.location.street",
-    "genInfo.company.id.location.houseNo",
-    "genInfo.company.id.location.zipCode",
-    "genInfo.company.id.location.city",
-    "genInfo.company.id.location.country",
+    FISCAL_YEAR_BEGIN,
+    FISCAL_YEAR_END,
+    CLOSING_DATE,
+    COMPANY_TAX_NUMBER,
+    COMPANY_STREET,
+    COMPANY_HOUSE_NO,
+    COMPANY_ZIP_CODE,
+    COMPANY_CITY,
+    COMPANY_COUNTRY,
 ];
+
+pub const FISCAL_YEAR_BEGIN: &str = "genInfo.report.period.fiscalYearBegin";
+pub const FISCAL_YEAR_END: &str = "genInfo.report.period.fiscalYearEnd";
+pub const CLOSING_DATE: &str = "genInfo.report.period.balSheetClosingDate";
+pub const COMPANY_NAME: &str = "genInfo.company.id.name";
+pub const COMPANY_STREET: &str = "genInfo.company.id.location.street";
+pub const COMPANY_HOUSE_NO: &str = "genInfo.company.id.location.houseNo";
+pub const COMPANY_ZIP_CODE: &str = "genInfo.company.id.location.zipCode";
+pub const COMPANY_CITY: &str = "genInfo.company.id.location.city";
+pub const COMPANY_COUNTRY: &str = "genInfo.company.id.location.country";
+pub const COMPANY_TAX_NUMBER: &str = "genInfo.company.id.idNo.type.companyId.ST13";
+/// The parent fact of `COMPANY_TAX_NUMBER` is used to uniquely identify the tax
+/// number fact.
+pub const COMPANY_TAX_NUMBER_PARENT: &str = "genInfo.company.id.idNo";
 
 /// The eBilanz taxonomy module to use for a new report. Each variant
 /// corresponds to a specific set of schema ref URLs (plus the always-included
