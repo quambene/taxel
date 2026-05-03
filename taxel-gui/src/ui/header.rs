@@ -1,11 +1,10 @@
 use crate::{
     app::{self, DiagnosticLevel},
-    ui::diagnostic_panel::{SUCCESS_COLOR, WARNING_COLOR},
+    ui::diagnostic_panel::{ERROR_COLOR, SUCCESS_COLOR, WARNING_COLOR},
     TaxelApp,
 };
 use eframe::egui::{
-    text::LayoutJob, vec2, Align, Button, Color32, Layout, Response, Shape, TextEdit, TextFormat,
-    Ui,
+    text::LayoutJob, vec2, Align, Button, Layout, Response, Shape, TextEdit, TextFormat, Ui,
 };
 use rfd::FileDialog;
 
@@ -124,7 +123,7 @@ fn draw_error_summary(app: &mut TaxelApp, ui: &mut Ui) {
         &format!("errors: {error_count}"),
         0.0,
         TextFormat {
-            color: Color32::RED,
+            color: ERROR_COLOR,
             ..Default::default()
         },
     );
