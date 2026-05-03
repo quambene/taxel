@@ -703,7 +703,6 @@ fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error
     Ok(())
 }
 
-// TODO: provide certifcate path and password
 /// Sends the imported report and reports the server response in the diagnostics
 /// panel.
 pub fn send_report(app: &mut TaxelApp) {
