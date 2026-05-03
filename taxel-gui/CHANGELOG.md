@@ -5,6 +5,7 @@
 - fixed
   - Fix non-nil facts with empty string as value
   - Fix unsanitized xml for `Eric::validate`
+  - Fix missing `context_ref` on tuple child after editing via dropdown
 - added
   - Import report
   - Display report

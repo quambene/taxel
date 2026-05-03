@@ -4,7 +4,7 @@ use log::debug;
 use std::collections::HashMap;
 use xbrl_rs::{
     Context as XbrlContext, ContextId, EntityIdentifier, ExpandedName, InstanceDocument, ItemFact,
-    NamespacePrefix, NamespaceUri, Period, TaxonomySet, Unit, UnitId,
+    NamespacePrefix, NamespaceUri, Period, PeriodType, TaxonomySet, Unit, UnitId,
 };
 
 /// The outcome of [`update_instance_document`].
@@ -190,15 +190,38 @@ pub fn update_instance_document(
                     });
 
                 let (namespace_uri, context_ref) = sibling_info.unwrap_or_else(|| {
-                    let namespace_uri = taxonomy
-                        .and_then(|tax| {
-                            tax.elements()
-                                .into_iter()
-                                .find(|concept| concept.name.local_name == selected.as_str())
-                        })
+                    let selected_concept = taxonomy.and_then(|tax| {
+                        tax.elements()
+                            .into_iter()
+                            .find(|concept| concept.name.local_name == selected.as_str())
+                    });
+
+                    let namespace_uri = selected_concept
                         .map(|concept| concept.name.namespace_uri.clone())
                         .unwrap_or_else(|| NamespaceUri::from(""));
-                    (namespace_uri, String::new())
+
+                    let context_ref = selected_concept
+                        .and_then(|concept| {
+                            concept.period_type.as_ref().and_then(|period_type| {
+                                instance.contexts().iter().find_map(|(id, ctx)| {
+                                    let matches = matches!(
+                                        (period_type, &ctx.period),
+                                        (PeriodType::Duration, Period::Duration { .. })
+                                            | (PeriodType::Instant, Period::Instant { .. })
+                                    );
+
+                                    if matches {
+                                        Some(id.to_string())
+                                    } else {
+                                        None
+                                    }
+                                })
+                            })
+                        })
+                        .or_else(|| instance.contexts().keys().next().map(ToString::to_string))
+                        .unwrap_or_default();
+
+                    (namespace_uri, context_ref)
                 });
 
                 let new_child = ItemFact::new(
