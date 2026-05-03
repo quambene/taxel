@@ -1,6 +1,6 @@
 use crate::{
     app::{RowHighlight, Search, SectionState},
-    domain::Report,
+    domain::{FactValue, Report},
     ui::report_view::{
         table::{ensure_row_visible, visible_rows},
         JUMP_HIGHLIGHT_DURATION,
@@ -118,19 +118,31 @@ pub fn draw_search_results_overlay(
                                         &mut state.collapsed,
                                     );
 
-                                    if state.show_required_only
-                                        && section
-                                            .rows
-                                            .get(row_idx)
-                                            .is_some_and(|row| !row.is_required)
-                                    {
-                                        state.show_required_only = false;
+                                    if let Some(row) = section.rows.get(row_idx) {
+                                        if state.show_required_only && !row.is_required {
+                                            state.show_required_only = false;
+                                        }
+
+                                        if state.show_filled_only {
+                                            let is_filled = match &row.value {
+                                                FactValue::Text(text) => !text.trim().is_empty(),
+                                                FactValue::Checkbox(checked) => *checked,
+                                                FactValue::Dropdown { selected, .. } => {
+                                                    !selected.is_empty()
+                                                }
+                                            };
+
+                                            if !is_filled {
+                                                state.show_filled_only = false;
+                                            }
+                                        }
                                     }
 
                                     let visible = visible_rows(
                                         &section.rows,
                                         &state.collapsed,
                                         state.show_required_only,
+                                        state.show_filled_only,
                                     );
                                     if let Some(visible_idx) =
                                         visible.iter().position(|&raw| raw == row_idx)

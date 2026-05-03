@@ -10,6 +10,8 @@
   - Display report
   - Display single-choice tuples as dropdown
   - Display multiple-choice tuples as checkbox
+  - Display required facts only
+  - Display filled facts only
   - Display report sections in sidebar
   - Edit and save report
   - Close report

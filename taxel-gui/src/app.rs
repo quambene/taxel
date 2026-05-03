@@ -48,6 +48,8 @@ pub struct SectionState {
     pub max_depth: Option<usize>,
     /// When true, only rows with `is_required = true` are shown.
     pub show_required_only: bool,
+    /// When true, only rows with non-empty values are shown.
+    pub show_filled_only: bool,
 }
 
 /// Transient state for the diagnostics copy-message popup.
@@ -362,6 +364,7 @@ impl App for TaxelApp {
                                 &lang,
                                 editing,
                                 &mut state.show_required_only,
+                                &mut state.show_filled_only,
                             )
                         } else {
                             EditAction::None
@@ -430,6 +433,7 @@ impl App for TaxelApp {
                                 editing,
                                 ui,
                                 state.show_required_only,
+                                state.show_filled_only,
                             );
                         }
 

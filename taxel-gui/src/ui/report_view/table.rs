@@ -19,9 +19,10 @@ pub fn draw_table(
     editing: bool,
     ui: &mut Ui,
     show_required_only: bool,
+    show_filled_only: bool,
 ) {
     let row_height = ui.text_style_height(&TextStyle::Body) + ui.spacing().item_spacing.y;
-    let visible = visible_rows(rows, collapsed, show_required_only);
+    let visible = visible_rows(rows, collapsed, show_required_only, show_filled_only);
     let mut toggle: Option<usize> = None;
 
     let mut builder = TableBuilder::new(ui)
@@ -214,11 +215,13 @@ pub fn collapsed_at_depth(rows: &[FactRow], max_depth: usize) -> HashSet<usize> 
 /// Returns the raw indices of visible rows (positions in `rows`).
 /// `collapsed` stores raw indices, which are stable across expand/collapse
 /// operations. When `show_required_only` is true, only rows with
-/// `is_required = true` are included.
+/// `is_required = true` are included. When `show_filled_only` is true, only
+/// rows with non-empty values are included.
 pub fn visible_rows(
     rows: &[FactRow],
     collapsed: &HashSet<usize>,
     show_required_only: bool,
+    show_filled_only: bool,
 ) -> Vec<usize> {
     let mut visible = Vec::new();
     let mut hidden_above_depth: Option<usize> = None;
@@ -238,6 +241,13 @@ pub fn visible_rows(
             continue;
         }
 
+        if show_filled_only && !is_filled(row) {
+            if row.has_children && collapsed.contains(&raw_idx) {
+                hidden_above_depth = Some(row.depth);
+            }
+            continue;
+        }
+
         visible.push(raw_idx);
         if row.has_children && collapsed.contains(&raw_idx) {
             hidden_above_depth = Some(row.depth);
@@ -245,6 +255,14 @@ pub fn visible_rows(
     }
 
     visible
+}
+
+fn is_filled(row: &FactRow) -> bool {
+    match &row.value {
+        FactValue::Text(text) => !text.trim().is_empty(),
+        FactValue::Checkbox(checked) => *checked,
+        FactValue::Dropdown { selected, .. } => !selected.is_empty(),
+    }
 }
 
 /// Ensures that a given row is visible by expanding (uncollapsing) all its

@@ -29,6 +29,7 @@ pub fn draw_toolbar(
     lang: &str,
     editing: bool,
     show_required_only: &mut bool,
+    show_filled_only: &mut bool,
 ) -> EditAction {
     let total_width = ui.available_width();
     let mut action = EditAction::None;
@@ -41,6 +42,7 @@ pub fn draw_toolbar(
             collapsed,
             rows,
             show_required_only,
+            show_filled_only,
         );
         draw_search_bar(ui, search, table, lang, total_width);
 
@@ -62,6 +64,7 @@ fn draw_level_toolbar(
     collapsed: &mut HashSet<usize>,
     rows: &[FactRow],
     show_required_only: &mut bool,
+    show_filled_only: &mut bool,
 ) {
     ui.label("Level:");
 
@@ -87,6 +90,10 @@ fn draw_level_toolbar(
         .clicked()
     {
         *show_required_only = !*show_required_only;
+    }
+
+    if ui.selectable_label(*show_filled_only, "Filled").clicked() {
+        *show_filled_only = !*show_filled_only;
     }
 }
 
