@@ -21,3 +21,11 @@ test:
 # Run unit tests
 test-unit:
     cargo test --lib
+
+# Run cargo check with env vars
+check:
+    cargo check
+
+# Run cargo build with env vars
+build:
+    cargo build
