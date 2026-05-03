@@ -53,6 +53,8 @@ pub struct FactRow {
     /// Whether this concept is a "Mussfeld" (required field) per the taxonomy
     /// reference linkbase.
     pub is_required: bool,
+    /// Whether this concept is abstract in the taxonomy schema.
+    pub is_abstract: bool,
 }
 
 /// One presentation section with its rows.
@@ -572,6 +574,9 @@ fn collect_node(
                 has_children: false,
                 fact_index: None,
                 is_required: is_required(node.concept_name, concept_map, taxonomy),
+                is_abstract: concept_map
+                    .get(node.concept_name)
+                    .is_some_and(|concept| concept.is_abstract),
             });
 
             // Children are represented inside the dropdown; don't recurse.
@@ -588,6 +593,9 @@ fn collect_node(
                 has_children,
                 fact_index: None,
                 is_required: is_required(node.concept_name, concept_map, taxonomy),
+                is_abstract: concept_map
+                    .get(node.concept_name)
+                    .is_some_and(|concept| concept.is_abstract),
             });
 
             for child in &node.children {
@@ -622,6 +630,9 @@ fn collect_node(
             has_children,
             fact_index: None,
             is_required: is_required(node.concept_name, concept_map, taxonomy),
+            is_abstract: concept_map
+                .get(node.concept_name)
+                .is_some_and(|concept| concept.is_abstract),
         });
     } else {
         for &idx in &node.fact_indices {
@@ -640,6 +651,9 @@ fn collect_node(
                     has_children,
                     fact_index: Some(idx),
                     is_required: is_required(node.concept_name, concept_map, taxonomy),
+                    is_abstract: concept_map
+                        .get(node.concept_name)
+                        .is_some_and(|concept| concept.is_abstract),
                 });
             }
         }
