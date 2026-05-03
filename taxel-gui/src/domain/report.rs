@@ -480,13 +480,8 @@ fn collect_choice_options(
     }
 }
 
-fn is_required(
-    concept_name: &str,
-    concept_map: &HashMap<&str, &Concept>,
-    taxonomy: &TaxonomySet,
-) -> bool {
-    concept_map
-        .get(concept_name)
+fn is_required(concept: Option<&Concept>, taxonomy: &TaxonomySet) -> bool {
+    concept
         .and_then(|concept| concept.id.as_deref())
         .and_then(|id| taxonomy.references_for(id))
         .is_some_and(|references| {
@@ -531,6 +526,7 @@ fn collect_node(
 
     if let Some(max) = choice_max {
         if max == Some(1) {
+            let concept = concept_map.get(node.concept_name).copied();
             // Single-select choice → Dropdown row; options come from the
             // taxonomy schema so all declared choices are shown as dropdown
             // options even when only one child is present in the instance
@@ -543,7 +539,8 @@ fn collect_node(
                         ("de".to_owned(), "—".to_owned()),
                     ]),
                 )];
-                if let Some(concept) = concept_map.get(node.concept_name) {
+
+                if let Some(concept) = concept {
                     let concept_view = ConceptView::build(concept, taxonomy);
 
                     if let Some(particle) = &concept_view.tuple_content {
@@ -573,15 +570,15 @@ fn collect_node(
                 value: FactValue::Dropdown { selected, options },
                 has_children: false,
                 fact_index: None,
-                is_required: is_required(node.concept_name, concept_map, taxonomy),
-                is_abstract: concept_map
-                    .get(node.concept_name)
-                    .is_some_and(|concept| concept.is_abstract),
+                is_required: is_required(concept, taxonomy),
+                is_abstract: concept.is_some_and(|concept| concept.is_abstract),
             });
 
             // Children are represented inside the dropdown; don't recurse.
             return;
         } else {
+            let concept = concept_map.get(node.concept_name).copied();
+
             // Multi-select choice → concept-only parent row, then recurse as checkboxes.
             rows.push(FactRow {
                 concept: node.concept_name.to_string(),
@@ -592,10 +589,8 @@ fn collect_node(
                 value: FactValue::default(),
                 has_children,
                 fact_index: None,
-                is_required: is_required(node.concept_name, concept_map, taxonomy),
-                is_abstract: concept_map
-                    .get(node.concept_name)
-                    .is_some_and(|concept| concept.is_abstract),
+                is_required: is_required(concept, taxonomy),
+                is_abstract: concept.is_some_and(|concept| concept.is_abstract),
             });
 
             for child in &node.children {
@@ -616,6 +611,8 @@ fn collect_node(
 
     // Normal item fact, or checkbox item inside a multi-select choice.
     if node.fact_indices.is_empty() {
+        let concept = concept_map.get(node.concept_name).copied();
+
         rows.push(FactRow {
             concept: node.concept_name.to_string(),
             labels,
@@ -629,14 +626,14 @@ fn collect_node(
             },
             has_children,
             fact_index: None,
-            is_required: is_required(node.concept_name, concept_map, taxonomy),
-            is_abstract: concept_map
-                .get(node.concept_name)
-                .is_some_and(|concept| concept.is_abstract),
+            is_required: is_required(concept, taxonomy),
+            is_abstract: concept.is_some_and(|concept| concept.is_abstract),
         });
     } else {
         for &idx in &node.fact_indices {
             if let Some(fact) = facts.get(idx) {
+                let concept = concept_map.get(node.concept_name).copied();
+
                 rows.push(FactRow {
                     concept: node.concept_name.to_string(),
                     labels: labels.clone(),
@@ -650,10 +647,8 @@ fn collect_node(
                     },
                     has_children,
                     fact_index: Some(idx),
-                    is_required: is_required(node.concept_name, concept_map, taxonomy),
-                    is_abstract: concept_map
-                        .get(node.concept_name)
-                        .is_some_and(|concept| concept.is_abstract),
+                    is_required: is_required(concept, taxonomy),
+                    is_abstract: concept.is_some_and(|concept| concept.is_abstract),
                 });
             }
         }
