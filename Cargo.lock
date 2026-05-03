@@ -1447,7 +1447,7 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 [[package]]
 name = "eric-bindings"
 version = "0.5.1"
-source = "git+https://github.com/quambene/eric-rs.git#f93cf2b52e3c21297fc12a505e80ce0fef82ab07"
+source = "git+https://github.com/quambene/eric-rs.git#79935f9d6abe080366a89c51752a271c5ee5453b"
 dependencies = [
  "anyhow",
 ]
@@ -1455,7 +1455,7 @@ dependencies = [
 [[package]]
 name = "eric-sdk"
 version = "0.5.0"
-source = "git+https://github.com/quambene/eric-rs.git#f93cf2b52e3c21297fc12a505e80ce0fef82ab07"
+source = "git+https://github.com/quambene/eric-rs.git#79935f9d6abe080366a89c51752a271c5ee5453b"
 dependencies = [
  "anyhow",
  "eric-bindings",
@@ -6182,7 +6182,7 @@ checksum = "ea6fc2961e4ef194dcbfe56bb845534d0dc8098940c7e5c012a258bfec6701bd"
 [[package]]
 name = "xbrl-rs"
 version = "0.2.1"
-source = "git+https://github.com/quambene/xbrl-rs.git#83ef34116440ab02b68a39359ec8d0a6cc69b1be"
+source = "git+https://github.com/quambene/xbrl-rs.git#c1d1edda54a0d9180edfac9fb1780f068616f0d1"
 dependencies = [
  "chrono",
  "indexmap 2.14.0",
