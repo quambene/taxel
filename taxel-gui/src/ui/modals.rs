@@ -2,7 +2,9 @@ use crate::{
     app::{self, LoadKind},
     TaxelApp,
 };
-use eframe::egui::{Align2, Button, ComboBox, Grid, Id, Modal, TextEdit, Ui, Vec2, Widget, Window};
+use eframe::egui::{
+    pos2, Align2, Button, ComboBox, Grid, Id, Modal, TextEdit, Ui, Vec2, Widget, Window,
+};
 use rfd::FileDialog;
 use taxel::{TAXONOMY_TYPES, TAXONOMY_VERSION_TO_DATE};
 
@@ -282,4 +284,42 @@ pub fn draw_unsaved_changes_modal(ui: &mut Ui, stay: &mut bool, continue_nav: &m
                 }
             });
         });
+}
+
+/// Draws a modal to copy a diagnostic message to the clipboard.
+pub fn draw_copy_message_modal(ui: &mut Ui, app: &mut TaxelApp) {
+    let mut copied = false;
+
+    let Some(copy_message) = app.copy_message.as_ref() else {
+        return;
+    };
+
+    let click_pos = copy_message.position;
+    let mut window_pos = pos2(click_pos.x, click_pos.y - 44.0);
+    let viewport = ui.ctx().content_rect();
+    window_pos.x = window_pos
+        .x
+        .clamp(viewport.left() + 8.0, viewport.right() - 160.0);
+    window_pos.y = window_pos
+        .y
+        .clamp(viewport.top() + 8.0, viewport.bottom() - 48.0);
+
+    Window::new("copy_message_modal")
+        .id(Id::new("copy_message_modal"))
+        .title_bar(false)
+        .collapsible(false)
+        .resizable(false)
+        .fixed_pos(window_pos)
+        .show(ui.ctx(), |ui| {
+            if ui.button("Copy message").clicked() {
+                ui.ctx().copy_text(copy_message.message.clone());
+                copied = true;
+            }
+        });
+
+    let clicked_anywhere = ui.ctx().input(|input| input.pointer.primary_clicked());
+
+    if copied || clicked_anywhere {
+        app.copy_message = None;
+    }
 }

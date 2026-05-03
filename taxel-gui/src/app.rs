@@ -12,7 +12,7 @@ use crate::{
 pub use diagnostics::{AppDiagnostic, DiagnosticCategory, DiagnosticLevel};
 use dioxus_devtools::subsecond;
 use eframe::{
-    egui::{CentralPanel, Frame, Key, KeyboardShortcut, Modifiers, Panel, Ui, Visuals},
+    egui::{CentralPanel, Frame, Key, KeyboardShortcut, Modifiers, Panel, Pos2, Ui, Visuals},
     App, CreationContext,
 };
 use eric_sdk::Eric;
@@ -48,6 +48,14 @@ pub struct SectionState {
     pub max_depth: Option<usize>,
     /// When true, only rows with `is_required = true` are shown.
     pub show_required_only: bool,
+}
+
+/// Transient state for the diagnostics copy-message popup.
+pub struct CopyMessage {
+    /// The diagnostic message to copy to the clipboard.
+    pub message: String,
+    /// Screen-space position where the popup should appear.
+    pub position: Pos2,
 }
 
 /// Main application struct for the Taxel GUI, managing the state of the app.
@@ -98,6 +106,8 @@ pub struct TaxelApp {
     pub show_send_modal: bool,
     /// Controls whether the keyboard shortcuts info modal is visible.
     pub show_shortcuts_modal: bool,
+    /// Transient copy-message popup state. None means hidden.
+    pub copy_message: Option<CopyMessage>,
     /// Certificate file path selected in the send modal, persisted across opens.
     pub send_certificate_path: Option<PathBuf>,
     /// Password entered in the send modal, persisted across opens (in-memory only).
@@ -194,6 +204,7 @@ impl TaxelApp {
             show_delete_modal: false,
             show_send_modal: false,
             show_shortcuts_modal: false,
+            copy_message: None,
             show_download_modal: false,
             pending_load_kind: None,
             send_certificate_path: None,
@@ -266,21 +277,34 @@ impl App for TaxelApp {
                 .unwrap_or(&[]);
             ui::draw_sidebar(ctx, sections, &mut self.selected_tab, &self.settings.lang);
 
-            let fact_clicked = if self.show_error_panel {
+            let diagnostic_action = if self.show_error_panel {
                 ui::draw_error_panel(ctx, &self.diagnostics, &mut self.show_error_panel)
             } else {
                 None
             };
 
-            if let Some(fact) = fact_clicked {
-                if let Some(report) = &self.report {
-                    ui::navigate_to_fact(
-                        &fact,
-                        report,
-                        &mut self.selected_tab,
-                        &mut self.section_states,
-                        &mut self.search,
-                    );
+            if let Some(action) = diagnostic_action {
+                match action {
+                    ui::DiagnosticPanelAction::NavigateToFact(fact) => {
+                        if let Some(report) = &self.report {
+                            ui::navigate_to_fact(
+                                &fact,
+                                report,
+                                &mut self.selected_tab,
+                                &mut self.section_states,
+                                &mut self.search,
+                            );
+                        }
+                    }
+                    ui::DiagnosticPanelAction::OpenCopyMessage {
+                        message,
+                        pointer_pos,
+                    } => {
+                        self.copy_message = Some(CopyMessage {
+                            message,
+                            position: pointer_pos,
+                        });
+                    }
                 }
             }
 
@@ -467,6 +491,10 @@ impl App for TaxelApp {
 
             if self.show_shortcuts_modal {
                 ui::draw_shortcuts_modal(ctx, self);
+            }
+
+            if self.copy_message.is_some() {
+                ui::draw_copy_message_modal(ctx, self);
             }
 
             if self.show_new_report_modal {

@@ -1,12 +1,22 @@
 use crate::app::{AppDiagnostic, DiagnosticLevel};
 use eframe::egui::{
     vec2, Align, Button, Color32, CursorIcon, Frame, InnerResponse, Layout, Margin, Panel,
-    ScrollArea, Sense, Ui,
+    PointerButton, Pos2, ScrollArea, Sense, Ui,
 };
 
 pub const WARNING_COLOR: Color32 = Color32::from_rgb(180, 120, 0);
 pub const ERROR_COLOR: Color32 = Color32::RED;
 pub const SUCCESS_COLOR: Color32 = Color32::from_rgb(34, 139, 34);
+
+/// Actions that can be triggered from the diagnostics panel, such as navigating
+/// to a fact or opening the copy message modal.
+pub enum DiagnosticPanelAction {
+    /// Navigate to the fact with the given name.
+    NavigateToFact(String),
+    /// Open a modal to copy the given message, anchored at the given
+    /// screen-space position.
+    OpenCopyMessage { message: String, pointer_pos: Pos2 },
+}
 
 /// Draws a bottom diagnostics panel. Rows that carry a `fact` are clickable;
 /// clicking one returns the fact name so the caller can navigate to it.
@@ -14,7 +24,7 @@ pub fn draw_error_panel(
     ctx: &mut Ui,
     diagnostics: &[AppDiagnostic],
     show_error_panel: &mut bool,
-) -> Option<String> {
+) -> Option<DiagnosticPanelAction> {
     Panel::bottom("error_panel")
         .resizable(true)
         .default_size(400.0)
@@ -37,7 +47,7 @@ pub fn draw_error_panel(
                             return None;
                         }
 
-                        let mut clicked_fact = None;
+                        let mut action = None;
 
                         for (i, diagnostic) in diagnostics.iter().enumerate().rev() {
                             let (tag, color) = match diagnostic.level {
@@ -70,12 +80,29 @@ pub fn draw_error_panel(
                                 );
                             }
 
-                            if response.clicked() {
-                                clicked_fact = diagnostic.fact.clone();
+                            if response.clicked_by(PointerButton::Secondary) {
+                                let pointer_pos = response
+                                    .interact_pointer_pos()
+                                    .unwrap_or(row.response.rect.center());
+
+                                action = Some(DiagnosticPanelAction::OpenCopyMessage {
+                                    message: diagnostic.message.clone(),
+                                    pointer_pos,
+                                });
+
+                                break;
+                            }
+
+                            if response.clicked_by(PointerButton::Primary) {
+                                if let Some(fact) = diagnostic.fact.clone() {
+                                    action = Some(DiagnosticPanelAction::NavigateToFact(fact));
+
+                                    break;
+                                }
                             }
                         }
 
-                        clicked_fact
+                        action
                     })
                     .inner
             })

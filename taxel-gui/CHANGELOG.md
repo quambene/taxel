@@ -30,3 +30,4 @@
   - Sync GCD section with `ElsterReport` and XBRL `Period`
   - Validate required facts
   - Make error message clickable and jump to relevant fact
+  - Copy diagnostic message on right click
