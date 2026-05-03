@@ -32,6 +32,10 @@ test-unit:
 check:
     cargo check
 
+# Run cargo clippy with env vars
+clippy:
+    cargo clippy --all-targets --all-features
+
 # Run cargo build with env vars
 build:
     cargo build
