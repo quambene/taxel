@@ -487,7 +487,13 @@ fn is_required(concept: Option<&Concept>, taxonomy: &TaxonomySet) -> bool {
         .is_some_and(|references| {
             references.iter().any(|reference| {
                 reference.parts.iter().any(|part| {
-                    part.name == "hgbref:fiscalRequirement" && part.value.starts_with("Mussfeld")
+                    part.name == "hgbref:fiscalRequirement"
+                        && (part.value.starts_with("Mussfeld")
+                            || part.value.starts_with("Mussfeld, Kontennachweis erwünscht")
+                            || part.value.starts_with("Summenmussfeld")
+                            || part
+                                .value
+                                .starts_with("Rechnerisch notwendig, soweit vorhanden"))
                 })
             })
         })
