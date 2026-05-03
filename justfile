@@ -1,4 +1,3 @@
-
 set dotenv-load
 
 # Run desktop app
