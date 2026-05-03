@@ -113,6 +113,8 @@ pub fn draw_table(
 
                     match &mut rows[raw_idx].value {
                         FactValue::Text(text) => {
+                            // Tuples are structural and shouldn't be edited as
+                            // text value.
                             if row_editing && !rows[raw_idx].is_tuple {
                                 ui.text_edit_singleline(text);
                             } else {
