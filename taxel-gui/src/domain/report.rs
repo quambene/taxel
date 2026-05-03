@@ -50,6 +50,9 @@ pub struct FactRow {
     /// `InstanceDocument::set_fact_value`. `None` for concept-only rows that
     /// have no associated fact.
     pub fact_index: Option<usize>,
+    /// Whether this concept is a "Mussfeld" (required field) per the taxonomy
+    /// reference linkbase.
+    pub is_required: bool,
 }
 
 /// One presentation section with its rows.
@@ -475,6 +478,24 @@ fn collect_choice_options(
     }
 }
 
+fn is_required(
+    concept_name: &str,
+    concept_map: &HashMap<&str, &Concept>,
+    taxonomy: &TaxonomySet,
+) -> bool {
+    concept_map
+        .get(concept_name)
+        .and_then(|concept| concept.id.as_deref())
+        .and_then(|id| taxonomy.references_for(id))
+        .is_some_and(|references| {
+            references.iter().any(|reference| {
+                reference.parts.iter().any(|part| {
+                    part.name == "hgbref:fiscalRequirement" && part.value.starts_with("Mussfeld")
+                })
+            })
+        })
+}
+
 /// Recursively collects facts from the tree nodes and populates the fact table
 /// rows.
 ///
@@ -550,6 +571,7 @@ fn collect_node(
                 value: FactValue::Dropdown { selected, options },
                 has_children: false,
                 fact_index: None,
+                is_required: is_required(node.concept_name, concept_map, taxonomy),
             });
 
             // Children are represented inside the dropdown; don't recurse.
@@ -565,6 +587,7 @@ fn collect_node(
                 value: FactValue::default(),
                 has_children,
                 fact_index: None,
+                is_required: is_required(node.concept_name, concept_map, taxonomy),
             });
 
             for child in &node.children {
@@ -598,6 +621,7 @@ fn collect_node(
             },
             has_children,
             fact_index: None,
+            is_required: is_required(node.concept_name, concept_map, taxonomy),
         });
     } else {
         for &idx in &node.fact_indices {
@@ -615,6 +639,7 @@ fn collect_node(
                     },
                     has_children,
                     fact_index: Some(idx),
+                    is_required: is_required(node.concept_name, concept_map, taxonomy),
                 });
             }
         }
