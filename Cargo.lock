@@ -1447,7 +1447,7 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 [[package]]
 name = "eric-bindings"
 version = "0.5.1"
-source = "git+https://github.com/quambene/eric-rs.git#79935f9d6abe080366a89c51752a271c5ee5453b"
+source = "git+https://github.com/quambene/eric-rs.git#066c2528c937af0f36a291dc2cfd9df68b1a4c00"
 dependencies = [
  "anyhow",
 ]
@@ -1455,7 +1455,7 @@ dependencies = [
 [[package]]
 name = "eric-sdk"
 version = "0.5.0"
-source = "git+https://github.com/quambene/eric-rs.git#79935f9d6abe080366a89c51752a271c5ee5453b"
+source = "git+https://github.com/quambene/eric-rs.git#066c2528c937af0f36a291dc2cfd9df68b1a4c00"
 dependencies = [
  "anyhow",
  "eric-bindings",
