@@ -109,16 +109,18 @@ pub fn draw_table(
                             ui.visuals().selection.bg_fill.gamma_multiply(0.35),
                         );
                     }
+                    let row_editing = editing && !rows[raw_idx].is_abstract;
+
                     match &mut rows[raw_idx].value {
                         FactValue::Text(text) => {
-                            if editing {
+                            if row_editing {
                                 ui.text_edit_singleline(text);
                             } else {
                                 ui.label(text.as_str());
                             }
                         }
                         FactValue::Checkbox(checked) => {
-                            if editing {
+                            if row_editing {
                                 ui.checkbox(checked, "");
                             } else {
                                 ui.add_enabled(false, egui::Checkbox::new(checked, ""));
@@ -136,7 +138,7 @@ pub fn draw_table(
                                     selected.as_str()
                                 });
 
-                            if editing {
+                            if row_editing {
                                 ComboBox::from_id_salt(raw_idx)
                                     .selected_text(display_label)
                                     .show_ui(ui, |ui| {
