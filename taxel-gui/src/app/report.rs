@@ -12,7 +12,6 @@ use crate::{
 use anyhow::Context;
 use chrono::{Datelike, Utc};
 use eframe::egui::{self};
-use eric_sdk::ErrorCode;
 use log::debug;
 use std::{
     collections::HashSet,
@@ -682,30 +681,20 @@ fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error
 
     match eric.validate(xml, "Bilanz", taxonomy_version, None) {
         Ok(response) => {
-            if response.error_code == ErrorCode::ERIC_OK as i32 {
-                if let Some(report) = &mut app.report {
-                    report.status = ReportStatus::Validated;
-                    app.report_list
-                        .set_report_status(&report.path, ReportStatus::Validated);
-                    app.report_list.save(&mut app.diagnostics);
-                }
-
-                app.diagnostics.push(AppDiagnostic::new_success(
-                    DiagnosticCategory::Validation,
-                    format!(
-                        "Validation completed successfully\n{}",
-                        response.validation_response
-                    ),
-                ));
-            } else {
-                app.diagnostics.push(AppDiagnostic::new_error(
-                    DiagnosticCategory::Validation,
-                    format!(
-                        "Validation failed with error code {}\n{}",
-                        response.error_code, response.validation_response
-                    ),
-                ));
+            if let Some(report) = &mut app.report {
+                report.status = ReportStatus::Validated;
+                app.report_list
+                    .set_report_status(&report.path, ReportStatus::Validated);
+                app.report_list.save(&mut app.diagnostics);
             }
+
+            app.diagnostics.push(AppDiagnostic::new_success(
+                DiagnosticCategory::Validation,
+                format!(
+                    "Validation completed successfully\n{}",
+                    response.validation_response()
+                ),
+            ));
         }
         Err(err) => app.diagnostics.push(AppDiagnostic::new_error(
             DiagnosticCategory::Validation,
@@ -767,29 +756,18 @@ pub fn send_report(app: &mut TaxelApp) {
         None,
     ) {
         Ok(response) => {
-            if response.error_code == ErrorCode::ERIC_OK as i32 {
-                report.status = ReportStatus::Sent;
+            report.status = ReportStatus::Sent;
+            app.report_list
+                .set_report_status(&report.path, ReportStatus::Sent);
+            app.report_list.save(&mut app.diagnostics);
 
-                if let Some(report) = &app.report {
-                    app.report_list
-                        .set_report_status(&report.path, ReportStatus::Sent);
-                    app.report_list.save(&mut app.diagnostics);
-                }
-
-                app.diagnostics.push(AppDiagnostic::new_success(
-                    DiagnosticCategory::Send,
-                    format!("Send completed successfully\n{}", response.server_response),
-                ));
-            } else {
-                // TODO: parse `server_response` for better error messages
-                app.diagnostics.push(AppDiagnostic::new_error(
-                    DiagnosticCategory::Send,
-                    format!(
-                        "Send failed with error code {}\n{}",
-                        response.error_code, response.server_response
-                    ),
-                ))
-            }
+            app.diagnostics.push(AppDiagnostic::new_success(
+                DiagnosticCategory::Send,
+                format!(
+                    "Send completed successfully\n{}",
+                    response.payload.server_response
+                ),
+            ));
         }
         Err(err) => app.diagnostics.push(AppDiagnostic::new_error(
             DiagnosticCategory::Send,
