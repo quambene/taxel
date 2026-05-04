@@ -51,7 +51,12 @@ impl Search {
 
         let mut hits = Vec::new();
 
-        for (section_idx, section) in sections.iter().enumerate() {
+        // Allow search on enabled report sections only.
+        for (section_idx, section) in sections
+            .iter()
+            .enumerate()
+            .filter(|(_, section)| !section.disabled)
+        {
             let section_name = section
                 .labels
                 .get(lang)
