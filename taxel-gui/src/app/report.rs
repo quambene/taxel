@@ -698,7 +698,10 @@ fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error
         Err(err) => {
             app.diagnostics.push(AppDiagnostic::new_error(
                 DiagnosticCategory::Validation,
-                format!("Validation error: {err}"),
+                format!(
+                    "Validation error: {err}\n{}",
+                    err.validation_response().unwrap_or_default()
+                ),
             ));
 
             if let Some(validation_report) = err
