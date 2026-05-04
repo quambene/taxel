@@ -696,10 +696,28 @@ fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error
                 ),
             ));
         }
-        Err(err) => app.diagnostics.push(AppDiagnostic::new_error(
-            DiagnosticCategory::Validation,
-            format!("Validation error: {err}"),
-        )),
+        Err(err) => {
+            app.diagnostics.push(AppDiagnostic::new_error(
+                DiagnosticCategory::Validation,
+                format!("Validation error: {err}"),
+            ));
+
+            if let Some(validation_report) = err
+                .validation_report()
+                .context("Failed to extract validation report from error")?
+            {
+                for issue in validation_report.issues {
+                    if let (Some(error_code), Some(error_text)) =
+                        (issue.fachliche_fehler_id, issue.text)
+                    {
+                        app.diagnostics.push(AppDiagnostic::new_error(
+                            DiagnosticCategory::Validation,
+                            format!("Error code ({error_code}): {error_text}"),
+                        ));
+                    }
+                }
+            }
+        }
     }
 
     Ok(())
