@@ -310,7 +310,7 @@ fn load_taxonomy_and_create_instance_document(
         return Ok(LoadOutcome::NeedsDownload);
     };
 
-    let instance = create_instance_document(
+    let mut instance = create_instance_document(
         &form.start_date,
         &form.end_date,
         namespace_prefix,
@@ -325,6 +325,7 @@ fn load_taxonomy_and_create_instance_document(
     let mut report = Report::new(dest.clone(), form.taxonomy_type.clone());
 
     report.populate(view, &item_facts, &taxonomy);
+    report.initialize_period_dates(&mut instance, &form.start_date, &form.end_date);
 
     // Serialize and wrap in an Elster envelope, then write to disk.
     let mut xbrl_bytes: Vec<u8> = Vec::new();

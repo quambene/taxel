@@ -353,6 +353,44 @@ impl Report {
             }
         }
     }
+
+    /// Pre-populates the three GCD period-date concepts from the form dates on
+    /// new report creation. Updates both the `Report` rows (for the UI) and the
+    /// underlying `InstanceDocument` facts.
+    pub fn initialize_period_dates(
+        &mut self,
+        instance: &mut InstanceDocument,
+        start_date: &str,
+        end_date: &str,
+    ) {
+        let mappings = [
+            (FISCAL_YEAR_BEGIN, start_date),
+            (FISCAL_YEAR_END, end_date),
+            (CLOSING_DATE, end_date),
+        ];
+
+        let Some(section) = self
+            .sections
+            .iter_mut()
+            .find(|section| section.role == GCD_ROLE_URI)
+        else {
+            return;
+        };
+
+        for row in &mut section.rows {
+            for &(concept, date) in &mappings {
+                if row.concept == concept {
+                    if let FactValue::Text(ref mut text) = row.value {
+                        *text = date.to_string();
+                    }
+
+                    if let Some(idx) = row.fact_index {
+                        instance.set_fact_value(idx, date.to_string());
+                    }
+                }
+            }
+        }
+    }
 }
 
 /// Resolves the label for a given tree node, preferring terse labels over

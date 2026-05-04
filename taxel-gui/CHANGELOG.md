@@ -32,6 +32,7 @@
   - Display report list
   - Replace app and vendor data in imported report
   - Sync GCD section with `ElsterReport` and XBRL `Period`
+  - Sync start and end date from `NewReportForm` to GCD section
   - Validate required facts
   - Make error message clickable and jump to relevant fact
   - Copy diagnostic message on right click
