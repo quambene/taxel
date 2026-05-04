@@ -202,7 +202,7 @@ impl ElsterReport {
                 procedure: "ElsterBilanz".to_string(),
                 data_type: "Bilanz".to_string(),
                 operation: "send-Auth".to_string(),
-                test_marker: test_marker.map(|t| t.into()),
+                test_marker: test_marker.map(|test_marker| test_marker.into()),
                 manufacturer_id: manufacturer_id.into(),
                 submitter: submitter.clone(),
                 file: File {

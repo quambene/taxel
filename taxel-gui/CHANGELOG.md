@@ -36,3 +36,4 @@
   - Validate required facts
   - Make error message clickable and jump to relevant fact
   - Copy diagnostic message on right click
+  - Send report in test mode via env var `TEST_MARKER`

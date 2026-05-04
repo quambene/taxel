@@ -25,7 +25,6 @@ use std::{
 use taxel::{
     elster::Submitter, ElsterReport, TaxonomyType, COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT,
     GCD_ROLE_URI, REQUIRED_GCD_FACTS, TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE,
-    TEST_MARKER,
 };
 use uuid::Uuid;
 use xbrl_rs::{InstanceDocument, TaxonomyLoader, TaxonomySet};
@@ -281,6 +280,7 @@ fn load_taxonomy_and_create_instance_document(
     allow_download: bool,
 ) -> Result<LoadOutcome, anyhow::Error> {
     let vendor_id = env::var("VENDOR_ID").unwrap_or_else(|_| VENDOR_ID.to_string());
+    let test_marker = env::var("TEST_MARKER").ok();
     let taxonomy_date = TAXONOMY_VERSION_TO_DATE
         .get(form.taxonomy_version.as_str())
         .with_context(|| {
@@ -333,15 +333,13 @@ fn load_taxonomy_and_create_instance_document(
 
     let balance_date: u32 = form.end_date.replace('-', "").parse()?;
 
-    // TODO: overwrite manufacturer id, recipient id, recipient value,
-    // ebilanz_version, and test_marker.
     let mut elster = ElsterReport::new(
         vendor_id,
         Submitter::default(),
         "",
         "",
         balance_date,
-        Some(TEST_MARKER),
+        test_marker,
     );
     elster.set_payload_xbrl(xbrl_bytes);
     let xml = elster.to_xml()?;
