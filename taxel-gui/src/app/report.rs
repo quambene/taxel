@@ -707,9 +707,7 @@ fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error
                 .context("Failed to extract validation report from error")?
             {
                 for issue in validation_report.issues {
-                    if let (Some(error_code), Some(error_text)) =
-                        (issue.fachliche_fehler_id, issue.text)
-                    {
+                    if let (Some(error_code), Some(error_text)) = (issue.error_code, issue.text) {
                         app.diagnostics.push(AppDiagnostic::new_error(
                             DiagnosticCategory::Validation,
                             format!("Error code ({error_code}): {error_text}"),
