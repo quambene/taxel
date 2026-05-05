@@ -3,8 +3,9 @@ use anyhow::Context;
 use log::debug;
 use std::collections::HashMap;
 use xbrl_rs::{
-    Context as XbrlContext, ContextId, EntityIdentifier, ExpandedName, Fact, InstanceDocument,
-    ItemFact, NamespacePrefix, NamespaceUri, Period, PeriodType, TaxonomySet, Unit, UnitId,
+    Context as XbrlContext, ContextId, Decimals, EntityIdentifier, ExpandedName, Fact,
+    FactAttribute, FactAttributeName, InstanceDocument, ItemFact, NamespacePrefix, NamespaceUri,
+    Period, PeriodType, TaxonomySet, Unit, UnitId,
 };
 
 /// The outcome of [`update_instance_document`].
@@ -197,16 +198,34 @@ pub fn update_instance_document(
     value: &FactValue,
     snapshot: Option<&FactValue>,
     fact_index: Option<usize>,
-    concept: &str,
+    concept_name: &str,
     taxonomy: Option<&TaxonomySet>,
 ) -> Result<UpdateOutcome, anyhow::Error> {
     match value {
         FactValue::Text(text) => {
             if let Some(idx) = fact_index {
+                // TODO: add lookup table for concepts.
+                let is_numeric = taxonomy
+                    .and_then(|tax| {
+                        tax.concepts()
+                            .find(|concept| concept.name.local_name == concept_name)
+                    })
+                    .map(|concept| concept.data_type.is_numeric())
+                    .unwrap_or(false);
+
                 if text.is_empty() {
                     instance.set_fact_nil(idx, true);
+
+                    if is_numeric {
+                        instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
+                    }
                 } else {
                     instance.set_fact_value(idx, text.clone());
+
+                    if is_numeric {
+                        instance
+                            .set_fact_attribute(idx, FactAttribute::Decimals(Decimals::Finite(2)));
+                    }
                 }
             }
             Ok(UpdateOutcome::NoChange)
@@ -231,14 +250,14 @@ pub fn update_instance_document(
 
             if !old.is_empty() {
                 instance
-                    .remove_tuple_child(concept, old)
+                    .remove_tuple_child(concept_name, old)
                     .with_context(|| format!("Failed to remove tuple child '{old}'"))?;
             }
 
             if selected.is_empty() {
                 instance
-                    .set_tuple_fact_nil(concept, true)
-                    .with_context(|| format!("Failed to nil tuple '{concept}'"))?;
+                    .set_tuple_fact_nil(concept_name, true)
+                    .with_context(|| format!("Failed to nil tuple '{concept_name}'"))?;
             }
 
             if !selected.is_empty() {
@@ -251,7 +270,7 @@ pub fn update_instance_document(
                         if !old.is_empty() {
                             fact.concept_name().local_name == old
                         } else {
-                            fact.concept_name().local_name.starts_with(concept)
+                            fact.concept_name().local_name.starts_with(concept_name)
                         }
                     })
                     .map(|fact| {
@@ -308,19 +327,22 @@ pub fn update_instance_document(
                 );
 
                 match instance
-                    .add_tuple_child(concept, &new_child)
+                    .add_tuple_child(concept_name, &new_child)
                     .with_context(|| format!("Failed to add tuple child '{selected}'"))?
                 {
                     0 => {
                         // Child already exists as nil; activate it.
                         instance
-                            .set_tuple_child_nil(concept, selected, false)
+                            .set_tuple_child_nil(concept_name, selected, false)
                             .with_context(|| {
                                 format!("Failed to activate tuple child '{selected}'")
                             })?;
                     }
                     _ => {
-                        debug!("Added tuple child '{}' for concept '{}'", selected, concept);
+                        debug!(
+                            "Added tuple child '{}' for concept '{}'",
+                            selected, concept_name
+                        );
                     }
                 }
             }
