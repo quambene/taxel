@@ -23,6 +23,7 @@ pub fn navigate_to_fact(
             .sections
             .iter()
             .enumerate()
+            .filter(|(_, section)| !section.disabled)
             .find_map(|(section_idx, section)| {
                 section.rows.iter().enumerate().find_map(|(row_idx, row)| {
                     (row.concept == fact).then_some((section_idx, row_idx))
