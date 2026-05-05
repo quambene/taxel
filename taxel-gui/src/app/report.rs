@@ -281,6 +281,11 @@ fn load_taxonomy_and_create_instance_document(
 ) -> Result<LoadOutcome, anyhow::Error> {
     let vendor_id = env::var("VENDOR_ID").unwrap_or_else(|_| VENDOR_ID.to_string());
     let test_marker = env::var("TEST_MARKER").ok();
+
+    if let Some(test_marker) = &test_marker {
+        debug!("Using test marker: {test_marker}");
+    }
+
     let taxonomy_date = TAXONOMY_VERSION_TO_DATE
         .get(form.taxonomy_version.as_str())
         .with_context(|| {
