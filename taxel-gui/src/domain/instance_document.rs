@@ -191,7 +191,7 @@ pub fn update_instance_document(
 
                 let (namespace_uri, context_ref) = sibling_info.unwrap_or_else(|| {
                     let selected_concept = taxonomy.and_then(|tax| {
-                        tax.elements()
+                        tax.concepts()
                             .into_iter()
                             .find(|concept| concept.name.local_name == selected.as_str())
                     });

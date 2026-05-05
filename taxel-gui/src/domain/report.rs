@@ -125,7 +125,7 @@ impl Report {
         self.role_mapping_errors.clear();
 
         let concept_map: HashMap<&str, &Concept> = taxonomy
-            .elements()
+            .concepts()
             .into_iter()
             .map(|concept| (concept.name.local_name.as_str(), concept))
             .collect();
@@ -136,7 +136,7 @@ impl Report {
         // taxonomy elements per abstract head.
         let mut substitution_map: HashMap<&str, Vec<&Concept>> = HashMap::new();
 
-        for concept in taxonomy.elements() {
+        for concept in taxonomy.concepts() {
             if !concept.is_abstract {
                 let head = concept.substitution_group.original.local_name.as_str();
                 substitution_map.entry(head).or_default().push(concept);
