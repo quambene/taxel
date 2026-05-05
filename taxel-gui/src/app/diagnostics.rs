@@ -52,6 +52,19 @@ impl AppDiagnostic {
         }
     }
 
+    pub fn new_error_with_fact(
+        category: DiagnosticCategory,
+        message: String,
+        fact: impl Into<String>,
+    ) -> Self {
+        AppDiagnostic {
+            level: DiagnosticLevel::Error,
+            category,
+            message,
+            fact: Some(fact.into()),
+        }
+    }
+
     pub fn new_success(category: DiagnosticCategory, message: String) -> Self {
         AppDiagnostic {
             level: DiagnosticLevel::Success,
@@ -61,11 +74,14 @@ impl AppDiagnostic {
         }
     }
 
-    pub fn new_missing_fact_value(category: DiagnosticCategory, fact: impl Into<String>) -> Self {
+    pub fn new_missing_fact_value(
+        category: DiagnosticCategory,
+        fact: impl AsRef<str> + Into<String>,
+    ) -> Self {
         AppDiagnostic {
             level: DiagnosticLevel::Error,
             category,
-            message: "Required value is missing".to_string(),
+            message: format!("Required value is missing for fact '{}'", fact.as_ref()),
             fact: Some(fact.into()),
         }
     }

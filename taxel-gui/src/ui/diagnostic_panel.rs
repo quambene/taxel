@@ -126,12 +126,7 @@ fn draw_error_row(
             ui.set_width(ui.available_width());
             ui.horizontal_wrapped(|ui| {
                 ui.colored_label(color, format!("[{tag}]"));
-
-                if let Some(fact) = &diagnostic.fact {
-                    ui.label(format!("{}: {}", diagnostic.message, fact));
-                } else {
-                    ui.label(&diagnostic.message);
-                }
+                ui.label(&diagnostic.message);
             });
         })
 }

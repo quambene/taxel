@@ -126,7 +126,6 @@ impl Report {
 
         let concept_map: HashMap<&str, &Concept> = taxonomy
             .concepts()
-            .into_iter()
             .map(|concept| (concept.name.local_name.as_str(), concept))
             .collect();
 
