@@ -7,8 +7,8 @@
   - Fix unsanitized xml for `Eric::validate`
   - Fix missing `context_ref` on tuple child after editing via dropdown
   - Allow search on enabled report sections only
-  - Allow jumping to fact referenced by the diagnostic issue for enabled report
-    sections only
+  - Allow jumping to fact referenced by the diagnostic issue for enabled report sections only
+  - Filter out forbidden facts from created `InstanceDocument`
 - added
   - Import report
   - Display report

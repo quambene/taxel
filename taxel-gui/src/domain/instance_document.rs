@@ -3,8 +3,8 @@ use anyhow::Context;
 use log::debug;
 use std::collections::HashMap;
 use xbrl_rs::{
-    Context as XbrlContext, ContextId, EntityIdentifier, ExpandedName, InstanceDocument, ItemFact,
-    NamespacePrefix, NamespaceUri, Period, PeriodType, TaxonomySet, Unit, UnitId,
+    Context as XbrlContext, ContextId, EntityIdentifier, ExpandedName, Fact, InstanceDocument,
+    ItemFact, NamespacePrefix, NamespaceUri, Period, PeriodType, TaxonomySet, Unit, UnitId,
 };
 
 /// The outcome of [`update_instance_document`].
@@ -111,7 +111,79 @@ pub fn create_instance_document(
         &units,
     );
 
+    let instance = remove_forbidden_facts(instance, taxonomy);
+
     Ok(instance)
+}
+
+/// Removes facts from the instance document that are not allowed for submission
+/// to the Finanzverwaltung. This is necessary because the instance is built
+/// from the full taxonomy, which contains some concepts that are only relevant
+/// for other use cases (e.g. internal reporting) but not for tax filing.
+fn remove_forbidden_facts(instance: InstanceDocument, taxonomy: &TaxonomySet) -> InstanceDocument {
+    let filtered_facts: Vec<Fact> = instance
+        .facts()
+        .iter()
+        .filter(|fact| !is_not_permitted(fact, taxonomy))
+        .cloned()
+        .map(|mut fact| {
+            remove_forbidden_children(&mut fact, taxonomy);
+            fact
+        })
+        .collect();
+
+    let role_refs = instance.role_refs().to_vec();
+    let arcrole_refs = instance.arcrole_refs().to_vec();
+
+    // TODO: use retain_facts from xbrl-rs when available instead of
+    // reconstructing the whole instance document.
+    let mut filtered = InstanceDocument::new(
+        instance.schema_refs().to_vec(),
+        instance.contexts().clone(),
+        instance.units().clone(),
+        filtered_facts,
+        instance.namespaces().clone(),
+        instance.footnote_links().to_vec(),
+    );
+
+    for role_ref in role_refs {
+        filtered.add_role_ref(role_ref);
+    }
+    for arcrole_ref in arcrole_refs {
+        filtered.add_arcrole_ref(arcrole_ref);
+    }
+
+    filtered
+}
+
+fn remove_forbidden_children(fact: &mut Fact, taxonomy: &TaxonomySet) {
+    if let Fact::Tuple(tuple) = fact {
+        tuple
+            .children_mut()
+            .retain(|child| !is_not_permitted(child, taxonomy));
+
+        for child in tuple.children_mut().iter_mut() {
+            remove_forbidden_children(child, taxonomy);
+        }
+    }
+}
+
+fn is_not_permitted(fact: &Fact, taxonomy: &TaxonomySet) -> bool {
+    let Some(concept) = taxonomy.find_concept(fact.concept_name()) else {
+        return false;
+    };
+    let Some(id) = &concept.id else {
+        return false;
+    };
+    let Some(references) = taxonomy.references_for(id) else {
+        return false;
+    };
+
+    references.iter().any(|reference| {
+        reference.parts.iter().any(|part| {
+            part.name == "hgbref:notPermittedFor" && part.value == "Einreichung an Finanzverwaltung"
+        })
+    })
 }
 
 /// Writes one edited fact value back into the instance document.
