@@ -283,7 +283,7 @@ fn load_taxonomy_and_create_instance_document(
     let test_marker = env::var("TEST_MARKER").ok();
 
     if let Some(test_marker) = &test_marker {
-        debug!("Using test marker: {test_marker}");
+        debug!("Using test marker {test_marker}");
     }
 
     let taxonomy_date = TAXONOMY_VERSION_TO_DATE
