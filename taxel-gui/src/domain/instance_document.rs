@@ -182,7 +182,11 @@ fn is_not_permitted(fact: &Fact, taxonomy: &TaxonomySet) -> bool {
 
     references.iter().any(|reference| {
         reference.parts.iter().any(|part| {
-            part.name == "hgbref:notPermittedFor" && part.value == "Einreichung an Finanzverwaltung"
+            part.name == "hgbref:notPermittedFor"
+                && matches!(
+                    part.value.as_str(),
+                    "Einreichung an Finanzverwaltung" | "steuerlich"
+                )
         })
     })
 }
