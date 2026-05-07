@@ -4,8 +4,8 @@ use crate::{
         SectionState, TaxelApp, APP_NAME, APP_VERSION, VENDOR_ID,
     },
     domain::{
-        create_instance_document, extract_period, update_instance_document, FactValue, Report,
-        ReportStatus, UpdateOutcome,
+        create_instance_document, extract_period, remove_trade_accounting_facts,
+        update_instance_document, FactValue, Report, ReportStatus, UpdateOutcome,
     },
     infrastructure::report_store::reports_dir,
 };
@@ -628,7 +628,13 @@ pub fn save_report(app: &mut TaxelApp) {
                 }
             }
         }
+    }
 
+    if handle_consolidation_range_change(app, editing_tab) == UpdateOutcome::Rebuild {
+        update_outcome = UpdateOutcome::Rebuild;
+    }
+
+    if let (Some(report), Some(instance)) = (&app.report, &mut app.instance_document) {
         // Sync GCD facts to ElsterReport metadata and XBRL contexts.
         if let Some(elster) = &mut app.elster_report {
             report.sync_gcd_to_elster(instance, elster);
@@ -698,6 +704,145 @@ pub fn save_report(app: &mut TaxelApp) {
 
     app.editing_section = None;
     app.edit_snapshot.clear();
+}
+
+/// Handles the special case which can cause structural changes to the report by
+/// adding or removing tuple facts.
+fn handle_consolidation_range_change(app: &mut TaxelApp, editing_tab: usize) -> UpdateOutcome {
+    const CONSOLIDATION_RANGE: &str = "genInfo.report.id.consolidationRange";
+    const EA_VALUE: &str = "genInfo.report.id.consolidationRange.consolidationRange.EA";
+
+    let mut consolidation_range_changed = false;
+    let mut ea_selected = false;
+
+    if let Some(report) = &app.report {
+        if let Some(section) = report.sections.get(editing_tab) {
+            consolidation_range_changed = section.rows.iter().enumerate().any(|(i, row)| {
+                row.concept == CONSOLIDATION_RANGE
+                    && app
+                        .edit_snapshot
+                        .get(i)
+                        .is_some_and(|snap| snap != &row.value)
+            });
+            ea_selected = section.rows.iter().any(|row| {
+                row.concept == CONSOLIDATION_RANGE
+                    && matches!(&row.value, FactValue::Dropdown { selected, .. } if selected == EA_VALUE)
+            });
+        }
+    }
+
+    if consolidation_range_changed {
+        match recreate_instance_document(app, ea_selected) {
+            Ok(()) => return UpdateOutcome::Rebuild,
+            Err(err) => {
+                app.diagnostics.push(AppDiagnostic::new_error(
+                    DiagnosticCategory::App,
+                    format!("{err}"),
+                ));
+                return UpdateOutcome::NoChange;
+            }
+        }
+    }
+
+    UpdateOutcome::NoChange
+}
+
+/// Recreates the instance document and report from the taxonomy when
+/// consolidationRange changes, preserving the current in-memory fact values.
+///
+/// Takes the current instance out of app state, uses it as the source for
+/// value import, then replaces both instance and report with fresh copies.
+fn recreate_instance_document(app: &mut TaxelApp, selected: bool) -> Result<(), anyhow::Error> {
+    let source_instance = app
+        .instance_document
+        .take()
+        .context("No instance document in app state")?;
+
+    let report_path = app.report.as_ref().context("No report")?.path.clone();
+    let taxonomy_type = app.report.as_ref().unwrap().taxonomy_type.clone();
+    let taxonomy_version = extract_taxonomy_version_from_schema_refs(source_instance.schema_refs());
+    let taxonomy_date = taxonomy_version.and_then(|v| TAXONOMY_VERSION_TO_DATE.get(v).copied());
+    let (start_date, end_date) = extract_period(&source_instance).unwrap_or_default();
+    let namespace_prefix = taxonomy_type.namespace_prefix();
+    let namespace_uri = taxonomy_date
+        .map(|d| taxonomy_type.namespace_uri(d))
+        .unwrap_or_default();
+
+    let mut source_report = Report::new(report_path.clone(), taxonomy_type.clone());
+    {
+        let taxonomy = app.taxonomy.as_ref().context("No taxonomy in app state")?;
+        let source_item_facts = source_instance.item_facts();
+        let source_view = source_instance.view(taxonomy);
+        source_report.populate(source_view, &source_item_facts, taxonomy);
+    }
+
+    let mut fresh_instance = {
+        let taxonomy = app.taxonomy.as_ref().context("No taxonomy in app state")?;
+        create_instance_document(
+            &start_date,
+            &end_date,
+            namespace_prefix,
+            &namespace_uri,
+            taxonomy_date.unwrap_or(""),
+            taxonomy,
+        )?
+    };
+
+    if selected {
+        let taxonomy = app.taxonomy.as_ref().context("No taxonomy in app state")?;
+        fresh_instance = remove_trade_accounting_facts(fresh_instance, taxonomy);
+    }
+
+    let mut fresh_report = Report::new(report_path, taxonomy_type.clone());
+
+    {
+        let taxonomy = app.taxonomy.as_ref().context("No taxonomy in app state")?;
+        let source_item_facts = source_instance.item_facts();
+
+        {
+            let fresh_view = fresh_instance.view(taxonomy);
+            let fresh_item_facts = fresh_instance.item_facts();
+            fresh_report.populate(fresh_view, &fresh_item_facts, taxonomy);
+        }
+
+        let (matched, imported) = fresh_report.apply_imported_values(
+            &source_report,
+            &source_item_facts,
+            &mut fresh_instance,
+            taxonomy,
+        );
+        debug!("Recreate import: matched={matched}, imported={imported}");
+    }
+
+    {
+        let taxonomy = app.taxonomy.as_ref().context("No taxonomy in app state")?;
+        for section in &fresh_report.sections {
+            for row in &section.rows {
+                if let FactValue::Dropdown { selected, .. } = &row.value {
+                    if !selected.is_empty() {
+                        let snapshot_val = FactValue::Dropdown {
+                            selected: String::new(),
+                            options: vec![],
+                        };
+                        let _ = update_instance_document(
+                            &mut fresh_instance,
+                            &row.value,
+                            Some(&snapshot_val),
+                            row.fact_index,
+                            row.parent_concept.as_deref(),
+                            &row.concept,
+                            Some(taxonomy),
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    app.instance_document = Some(fresh_instance);
+    app.report = Some(fresh_report);
+
+    Ok(())
 }
 
 /// Validates the imported report and reports any issues in the diagnostics

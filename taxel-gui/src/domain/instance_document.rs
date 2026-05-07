@@ -1,5 +1,6 @@
 use crate::domain::FactValue;
 use anyhow::Context;
+use chrono::NaiveDate;
 use log::debug;
 use std::collections::HashMap;
 use xbrl_rs::{
@@ -112,7 +113,9 @@ pub fn create_instance_document(
         &units,
     );
 
-    let instance = remove_forbidden_facts(instance, taxonomy);
+    let end_date = NaiveDate::parse_from_str(end_date, "%Y-%m-%d")
+        .with_context(|| format!("Failed to parse end date '{end_date}'"))?;
+    let instance = remove_forbidden_facts(instance, taxonomy, &end_date);
 
     Ok(instance)
 }
@@ -121,24 +124,83 @@ pub fn create_instance_document(
 /// to the Finanzverwaltung. This is necessary because the instance is built
 /// from the full taxonomy, which contains some concepts that are only relevant
 /// for other use cases (e.g. internal reporting) but not for tax filing.
-fn remove_forbidden_facts(instance: InstanceDocument, taxonomy: &TaxonomySet) -> InstanceDocument {
-    let has_forbidden = instance
-        .facts()
-        .iter()
-        .any(|fact| is_not_permitted(fact, taxonomy));
+fn remove_forbidden_facts(
+    instance: InstanceDocument,
+    taxonomy: &TaxonomySet,
+    end_date: &NaiveDate,
+) -> InstanceDocument {
+    filter_facts_by(instance, |fact| {
+        is_not_permitted(fact, taxonomy, end_date).unwrap_or_default()
+    })
+}
 
-    // Fast path: if there are no forbidden facts, return the original instance
-    if !has_forbidden {
+/// Checks if the fact is marked as not permitted.
+fn is_not_permitted(fact: &Fact, taxonomy: &TaxonomySet, end_date: &NaiveDate) -> Option<bool> {
+    let concept = taxonomy.find_concept(fact.concept_name())?;
+    let id = concept.id.as_deref()?;
+    let references = taxonomy.references_for(id)?;
+
+    Some(references.iter().any(|reference| {
+        reference.parts.iter().any(|part| {
+            if let Ok(value_date) = NaiveDate::parse_from_str(&part.value, "%Y-%m-%d") {
+                (part.name == "hgbref:notPermittedFor"
+                    && matches!(
+                        part.value.as_str(),
+                        "Einreichung an Finanzverwaltung" | "steuerlich"
+                    ))
+                    || (part.name == "hgbref:ValidThrough" && value_date < *end_date)
+            } else {
+                part.name == "hgbref:notPermittedFor"
+                    && matches!(
+                        part.value.as_str(),
+                        "Einreichung an Finanzverwaltung" | "steuerlich"
+                    )
+            }
+        })
+    }))
+}
+
+/// Removes facts not permitted for handelsrechtlicher Einzelabschluss (EA).
+/// Only reconstructs the document when there are facts to remove.
+pub fn remove_trade_accounting_facts(
+    instance: InstanceDocument,
+    taxonomy: &TaxonomySet,
+) -> InstanceDocument {
+    filter_facts_by(instance, |fact| {
+        is_trade_accounting_not_permitted(fact, taxonomy).unwrap_or_default()
+    })
+}
+/// Checks if the fact is not permitted for trade accounting.
+fn is_trade_accounting_not_permitted(fact: &Fact, taxonomy: &TaxonomySet) -> Option<bool> {
+    let concept = taxonomy.find_concept(fact.concept_name())?;
+    let id = concept.id.as_deref()?;
+    let references = taxonomy.references_for(id)?;
+
+    Some(references.iter().any(|reference| {
+        reference.parts.iter().any(|part| {
+            part.name == "hgbref:tradeAccountingNotPermittedFor"
+                && part.value == "handelsrechtlicher Einzelabschluss"
+        })
+    }))
+}
+
+/// TODO: use retain_facts from xbrl-rs when available instead of
+/// reconstructing the whole instance document.
+fn filter_facts_by(
+    instance: InstanceDocument,
+    should_remove: impl Fn(&Fact) -> bool,
+) -> InstanceDocument {
+    if !instance.facts().iter().any(&should_remove) {
         return instance;
     }
 
     let filtered_facts: Vec<Fact> = instance
         .facts()
         .iter()
-        .filter(|fact| !is_not_permitted(fact, taxonomy))
+        .filter(|fact| !should_remove(fact))
         .cloned()
         .map(|mut fact| {
-            remove_forbidden_children(&mut fact, taxonomy);
+            remove_children_by(&mut fact, &should_remove);
             fact
         })
         .collect();
@@ -146,8 +208,6 @@ fn remove_forbidden_facts(instance: InstanceDocument, taxonomy: &TaxonomySet) ->
     let role_refs = instance.role_refs().to_vec();
     let arcrole_refs = instance.arcrole_refs().to_vec();
 
-    // TODO: use retain_facts from xbrl-rs when available instead of
-    // reconstructing the whole instance document.
     let mut filtered = InstanceDocument::new(
         instance.schema_refs().to_vec(),
         instance.contexts().clone(),
@@ -167,38 +227,15 @@ fn remove_forbidden_facts(instance: InstanceDocument, taxonomy: &TaxonomySet) ->
     filtered
 }
 
-fn remove_forbidden_children(fact: &mut Fact, taxonomy: &TaxonomySet) {
+/// Recursively removes child facts that match the given predicate.
+fn remove_children_by(fact: &mut Fact, should_remove: &impl Fn(&Fact) -> bool) {
     if let Fact::Tuple(tuple) = fact {
-        tuple
-            .children_mut()
-            .retain(|child| !is_not_permitted(child, taxonomy));
+        tuple.children_mut().retain(|child| !should_remove(child));
 
         for child in tuple.children_mut().iter_mut() {
-            remove_forbidden_children(child, taxonomy);
+            remove_children_by(child, should_remove);
         }
     }
-}
-
-fn is_not_permitted(fact: &Fact, taxonomy: &TaxonomySet) -> bool {
-    let Some(concept) = taxonomy.find_concept(fact.concept_name()) else {
-        return false;
-    };
-    let Some(id) = &concept.id else {
-        return false;
-    };
-    let Some(references) = taxonomy.references_for(id) else {
-        return false;
-    };
-
-    references.iter().any(|reference| {
-        reference.parts.iter().any(|part| {
-            part.name == "hgbref:notPermittedFor"
-                && matches!(
-                    part.value.as_str(),
-                    "Einreichung an Finanzverwaltung" | "steuerlich"
-                )
-        })
-    })
 }
 
 /// Writes one edited fact value back into the instance document.
