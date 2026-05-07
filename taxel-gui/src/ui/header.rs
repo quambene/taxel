@@ -31,7 +31,7 @@ pub fn draw_header(ui: &mut Ui, app: &mut TaxelApp) {
             app.search.row_highlight = None;
             app.loading = None;
             app.diagnostics.clear();
-            app.show_error_panel = true;
+            app.show_diagnostics_panel = true;
             app.editing_section = None;
             app.edit_snapshot.clear();
         }
@@ -162,7 +162,7 @@ fn draw_error_summary(app: &mut TaxelApp, ui: &mut Ui) {
     }
 
     if response.clicked() {
-        app.show_error_panel = !app.show_error_panel;
+        app.show_diagnostics_panel = !app.show_diagnostics_panel;
     }
 }
 

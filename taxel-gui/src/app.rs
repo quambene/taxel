@@ -86,7 +86,7 @@ pub struct TaxelApp {
     /// Structured diagnostics for non-blocking and blocking issues.
     pub diagnostics: Vec<AppDiagnostic>,
     /// Controls whether the detailed diagnostics panel is visible.
-    pub show_error_panel: bool,
+    pub show_diagnostics_panel: bool,
     /// Search state.
     pub search: Search,
     /// Receives the result of a background XML load, if one is in progress.
@@ -180,7 +180,7 @@ impl TaxelApp {
                 None
             };
 
-        let show_error_panel = true;
+        let show_diagnostics_panel = true;
 
         let mut report_list = ReportList::new();
 
@@ -200,7 +200,7 @@ impl TaxelApp {
             section_states,
             settings,
             diagnostics,
-            show_error_panel,
+            show_diagnostics_panel,
             loading: None,
             search: Search::default(),
             report_list,
@@ -251,7 +251,7 @@ impl TaxelApp {
                     DiagnosticCategory::App,
                     format!("Failed to refresh imported reports: {err}"),
                 ));
-                self.show_error_panel = true;
+                self.show_diagnostics_panel = true;
             }
         }
     }
@@ -285,8 +285,8 @@ impl App for TaxelApp {
                 .unwrap_or(&[]);
             ui::draw_sidebar(ctx, sections, &mut self.selected_tab, &self.settings.lang);
 
-            let diagnostic_action = if self.show_error_panel {
-                ui::draw_error_panel(ctx, &self.diagnostics, &mut self.show_error_panel)
+            let diagnostic_action = if self.show_diagnostics_panel {
+                ui::draw_error_panel(ctx, &self.diagnostics, &mut self.show_diagnostics_panel)
             } else {
                 None
             };
@@ -320,7 +320,7 @@ impl App for TaxelApp {
 
             let central_frame = {
                 let mut frame = Frame::central_panel(ctx.style());
-                if self.show_error_panel {
+                if self.show_diagnostics_panel {
                     frame.inner_margin.bottom = 0;
                 }
                 frame

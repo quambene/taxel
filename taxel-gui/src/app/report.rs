@@ -165,7 +165,7 @@ pub fn poll_load_result(app: &mut TaxelApp) {
                     DiagnosticCategory::Import,
                     err.to_string(),
                 ));
-                app.show_error_panel = true;
+                app.show_diagnostics_panel = true;
                 app.loading = None;
                 app.pending_load_kind = None;
             }
@@ -193,7 +193,7 @@ pub fn import_report(app: &mut TaxelApp, path: PathBuf, ctx: &egui::Context) {
                 DiagnosticCategory::App,
                 format!("Failed to import report: {err}"),
             ));
-            app.show_error_panel = true;
+            app.show_diagnostics_panel = true;
         }
     }
 }
@@ -248,14 +248,14 @@ pub fn import_values(app: &mut TaxelApp) {
                 source_path.display()
             ),
         ));
-            app.show_error_panel = true;
+            app.show_diagnostics_panel = true;
         }
         Err(err) => {
             app.diagnostics.push(AppDiagnostic::new_error(
                 DiagnosticCategory::Import,
                 format!("Failed to import values: {err}"),
             ));
-            app.show_error_panel = true;
+            app.show_diagnostics_panel = true;
         }
     }
 }
@@ -741,7 +741,7 @@ fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error
         app.diagnostics.push(AppDiagnostic::taxonomy_version_error(
             DiagnosticCategory::Validation,
         ));
-        app.show_error_panel = true;
+        app.show_diagnostics_panel = true;
         return Ok(());
     };
 
@@ -864,14 +864,14 @@ pub fn send_report(app: &mut TaxelApp) {
             DiagnosticCategory::Send,
             "Validate the report first and make sure that all errors are resolved".to_string(),
         ));
-        app.show_error_panel = true;
+        app.show_diagnostics_panel = true;
         return;
     }
 
     let Some(xml) = read_report(
         &report.path,
         &mut app.diagnostics,
-        &mut app.show_error_panel,
+        &mut app.show_diagnostics_panel,
     ) else {
         return;
     };
@@ -883,7 +883,7 @@ pub fn send_report(app: &mut TaxelApp) {
         app.diagnostics.push(AppDiagnostic::taxonomy_version_error(
             DiagnosticCategory::Send,
         ));
-        app.show_error_panel = true;
+        app.show_diagnostics_panel = true;
         return;
     };
 
@@ -915,7 +915,7 @@ pub fn send_report(app: &mut TaxelApp) {
         )),
     }
 
-    app.show_error_panel = true;
+    app.show_diagnostics_panel = true;
 }
 
 /// Moves the currently loaded report to the operating system trash and resets
@@ -939,7 +939,7 @@ pub fn delete_report(app: &mut TaxelApp) {
             app.search.row_highlight = None;
             app.loading = None;
             app.diagnostics.clear();
-            app.show_error_panel = true;
+            app.show_diagnostics_panel = true;
             app.editing_section = None;
             app.edit_snapshot.clear();
         }
@@ -948,7 +948,7 @@ pub fn delete_report(app: &mut TaxelApp) {
                 DiagnosticCategory::App,
                 format!("Failed to move report to trash: {err}"),
             ));
-            app.show_error_panel = true;
+            app.show_diagnostics_panel = true;
         }
     }
 }
