@@ -23,6 +23,7 @@
   - Delete report
   - Create report
   - Send and validate report
+  - Import values from source report into existing report
   - Select display level
   - Select label language
   - Zoom in & out

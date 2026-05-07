@@ -200,7 +200,7 @@ pub fn import_report(app: &mut TaxelApp, path: PathBuf, ctx: &egui::Context) {
 
 /// Parses and copies the report.
 ///
-/// The source XML is parsed as an [`taxel::elster::ElsterReport`], modified,
+/// The source report is parsed as an [`taxel::elster::ElsterReport`], modified,
 /// and serialized back to XML. The original file is never modified.
 fn parse_and_copy_report(path: &Path, vendor_id: String) -> Result<PathBuf, anyhow::Error> {
     let reports_dir = reports_dir()?;
@@ -231,6 +231,80 @@ fn parse_and_copy_report(path: &Path, vendor_id: String) -> Result<PathBuf, anyh
         .with_context(|| format!("Failed to write report to {}", dest.display()))?;
 
     Ok(dest)
+}
+
+/// Imports fact values from a source XML into the currently opened report.
+///
+/// The import updates both the in-memory `InstanceDocument` and the visible
+/// fact rows. Changes are not written to disk here; the user must explicitly
+/// click "Save" to persist them.
+pub fn import_values(app: &mut TaxelApp) {
+    match read_and_import_values(app) {
+        Ok((matched_count, imported_count, source_path)) => {
+            app.diagnostics.push(AppDiagnostic::new_success(
+            DiagnosticCategory::Import,
+            format!(
+                "Imported values from {} (matched facts: {matched_count}, updated facts: {imported_count}). Changes are pending and will be written only after Save.",
+                source_path.display()
+            ),
+        ));
+            app.show_error_panel = true;
+        }
+        Err(err) => {
+            app.diagnostics.push(AppDiagnostic::new_error(
+                DiagnosticCategory::Import,
+                format!("Failed to import values: {err}"),
+            ));
+            app.show_error_panel = true;
+        }
+    }
+}
+
+/// Reads the source XML, extracts fact values, and applies them to the
+/// currently loaded report and instance document.
+fn read_and_import_values(app: &mut TaxelApp) -> Result<(usize, usize, PathBuf), anyhow::Error> {
+    let Some(source_path) = app.import_values_path.clone() else {
+        return Err(anyhow::anyhow!("No XML file selected for value import"));
+    };
+
+    // Ensure the UI stays in edit mode after applying imported values so the
+    // user can confirm with Save.
+    if app.editing_section.is_none() {
+        edit_report(app);
+    }
+
+    let source_instance =
+        InstanceDocument::from_file(&source_path).context("Failed to parse source XML")?;
+
+    let Some(taxonomy) = app.taxonomy.as_ref() else {
+        return Err(anyhow::anyhow!(
+            "Cannot import values without a loaded taxonomy"
+        ));
+    };
+
+    let Some(target_taxonomy_type) = app
+        .report
+        .as_ref()
+        .map(|report| report.taxonomy_type.clone())
+    else {
+        return Err(anyhow::anyhow!(
+            "Cannot import values without a loaded report"
+        ));
+    };
+
+    let mut source_report = Report::new(source_path.to_path_buf(), target_taxonomy_type);
+    let source_view = source_instance.view(taxonomy);
+    let source_item_facts = source_instance.item_facts();
+    source_report.populate(source_view, &source_item_facts, taxonomy);
+
+    if let (Some(report), Some(instance)) = (&mut app.report, &mut app.instance_document) {
+        let (matched_count, imported_count) =
+            report.apply_imported_values(&source_report, &source_item_facts, instance, taxonomy);
+
+        Ok((matched_count, imported_count, source_path))
+    } else {
+        Ok((0, 0, source_path))
+    }
 }
 
 /// Loads an XBRL instance document from the specified path, discovers the
@@ -490,37 +564,67 @@ pub fn save_report(app: &mut TaxelApp) {
 
     if let (Some(report), Some(instance)) = (&app.report, &mut app.instance_document) {
         if let Some(section) = report.sections.get(editing_tab) {
-            // Only write back rows whose value differs from the pre-edit
-            // snapshot. The same fact can appear in multiple rows (same concept
-            // at multiple positions in the presentation tree) but we only need
-            // to update it once.
-            for (i, row) in section.rows.iter().enumerate() {
-                let unchanged = app
-                    .edit_snapshot
-                    .get(i)
-                    .is_some_and(|snapshot| snapshot == &row.value);
+            let mut apply_row_update =
+                |i: usize, row: &crate::domain::FactRow| -> Result<(), anyhow::Error> {
+                    let unchanged = app
+                        .edit_snapshot
+                        .get(i)
+                        .is_some_and(|snapshot| snapshot == &row.value);
 
-                if unchanged {
+                    if unchanged {
+                        return Ok(());
+                    }
+
+                    let snapshot = app.edit_snapshot.get(i).map(|s| s as &FactValue);
+                    let outcome = update_instance_document(
+                        instance,
+                        &row.value,
+                        snapshot,
+                        row.fact_index,
+                        row.parent_concept.as_deref(),
+                        &row.concept,
+                        app.taxonomy.as_ref(),
+                    )?;
+
+                    if outcome == UpdateOutcome::Rebuild {
+                        update_outcome = UpdateOutcome::Rebuild;
+                    }
+
+                    Ok(())
+                };
+
+            // Apply non-structural updates first because they rely on stable
+            // fact_index mappings. Tuple structural updates (dropdown and
+            // tuple-child checkboxes) can reorder item_facts.
+            for (i, row) in section.rows.iter().enumerate() {
+                let is_structural = matches!(row.value, FactValue::Dropdown { .. })
+                    || matches!(row.value, FactValue::Checkbox(_) if row.fact_index.is_none());
+
+                if is_structural {
                     continue;
                 }
 
-                let snapshot = app.edit_snapshot.get(i).map(|s| s as &FactValue);
+                if let Err(err) = apply_row_update(i, row) {
+                    app.diagnostics.push(AppDiagnostic::new_error(
+                        DiagnosticCategory::App,
+                        format!("{err}"),
+                    ));
+                }
+            }
 
-                match update_instance_document(
-                    instance,
-                    &row.value,
-                    snapshot,
-                    row.fact_index,
-                    &row.concept,
-                    app.taxonomy.as_ref(),
-                ) {
-                    Ok(outcome) => update_outcome = outcome,
-                    Err(err) => {
-                        app.diagnostics.push(AppDiagnostic::new_error(
-                            DiagnosticCategory::App,
-                            format!("{err}"),
-                        ));
-                    }
+            for (i, row) in section.rows.iter().enumerate() {
+                let is_structural = matches!(row.value, FactValue::Dropdown { .. })
+                    || matches!(row.value, FactValue::Checkbox(_) if row.fact_index.is_none());
+
+                if !is_structural {
+                    continue;
+                }
+
+                if let Err(err) = apply_row_update(i, row) {
+                    app.diagnostics.push(AppDiagnostic::new_error(
+                        DiagnosticCategory::App,
+                        format!("{err}"),
+                    ));
                 }
             }
         }

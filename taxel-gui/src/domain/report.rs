@@ -6,9 +6,20 @@ use taxel::{
     FISCAL_YEAR_BEGIN, FISCAL_YEAR_END, GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT,
 };
 use xbrl_rs::{
-    Concept, ConceptView, DocumentView, InstanceDocument, ItemFact, Label, Particle, Period,
-    TaxonomySet, TreeNode, TupleParticleView, ROLE_LABEL, ROLE_TERSE,
+    Concept, ConceptView, Decimals, DocumentView, FactAttribute, FactAttributeName,
+    InstanceDocument, ItemFact, Label, Particle, Period, TaxonomySet, TreeNode, TupleParticleView,
+    ROLE_LABEL, ROLE_TERSE,
 };
+
+/// An imported fact value extracted from a source instance document for merging
+/// into the current report. Carries nil-ness separately from the text value
+/// because an empty string and `xsi:nil="true"` are distinct states in XBRL.
+#[derive(Clone, PartialEq)]
+enum SourceImportValue {
+    Text { value: String, is_nil: bool },
+    Checkbox(bool),
+    Dropdown(String),
+}
 
 /// The value of a fact, determining both its display widget and write-back behaviour.
 #[derive(Debug, Clone, PartialEq)]
@@ -389,6 +400,147 @@ impl Report {
                 }
             }
         }
+    }
+
+    /// Merges fact values from `source_report` into this report and the
+    /// accompanying `instance`. Returns `(matched_count, imported_count)`.
+    pub fn apply_imported_values(
+        &mut self,
+        source_report: &Report,
+        source_item_facts: &[&ItemFact],
+        instance: &mut InstanceDocument,
+        taxonomy: &TaxonomySet,
+    ) -> (usize, usize) {
+        // Keyed by `(concept, parent, unit)`; collapsed to `None` when multiple
+        // source rows share the key but disagree on value (conflicting contexts).
+        let mut source_map: HashMap<
+            (String, Option<String>, Option<String>),
+            Option<SourceImportValue>,
+        > = HashMap::new();
+
+        for source_section in &source_report.sections {
+            for row in &source_section.rows {
+                let source_value = match &row.value {
+                    FactValue::Text(text) => {
+                        let is_nil = row
+                            .fact_index
+                            .and_then(|idx| source_item_facts.get(idx).map(|fact| fact.is_nil()))
+                            .unwrap_or(text.is_empty());
+
+                        SourceImportValue::Text {
+                            value: text.clone(),
+                            is_nil,
+                        }
+                    }
+                    FactValue::Checkbox(checked) => SourceImportValue::Checkbox(*checked),
+                    FactValue::Dropdown { selected, .. } => {
+                        SourceImportValue::Dropdown(selected.clone())
+                    }
+                };
+
+                let key = (
+                    row.concept.clone(),
+                    row.parent_concept.clone(),
+                    row.unit.clone(),
+                );
+                source_map
+                    .entry(key)
+                    .and_modify(|current| match current {
+                        Some(existing) if *existing == source_value => {}
+                        _ => *current = None,
+                    })
+                    .or_insert_with(|| Some(source_value));
+            }
+        }
+
+        let mut matched_count = 0usize;
+        let mut imported_count = 0usize;
+
+        for section in &mut self.sections {
+            for row in &mut section.rows {
+                let key = (
+                    row.concept.clone(),
+                    row.parent_concept.clone(),
+                    row.unit.clone(),
+                );
+
+                let source_value = source_map.get(&key).and_then(|v| v.clone());
+
+                let Some(source_value) = source_value else {
+                    continue;
+                };
+
+                match (&mut row.value, source_value) {
+                    (FactValue::Text(text), SourceImportValue::Text { value, is_nil }) => {
+                        matched_count += 1;
+
+                        if let Some(idx) = row.fact_index {
+                            let is_numeric = taxonomy
+                                .concepts()
+                                .find(|concept| concept.name.local_name == row.concept)
+                                .map(|concept| concept.data_type.is_numeric())
+                                .unwrap_or(false);
+
+                            if is_nil {
+                                instance.set_fact_nil(idx, true);
+
+                                if is_numeric {
+                                    instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
+                                }
+                            } else {
+                                instance.set_fact_value(idx, value.clone());
+
+                                if is_numeric {
+                                    instance.set_fact_attribute(
+                                        idx,
+                                        FactAttribute::Decimals(Decimals::Finite(2)),
+                                    );
+                                }
+                            }
+                        }
+
+                        let new_text = if is_nil { String::new() } else { value };
+
+                        if *text != new_text {
+                            imported_count += 1;
+                        }
+
+                        *text = new_text;
+                    }
+                    (FactValue::Checkbox(checked), SourceImportValue::Checkbox(new_checked)) => {
+                        matched_count += 1;
+
+                        if let Some(idx) = row.fact_index {
+                            instance.set_fact_nil(idx, !new_checked);
+                        }
+
+                        if *checked != new_checked {
+                            imported_count += 1;
+                        }
+
+                        *checked = new_checked;
+                    }
+                    (
+                        FactValue::Dropdown { selected, .. },
+                        SourceImportValue::Dropdown(new_selected),
+                    ) => {
+                        matched_count += 1;
+
+                        if *selected != new_selected {
+                            imported_count += 1;
+                        }
+
+                        // Dropdown rows represent tuple choices. Only the UI
+                        // selection is staged here; tuple-child creation is
+                        // deferred to Save via update_instance_document.
+                        *selected = new_selected;
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        (matched_count, imported_count)
     }
 }
 

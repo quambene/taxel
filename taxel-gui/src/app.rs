@@ -18,8 +18,8 @@ use eframe::{
 use eric_sdk::Eric;
 use report::LoadOutcome;
 pub use report::{
-    cancel_edit, delete_report, edit_report, import_report, poll_load_result, save_report,
-    send_report, start_load, validate_report, LoadKind,
+    cancel_edit, delete_report, edit_report, import_report, import_values, poll_load_result,
+    save_report, send_report, start_load, validate_report, LoadKind,
 };
 pub use report_list::ReportOverview;
 pub use search::{RowHighlight, Search};
@@ -106,6 +106,8 @@ pub struct TaxelApp {
     pub show_delete_modal: bool,
     /// Controls whether the send-report modal is visible.
     pub show_send_modal: bool,
+    /// Controls whether the import-values modal is visible.
+    pub show_import_values_modal: bool,
     /// Controls whether the keyboard shortcuts info modal is visible.
     pub show_shortcuts_modal: bool,
     /// Transient copy-message popup state. None means hidden.
@@ -114,6 +116,8 @@ pub struct TaxelApp {
     pub send_certificate_path: Option<PathBuf>,
     /// Password entered in the send modal, persisted across opens (in-memory only).
     pub send_password: String,
+    /// Source XML selected in the import-values modal, persisted across opens.
+    pub import_values_path: Option<PathBuf>,
     /// Controls whether the new-report creation modal is visible.
     pub show_new_report_modal: bool,
     /// Form state for the new-report dialog, preserved across opens.
@@ -205,12 +209,14 @@ impl TaxelApp {
             eric,
             show_delete_modal: false,
             show_send_modal: false,
+            show_import_values_modal: false,
             show_shortcuts_modal: false,
             copy_message: None,
             show_download_modal: false,
             pending_load_kind: None,
             send_certificate_path: None,
             send_password: String::new(),
+            import_values_path: None,
             show_new_report_modal: false,
             new_report_form: NewReportForm::default(),
         }
@@ -491,6 +497,10 @@ impl App for TaxelApp {
 
             if self.show_send_modal {
                 ui::draw_send_modal(ctx, self);
+            }
+
+            if self.show_import_values_modal {
+                ui::draw_import_values_modal(ctx, self);
             }
 
             if self.show_shortcuts_modal {

@@ -106,6 +106,61 @@ pub fn draw_send_modal(ui: &mut Ui, app: &mut TaxelApp) {
     }
 }
 
+/// Draws the import-values modal when the user clicks "Import values".
+pub fn draw_import_values_modal(ui: &mut Ui, app: &mut TaxelApp) {
+    let mut cancel = false;
+    let mut confirm = false;
+
+    let modal = Modal::new(Id::new("import_values_modal")).show(ui.ctx(), |ui| {
+        ui.heading("Import values");
+        ui.add_space(8.0);
+
+        ui.horizontal(|ui| {
+            ui.label("Source XML");
+            let path_label = app
+                .import_values_path
+                .as_deref()
+                .and_then(|p| p.to_str())
+                .unwrap_or("No file selected");
+            ui.label(path_label);
+
+            if ui.button("Browse…").clicked() {
+                if let Some(path) = FileDialog::new()
+                    .add_filter("XML", &["xml"])
+                    .add_filter("All", &["*"])
+                    .pick_file()
+                {
+                    app.import_values_path = Some(path);
+                }
+            }
+        });
+
+        ui.add_space(8.0);
+
+        ui.horizontal(|ui| {
+            if ui.button("Cancel").clicked() {
+                cancel = true;
+            }
+
+            if ui
+                .add_enabled(app.import_values_path.is_some(), Button::new("Import"))
+                .clicked()
+            {
+                confirm = true;
+            }
+        });
+    });
+
+    if modal.should_close() || cancel {
+        app.show_import_values_modal = false;
+    }
+
+    if confirm {
+        app.show_import_values_modal = false;
+        app::import_values(app);
+    }
+}
+
 /// Draws a modal dialog asking the user to confirm downloading missing
 /// taxonomies, with "Download" and "Cancel" buttons.
 pub fn draw_download_modal(ui: &mut Ui, confirm: &mut bool, cancel: &mut bool) {

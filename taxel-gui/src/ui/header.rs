@@ -48,6 +48,10 @@ pub fn draw_header(ui: &mut Ui, app: &mut TaxelApp) {
             app.show_send_modal = true;
         }
 
+        if app.report.is_some() && ui.button("Import values").clicked() {
+            app.show_import_values_modal = true;
+        }
+
         draw_error_summary(app, ui);
 
         ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
