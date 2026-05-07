@@ -97,11 +97,11 @@ taxel send \
 # Run unit tests for taxel-cli
 cargo test -p taxel-cli
 
-# Run integration tests for taxel-cli
-cargo test -p taxel-cli --test '*' --features integration-test -- --test-threads=1
+# Run integration tests for taxel-cli (requires ERiC library)
+cargo test -p taxel-cli --test '*' -- --test-threads=1
 
-# Run integration tests for taxel-cli in release mode
-cargo test -p taxel-cli --release --test '*' --features integration-test -- --test-threads=1
+# Run external tests for taxel-cli (requires ERiC library and Elster certificate)
+cargo test -p taxel-cli --release --test '*' --features external-test -- --test-threads=1
 
 # Run unit tests for taxel
 cargo test --lib -p taxel

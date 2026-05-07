@@ -1,13 +1,13 @@
 use taxel_cli::{app, cmd};
 
 #[test]
-#[cfg_attr(feature = "external-test", ignore)]
+#[cfg_attr(not(feature = "external-test"), ignore)]
 fn test_send() {
     let args = vec![
         cmd::BIN,
         cmd::SEND,
         "--xml-file",
-        "../test_data/taxonomy/v6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
+        "../test_data/instances/v6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
     ];
 
     let app = app();
@@ -22,13 +22,13 @@ fn test_send() {
 }
 
 #[test]
-#[cfg_attr(feature = "external-test", ignore)]
+#[cfg_attr(not(feature = "external-test"), ignore)]
 fn test_send_and_print() {
     let args = vec![
         cmd::BIN,
         cmd::SEND,
         "--xml-file",
-        "../test_data/taxonomy/v6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
+        "../test_data/instances/v6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
         "--print",
         "ebilanz.pdf",
     ];

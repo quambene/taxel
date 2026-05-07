@@ -6,7 +6,7 @@ fn test_validate() {
         cmd::BIN,
         cmd::VALIDATE,
         "--xml-file",
-        "../test_data/taxonomy/v6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
+        "../test_data/instances/v6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
     ];
 
     let app = app();
@@ -26,7 +26,7 @@ fn test_validate_and_print() {
         cmd::BIN,
         cmd::VALIDATE,
         "--xml-file",
-        "../test_data/taxonomy/v6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
+        "../test_data/instances/v6.5/SteuerbilanzAutoverkaeufer_PersG.xml",
         "--print",
         "ebilanz.pdf",
     ];

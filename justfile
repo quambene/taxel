@@ -20,13 +20,29 @@ run-dev:
 run-dev-trace:
     cd taxel-gui && RUST_LOG="taxel_gui=trace,taxel=trace" dx serve --hotpatch
 
-# Run tests
-test:
-    cargo test
-
 # Run unit tests
 test-unit:
     cargo test --lib
+
+# Run integration tests (requires ERiC library)
+test-integration:
+    cargo test --test '*' -- --test-threads=1
+
+# Run integration tests in release mode (requires ERiC library)
+test-integration-release:
+    cargo test --release --test '*' -- --test-threads=1
+
+# Run external tests (requires ERiC library and Elster certificate)
+test-external:
+    cargo test --test '*' --features external-test -- --test-threads=1
+
+# Run external tests in release mode (requires ERiC library and Elster certificate)
+test-external-release:
+    cargo test --release --test '*' --features external-test -- --test-threads=1
+
+# Run Python unit tests
+test-py:
+    cd taxel-py && pytest -v -m unit
 
 # Run cargo check with env vars
 check:
