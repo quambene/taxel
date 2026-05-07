@@ -122,6 +122,16 @@ pub fn create_instance_document(
 /// from the full taxonomy, which contains some concepts that are only relevant
 /// for other use cases (e.g. internal reporting) but not for tax filing.
 fn remove_forbidden_facts(instance: InstanceDocument, taxonomy: &TaxonomySet) -> InstanceDocument {
+    let has_forbidden = instance
+        .facts()
+        .iter()
+        .any(|fact| is_not_permitted(fact, taxonomy));
+
+    // Fast path: if there are no forbidden facts, return the original instance
+    if !has_forbidden {
+        return instance;
+    }
+
     let filtered_facts: Vec<Fact> = instance
         .facts()
         .iter()
