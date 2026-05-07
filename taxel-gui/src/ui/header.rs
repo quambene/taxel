@@ -40,16 +40,16 @@ pub fn draw_header(ui: &mut Ui, app: &mut TaxelApp) {
             app.show_delete_modal = true;
         }
 
+        if app.report.is_some() && ui.button("Import values").clicked() {
+            app.show_import_values_modal = true;
+        }
+
         if app.report.is_some() && ui.button("Validate report").clicked() {
             app::validate_report(app);
         }
 
         if app.report.is_some() && ui.button("Send report").clicked() {
             app.show_send_modal = true;
-        }
-
-        if app.report.is_some() && ui.button("Import values").clicked() {
-            app.show_import_values_modal = true;
         }
 
         draw_error_summary(app, ui);
