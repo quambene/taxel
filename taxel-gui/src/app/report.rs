@@ -818,19 +818,24 @@ fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error
                 .context("Failed to extract validation report from error")?
             {
                 for issue in validation_report.issues {
-                    if let (Some(error_code), Some(field_identifier), Some(error_text)) =
-                        (issue.error_code, issue.field_identifier, issue.text)
-                    {
-                        let fact_name = field_identifier
-                            .split_once(':')
-                            .map(|(_, name)| name)
-                            .unwrap_or(&field_identifier);
+                    if let (Some(error_code), Some(error_text)) = (issue.error_code, issue.text) {
+                        if let Some(field_identifier) = issue.field_identifier {
+                            let fact_name = field_identifier
+                                .split_once(':')
+                                .map(|(_, name)| name)
+                                .unwrap_or(&field_identifier);
 
-                        app.diagnostics.push(AppDiagnostic::new_error_with_fact(
-                            DiagnosticCategory::Validation,
-                            format!("Error code ({error_code}): {error_text}"),
-                            fact_name,
-                        ));
+                            app.diagnostics.push(AppDiagnostic::new_error_with_fact(
+                                DiagnosticCategory::Validation,
+                                format!("Error code ({error_code}): {error_text}"),
+                                fact_name,
+                            ));
+                        } else {
+                            app.diagnostics.push(AppDiagnostic::new_error(
+                                DiagnosticCategory::Validation,
+                                format!("Error code ({error_code}): {error_text}"),
+                            ));
+                        }
                     }
                 }
             }
