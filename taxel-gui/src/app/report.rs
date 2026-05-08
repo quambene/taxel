@@ -13,14 +13,16 @@ use anyhow::Context;
 use chrono::{Datelike, Utc};
 use eframe::egui::{self};
 use log::debug;
+use reqwest::blocking::Client;
 use std::{
     collections::HashSet,
     env,
     fs::{self},
+    io::{self, Cursor},
     path::{Path, PathBuf},
     sync::mpsc,
     thread,
-    time::SystemTime,
+    time::{Duration, SystemTime},
 };
 use taxel::{
     elster::Submitter, ElsterReport, TaxonomyType, COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT,
@@ -28,6 +30,7 @@ use taxel::{
 };
 use uuid::Uuid;
 use xbrl_rs::{InstanceDocument, TaxonomyLoader, TaxonomySet};
+use zip::ZipArchive;
 
 /// Discriminates how a report reaches the background load thread.
 #[derive(Clone)]
@@ -461,12 +464,107 @@ fn load_taxonomies(
             })?;
         }
 
-        loader.download_all(&schema_refs, &taxonomy_dir)?;
+        let taxonomies_missing = match loader.download_all(&schema_refs, &taxonomy_dir) {
+            Ok(result) => {
+                if !result.failed.is_empty() {
+                    true
+                } else {
+                    false
+                }
+            }
+            Err(err) => {
+                debug!("Primary taxonomy download returned error: {err}");
+                true
+            }
+        };
+
+        if taxonomies_missing {
+            debug!("Taxonomy files still missing after primary download, trying zip fallback");
+
+            let version = extract_taxonomy_version_from_schema_refs(&schema_refs)
+                .context("Cannot determine taxonomy version for zip fallback")?;
+            let date = TAXONOMY_VERSION_TO_DATE
+                .get(version)
+                .with_context(|| format!("No date known for taxonomy version {version}"))?;
+
+            download_taxonomy_zip(version, date, &taxonomy_dir)
+                .with_context(|| format!("Zip fallback failed for taxonomy v{version}"))?;
+        }
     }
 
     let taxonomy = TaxonomySet::discover(schema_refs, taxonomy_dir)?;
 
     Ok(Some(taxonomy))
+}
+
+/// Downloads the bundled taxonomy zip for `version`/`date` from
+/// `https://www.xbrl.de/german-gaap-taxonomy-v{version}-{date}.zip` and
+/// extracts all entries under the `xbrl/` subfolder into `taxonomy_dir`.
+fn download_taxonomy_zip(
+    version: &str,
+    date: &str,
+    taxonomy_dir: &Path,
+) -> Result<(), anyhow::Error> {
+    let url = format!("https://www.xbrl.de/german-gaap-taxonomy-v{version}-{date}.zip");
+    debug!("Downloading taxonomy zip from {url}");
+
+    let client = Client::builder()
+        .timeout(Duration::from_secs(120))
+        .build()?;
+    let response = client
+        .get(&url)
+        .send()
+        .with_context(|| format!("Failed to GET {url}"))?;
+
+    if !response.status().is_success() {
+        return Err(anyhow::anyhow!(
+            "Taxonomy zip download returned HTTP {}",
+            response.status()
+        ));
+    }
+
+    let bytes = response
+        .bytes()
+        .context("Failed to read taxonomy zip body")?;
+    let cursor = Cursor::new(bytes);
+    let mut archive = ZipArchive::new(cursor).context("Failed to open taxonomy zip")?;
+
+    for i in 0..archive.len() {
+        let mut entry = archive.by_index(i)?;
+        let entry_name = entry.name().to_owned();
+
+        // The zip has a top-level folder:
+        // german-gaap-taxonomy-v6.9-2025-04-01/xbrl/de-gcd-2025-04-01/... Find
+        // "/xbrl/" anywhere in the path and take the remainder.
+        let Some(xbrl_pos) = entry_name.find("/xbrl/") else {
+            continue;
+        };
+        let relative = &entry_name[xbrl_pos + "/xbrl/".len()..];
+
+        if relative.is_empty() {
+            continue;
+        }
+
+        let dest = taxonomy_dir.join(relative);
+
+        if !dest.starts_with(taxonomy_dir) {
+            continue;
+        }
+
+        if entry.is_dir() {
+            fs::create_dir_all(&dest)?;
+        } else {
+            if let Some(parent) = dest.parent() {
+                fs::create_dir_all(parent)?;
+            }
+            let mut outfile = fs::File::create(&dest)
+                .with_context(|| format!("Failed to create {}", dest.display()))?;
+
+            io::copy(&mut entry, &mut outfile)?;
+        }
+    }
+
+    Ok(())
 }
 
 /// Applies a successfully loaded or created report to the app state.
