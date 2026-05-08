@@ -283,6 +283,10 @@ fn read_and_import_values(app: &mut TaxelApp) -> Result<(usize, usize, PathBuf),
 
     let source_instance =
         InstanceDocument::from_file(&source_path).context("Failed to parse source XML")?;
+    let source_schema_refs = source_instance.schema_refs().to_vec();
+    let source_schema_ref_paths = source_instance.schema_ref_paths();
+    let source_taxonomy = load_taxonomies(source_schema_refs, &source_schema_ref_paths, false)?
+        .context("Source taxonomy not available on disk. Open the source report first so its taxonomy is downloaded.")?;
 
     let Some(loaded) = app.loaded.as_mut() else {
         return Err(anyhow::anyhow!(
@@ -294,9 +298,9 @@ fn read_and_import_values(app: &mut TaxelApp) -> Result<(usize, usize, PathBuf),
         source_path.to_path_buf(),
         loaded.report.taxonomy_type.clone(),
     );
-    let source_view = source_instance.view(&loaded.taxonomy);
+    let source_view = source_instance.view(&source_taxonomy);
     let source_item_facts = source_instance.item_facts();
-    source_report.populate(source_view, &source_item_facts, &loaded.taxonomy);
+    source_report.populate(source_view, &source_item_facts, &source_taxonomy);
 
     let (matched_count, imported_count) = loaded.report.apply_imported_values(
         &source_report,
