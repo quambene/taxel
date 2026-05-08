@@ -465,13 +465,7 @@ fn load_taxonomies(
         }
 
         let taxonomies_missing = match loader.download_all(&schema_refs, &taxonomy_dir) {
-            Ok(result) => {
-                if !result.failed.is_empty() {
-                    true
-                } else {
-                    false
-                }
-            }
+            Ok(result) => !result.failed.is_empty(),
             Err(err) => {
                 debug!("Primary taxonomy download returned error: {err}");
                 true
