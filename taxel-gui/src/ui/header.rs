@@ -21,10 +21,8 @@ pub fn draw_header(ui: &mut Ui, app: &mut TaxelApp) {
             ui.label("Loading…");
         }
 
-        if app.report.is_some() && ui.button("Close report").clicked() {
-            app.report = None;
-            app.taxonomy = None;
-            app.instance_document = None;
+        if app.loaded.is_some() && ui.button("Close report").clicked() {
+            app.loaded = None;
             app.selected_tab = 0;
             app.search.results.clear();
             app.search.scroll_to_row = None;
@@ -36,19 +34,19 @@ pub fn draw_header(ui: &mut Ui, app: &mut TaxelApp) {
             app.edit_snapshot.clear();
         }
 
-        if app.report.is_some() && ui.button("Delete report").clicked() {
+        if app.loaded.is_some() && ui.button("Delete report").clicked() {
             app.show_delete_modal = true;
         }
 
-        if app.report.is_some() && ui.button("Import values").clicked() {
+        if app.loaded.is_some() && ui.button("Import values").clicked() {
             app.show_import_values_modal = true;
         }
 
-        if app.report.is_some() && ui.button("Validate report").clicked() {
+        if app.loaded.is_some() && ui.button("Validate report").clicked() {
             app::validate_report(app);
         }
 
-        if app.report.is_some() && ui.button("Send report").clicked() {
+        if app.loaded.is_some() && ui.button("Send report").clicked() {
             app.show_send_modal = true;
         }
 
@@ -82,7 +80,7 @@ fn draw_info_button(ui: &mut Ui) -> Response {
 
 /// Draws the "New report" button. Clicking opens the report creation modal.
 fn draw_new_report_button(ui: &mut Ui, app: &mut TaxelApp) {
-    if app.report.is_none() && app.loading.is_none() && ui.button("New report").clicked() {
+    if app.loaded.is_none() && app.loading.is_none() && ui.button("New report").clicked() {
         app.show_new_report_modal = true;
     }
 }
@@ -90,7 +88,7 @@ fn draw_new_report_button(ui: &mut Ui, app: &mut TaxelApp) {
 /// Draws the "Import report" button. Clicking the button opens a file dialog to
 /// select an XML file.
 fn draw_import_button(ui: &mut Ui, app: &mut TaxelApp) {
-    if app.report.is_none() && app.loading.is_none() && ui.button("Import report").clicked() {
+    if app.loaded.is_none() && app.loading.is_none() && ui.button("Import report").clicked() {
         if let Some(path) = FileDialog::new()
             .add_filter("XML", &["xml"])
             .add_filter("All", &["*"])

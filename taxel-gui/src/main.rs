@@ -31,7 +31,7 @@ fn main() -> Result<(), anyhow::Error> {
     eframe::run_native(
         "Taxel",
         options,
-        Box::new(|ctx| Ok(Box::new(TaxelApp::new(ctx, None, None)))),
+        Box::new(|ctx| Ok(Box::new(TaxelApp::new(ctx)))),
     )
     .map_err(|err| anyhow::anyhow!(err.to_string()))?;
 

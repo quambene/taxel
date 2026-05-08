@@ -105,7 +105,7 @@ pub fn create_instance_document(
 
     // TODO: build instance selectively for chosen sections only.
     // Currently builds the full instance from all sections in the taxonomy.
-    let instance = InstanceDocument::from_taxonomy(
+    let mut instance = InstanceDocument::from_taxonomy(
         taxonomy,
         namespaces,
         instant_context,
@@ -115,7 +115,7 @@ pub fn create_instance_document(
 
     let end_date = NaiveDate::parse_from_str(end_date, "%Y-%m-%d")
         .with_context(|| format!("Failed to parse end date '{end_date}'"))?;
-    let instance = remove_forbidden_facts(instance, taxonomy, &end_date);
+    remove_forbidden_facts(&mut instance, taxonomy, &end_date);
 
     Ok(instance)
 }
@@ -125,13 +125,13 @@ pub fn create_instance_document(
 /// from the full taxonomy, which contains some concepts that are only relevant
 /// for other use cases (e.g. internal reporting) but not for tax filing.
 fn remove_forbidden_facts(
-    instance: InstanceDocument,
+    instance: &mut InstanceDocument,
     taxonomy: &TaxonomySet,
     end_date: &NaiveDate,
-) -> InstanceDocument {
+) {
     filter_facts_by(instance, |fact| {
         is_not_permitted(fact, taxonomy, end_date).unwrap_or_default()
-    })
+    });
 }
 
 /// Checks if the fact is marked as not permitted.
@@ -162,13 +162,10 @@ fn is_not_permitted(fact: &Fact, taxonomy: &TaxonomySet, end_date: &NaiveDate) -
 
 /// Removes facts not permitted for handelsrechtlicher Einzelabschluss (EA).
 /// Only reconstructs the document when there are facts to remove.
-pub fn remove_trade_accounting_facts(
-    instance: InstanceDocument,
-    taxonomy: &TaxonomySet,
-) -> InstanceDocument {
+pub fn remove_trade_accounting_facts(instance: &mut InstanceDocument, taxonomy: &TaxonomySet) {
     filter_facts_by(instance, |fact| {
         is_trade_accounting_not_permitted(fact, taxonomy).unwrap_or_default()
-    })
+    });
 }
 /// Checks if the fact is not permitted for trade accounting.
 fn is_trade_accounting_not_permitted(fact: &Fact, taxonomy: &TaxonomySet) -> Option<bool> {
@@ -186,15 +183,14 @@ fn is_trade_accounting_not_permitted(fact: &Fact, taxonomy: &TaxonomySet) -> Opt
 
 /// TODO: use retain_facts from xbrl-rs when available instead of
 /// reconstructing the whole instance document.
-fn filter_facts_by(
-    instance: InstanceDocument,
-    should_remove: impl Fn(&Fact) -> bool,
-) -> InstanceDocument {
+fn filter_facts_by(instance: &mut InstanceDocument, should_remove: impl Fn(&Fact) -> bool) {
     if !instance.facts().iter().any(&should_remove) {
-        return instance;
+        return;
     }
 
-    let filtered_facts: Vec<Fact> = instance
+    let source = instance.clone();
+
+    let filtered_facts: Vec<Fact> = source
         .facts()
         .iter()
         .filter(|fact| !should_remove(fact))
@@ -205,16 +201,16 @@ fn filter_facts_by(
         })
         .collect();
 
-    let role_refs = instance.role_refs().to_vec();
-    let arcrole_refs = instance.arcrole_refs().to_vec();
+    let role_refs = source.role_refs().to_vec();
+    let arcrole_refs = source.arcrole_refs().to_vec();
 
     let mut filtered = InstanceDocument::new(
-        instance.schema_refs().to_vec(),
-        instance.contexts().clone(),
-        instance.units().clone(),
+        source.schema_refs().to_vec(),
+        source.contexts().clone(),
+        source.units().clone(),
         filtered_facts,
-        instance.namespaces().clone(),
-        instance.footnote_links().to_vec(),
+        source.namespaces().clone(),
+        source.footnote_links().to_vec(),
     );
 
     for role_ref in role_refs {
@@ -224,7 +220,7 @@ fn filter_facts_by(
         filtered.add_arcrole_ref(arcrole_ref);
     }
 
-    filtered
+    *instance = filtered;
 }
 
 /// Recursively removes child facts that match the given predicate.

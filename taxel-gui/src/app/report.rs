@@ -43,15 +43,23 @@ pub enum LoadKind {
     Create(NewReportForm),
 }
 
+/// All state associated with a currently loaded report.
+pub struct LoadedReport {
+    pub taxonomy: TaxonomySet,
+    pub instance: InstanceDocument,
+    pub elster: ElsterReport,
+    pub report: Report,
+}
+
 /// The result of a background load operation.
 #[allow(clippy::large_enum_variant)]
 pub enum LoadOutcome {
     /// The report was loaded successfully. Already registered in the manifest.
-    Ready(TaxonomySet, InstanceDocument, Report, ElsterReport),
+    Ready(LoadedReport),
     /// Like `Ready`, but the report was freshly imported.
-    Imported(TaxonomySet, InstanceDocument, Report, ElsterReport),
+    Imported(LoadedReport),
     /// Like `Ready`, but the report was freshly created.
-    Created(TaxonomySet, InstanceDocument, Report, ElsterReport),
+    Created(LoadedReport),
     /// Taxonomies are missing from disk; the user must confirm before downloading.
     NeedsDownload,
 }
@@ -119,9 +127,7 @@ fn load_report(kind: LoadKind, allow_download: bool) -> Result<LoadOutcome, anyh
         LoadKind::Open(path) => load_instance_document_and_taxonomy(&path, allow_download),
         LoadKind::Import(path) => {
             match load_instance_document_and_taxonomy(&path, allow_download)? {
-                LoadOutcome::Ready(taxonomy, instance, report, elster_report) => Ok(
-                    LoadOutcome::Imported(taxonomy, instance, report, elster_report),
-                ),
+                LoadOutcome::Ready(loaded) => Ok(LoadOutcome::Imported(loaded)),
                 other => Ok(other),
             }
         }
@@ -133,28 +139,27 @@ fn load_report(kind: LoadKind, allow_download: bool) -> Result<LoadOutcome, anyh
 pub fn poll_load_result(app: &mut TaxelApp) {
     if let Some(rx) = &app.loading {
         match rx.try_recv() {
-            Ok(Ok(LoadOutcome::Ready(taxonomy, instance, report, elster_report))) => {
-                finish_load(app, taxonomy, instance, report, elster_report);
+            Ok(Ok(LoadOutcome::Ready(loaded))) => {
+                finish_load(app, loaded);
             }
-            Ok(Ok(LoadOutcome::Created(taxonomy, instance, report, elster_report)))
-            | Ok(Ok(LoadOutcome::Imported(taxonomy, instance, report, elster_report))) => {
-                let (start_date, end_date) = extract_period(&instance)
+            Ok(Ok(LoadOutcome::Created(loaded))) | Ok(Ok(LoadOutcome::Imported(loaded))) => {
+                let (start_date, end_date) = extract_period(&loaded.instance)
                     .map(|(start, end)| (Some(start), Some(end)))
                     .unwrap_or((None, None));
                 let taxonomy_version =
-                    extract_taxonomy_version_from_schema_refs(instance.schema_refs())
+                    extract_taxonomy_version_from_schema_refs(loaded.instance.schema_refs())
                         .map(|v| v.to_owned());
 
                 app.upsert_report(
-                    &report.path,
-                    Some(report.taxonomy_type.clone()),
+                    &loaded.report.path,
+                    Some(loaded.report.taxonomy_type.clone()),
                     taxonomy_version,
                     start_date,
                     end_date,
                 );
                 app.refresh_reports();
 
-                finish_load(app, taxonomy, instance, report, elster_report);
+                finish_load(app, loaded);
             }
             Ok(Ok(LoadOutcome::NeedsDownload)) => {
                 app.show_download_modal = true;
@@ -276,35 +281,28 @@ fn read_and_import_values(app: &mut TaxelApp) -> Result<(usize, usize, PathBuf),
     let source_instance =
         InstanceDocument::from_file(&source_path).context("Failed to parse source XML")?;
 
-    let Some(taxonomy) = app.taxonomy.as_ref() else {
-        return Err(anyhow::anyhow!(
-            "Cannot import values without a loaded taxonomy"
-        ));
-    };
-
-    let Some(target_taxonomy_type) = app
-        .report
-        .as_ref()
-        .map(|report| report.taxonomy_type.clone())
-    else {
+    let Some(loaded) = app.loaded.as_mut() else {
         return Err(anyhow::anyhow!(
             "Cannot import values without a loaded report"
         ));
     };
 
-    let mut source_report = Report::new(source_path.to_path_buf(), target_taxonomy_type);
-    let source_view = source_instance.view(taxonomy);
+    let mut source_report = Report::new(
+        source_path.to_path_buf(),
+        loaded.report.taxonomy_type.clone(),
+    );
+    let source_view = source_instance.view(&loaded.taxonomy);
     let source_item_facts = source_instance.item_facts();
-    source_report.populate(source_view, &source_item_facts, taxonomy);
+    source_report.populate(source_view, &source_item_facts, &loaded.taxonomy);
 
-    if let (Some(report), Some(instance)) = (&mut app.report, &mut app.instance_document) {
-        let (matched_count, imported_count) =
-            report.apply_imported_values(&source_report, &source_item_facts, instance, taxonomy);
+    let (matched_count, imported_count) = loaded.report.apply_imported_values(
+        &source_report,
+        &source_item_facts,
+        &mut loaded.instance,
+        &loaded.taxonomy,
+    );
 
-        Ok((matched_count, imported_count, source_path))
-    } else {
-        Ok((0, 0, source_path))
-    }
+    Ok((matched_count, imported_count, source_path))
 }
 
 /// Loads an XBRL instance document from the specified path, discovers the
@@ -336,12 +334,12 @@ fn load_instance_document_and_taxonomy(
     let elster_report = ElsterReport::parse(&xml)
         .with_context(|| format!("Failed to parse ElsterReport from {}", path.display()))?;
 
-    Ok(LoadOutcome::Ready(
+    Ok(LoadOutcome::Ready(LoadedReport {
         taxonomy,
         instance,
         report,
-        elster_report,
-    ))
+        elster: elster_report,
+    }))
 }
 
 /// Creates a new XBRL instance document based on the provided form data,
@@ -426,7 +424,12 @@ fn load_taxonomy_and_create_instance_document(
     fs::write(&dest, &xml)
         .with_context(|| format!("Failed to write new report to {}", dest.display()))?;
 
-    Ok(LoadOutcome::Created(taxonomy, instance, report, elster))
+    Ok(LoadOutcome::Created(LoadedReport {
+        taxonomy,
+        instance,
+        report,
+        elster,
+    }))
 }
 
 /// Loads the taxonomies required for the given schema refs. If they are missing
@@ -467,14 +470,8 @@ fn load_taxonomies(
 }
 
 /// Applies a successfully loaded or created report to the app state.
-fn finish_load(
-    app: &mut TaxelApp,
-    taxonomy: TaxonomySet,
-    instance: InstanceDocument,
-    mut report: Report,
-    elster_report: ElsterReport,
-) {
-    for missing_role in &report.role_mapping_errors {
+fn finish_load(app: &mut TaxelApp, mut loaded: LoadedReport) {
+    for missing_role in &loaded.report.role_mapping_errors {
         app.diagnostics.push(AppDiagnostic::new_warning(
             DiagnosticCategory::Import,
             format!("Missing report-element mapping for role URI: {missing_role}"),
@@ -485,20 +482,18 @@ fn finish_load(
         .report_list
         .reports()
         .iter()
-        .find(|overview| overview.path == report.path)
+        .find(|overview| overview.path == loaded.report.path)
     {
-        report.status = overview.report_status;
+        loaded.report.status = overview.report_status;
     }
 
-    app.section_states = report
+    app.section_states = loaded
+        .report
         .sections
         .iter()
         .map(|_| SectionState::default())
         .collect();
-    app.report = Some(report);
-    app.taxonomy = Some(taxonomy);
-    app.instance_document = Some(instance);
-    app.elster_report = Some(elster_report);
+    app.loaded = Some(loaded);
     app.loading = None;
     app.pending_load_kind = None;
 }
@@ -523,8 +518,8 @@ fn new_report_path() -> Result<PathBuf, anyhow::Error> {
 /// Edits the currently loaded report by enabling edit mode for the selected
 /// section and taking a snapshot of the current values for that section.
 pub fn edit_report(app: &mut TaxelApp) {
-    if let Some(table) = &app.report {
-        if let Some(section) = table.sections.get(app.selected_tab) {
+    if let Some(loaded) = &app.loaded {
+        if let Some(section) = loaded.report.sections.get(app.selected_tab) {
             app.edit_snapshot = section.rows.iter().map(|r| r.value.clone()).collect();
         }
     }
@@ -532,9 +527,9 @@ pub fn edit_report(app: &mut TaxelApp) {
 
     // If the report was previously validated, mark it
     // as draft again since it has unsaved changes now.
-    if let Some(report) = &app.report {
+    if let Some(loaded) = &app.loaded {
         app.report_list
-            .set_report_status(&report.path, ReportStatus::Draft);
+            .set_report_status(&loaded.report.path, ReportStatus::Draft);
         app.report_list.save(&mut app.diagnostics);
     }
 }
@@ -544,8 +539,8 @@ pub fn edit_report(app: &mut TaxelApp) {
 pub fn cancel_edit(app: &mut TaxelApp) {
     let editing_tab = app.editing_section.unwrap_or(app.selected_tab);
 
-    if let Some(table) = &mut app.report {
-        if let Some(section) = table.sections.get_mut(editing_tab) {
+    if let Some(loaded) = &mut app.loaded {
+        if let Some(section) = loaded.report.sections.get_mut(editing_tab) {
             for (row, value) in section.rows.iter_mut().zip(app.edit_snapshot.iter()) {
                 row.value = value.clone();
             }
@@ -562,8 +557,11 @@ pub fn save_report(app: &mut TaxelApp) {
 
     let mut update_outcome = UpdateOutcome::NoChange;
 
-    if let (Some(report), Some(instance)) = (&app.report, &mut app.instance_document) {
-        if let Some(section) = report.sections.get(editing_tab) {
+    if let Some(loaded) = app.loaded.as_mut() {
+        if let Some(section) = loaded.report.sections.get(editing_tab) {
+            let instance = &mut loaded.instance;
+            let taxonomy = &loaded.taxonomy;
+
             let mut apply_row_update =
                 |i: usize, row: &crate::domain::FactRow| -> Result<(), anyhow::Error> {
                     let unchanged = app
@@ -583,7 +581,7 @@ pub fn save_report(app: &mut TaxelApp) {
                         row.fact_index,
                         row.parent_concept.as_deref(),
                         &row.concept,
-                        app.taxonomy.as_ref(),
+                        Some(taxonomy),
                     )?;
 
                     if outcome == UpdateOutcome::Rebuild {
@@ -634,17 +632,16 @@ pub fn save_report(app: &mut TaxelApp) {
         update_outcome = UpdateOutcome::Rebuild;
     }
 
-    if let (Some(report), Some(instance)) = (&app.report, &mut app.instance_document) {
+    if let Some(loaded) = app.loaded.as_mut() {
         // Sync GCD facts to ElsterReport metadata and XBRL contexts.
-        if let Some(elster) = &mut app.elster_report {
-            report.sync_gcd_to_elster(instance, elster);
-        }
+        loaded
+            .report
+            .sync_gcd_to_elster(&mut loaded.instance, &mut loaded.elster);
 
         // Serialize the updated InstanceDocument to bytes.
         let mut xbrl_bytes: Vec<u8> = Vec::new();
-        let serialize_result = instance.to_writer(&mut xbrl_bytes);
 
-        match serialize_result {
+        match loaded.instance.to_writer(&mut xbrl_bytes) {
             Err(err) => {
                 app.diagnostics.push(AppDiagnostic::new_error(
                     DiagnosticCategory::App,
@@ -652,31 +649,30 @@ pub fn save_report(app: &mut TaxelApp) {
                 ));
             }
             Ok(()) => {
-                let result = app
-                    .elster_report
-                    .as_mut()
-                    .context("No Elster report in app state")
-                    .and_then(|elster| {
-                        elster.set_payload_xbrl(xbrl_bytes);
-                        elster.to_xml().context("Failed to serialize Elster report")
-                    })
+                loaded.elster.set_payload_xbrl(xbrl_bytes);
+
+                let result = loaded
+                    .elster
+                    .to_xml()
+                    .context("Failed to serialize Elster report")
                     .and_then(|xml| {
-                        fs::write(&report.path, xml).context("Failed to write report to disk")
+                        fs::write(&loaded.report.path, xml)
+                            .context("Failed to write report to disk")
                     });
 
                 match result {
                     Ok(()) => {
                         let now = SystemTime::now();
 
-                        if let Some((start_date, end_date)) = extract_period(instance) {
+                        if let Some((start_date, end_date)) = extract_period(&loaded.instance) {
                             app.report_list.set_period(
-                                &report.path,
+                                &loaded.report.path,
                                 Some(start_date),
                                 Some(end_date),
                             );
                         }
 
-                        app.report_list.set_timestamp(&report.path, now);
+                        app.report_list.set_timestamp(&loaded.report.path, now);
                         app.report_list.save(&mut app.diagnostics);
                     }
                     Err(err) => {
@@ -693,12 +689,10 @@ pub fn save_report(app: &mut TaxelApp) {
     // Rebuild the fact table after a tuple child switch so the new element
     // names and row structure are reflected in the UI.
     if update_outcome == UpdateOutcome::Rebuild {
-        if let (Some(taxonomy), Some(instance), Some(report)) =
-            (&app.taxonomy, &app.instance_document, &mut app.report)
-        {
-            let view = instance.view(taxonomy);
-            let item_facts = instance.item_facts();
-            report.populate(view, &item_facts, taxonomy);
+        if let Some(loaded) = app.loaded.as_mut() {
+            let view = loaded.instance.view(&loaded.taxonomy);
+            let item_facts = loaded.instance.item_facts();
+            loaded.report.populate(view, &item_facts, &loaded.taxonomy);
         }
     }
 
@@ -715,8 +709,8 @@ fn handle_consolidation_range_change(app: &mut TaxelApp, editing_tab: usize) -> 
     let mut consolidation_range_changed = false;
     let mut ea_selected = false;
 
-    if let Some(report) = &app.report {
-        if let Some(section) = report.sections.get(editing_tab) {
+    if let Some(loaded) = &app.loaded {
+        if let Some(section) = loaded.report.sections.get(editing_tab) {
             consolidation_range_changed = section.rows.iter().enumerate().any(|(i, row)| {
                 row.concept == CONSOLIDATION_RANGE
                     && app
@@ -753,31 +747,36 @@ fn handle_consolidation_range_change(app: &mut TaxelApp, editing_tab: usize) -> 
 /// Takes the current instance out of app state, uses it as the source for
 /// value import, then replaces both instance and report with fresh copies.
 fn recreate_instance_document(app: &mut TaxelApp, selected: bool) -> Result<(), anyhow::Error> {
-    let source_instance = app
-        .instance_document
-        .take()
-        .context("No instance document in app state")?;
-
-    let report_path = app.report.as_ref().context("No report")?.path.clone();
-    let taxonomy_type = app.report.as_ref().unwrap().taxonomy_type.clone();
+    let loaded = app
+        .loaded
+        .as_ref()
+        .context("No loaded report in app state")?;
+    let source_instance = loaded.instance.clone();
+    let report_path = loaded.report.path.clone();
+    let taxonomy_type = loaded.report.taxonomy_type.clone();
     let taxonomy_version = extract_taxonomy_version_from_schema_refs(source_instance.schema_refs());
-    let taxonomy_date = taxonomy_version.and_then(|v| TAXONOMY_VERSION_TO_DATE.get(v).copied());
+    let taxonomy_date =
+        taxonomy_version.and_then(|version| TAXONOMY_VERSION_TO_DATE.get(version).copied());
     let (start_date, end_date) = extract_period(&source_instance).unwrap_or_default();
     let namespace_prefix = taxonomy_type.namespace_prefix();
     let namespace_uri = taxonomy_date
-        .map(|d| taxonomy_type.namespace_uri(d))
+        .map(|date| taxonomy_type.namespace_uri(date))
         .unwrap_or_default();
 
     let mut source_report = Report::new(report_path.clone(), taxonomy_type.clone());
     {
-        let taxonomy = app.taxonomy.as_ref().context("No taxonomy in app state")?;
+        let taxonomy = &loaded.taxonomy;
         let source_item_facts = source_instance.item_facts();
         let source_view = source_instance.view(taxonomy);
         source_report.populate(source_view, &source_item_facts, taxonomy);
     }
 
     let mut fresh_instance = {
-        let taxonomy = app.taxonomy.as_ref().context("No taxonomy in app state")?;
+        let taxonomy = &app
+            .loaded
+            .as_ref()
+            .context("No loaded report in app state")?
+            .taxonomy;
         create_instance_document(
             &start_date,
             &end_date,
@@ -789,14 +788,22 @@ fn recreate_instance_document(app: &mut TaxelApp, selected: bool) -> Result<(), 
     };
 
     if selected {
-        let taxonomy = app.taxonomy.as_ref().context("No taxonomy in app state")?;
-        fresh_instance = remove_trade_accounting_facts(fresh_instance, taxonomy);
+        let taxonomy = &app
+            .loaded
+            .as_ref()
+            .context("No loaded report in app state")?
+            .taxonomy;
+        remove_trade_accounting_facts(&mut fresh_instance, taxonomy);
     }
 
     let mut fresh_report = Report::new(report_path, taxonomy_type.clone());
 
     {
-        let taxonomy = app.taxonomy.as_ref().context("No taxonomy in app state")?;
+        let taxonomy = &app
+            .loaded
+            .as_ref()
+            .context("No loaded report in app state")?
+            .taxonomy;
         let source_item_facts = source_instance.item_facts();
 
         {
@@ -815,7 +822,11 @@ fn recreate_instance_document(app: &mut TaxelApp, selected: bool) -> Result<(), 
     }
 
     {
-        let taxonomy = app.taxonomy.as_ref().context("No taxonomy in app state")?;
+        let taxonomy = &app
+            .loaded
+            .as_ref()
+            .context("No loaded report in app state")?
+            .taxonomy;
         for section in &fresh_report.sections {
             for row in &section.rows {
                 if let FactValue::Dropdown { selected, .. } = &row.value {
@@ -839,8 +850,10 @@ fn recreate_instance_document(app: &mut TaxelApp, selected: bool) -> Result<(), 
         }
     }
 
-    app.instance_document = Some(fresh_instance);
-    app.report = Some(fresh_report);
+    if let Some(loaded) = app.loaded.as_mut() {
+        loaded.instance = fresh_instance;
+        loaded.report = fresh_report;
+    }
 
     Ok(())
 }
@@ -850,13 +863,13 @@ fn recreate_instance_document(app: &mut TaxelApp, selected: bool) -> Result<(), 
 pub fn validate_report(app: &mut TaxelApp) {
     clear_diagnostics_by_category(app, DiagnosticCategory::Validation);
 
-    let Some(report) = &mut app.report else {
+    let Some(loaded) = app.loaded.as_mut() else {
         return;
     };
 
-    report.status = ReportStatus::Draft;
+    loaded.report.status = ReportStatus::Draft;
     app.report_list
-        .set_report_status(&report.path, ReportStatus::Draft);
+        .set_report_status(&loaded.report.path, ReportStatus::Draft);
     app.report_list.save(&mut app.diagnostics);
 
     serialize_and_validate_report(app)
@@ -872,17 +885,23 @@ pub fn validate_report(app: &mut TaxelApp) {
 /// Serializes the current XBRL instance document, wraps it in an Elster
 /// envelope, and sends it to ERiC for validation.
 fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error> {
-    let instance = app
-        .instance_document
-        .as_ref()
-        .context("Failed to get instance document from app state")?;
-    let mut xbrl_bytes = Vec::new();
+    let loaded = app
+        .loaded
+        .as_mut()
+        .context("Failed to get loaded report from app state")?;
 
-    instance
+    let mut xbrl_bytes = Vec::new();
+    loaded
+        .instance
         .to_writer(&mut xbrl_bytes)
         .context("Failed to serialize XBRL instance")?;
 
-    let Some(taxonomy_version) = extract_taxonomy_version(&app.taxonomy) else {
+    let taxonomy_version = loaded
+        .taxonomy
+        .date()
+        .and_then(|date| TAXONOMY_DATE_TO_VERSION.get(date));
+
+    let Some(taxonomy_version) = taxonomy_version else {
         app.diagnostics.push(AppDiagnostic::taxonomy_version_error(
             DiagnosticCategory::Validation,
         ));
@@ -890,37 +909,35 @@ fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error
         return Ok(());
     };
 
-    let elster = app
-        .elster_report
+    let loaded = app
+        .loaded
         .as_mut()
-        .context("No Elster report in app state")?;
-
-    elster.set_payload_xbrl(xbrl_bytes);
-
-    let xml = elster
+        .context("No loaded report in app state")?;
+    loaded.elster.set_payload_xbrl(xbrl_bytes);
+    let xml = loaded
+        .elster
         .to_xml()
         .context("Failed to serialize Elster report")?;
 
-    if let Some(report) = &app.report {
-        for &concept in REQUIRED_GCD_FACTS {
-            // The "companyId.ST13" concept can occur multiple times in the
-            // report under different parent concepts. We only want to check for
-            // its existence once.
-            let parent = if concept == COMPANY_TAX_NUMBER {
-                Some(COMPANY_TAX_NUMBER_PARENT)
-            } else {
-                None
-            };
+    for &concept in REQUIRED_GCD_FACTS {
+        // The "companyId.ST13" concept can occur multiple times in the
+        // report under different parent concepts. We only want to check for
+        // its existence once.
+        let parent = if concept == COMPANY_TAX_NUMBER {
+            Some(COMPANY_TAX_NUMBER_PARENT)
+        } else {
+            None
+        };
 
-            if report
-                .find_in_section(GCD_ROLE_URI, concept, parent)
-                .is_none()
-            {
-                app.diagnostics.push(AppDiagnostic::new_missing_fact_value(
-                    DiagnosticCategory::Validation,
-                    concept,
-                ));
-            }
+        if loaded
+            .report
+            .find_in_section(GCD_ROLE_URI, concept, parent)
+            .is_none()
+        {
+            app.diagnostics.push(AppDiagnostic::new_missing_fact_value(
+                DiagnosticCategory::Validation,
+                concept,
+            ));
         }
     }
 
@@ -934,10 +951,10 @@ fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error
 
     match eric.validate(xml, "Bilanz", taxonomy_version, None) {
         Ok(response) => {
-            if let Some(report) = &mut app.report {
-                report.status = ReportStatus::Validated;
+            if let Some(loaded) = app.loaded.as_mut() {
+                loaded.report.status = ReportStatus::Validated;
                 app.report_list
-                    .set_report_status(&report.path, ReportStatus::Validated);
+                    .set_report_status(&loaded.report.path, ReportStatus::Validated);
                 app.report_list.save(&mut app.diagnostics);
             }
 
@@ -1000,11 +1017,11 @@ pub fn send_report(app: &mut TaxelApp) {
     };
     let password = &app.send_password;
 
-    let Some(report) = &mut app.report else {
+    let Some(loaded) = app.loaded.as_ref() else {
         return;
     };
 
-    if report.status != ReportStatus::Validated {
+    if loaded.report.status != ReportStatus::Validated {
         app.diagnostics.push(AppDiagnostic::new_error(
             DiagnosticCategory::Send,
             "Validate the report first and make sure that all errors are resolved".to_string(),
@@ -1013,8 +1030,10 @@ pub fn send_report(app: &mut TaxelApp) {
         return;
     }
 
+    let report_path = loaded.report.path.clone();
+
     let Some(xml) = read_report(
-        &report.path,
+        &report_path,
         &mut app.diagnostics,
         &mut app.show_diagnostics_panel,
     ) else {
@@ -1024,7 +1043,14 @@ pub fn send_report(app: &mut TaxelApp) {
     let Some(eric) = &app.eric else {
         return;
     };
-    let Some(taxonomy_version) = extract_taxonomy_version(&app.taxonomy) else {
+
+    let taxonomy_version = app
+        .loaded
+        .as_ref()
+        .and_then(|l| l.taxonomy.date())
+        .and_then(|date| TAXONOMY_DATE_TO_VERSION.get(date));
+
+    let Some(taxonomy_version) = taxonomy_version else {
         app.diagnostics.push(AppDiagnostic::taxonomy_version_error(
             DiagnosticCategory::Send,
         ));
@@ -1032,19 +1058,24 @@ pub fn send_report(app: &mut TaxelApp) {
         return;
     };
 
+    let certificate_path = certificate_path.clone();
+    let password = password.clone();
+
     match eric.send(
         xml,
         "Bilanz",
         taxonomy_version,
-        certificate_path,
-        password,
+        &certificate_path,
+        &password,
         None,
     ) {
         Ok(response) => {
-            report.status = ReportStatus::Sent;
-            app.report_list
-                .set_report_status(&report.path, ReportStatus::Sent);
-            app.report_list.save(&mut app.diagnostics);
+            if let Some(loaded) = app.loaded.as_mut() {
+                loaded.report.status = ReportStatus::Sent;
+                app.report_list
+                    .set_report_status(&loaded.report.path, ReportStatus::Sent);
+                app.report_list.save(&mut app.diagnostics);
+            }
 
             app.diagnostics.push(AppDiagnostic::new_success(
                 DiagnosticCategory::Send,
@@ -1066,18 +1097,15 @@ pub fn send_report(app: &mut TaxelApp) {
 /// Moves the currently loaded report to the operating system trash and resets
 /// the app state to the home screen.
 pub fn delete_report(app: &mut TaxelApp) {
-    let Some(report) = &app.report else {
+    let Some(loaded) = &app.loaded else {
         return;
     };
-    let path = report.path.clone();
+    let path = loaded.report.path.clone();
 
     match trash::delete(&path) {
         Ok(()) => {
             app.report_list.remove_report(&path, &mut app.diagnostics);
-            app.report = None;
-            app.taxonomy = None;
-            app.instance_document = None;
-            app.elster_report = None;
+            app.loaded = None;
             app.selected_tab = 0;
             app.search.results.clear();
             app.search.scroll_to_row = None;
@@ -1124,16 +1152,6 @@ fn read_report(
             None
         }
     }
-}
-
-/// The taxonomy version is derived from the schemaRef URLs, which
-/// contain a date like "2024-06-30". We extract the date and map it to
-/// the corresponding version string expected by ERiC.
-fn extract_taxonomy_version(taxonomy: &Option<TaxonomySet>) -> Option<&&str> {
-    taxonomy
-        .as_ref()
-        .and_then(|taxonomy| taxonomy.date())
-        .and_then(|date| TAXONOMY_DATE_TO_VERSION.get(date))
 }
 
 /// Determines the taxonomy version string (e.g. `"6.8"`) from a set of

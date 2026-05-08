@@ -11,9 +11,9 @@ use taxel::{TAXONOMY_TYPES, TAXONOMY_VERSION_TO_DATE};
 /// Draws the delete confirmation modal when the user clicks "Delete report".
 pub fn draw_delete_modal(ui: &mut Ui, app: &mut TaxelApp) {
     let filename = app
-        .report
+        .loaded
         .as_ref()
-        .and_then(|report| report.path.file_name())
+        .and_then(|l| l.report.path.file_name())
         .and_then(|file_name| file_name.to_str())
         .unwrap_or("this report");
 

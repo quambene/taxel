@@ -6,7 +6,7 @@ mod settings;
 
 use crate::{
     app::{self, report::NewReportForm, report_list::ReportList, settings::Settings},
-    domain::{FactValue, Report},
+    domain::FactValue,
     ui::{self, EditAction},
 };
 pub use diagnostics::{AppDiagnostic, DiagnosticCategory, DiagnosticLevel};
@@ -19,7 +19,7 @@ use eric_sdk::Eric;
 use report::LoadOutcome;
 pub use report::{
     cancel_edit, delete_report, edit_report, import_report, import_values, poll_load_result,
-    save_report, send_report, start_load, validate_report, LoadKind,
+    save_report, send_report, start_load, validate_report, LoadKind, LoadedReport,
 };
 pub use report_list::ReportOverview;
 pub use search::{RowHighlight, Search};
@@ -29,8 +29,6 @@ use std::{
     path::{Path, PathBuf},
     sync::mpsc::Receiver,
 };
-use taxel::ElsterReport;
-use xbrl_rs::{InstanceDocument, TaxonomySet};
 
 /// The name of the application.
 pub const APP_NAME: &str = "Taxel";
@@ -62,19 +60,13 @@ pub struct CopyMessage {
 
 /// Main application struct for the Taxel GUI, managing the state of the app.
 pub struct TaxelApp {
-    /// The taxonomy set for the currently loaded XBRL instance document, if
-    /// any.
-    pub taxonomy: Option<TaxonomySet>,
-    /// The instance document currently loaded in the app, if any.
-    pub instance_document: Option<InstanceDocument>,
-    /// The Elster envelope for the currently loaded report, if any.
-    pub elster_report: Option<ElsterReport>,
+    /// The currently loaded report together with its taxonomy, instance
+    /// document, and Elster envelope. `None` when no report is open.
+    pub loaded: Option<LoadedReport>,
     /// Eric instance to validate XBRL instance documents and provide
     /// diagnostics. Initialized on app start if the data directory can be
     /// determined, otherwise skipped with a warning.
     pub eric: Option<Eric>,
-    /// The currently loaded report.
-    pub report: Option<Report>,
     /// Imported reports and creation date bookkeeping.
     pub report_list: ReportList,
     /// The index of the currently selected section tab in the sidebar.
@@ -125,30 +117,11 @@ pub struct TaxelApp {
 }
 
 impl TaxelApp {
-    /// Creates a new `TaxelApp` instance with the given fact table and error
-    /// message. Both parameters are optional to allow starting with an empty
-    /// state. Loads persisted settings (language, zoom) from eframe storage if
-    /// available.
-    pub fn new(
-        ctx: &CreationContext<'_>,
-        table: Option<Report>,
-        error_message: Option<String>,
-    ) -> TaxelApp {
-        let section_states = table
-            .as_ref()
-            .map(|table| {
-                table
-                    .sections
-                    .iter()
-                    .map(|_| SectionState::default())
-                    .collect()
-            })
-            .unwrap_or_default();
+    /// Creates a new `TaxelApp` instance. Loads persisted settings (language,
+    /// zoom) from eframe storage if available.
+    pub fn new(ctx: &CreationContext<'_>) -> TaxelApp {
+        let section_states = Vec::new();
         let mut diagnostics = Vec::new();
-
-        if let Some(message) = error_message {
-            diagnostics.push(AppDiagnostic::new_error(DiagnosticCategory::App, message));
-        }
 
         let settings = Settings::load(ctx.storage);
         settings.apply(&ctx.egui_ctx);
@@ -192,10 +165,7 @@ impl TaxelApp {
         }
 
         Self {
-            taxonomy: None,
-            instance_document: None,
-            elster_report: None,
-            report: table,
+            loaded: None,
             selected_tab: 0,
             section_states,
             settings,
@@ -279,9 +249,9 @@ impl App for TaxelApp {
             });
 
             let sections = self
-                .report
+                .loaded
                 .as_ref()
-                .map(|table| table.sections.as_slice())
+                .map(|loaded| loaded.report.sections.as_slice())
                 .unwrap_or(&[]);
             ui::draw_sidebar(ctx, sections, &mut self.selected_tab, &self.settings.lang);
 
@@ -294,10 +264,10 @@ impl App for TaxelApp {
             if let Some(action) = diagnostic_action {
                 match action {
                     ui::DiagnosticPanelAction::NavigateToFact(fact) => {
-                        if let Some(report) = &self.report {
+                        if let Some(loaded) = &self.loaded {
                             ui::navigate_to_fact(
                                 &fact,
-                                report,
+                                &loaded.report,
                                 &mut self.selected_tab,
                                 &mut self.section_states,
                                 &mut self.search,
@@ -329,7 +299,7 @@ impl App for TaxelApp {
             CentralPanel::default()
                 .frame(central_frame)
                 .show_inside(ctx, |ui| {
-                    if self.report.is_none() {
+                    if self.loaded.is_none() {
                         if let Some(path) = ui::draw_report_list(
                             ui,
                             self.report_list.reports(),
@@ -353,7 +323,8 @@ impl App for TaxelApp {
 
                     // Toolbar block: immutable borrow for read-only access to table
                     // data.
-                    let mut action = if let Some(table) = &self.report {
+                    let mut action = if let Some(loaded) = &self.loaded {
+                        let table = &loaded.report;
                         if let Some(section) = table.sections.get(content_tab) {
                             let max_depth =
                                 section.rows.iter().map(|row| row.depth).max().unwrap_or(0) + 1;
@@ -395,7 +366,7 @@ impl App for TaxelApp {
                         } else if cancel_pressed {
                             action = EditAction::Cancel;
                         }
-                    } else if !editing && self.report.is_some() {
+                    } else if !editing && self.loaded.is_some() {
                         let edit_shortcut = KeyboardShortcut::new(Modifiers::COMMAND, Key::E);
                         let edit_pressed = ui
                             .ctx()
@@ -421,7 +392,8 @@ impl App for TaxelApp {
                     }
 
                     // Table block: mutable borrow for in-place editing.
-                    if let Some(table) = self.report.as_mut() {
+                    if let Some(loaded) = self.loaded.as_mut() {
+                        let table = &mut loaded.report;
                         let tab = content_tab;
                         let table_rect = ui.available_rect_before_wrap();
 
@@ -476,8 +448,8 @@ impl App for TaxelApp {
                         }
                         if continue_nav {
                             let editing_tab = self.editing_section.unwrap();
-                            if let Some(table) = &mut self.report {
-                                if let Some(section) = table.sections.get_mut(editing_tab) {
+                            if let Some(loaded) = &mut self.loaded {
+                                if let Some(section) = loaded.report.sections.get_mut(editing_tab) {
                                     for (row, value) in
                                         section.rows.iter_mut().zip(self.edit_snapshot.iter())
                                     {
