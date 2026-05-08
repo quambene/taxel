@@ -28,6 +28,8 @@ spreadsheet-ods = "0.22.0"
 clap = { version = "3.2.14", default-features = false, features = ["std", "cargo"] }
 dirs = "5"
 trash = "3"
+zip = "2"
+reqwest = { version = "0.12", features = ["blocking"] }
 eframe = { version = "0.34.1", features = ["persistence"] }
 egui_extras = { version = "0.34.1", features = ["serde"] }
 rfd = "0.17.2"

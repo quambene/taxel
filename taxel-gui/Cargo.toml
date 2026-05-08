@@ -22,8 +22,8 @@ xbrl-rs = { workspace = true }
 eric-sdk = { workspace = true }
 dirs = { workspace = true }
 trash = { workspace = true }
-zip = "2"
-reqwest = { version = "0.12", features = ["blocking"] }
+zip = { workspace = true }
+reqwest = { workspace = true }
 rfd = { workspace = true }
 eframe = { workspace = true }
 egui_extras = { workspace = true }
