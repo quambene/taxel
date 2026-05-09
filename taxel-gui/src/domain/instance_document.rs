@@ -10,6 +10,24 @@ use xbrl_rs::{
     Period, PeriodType, RoleUri, TaxonomySet, Unit, UnitId,
 };
 
+/// Tuples that must always contain exactly one nil child when no option is
+/// selected. ERiC rejects the instance if these tuples are absent or empty.
+/// Used by both [`create_instance_document`] and [`update_instance_document`].
+const REQUIRED_NIL_TUPLE_CHILDREN: &[(&str, &str)] = &[
+    (
+        "genInfo.report.id.statementType.tax",
+        "genInfo.report.id.statementType.tax.statementTypeTax.GHB",
+    ),
+    (
+        "genInfo.company.id.shareholder.group",
+        "genInfo.company.id.shareholder.group.genPartnerPersLiableOHG",
+    ),
+    (
+        "genInfo.company.id.entityWithTaxablePurposeBusiness",
+        "genInfo.company.id.entityWithTaxablePurposeBusiness.normal",
+    ),
+];
+
 /// The outcome of [`update_instance_document`].
 #[derive(Debug, PartialEq, Eq)]
 pub enum UpdateOutcome {
@@ -118,7 +136,23 @@ pub fn create_instance_document(
         .with_context(|| format!("Failed to parse end date '{end_date}'"))?;
     remove_forbidden_facts(&mut instance, taxonomy, &end_date);
 
+    for (tuple, child) in REQUIRED_NIL_TUPLE_CHILDREN {
+        ensure_nil_tuple_child(&mut instance, Some(taxonomy), tuple, child);
+    }
+
     Ok(instance)
+}
+
+/// Restores the nil placeholder children for all tuples in
+/// [`REQUIRED_NIL_TUPLE_CHILDREN`]. Call this after any operation that may have
+/// removed those children (e.g. `apply_imported_values`).
+pub fn restore_required_nil_tuple_children(
+    instance: &mut InstanceDocument,
+    taxonomy: &TaxonomySet,
+) {
+    for (tuple, child) in REQUIRED_NIL_TUPLE_CHILDREN {
+        ensure_nil_tuple_child(instance, Some(taxonomy), tuple, child);
+    }
 }
 
 /// Returns the baseline roles plus one role URI for each non-nil
@@ -365,6 +399,11 @@ pub fn update_instance_document(
                 return Ok(UpdateOutcome::NoChange);
             }
 
+            let nil_default = REQUIRED_NIL_TUPLE_CHILDREN
+                .iter()
+                .find(|(tuple, _)| *tuple == concept_name)
+                .map(|(_, child)| *child);
+
             if !old.is_empty() {
                 instance
                     .remove_tuple_child(concept_name, old)
@@ -372,12 +411,30 @@ pub fn update_instance_document(
             }
 
             if selected.is_empty() {
-                instance
-                    .set_tuple_fact_nil(concept_name, true)
-                    .with_context(|| format!("Failed to nil tuple '{concept_name}'"))?;
+                if let Some(nil_child) = nil_default {
+                    // Restore the nil placeholder instead of nilifying the whole
+                    // tuple; ERiC requires these tuples to always have a nil child.
+                    ensure_nil_tuple_child(instance, taxonomy, concept_name, nil_child);
+                } else {
+                    instance
+                        .set_tuple_fact_nil(concept_name, true)
+                        .with_context(|| format!("Failed to nil tuple '{concept_name}'"))?;
+                }
             }
 
             if !selected.is_empty() {
+                // When coming from the nil state (old == "") a nil placeholder
+                // child may still be present. Remove it first so we don't end up
+                // with two children, unless the user is selecting that exact child
+                // (in which case add_tuple_child's Ok(0) path activates it).
+                if old.is_empty() {
+                    if let Some(nil_child) = nil_default {
+                        if selected.as_str() != nil_child {
+                            let _ = instance.remove_tuple_child(concept_name, nil_child);
+                        }
+                    }
+                }
+
                 instance
                     .set_tuple_fact_nil(concept_name, false)
                     .with_context(|| format!("Failed to activate tuple '{concept_name}'"))?;
@@ -407,7 +464,7 @@ fn add_tuple_child(
     selected: &str,
     match_sibling: impl Fn(&str) -> bool,
 ) -> Result<(), anyhow::Error> {
-    let new_child = create_item_fact(instance, taxonomy, selected, match_sibling);
+    let new_child = create_item_fact(instance, taxonomy, selected, match_sibling, false);
 
     match instance
         .add_tuple_child(concept_name, &new_child)
@@ -437,6 +494,7 @@ fn create_item_fact(
     taxonomy: Option<&TaxonomySet>,
     fact_name: &str,
     match_sibling: impl Fn(&str) -> bool,
+    is_nil: bool,
 ) -> ItemFact {
     let sibling_info = instance
         .item_facts()
@@ -490,10 +548,43 @@ fn create_item_fact(
         context_ref,
         None,
         String::new(),
-        false,
+        is_nil,
         None,
         None,
     )
+}
+
+/// Ensures `tuple_concept` contains `child_concept` as a nil child. If the
+/// child does not yet exist it is added; in either case it is forced to nil.
+/// `add_tuple_child` in xbrl-rs always sets `is_nil = false` on the new fact,
+/// so a separate `set_tuple_child_nil` call is always required.
+fn ensure_nil_tuple_child(
+    instance: &mut InstanceDocument,
+    taxonomy: Option<&TaxonomySet>,
+    tuple_concept: &str,
+    child_concept: &str,
+) {
+    let new_child = create_item_fact(
+        instance,
+        taxonomy,
+        child_concept,
+        |name| name.starts_with(tuple_concept),
+        false,
+    );
+
+    match instance.add_tuple_child(tuple_concept, &new_child) {
+        Ok(_) => {}
+        Err(_) => return, // Tuple absent for this taxonomy type.
+    }
+
+    // Force the child to nil regardless of whether it was just added or already
+    // existed (xbrl-rs forces is_nil=false on every add).
+    if let Err(err) = instance.set_tuple_child_nil(tuple_concept, child_concept, true) {
+        debug!(
+            "Failed to nil child '{}' of '{}': {}",
+            child_concept, tuple_concept, err
+        );
+    }
 }
 
 /// Extracts the reporting period from the instance document, if available.

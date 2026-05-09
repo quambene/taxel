@@ -5,8 +5,8 @@ use crate::{
     },
     domain::{
         active_roles, create_instance_document, extract_period, remove_forbidden_facts,
-        remove_trade_accounting_facts, update_instance_document, FactValue, Report, ReportStatus,
-        UpdateOutcome,
+        remove_trade_accounting_facts, restore_required_nil_tuple_children,
+        update_instance_document, FactValue, Report, ReportStatus, UpdateOutcome,
     },
     infrastructure::report_store::reports_dir,
 };
@@ -311,6 +311,8 @@ fn read_and_import_values(app: &mut TaxelApp) -> Result<(usize, usize, PathBuf),
         &loaded.taxonomy,
         false,
     );
+
+    restore_required_nil_tuple_children(&mut loaded.instance, &loaded.taxonomy);
 
     Ok((matched_count, imported_count, source_path))
 }
@@ -1026,6 +1028,8 @@ fn rebuild_instance(
             true,
         );
         debug!("Rebuild import: matched={matched}, imported={imported}");
+
+        restore_required_nil_tuple_children(&mut fresh_instance, taxonomy);
     }
 
     {
