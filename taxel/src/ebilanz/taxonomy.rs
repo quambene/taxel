@@ -142,6 +142,17 @@ impl TaxonomyType {
         .to_string()
     }
 
+    /// Returns `true` for Supplementary (Ergänzungsbilanz / Sonderbilanz)
+    /// types. For example, concepts annotated with
+    /// `hgbref:onlyPermittedForSoBil_ErgBil` are allowed only for these types
+    /// and must be filtered out for all others.
+    pub fn is_supplementary(&self) -> bool {
+        matches!(
+            self,
+            TaxonomyType::SupplementaryFiscal | TaxonomyType::SupplementaryFiscalMicroBilG
+        )
+    }
+
     /// Returns the human-readable label for this taxonomy type and the given
     /// language code (e.g. "en", "de"), or `None` if no label is available.
     ///

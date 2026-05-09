@@ -3,7 +3,7 @@ use anyhow::Context;
 use chrono::NaiveDate;
 use log::debug;
 use std::collections::HashMap;
-use taxel::{GCD_ROLE_URI, REPORT_ELEMENT_TO_ROLE_URI};
+use taxel::{TaxonomyType, GCD_ROLE_URI, REPORT_ELEMENT_TO_ROLE_URI};
 use xbrl_rs::{
     Context as XbrlContext, ContextId, Decimals, EntityIdentifier, ExpandedName, Fact,
     FactAttribute, FactAttributeName, InstanceDocument, ItemFact, NamespacePrefix, NamespaceUri,
@@ -28,6 +28,7 @@ pub fn create_instance_document(
     taxonomy_date: &str,
     taxonomy: &TaxonomySet,
     roles: &[RoleUri],
+    taxonomy_type: &TaxonomyType,
 ) -> Result<InstanceDocument, anyhow::Error> {
     let mut namespaces: HashMap<NamespacePrefix, NamespaceUri> = [
         (
@@ -116,7 +117,7 @@ pub fn create_instance_document(
 
     let end_date = NaiveDate::parse_from_str(end_date, "%Y-%m-%d")
         .with_context(|| format!("Failed to parse end date '{end_date}'"))?;
-    remove_forbidden_facts(&mut instance, taxonomy, &end_date);
+    remove_forbidden_facts(&mut instance, taxonomy, taxonomy_type, &end_date);
 
     Ok(instance)
 }
@@ -153,15 +154,21 @@ pub fn active_roles(instance: &InstanceDocument) -> Vec<RoleUri> {
 pub fn remove_forbidden_facts(
     instance: &mut InstanceDocument,
     taxonomy: &TaxonomySet,
+    taxonomy_type: &TaxonomyType,
     end_date: &NaiveDate,
 ) {
     filter_facts_by(instance, |fact| {
-        is_not_permitted(fact, taxonomy, end_date).unwrap_or_default()
+        is_not_permitted(fact, taxonomy, taxonomy_type, end_date).unwrap_or_default()
     });
 }
 
 /// Checks if the fact is marked as not permitted.
-fn is_not_permitted(fact: &Fact, taxonomy: &TaxonomySet, end_date: &NaiveDate) -> Option<bool> {
+fn is_not_permitted(
+    fact: &Fact,
+    taxonomy: &TaxonomySet,
+    taxonomy_type: &TaxonomyType,
+    end_date: &NaiveDate,
+) -> Option<bool> {
     let concept = taxonomy.find_concept(fact.concept_name())?;
     let id = concept.id.as_deref()?;
     let references = taxonomy.references_for(id)?;
@@ -169,19 +176,17 @@ fn is_not_permitted(fact: &Fact, taxonomy: &TaxonomySet, end_date: &NaiveDate) -
     Some(references.iter().any(|reference| {
         reference.parts.iter().any(|part| {
             if let Ok(value_date) = NaiveDate::parse_from_str(&part.value, "%Y-%m-%d") {
+                (part.name == "hgbref:ValidThrough" && value_date < *end_date)
+                    || (part.name == "hgbref:ValidSince" && value_date > *end_date)
+            } else {
                 (part.name == "hgbref:notPermittedFor"
                     && matches!(
                         part.value.as_str(),
                         "Einreichung an Finanzverwaltung" | "steuerlich"
                     ))
-                    || (part.name == "hgbref:ValidThrough" && value_date < *end_date)
-                    || (part.name == "hgbref:ValidSince" && value_date > *end_date)
-            } else {
-                part.name == "hgbref:notPermittedFor"
-                    && matches!(
-                        part.value.as_str(),
-                        "Einreichung an Finanzverwaltung" | "steuerlich"
-                    )
+                    || (part.name == "hgbref:onlyPermittedForSoBil_ErgBil"
+                        && part.value == "true"
+                        && !taxonomy_type.is_supplementary())
             }
         })
     }))
