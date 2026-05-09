@@ -3,7 +3,7 @@ use anyhow::Context;
 use chrono::NaiveDate;
 use log::debug;
 use std::collections::HashMap;
-use taxel::{GCD_ROLE_URI, REPORT_ELEMENT_TO_ROLE_URI};
+use taxel::{BASELINE_ROLE_URIS, GCD_ROLE_URI, REPORT_ELEMENT_TO_ROLE_URI};
 use xbrl_rs::{
     Context as XbrlContext, ContextId, Decimals, EntityIdentifier, ExpandedName, Fact,
     FactAttribute, FactAttributeName, InstanceDocument, ItemFact, NamespacePrefix, NamespaceUri,
@@ -121,11 +121,19 @@ pub fn create_instance_document(
     Ok(instance)
 }
 
-/// Returns the GCD role plus one role URI for each non-nil `reportElements.*`
-/// fact in the instance. Used to determine which sections to include when
-/// rebuilding the instance after a report element selection change.
+/// Returns the baseline roles plus one role URI for each non-nil
+/// `reportElements.*` fact in the instance. Used to determine which sections
+/// to include when rebuilding the instance after a report element selection
+/// change.
+///
+/// The baseline always includes GCD, EV, SGE, and SGEP because ERiC requires
+/// their Mussfeld facts to be present as nil even when the user has not
+/// selected those sections (see [`BASELINE_ROLE_URIS`]).
 pub fn active_roles(instance: &InstanceDocument) -> Vec<RoleUri> {
-    let mut roles = vec![RoleUri::from(GCD_ROLE_URI)];
+    let mut roles: Vec<RoleUri> = BASELINE_ROLE_URIS
+        .iter()
+        .map(|&uri| RoleUri::from(uri))
+        .collect();
 
     for fact in instance.item_facts() {
         let local = &fact.concept_name().local_name;
@@ -158,14 +166,21 @@ pub fn remove_forbidden_facts(
     filter_facts_by(instance, |fact| {
         is_not_permitted(fact, taxonomy, end_date).unwrap_or_default()
     });
+
+    // ERiC rule 170155121: collItemChangeProfitHbst only belongs in the
+    // Überleitung/Umgliederung context, but the taxonomy places it in the
+    // income-statement (GuV/GuVMicroBilG) presentation roles. No taxonomy
+    // annotation documents this restriction, so we always filter it out.
+    // filter_facts_by(instance, |fact| {
+    //     matches!(
+    //         fact.concept_name().local_name.as_str(),
+    //         "ismi.netIncome.collItemChangeProfitHbst" | "is.netIncome.collItemChangeProfitHbst"
+    //     )
+    // });
 }
 
 /// Checks if the fact is marked as not permitted.
-fn is_not_permitted(
-    fact: &Fact,
-    taxonomy: &TaxonomySet,
-    end_date: &NaiveDate,
-) -> Option<bool> {
+fn is_not_permitted(fact: &Fact, taxonomy: &TaxonomySet, end_date: &NaiveDate) -> Option<bool> {
     let concept = taxonomy.find_concept(fact.concept_name())?;
     let id = concept.id.as_deref()?;
     let references = taxonomy.references_for(id)?;

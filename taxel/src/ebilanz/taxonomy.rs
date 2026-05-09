@@ -4,6 +4,21 @@ use std::{collections::HashMap, sync::LazyLock};
 pub const GCD_ROLE_URI: &str = "http://www.xbrl.de/taxonomies/de-gcd/role/gcd";
 pub const GCD_LABEL: &str = "GCD (Global Common Document)";
 
+/// Role URIs that must always be passed to `InstanceDocument::from_sections`,
+/// regardless of which `reportElements.*` facts the user has activated.
+///
+/// ERiC requires Mussfeld facts from these sections to be present as nil facts
+/// in the instance even when the corresponding report element is not selected:
+/// - EV (`appropriationProfits`): `incomeUse.gainLoss.*` Mussfelder
+/// - SGE (`determinationOfTaxableIncome`): `fpl.*` Mussfelder
+/// - SGEP (`determinationOfTaxableIncomeBusinessPartnership`): `fplgm.*` Mussfelder
+pub const BASELINE_ROLE_URIS: &[&str] = &[
+    GCD_ROLE_URI,
+    "http://www.xbrl.de/taxonomies/de-gaap-ci/role/appropriationProfits",
+    "http://www.xbrl.de/taxonomies/de-gaap-ci/role/determinationOfTaxableIncome",
+    "http://www.xbrl.de/taxonomies/de-gaap-ci/role/determinationOfTaxableIncomeBusinessPartnership",
+];
+
 /// The set of facts that must be present in `ElsterReport` and `EBilanz`.
 pub const REQUIRED_GCD_FACTS: &[&str] = &[
     FISCAL_YEAR_BEGIN,

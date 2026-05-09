@@ -26,9 +26,9 @@ use std::{
     time::{Duration, SystemTime},
 };
 use taxel::{
-    elster::Submitter, ElsterReport, TaxonomyType, CLOSING_DATE, COMPANY_TAX_NUMBER,
-    COMPANY_TAX_NUMBER_PARENT, GCD_ROLE_URI, REQUIRED_GCD_FACTS, TAXONOMY_DATE_TO_VERSION,
-    TAXONOMY_VERSION_TO_DATE,
+    elster::Submitter, ElsterReport, TaxonomyType, BASELINE_ROLE_URIS, CLOSING_DATE,
+    COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, GCD_ROLE_URI, REQUIRED_GCD_FACTS,
+    TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE,
 };
 use uuid::Uuid;
 use xbrl_rs::{InstanceDocument, RoleUri, TaxonomyLoader, TaxonomySet};
@@ -396,6 +396,11 @@ fn load_taxonomy_and_create_instance_document(
         return Ok(LoadOutcome::NeedsDownload);
     };
 
+    let baseline_roles: Vec<RoleUri> = BASELINE_ROLE_URIS
+        .iter()
+        .map(|&uri| RoleUri::from(uri))
+        .collect();
+
     let mut instance = create_instance_document(
         &form.start_date,
         &form.end_date,
@@ -403,7 +408,7 @@ fn load_taxonomy_and_create_instance_document(
         &namespace_uri,
         taxonomy_date,
         &taxonomy,
-        &[RoleUri::from(GCD_ROLE_URI)],
+        &baseline_roles,
     )?;
 
     let view = instance.view(&taxonomy);
