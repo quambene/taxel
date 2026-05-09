@@ -3,10 +3,11 @@ use anyhow::Context;
 use chrono::NaiveDate;
 use log::debug;
 use std::collections::HashMap;
+use taxel::{GCD_ROLE_URI, REPORT_ELEMENT_TO_ROLE_URI};
 use xbrl_rs::{
     Context as XbrlContext, ContextId, Decimals, EntityIdentifier, ExpandedName, Fact,
     FactAttribute, FactAttributeName, InstanceDocument, ItemFact, NamespacePrefix, NamespaceUri,
-    Period, PeriodType, TaxonomySet, Unit, UnitId,
+    Period, PeriodType, RoleUri, TaxonomySet, Unit, UnitId,
 };
 
 /// The outcome of [`update_instance_document`].
@@ -26,6 +27,7 @@ pub fn create_instance_document(
     namespace_uri: &str,
     taxonomy_date: &str,
     taxonomy: &TaxonomySet,
+    roles: &[RoleUri],
 ) -> Result<InstanceDocument, anyhow::Error> {
     let mut namespaces: HashMap<NamespacePrefix, NamespaceUri> = [
         (
@@ -103,10 +105,9 @@ pub fn create_instance_document(
         ),
     ];
 
-    // TODO: build instance selectively for chosen sections only.
-    // Currently builds the full instance from all sections in the taxonomy.
-    let mut instance = InstanceDocument::from_taxonomy(
+    let mut instance = InstanceDocument::from_sections(
         taxonomy,
+        roles,
         namespaces,
         instant_context,
         duration_context,
@@ -118,6 +119,31 @@ pub fn create_instance_document(
     remove_forbidden_facts(&mut instance, taxonomy, &end_date);
 
     Ok(instance)
+}
+
+/// Returns the GCD role plus one role URI for each non-nil `reportElements.*`
+/// fact in the instance. Used to determine which sections to include when
+/// rebuilding the instance after a report element selection change.
+pub fn active_roles(instance: &InstanceDocument) -> Vec<RoleUri> {
+    let mut roles = vec![RoleUri::from(GCD_ROLE_URI)];
+
+    for fact in instance.item_facts() {
+        let local = &fact.concept_name().local_name;
+
+        if fact.is_nil() {
+            continue;
+        }
+
+        if let Some(&role_uri) = REPORT_ELEMENT_TO_ROLE_URI.get(local.as_str()) {
+            let role = RoleUri::from(role_uri);
+
+            if !roles.contains(&role) {
+                roles.push(role);
+            }
+        }
+    }
+
+    roles
 }
 
 /// Removes facts from the instance document that are not allowed for submission
@@ -181,8 +207,9 @@ fn is_trade_accounting_not_permitted(fact: &Fact, taxonomy: &TaxonomySet) -> Opt
     }))
 }
 
-/// TODO: use retain_facts from xbrl-rs when available instead of
-/// reconstructing the whole instance document.
+/// Filters facts from the instance document based on the given predicate,
+/// removing any facts (and their children) for which the predicate returns
+/// true.
 fn filter_facts_by(instance: &mut InstanceDocument, should_remove: impl Fn(&Fact) -> bool) {
     if !instance.facts().iter().any(&should_remove) {
         return;

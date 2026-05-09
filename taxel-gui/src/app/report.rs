@@ -4,7 +4,7 @@ use crate::{
         SectionState, TaxelApp, APP_NAME, APP_VERSION, VENDOR_ID,
     },
     domain::{
-        create_instance_document, extract_period, remove_trade_accounting_facts,
+        active_roles, create_instance_document, extract_period, remove_trade_accounting_facts,
         update_instance_document, FactValue, Report, ReportStatus, UpdateOutcome,
     },
     infrastructure::report_store::reports_dir,
@@ -29,7 +29,7 @@ use taxel::{
     GCD_ROLE_URI, REQUIRED_GCD_FACTS, TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE,
 };
 use uuid::Uuid;
-use xbrl_rs::{InstanceDocument, TaxonomyLoader, TaxonomySet};
+use xbrl_rs::{InstanceDocument, RoleUri, TaxonomyLoader, TaxonomySet};
 use zip::ZipArchive;
 
 /// Discriminates how a report reaches the background load thread.
@@ -401,6 +401,7 @@ fn load_taxonomy_and_create_instance_document(
         &namespace_uri,
         taxonomy_date,
         &taxonomy,
+        &[RoleUri::from(GCD_ROLE_URI)],
     )?;
 
     let view = instance.view(&taxonomy);
@@ -728,6 +729,10 @@ pub fn save_report(app: &mut TaxelApp) {
         update_outcome = UpdateOutcome::Rebuild;
     }
 
+    if handle_report_element_change(app, editing_tab) == UpdateOutcome::Rebuild {
+        update_outcome = UpdateOutcome::Rebuild;
+    }
+
     if let Some(loaded) = app.loaded.as_mut() {
         // Sync GCD facts to ElsterReport metadata and XBRL contexts.
         loaded
@@ -796,53 +801,86 @@ pub fn save_report(app: &mut TaxelApp) {
     app.edit_snapshot.clear();
 }
 
-/// Handles the special case which can cause structural changes to the report by
-/// adding or removing tuple facts.
-fn handle_consolidation_range_change(app: &mut TaxelApp, editing_tab: usize) -> UpdateOutcome {
-    const CONSOLIDATION_RANGE: &str = "genInfo.report.id.consolidationRange";
-    const EA_VALUE: &str = "genInfo.report.id.consolidationRange.consolidationRange.EA";
+/// Detects if any row whose concept matches `is_target` changed vs the snapshot,
+/// then calls `rebuild`. Returns `Rebuild` on success or `NoChange` (with a
+/// diagnostic) on error. Shared by both structural-change handlers below.
+fn handle_structural_change(
+    app: &mut TaxelApp,
+    editing_tab: usize,
+    is_target: impl Fn(&str) -> bool,
+    rebuild: impl FnOnce(&mut TaxelApp) -> Result<(), anyhow::Error>,
+) -> UpdateOutcome {
+    let changed = app
+        .loaded
+        .as_ref()
+        .and_then(|l| l.report.sections.get(editing_tab))
+        .is_some_and(|section| {
+            section.rows.iter().enumerate().any(|(i, row)| {
+                is_target(&row.concept) && app.edit_snapshot.get(i).is_some_and(|s| s != &row.value)
+            })
+        });
 
-    let mut consolidation_range_changed = false;
-    let mut ea_selected = false;
-
-    if let Some(loaded) = &app.loaded {
-        if let Some(section) = loaded.report.sections.get(editing_tab) {
-            consolidation_range_changed = section.rows.iter().enumerate().any(|(i, row)| {
-                row.concept == CONSOLIDATION_RANGE
-                    && app
-                        .edit_snapshot
-                        .get(i)
-                        .is_some_and(|snap| snap != &row.value)
-            });
-            ea_selected = section.rows.iter().any(|row| {
-                row.concept == CONSOLIDATION_RANGE
-                    && matches!(&row.value, FactValue::Dropdown { selected, .. } if selected == EA_VALUE)
-            });
-        }
-    }
-
-    if consolidation_range_changed {
-        match recreate_instance_document(app, ea_selected) {
-            Ok(()) => return UpdateOutcome::Rebuild,
+    if changed {
+        match rebuild(app) {
+            Ok(()) => UpdateOutcome::Rebuild,
             Err(err) => {
                 app.diagnostics.push(AppDiagnostic::new_error(
                     DiagnosticCategory::App,
                     format!("{err}"),
                 ));
-                return UpdateOutcome::NoChange;
+                UpdateOutcome::NoChange
             }
         }
+    } else {
+        UpdateOutcome::NoChange
     }
-
-    UpdateOutcome::NoChange
 }
 
-/// Recreates the instance document and report from the taxonomy when
-/// consolidationRange changes, preserving the current in-memory fact values.
-///
-/// Takes the current instance out of app state, uses it as the source for
-/// value import, then replaces both instance and report with fresh copies.
-fn recreate_instance_document(app: &mut TaxelApp, selected: bool) -> Result<(), anyhow::Error> {
+/// Detects changes to the consolidation range dropdown and rebuilds the
+/// instance if the selection changed to or from "EA". This is necessary because
+/// the consolidation range determines which concepts are valid for the report
+/// and changing it can cause structural changes to the fact table (e.g. new
+/// fact rows being added or removed).
+fn handle_consolidation_range_change(app: &mut TaxelApp, editing_tab: usize) -> UpdateOutcome {
+    const CONSOLIDATION_RANGE: &str = "genInfo.report.id.consolidationRange";
+    const EA_VALUE: &str = "genInfo.report.id.consolidationRange.consolidationRange.EA";
+
+    let ea_selected = app
+        .loaded
+        .as_ref()
+        .and_then(|l| l.report.sections.get(editing_tab))
+        .is_some_and(|section| {
+            section.rows.iter().any(|row| {
+                row.concept == CONSOLIDATION_RANGE
+                    && matches!(&row.value, FactValue::Dropdown { selected, .. } if selected == EA_VALUE)
+            })
+        });
+
+    handle_structural_change(
+        app,
+        editing_tab,
+        |concept| concept == CONSOLIDATION_RANGE,
+        |app| rebuild_instance(app, ea_selected),
+    )
+}
+
+fn handle_report_element_change(app: &mut TaxelApp, editing_tab: usize) -> UpdateOutcome {
+    handle_structural_change(
+        app,
+        editing_tab,
+        |concept| concept.starts_with("genInfo.report.id.reportElement.reportElements."),
+        |app| rebuild_instance(app, false),
+    )
+}
+
+/// Rebuilds the instance document and report from scratch, importing values
+/// from the current instance. Used by both `handle_consolidation_range_change`
+/// and `handle_report_element_change`. When `remove_trade_accounting` is true,
+/// facts forbidden for handelsrechtlicher Einzelabschluss are stripped.
+fn rebuild_instance(
+    app: &mut TaxelApp,
+    remove_trade_accounting: bool,
+) -> Result<(), anyhow::Error> {
     let loaded = app
         .loaded
         .as_ref()
@@ -858,6 +896,7 @@ fn recreate_instance_document(app: &mut TaxelApp, selected: bool) -> Result<(), 
     let namespace_uri = taxonomy_date
         .map(|date| taxonomy_type.namespace_uri(date))
         .unwrap_or_default();
+    let roles = active_roles(&source_instance);
 
     let mut source_report = Report::new(report_path.clone(), taxonomy_type.clone());
     {
@@ -880,10 +919,11 @@ fn recreate_instance_document(app: &mut TaxelApp, selected: bool) -> Result<(), 
             &namespace_uri,
             taxonomy_date.unwrap_or(""),
             taxonomy,
+            &roles,
         )?
     };
 
-    if selected {
+    if remove_trade_accounting {
         let taxonomy = &app
             .loaded
             .as_ref()
@@ -892,7 +932,7 @@ fn recreate_instance_document(app: &mut TaxelApp, selected: bool) -> Result<(), 
         remove_trade_accounting_facts(&mut fresh_instance, taxonomy);
     }
 
-    let mut fresh_report = Report::new(report_path, taxonomy_type.clone());
+    let mut fresh_report = Report::new(report_path, taxonomy_type);
 
     {
         let taxonomy = &app
@@ -914,7 +954,7 @@ fn recreate_instance_document(app: &mut TaxelApp, selected: bool) -> Result<(), 
             &mut fresh_instance,
             taxonomy,
         );
-        debug!("Recreate import: matched={matched}, imported={imported}");
+        debug!("Rebuild import: matched={matched}, imported={imported}");
     }
 
     {

@@ -10,6 +10,7 @@
   - Allow jumping to fact referenced by the diagnostic issue for enabled report sections only
   - Filter out forbidden facts from created `InstanceDocument`
   - Fix missing precision or decimals attribute for numeric fact values
+  - Populate concepts from selected report sections only when creating a new report
 - added
   - Import report
   - Display report
