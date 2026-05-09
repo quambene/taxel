@@ -175,6 +175,7 @@ fn is_not_permitted(fact: &Fact, taxonomy: &TaxonomySet, end_date: &NaiveDate) -
                         "Einreichung an Finanzverwaltung" | "steuerlich"
                     ))
                     || (part.name == "hgbref:ValidThrough" && value_date < *end_date)
+                    || (part.name == "hgbref:ValidFrom" && value_date > *end_date)
             } else {
                 part.name == "hgbref:notPermittedFor"
                     && matches!(
