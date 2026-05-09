@@ -420,6 +420,15 @@ impl Report {
 
         for source_section in &source_report.sections {
             for row in &source_section.rows {
+                // Skip reportElements: import values of selected report
+                // sections but don't change the report structure.
+                if row
+                    .concept
+                    .starts_with("genInfo.report.id.reportElement.reportElements.")
+                {
+                    continue;
+                }
+
                 let source_value = match &row.value {
                     FactValue::Text(text) => {
                         let is_nil = row
