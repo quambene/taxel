@@ -34,6 +34,24 @@ pub const REQUIRED_GCD_FACTS: &[&str] = &[
     COMPANY_COUNTRY,
 ];
 
+/// Tuples that must always contain exactly one nil child when no option is
+/// selected. ERiC rejects the instance if these tuples are absent or empty.
+/// Used by both [`create_instance_document`] and [`update_instance_document`].
+pub const REQUIRED_NIL_TUPLE_CHILDREN: &[(&str, &str)] = &[
+    (
+        "genInfo.report.id.statementType.tax",
+        "genInfo.report.id.statementType.tax.statementTypeTax.GHB",
+    ),
+    (
+        "genInfo.company.id.shareholder.group",
+        "genInfo.company.id.shareholder.group.genPartnerPersLiableOHG",
+    ),
+    (
+        "genInfo.company.id.entityWithTaxablePurposeBusiness",
+        "genInfo.company.id.entityWithTaxablePurposeBusiness.normal",
+    ),
+];
+
 pub const FISCAL_YEAR_BEGIN: &str = "genInfo.report.period.fiscalYearBegin";
 pub const FISCAL_YEAR_END: &str = "genInfo.report.period.fiscalYearEnd";
 pub const CLOSING_DATE: &str = "genInfo.report.period.balSheetClosingDate";

@@ -3,30 +3,12 @@ use anyhow::Context;
 use chrono::NaiveDate;
 use log::debug;
 use std::collections::HashMap;
-use taxel::{BASELINE_ROLE_URIS, REPORT_ELEMENT_TO_ROLE_URI};
+use taxel::{BASELINE_ROLE_URIS, REPORT_ELEMENT_TO_ROLE_URI, REQUIRED_NIL_TUPLE_CHILDREN};
 use xbrl_rs::{
     Context as XbrlContext, ContextId, Decimals, EntityIdentifier, ExpandedName, Fact,
     FactAttribute, FactAttributeName, InstanceDocument, ItemFact, NamespacePrefix, NamespaceUri,
     Period, PeriodType, RoleUri, TaxonomySet, Unit, UnitId,
 };
-
-/// Tuples that must always contain exactly one nil child when no option is
-/// selected. ERiC rejects the instance if these tuples are absent or empty.
-/// Used by both [`create_instance_document`] and [`update_instance_document`].
-const REQUIRED_NIL_TUPLE_CHILDREN: &[(&str, &str)] = &[
-    (
-        "genInfo.report.id.statementType.tax",
-        "genInfo.report.id.statementType.tax.statementTypeTax.GHB",
-    ),
-    (
-        "genInfo.company.id.shareholder.group",
-        "genInfo.company.id.shareholder.group.genPartnerPersLiableOHG",
-    ),
-    (
-        "genInfo.company.id.entityWithTaxablePurposeBusiness",
-        "genInfo.company.id.entityWithTaxablePurposeBusiness.normal",
-    ),
-];
 
 /// The outcome of [`update_instance_document`].
 #[derive(Debug, PartialEq, Eq)]
