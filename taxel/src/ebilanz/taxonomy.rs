@@ -12,11 +12,13 @@ pub const GCD_LABEL: &str = "GCD (Global Common Document)";
 /// - EV (`appropriationProfits`): `incomeUse.gainLoss.*` Mussfelder
 /// - SGE (`determinationOfTaxableIncome`): `fpl.*` Mussfelder
 /// - SGEP (`determinationOfTaxableIncomeBusinessPartnership`): `fplgm.*` Mussfelder
+/// - KKE (`changesEquityAccounts`): `kke` Mussfeld
 pub const BASELINE_ROLE_URIS: &[&str] = &[
     GCD_ROLE_URI,
     "http://www.xbrl.de/taxonomies/de-gaap-ci/role/appropriationProfits",
     "http://www.xbrl.de/taxonomies/de-gaap-ci/role/determinationOfTaxableIncome",
     "http://www.xbrl.de/taxonomies/de-gaap-ci/role/determinationOfTaxableIncomeBusinessPartnership",
+    "http://www.xbrl.de/taxonomies/de-gaap-ci/role/changesEquityAccounts",
 ];
 
 /// The set of facts that must be present in `ElsterReport` and `EBilanz`.
