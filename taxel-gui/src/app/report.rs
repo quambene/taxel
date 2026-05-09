@@ -404,7 +404,6 @@ fn load_taxonomy_and_create_instance_document(
         taxonomy_date,
         &taxonomy,
         &[RoleUri::from(GCD_ROLE_URI)],
-        &form.taxonomy_type,
     )?;
 
     let view = instance.view(&taxonomy);
@@ -923,12 +922,7 @@ fn handle_end_date_change(app: &mut TaxelApp, editing_tab: usize) -> UpdateOutco
 
     let facts_before = loaded.instance.facts().len();
 
-    remove_forbidden_facts(
-        &mut loaded.instance,
-        &loaded.taxonomy,
-        &loaded.report.taxonomy_type,
-        &end_date,
-    );
+    remove_forbidden_facts(&mut loaded.instance, &loaded.taxonomy, &end_date);
 
     let facts_after = loaded.instance.facts().len();
 
@@ -990,7 +984,6 @@ fn rebuild_instance(
             taxonomy_date.unwrap_or(""),
             taxonomy,
             &roles,
-            &taxonomy_type,
         )?
     };
 
