@@ -1,5 +1,7 @@
 use std::{collections::HashMap, sync::LazyLock};
 
+pub const REPORT_ELEMENT_PREFIX: &str = "genInfo.report.id.reportElement.reportElements.";
+
 /// Static mapping from full eBilanz role URI to de-gcd report-element concept.
 pub static ROLE_URI_TO_REPORT_ELEMENT: LazyLock<HashMap<&'static str, &'static str>> =
     LazyLock::new(|| {

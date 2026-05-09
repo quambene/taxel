@@ -3,7 +3,8 @@ use std::{collections::HashMap, path::PathBuf};
 use taxel::{
     ElsterReport, TaxonomyType, CLOSING_DATE, COMPANY_CITY, COMPANY_COUNTRY, COMPANY_HOUSE_NO,
     COMPANY_NAME, COMPANY_STREET, COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, COMPANY_ZIP_CODE,
-    FISCAL_YEAR_BEGIN, FISCAL_YEAR_END, GCD_LABEL, GCD_ROLE_URI, ROLE_URI_TO_REPORT_ELEMENT,
+    FISCAL_YEAR_BEGIN, FISCAL_YEAR_END, GCD_LABEL, GCD_ROLE_URI, REPORT_ELEMENT_PREFIX,
+    ROLE_URI_TO_REPORT_ELEMENT,
 };
 use xbrl_rs::{
     Concept, ConceptView, Decimals, DocumentView, FactAttribute, FactAttributeName,
@@ -405,12 +406,17 @@ impl Report {
 
     /// Merges fact values from `source_report` into this report and the
     /// accompanying `instance`. Returns `(matched_count, imported_count)`.
+    ///
+    /// Use `import_report_elements` = `false` to skip importing report-element
+    /// selections from the source report. This prevents deletion of existing
+    /// sections from the target report.
     pub fn apply_imported_values(
         &mut self,
         source_report: &Report,
         source_item_facts: &[&ItemFact],
         instance: &mut InstanceDocument,
         taxonomy: &TaxonomySet,
+        import_report_elements: bool,
     ) -> (usize, usize) {
         // Keyed by `(concept, parent, unit)`; collapsed to `None` when multiple
         // source rows share the key but disagree on value (conflicting contexts).
@@ -421,6 +427,10 @@ impl Report {
 
         for source_section in &source_report.sections {
             for row in &source_section.rows {
+                if !import_report_elements && row.concept.starts_with(REPORT_ELEMENT_PREFIX) {
+                    continue;
+                }
+
                 let source_value = match &row.value {
                     FactValue::Text(text) => {
                         let is_nil = row

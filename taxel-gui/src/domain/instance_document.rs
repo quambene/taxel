@@ -3,7 +3,7 @@ use anyhow::Context;
 use chrono::NaiveDate;
 use log::debug;
 use std::collections::HashMap;
-use taxel::{BASELINE_ROLE_URIS, GCD_ROLE_URI, REPORT_ELEMENT_TO_ROLE_URI};
+use taxel::{BASELINE_ROLE_URIS, REPORT_ELEMENT_TO_ROLE_URI};
 use xbrl_rs::{
     Context as XbrlContext, ContextId, Decimals, EntityIdentifier, ExpandedName, Fact,
     FactAttribute, FactAttributeName, InstanceDocument, ItemFact, NamespacePrefix, NamespaceUri,

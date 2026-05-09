@@ -27,8 +27,8 @@ use std::{
 };
 use taxel::{
     elster::Submitter, ElsterReport, TaxonomyType, BASELINE_ROLE_URIS, CLOSING_DATE,
-    COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, GCD_ROLE_URI, REQUIRED_GCD_FACTS,
-    TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE,
+    COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, GCD_ROLE_URI, REPORT_ELEMENT_PREFIX,
+    REQUIRED_GCD_FACTS, TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE,
 };
 use uuid::Uuid;
 use xbrl_rs::{InstanceDocument, RoleUri, TaxonomyLoader, TaxonomySet};
@@ -309,6 +309,7 @@ fn read_and_import_values(app: &mut TaxelApp) -> Result<(usize, usize, PathBuf),
         &source_item_facts,
         &mut loaded.instance,
         &loaded.taxonomy,
+        false,
     );
 
     Ok((matched_count, imported_count, source_path))
@@ -879,7 +880,7 @@ fn handle_report_element_change(app: &mut TaxelApp, editing_tab: usize) -> Updat
     handle_structural_change(
         app,
         editing_tab,
-        |concept| concept.starts_with("genInfo.report.id.reportElement.reportElements."),
+        |concept| concept.starts_with(REPORT_ELEMENT_PREFIX),
         |app| rebuild_instance(app, false),
     )
 }
@@ -1022,6 +1023,7 @@ fn rebuild_instance(
             &source_item_facts,
             &mut fresh_instance,
             taxonomy,
+            true,
         );
         debug!("Rebuild import: matched={matched}, imported={imported}");
     }
