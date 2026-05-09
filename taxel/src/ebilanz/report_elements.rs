@@ -90,7 +90,11 @@ pub static ROLE_URI_TO_REPORT_ELEMENT: LazyLock<HashMap<&'static str, &'static s
                 "http://www.xbrl.de/taxonomies/de-gaap-ci/role/notesTableStatementOfChangesInFixedAssetsNet",
                 "genInfo.report.id.reportElement.reportElements.NA",
             ),
-                        (
+            (
+                "http://www.xbrl.de/taxonomies/de-gaap-ci/role/notes",
+                "genInfo.report.id.reportElement.reportElements.BAL",
+            ),
+            (
                 "http://www.xbrl.de/taxonomies/de-euer/role/cashBasedAccountingEconomicResult",
                 "genInfo.report.id.reportElement.reportElements.EUEB",
 
@@ -202,6 +206,10 @@ pub static REPORT_ELEMENT_TO_ROLE_URI: LazyLock<HashMap<&'static str, &'static s
             (
                 "genInfo.report.id.reportElement.reportElements.NA",
                 "http://www.xbrl.de/taxonomies/de-gaap-ci/role/notesTableStatementOfChangesInFixedAssetsNet",
+            ),
+            (
+                "genInfo.report.id.reportElement.reportElements.BAL",
+                "http://www.xbrl.de/taxonomies/de-gaap-ci/role/notes",
             ),
             (
                 "genInfo.report.id.reportElement.reportElements.EUEB",
