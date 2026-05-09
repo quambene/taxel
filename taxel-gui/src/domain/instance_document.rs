@@ -20,6 +20,7 @@ pub enum UpdateOutcome {
 }
 
 /// Creates a new instance document with the given parameters.
+#[allow(clippy::too_many_arguments)]
 pub fn create_instance_document(
     start_date: &str,
     end_date: &str,
