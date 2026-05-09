@@ -1117,21 +1117,25 @@ fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error
             {
                 for issue in validation_report.issues {
                     if let (Some(error_code), Some(error_text)) = (issue.error_code, issue.text) {
-                        if let Some(field_identifier) = issue.field_identifier {
-                            let fact_name = field_identifier
-                                .split_once(':')
-                                .map(|(_, name)| name)
-                                .unwrap_or(&field_identifier);
+                        let message = if let Some(rule_name) = &issue.rule_name {
+                            let rule_suffix = rule_name.rsplit('/').next().unwrap_or(rule_name);
 
+                            format!("Error code ({error_code}): {error_text}\nRule: {rule_suffix}")
+                        } else {
+                            format!("Error code ({error_code}): {error_text}")
+                        };
+
+                        if let Some(field_identifier) = issue.field_identifier {
+                            let fact_name = extract_fact_name(&field_identifier);
                             app.diagnostics.push(AppDiagnostic::new_error_with_fact(
                                 DiagnosticCategory::Validation,
-                                format!("Error code ({error_code}): {error_text}"),
+                                message,
                                 fact_name,
                             ));
                         } else {
                             app.diagnostics.push(AppDiagnostic::new_error(
                                 DiagnosticCategory::Validation,
-                                format!("Error code ({error_code}): {error_text}"),
+                                message,
                             ));
                         }
                     }
@@ -1299,6 +1303,28 @@ pub fn extract_taxonomy_version_from_schema_refs(schema_refs: &[String]) -> Opti
             .find(|(_, date)| schema_ref.contains(*date))
             .map(|(version, _)| *version)
     })
+}
+
+/// Extracts the XBRL concept local name from an ERiC `Feldidentifikator` value.
+///
+/// Input examples:
+/// - `"gcd:genInfo.report.id.accountingStandard"` → `"genInfo.report.id.accountingStandard"`
+/// - `"/Kontext[1]/gcd:genInfo.report.period.fiscalYearBegin[1]"` → `"genInfo.report.period.fiscalYearBegin"`
+fn extract_fact_name(field_identifier: &str) -> &str {
+    // Take the last `/`-delimited path segment.
+    let segment = field_identifier
+        .rsplit('/')
+        .next()
+        .unwrap_or(field_identifier);
+
+    // Strip namespace prefix (everything up to and including `:`).
+    let local = segment
+        .split_once(':')
+        .map(|(_, namespace)| namespace)
+        .unwrap_or(segment);
+
+    // Strip trailing XPath index such as `[1]`.
+    local.rfind('[').map(|pos| &local[..pos]).unwrap_or(local)
 }
 
 /// Returns the path to the application's taxonomy directory, which is located
