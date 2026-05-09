@@ -201,16 +201,23 @@ pub fn remove_forbidden_facts(
         is_not_permitted(fact, taxonomy, end_date).unwrap_or_default()
     });
 
-    // ERiC rule 170155121: collItemChangeProfitHbst only belongs in the
-    // Überleitung/Umgliederung context, but the taxonomy places it in the
-    // income-statement (GuV/GuVMicroBilG) presentation roles. No taxonomy
-    // annotation documents this restriction, so we always filter it out.
-    // filter_facts_by(instance, |fact| {
-    //     matches!(
-    //         fact.concept_name().local_name.as_str(),
-    //         "ismi.netIncome.collItemChangeProfitHbst" | "is.netIncome.collItemChangeProfitHbst"
-    //     )
-    // });
+    // ERiC rule 170155121: `collItemChangeProfitHbst` belongs only in the STU
+    // (Steuerliche Überleitung) section. The taxonomy also places it in the
+    // GuV/GuVMicroBilG presentation roles, which causes the error when STU is
+    // not selected. Keep the facts when STU is active; remove them otherwise.
+    let stu_active = instance.item_facts().iter().any(|fact| {
+        fact.concept_name().local_name == "genInfo.report.id.reportElement.reportElements.STU"
+            && !fact.is_nil()
+    });
+
+    if !stu_active {
+        filter_facts_by(instance, |fact| {
+            matches!(
+                fact.concept_name().local_name.as_str(),
+                "ismi.netIncome.collItemChangeProfitHbst" | "is.netIncome.collItemChangeProfitHbst"
+            )
+        });
+    }
 }
 
 /// Checks if the fact is marked as not permitted.
