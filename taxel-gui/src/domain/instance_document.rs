@@ -150,7 +150,7 @@ pub fn active_roles(instance: &InstanceDocument) -> Vec<RoleUri> {
 /// to the Finanzverwaltung. This is necessary because the instance is built
 /// from the full taxonomy, which contains some concepts that are only relevant
 /// for other use cases (e.g. internal reporting) but not for tax filing.
-fn remove_forbidden_facts(
+pub fn remove_forbidden_facts(
     instance: &mut InstanceDocument,
     taxonomy: &TaxonomySet,
     end_date: &NaiveDate,
@@ -175,7 +175,7 @@ fn is_not_permitted(fact: &Fact, taxonomy: &TaxonomySet, end_date: &NaiveDate) -
                         "Einreichung an Finanzverwaltung" | "steuerlich"
                     ))
                     || (part.name == "hgbref:ValidThrough" && value_date < *end_date)
-                    || (part.name == "hgbref:ValidFrom" && value_date > *end_date)
+                    || (part.name == "hgbref:ValidSince" && value_date > *end_date)
             } else {
                 part.name == "hgbref:notPermittedFor"
                     && matches!(

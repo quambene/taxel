@@ -4,13 +4,14 @@ use crate::{
         SectionState, TaxelApp, APP_NAME, APP_VERSION, VENDOR_ID,
     },
     domain::{
-        active_roles, create_instance_document, extract_period, remove_trade_accounting_facts,
-        update_instance_document, FactValue, Report, ReportStatus, UpdateOutcome,
+        active_roles, create_instance_document, extract_period, remove_forbidden_facts,
+        remove_trade_accounting_facts, update_instance_document, FactValue, Report, ReportStatus,
+        UpdateOutcome,
     },
     infrastructure::report_store::reports_dir,
 };
 use anyhow::Context;
-use chrono::{Datelike, Utc};
+use chrono::{Datelike, NaiveDate, Utc};
 use eframe::egui::{self};
 use log::debug;
 use reqwest::blocking::Client;
@@ -25,8 +26,9 @@ use std::{
     time::{Duration, SystemTime},
 };
 use taxel::{
-    elster::Submitter, ElsterReport, TaxonomyType, COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT,
-    GCD_ROLE_URI, REQUIRED_GCD_FACTS, TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE,
+    elster::Submitter, ElsterReport, TaxonomyType, CLOSING_DATE, COMPANY_TAX_NUMBER,
+    COMPANY_TAX_NUMBER_PARENT, GCD_ROLE_URI, REQUIRED_GCD_FACTS, TAXONOMY_DATE_TO_VERSION,
+    TAXONOMY_VERSION_TO_DATE,
 };
 use uuid::Uuid;
 use xbrl_rs::{InstanceDocument, RoleUri, TaxonomyLoader, TaxonomySet};
@@ -733,6 +735,10 @@ pub fn save_report(app: &mut TaxelApp) {
         update_outcome = UpdateOutcome::Rebuild;
     }
 
+    if handle_end_date_change(app, editing_tab) == UpdateOutcome::Rebuild {
+        update_outcome = UpdateOutcome::Rebuild;
+    }
+
     if let Some(loaded) = app.loaded.as_mut() {
         // Sync GCD facts to ElsterReport metadata and XBRL contexts.
         loaded
@@ -871,6 +877,62 @@ fn handle_report_element_change(app: &mut TaxelApp, editing_tab: usize) -> Updat
         |concept| concept.starts_with("genInfo.report.id.reportElement.reportElements."),
         |app| rebuild_instance(app, false),
     )
+}
+
+/// Detects changes to `balSheetClosingDate` and re-runs `remove_forbidden_facts`
+/// with the new date. Returns `Rebuild` when facts were actually removed so the
+/// UI reflects the trimmed instance.
+fn handle_end_date_change(app: &mut TaxelApp, editing_tab: usize) -> UpdateOutcome {
+    let changed = app
+        .loaded
+        .as_ref()
+        .and_then(|l| l.report.sections.get(editing_tab))
+        .is_some_and(|section| {
+            section.rows.iter().enumerate().any(|(i, row)| {
+                row.concept == CLOSING_DATE
+                    && app.edit_snapshot.get(i).is_some_and(|s| s != &row.value)
+            })
+        });
+
+    if !changed {
+        return UpdateOutcome::NoChange;
+    }
+
+    let new_end_date_str = app
+        .loaded
+        .as_ref()
+        .and_then(|l| l.report.sections.get(editing_tab))
+        .and_then(|section| section.rows.iter().find(|row| row.concept == CLOSING_DATE))
+        .and_then(|row| match &row.value {
+            FactValue::Text(text) if !text.is_empty() => Some(text.clone()),
+            _ => None,
+        });
+
+    let Some(end_date_str) = new_end_date_str else {
+        return UpdateOutcome::NoChange;
+    };
+
+    let Ok(end_date) = NaiveDate::parse_from_str(&end_date_str, "%Y-%m-%d") else {
+        return UpdateOutcome::NoChange;
+    };
+
+    let Some(loaded) = app.loaded.as_mut() else {
+        return UpdateOutcome::NoChange;
+    };
+
+    let facts_before = loaded.instance.facts().len();
+    remove_forbidden_facts(&mut loaded.instance, &loaded.taxonomy, &end_date);
+    let facts_after = loaded.instance.facts().len();
+
+    if facts_after < facts_before {
+        debug!(
+            "balSheetClosingDate changed: removed {} forbidden facts",
+            facts_before - facts_after
+        );
+        UpdateOutcome::Rebuild
+    } else {
+        UpdateOutcome::NoChange
+    }
 }
 
 /// Rebuilds the instance document and report from scratch, importing values
