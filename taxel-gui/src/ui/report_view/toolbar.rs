@@ -119,6 +119,11 @@ fn draw_search_bar(
             .hint_text("Search ID, name, value ..."),
     );
 
+    if search.focus_requested {
+        response.request_focus();
+        search.focus_requested = false;
+    }
+
     // Re-open results for the existing query when the user returns focus
     // to the search field.
     if response.changed() || response.gained_focus() || response.clicked() {

@@ -36,6 +36,8 @@ pub struct Search {
     pub scroll_to_row: Option<usize>,
     /// Transient highlight for the row selected via search results.
     pub row_highlight: Option<RowHighlight>,
+    /// Request focus for the search bar on the next toolbar draw.
+    pub focus_requested: bool,
 }
 
 impl Search {

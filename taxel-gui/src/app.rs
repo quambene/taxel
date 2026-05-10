@@ -388,10 +388,18 @@ impl App for TaxelApp {
 
                     if editing && !pending_section_switch {
                         let save_shortcut = KeyboardShortcut::new(Modifiers::COMMAND, Key::S);
+                        let search_shortcut = KeyboardShortcut::new(Modifiers::COMMAND, Key::F);
                         let save_pressed = ui
                             .ctx()
                             .input_mut(|input| input.consume_shortcut(&save_shortcut));
+                        let search_pressed = ui
+                            .ctx()
+                            .input_mut(|input| input.consume_shortcut(&search_shortcut));
                         let cancel_pressed = ui.ctx().input(|input| input.key_pressed(Key::Escape));
+
+                        if search_pressed {
+                            self.search.focus_requested = true;
+                        }
 
                         if save_pressed {
                             action = EditAction::Save;
@@ -400,9 +408,17 @@ impl App for TaxelApp {
                         }
                     } else if !editing && self.loaded.is_some() {
                         let edit_shortcut = KeyboardShortcut::new(Modifiers::COMMAND, Key::E);
+                        let search_shortcut = KeyboardShortcut::new(Modifiers::COMMAND, Key::F);
                         let edit_pressed = ui
                             .ctx()
                             .input_mut(|input| input.consume_shortcut(&edit_shortcut));
+                        let search_pressed = ui
+                            .ctx()
+                            .input_mut(|input| input.consume_shortcut(&search_shortcut));
+
+                        if search_pressed {
+                            self.search.focus_requested = true;
+                        }
 
                         if edit_pressed {
                             action = EditAction::Start;

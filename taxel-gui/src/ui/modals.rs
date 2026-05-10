@@ -193,6 +193,10 @@ pub fn draw_shortcuts_modal(ui: &mut Ui, app: &mut TaxelApp) {
             .num_columns(2)
             .spacing([24.0, 4.0])
             .show(ui, |ui| {
+                ui.strong("Ctrl+F");
+                ui.label("Focus the search bar");
+                ui.end_row();
+
                 ui.strong("Ctrl+E");
                 ui.label("Start editing the report section");
                 ui.end_row();
