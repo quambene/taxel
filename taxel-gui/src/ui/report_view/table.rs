@@ -5,10 +5,12 @@ use crate::{
 use eframe::egui::{self, Align, ComboBox, TextStyle, Ui};
 use egui_extras::{Column, TableBuilder};
 use std::collections::HashSet;
+use taxel::REPORT_ELEMENT_PREFIX;
 
 /// Draw the fact table in the main panel, showing only the rows that are not
 /// collapsed. Handles the toggle logic for expanding/collapsing rows with
-/// children.
+/// children. Returns the raw index of a row that the user attempted to uncheck
+/// (if any).
 #[allow(clippy::too_many_arguments)]
 pub fn draw_table(
     rows: &mut [FactRow],
@@ -20,10 +22,11 @@ pub fn draw_table(
     ui: &mut Ui,
     show_required_only: bool,
     show_filled_only: bool,
-) {
+) -> Option<usize> {
     let row_height = ui.text_style_height(&TextStyle::Body) + ui.spacing().item_spacing.y;
     let visible = visible_rows(rows, collapsed, show_required_only, show_filled_only);
     let mut toggle: Option<usize> = None;
+    let mut pending_report_element_uncheck: Option<usize> = None;
 
     let mut builder = TableBuilder::new(ui)
         .resizable(true)
@@ -124,7 +127,19 @@ pub fn draw_table(
                         }
                         FactValue::Checkbox(checked) => {
                             if row_editing {
-                                ui.checkbox(checked, "");
+                                let was_checked = *checked;
+                                let response = ui.checkbox(checked, "");
+
+                                if response.changed()
+                                    && was_checked
+                                    && !*checked
+                                    && rows[raw_idx].concept.starts_with(REPORT_ELEMENT_PREFIX)
+                                {
+                                    // Revert immediately; the app will ask for explicit
+                                    // confirmation before actually unchecking.
+                                    *checked = true;
+                                    pending_report_element_uncheck = Some(raw_idx);
+                                }
                             } else {
                                 ui.add_enabled(false, egui::Checkbox::new(checked, ""));
                             }
@@ -200,6 +215,8 @@ pub fn draw_table(
             collapsed.insert(raw_idx);
         }
     }
+
+    pending_report_element_uncheck
 }
 
 /// Compute which visible-list indices should be collapsed to show only rows up

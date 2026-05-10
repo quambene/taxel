@@ -58,6 +58,14 @@ pub struct CopyMessage {
     pub position: Pos2,
 }
 
+/// Pending uncheck action for a reportElements checkbox.
+pub struct PendingReportElementUncheck {
+    /// The section index containing the checkbox row.
+    pub section_idx: usize,
+    /// The raw row index within the section.
+    pub row_idx: usize,
+}
+
 /// Main application struct for the Taxel GUI, managing the state of the app.
 pub struct TaxelApp {
     /// The currently loaded report together with its taxonomy, instance
@@ -114,6 +122,10 @@ pub struct TaxelApp {
     pub show_new_report_modal: bool,
     /// Form state for the new-report dialog, preserved across opens.
     pub new_report_form: NewReportForm,
+    /// Controls whether the report-element uncheck warning modal is visible.
+    pub show_report_element_uncheck_modal: bool,
+    /// Pending report-element checkbox to uncheck on confirmation.
+    pub pending_report_element_uncheck: Option<PendingReportElementUncheck>,
 }
 
 impl TaxelApp {
@@ -189,6 +201,8 @@ impl TaxelApp {
             import_values_path: None,
             show_new_report_modal: false,
             new_report_form: NewReportForm::default(),
+            show_report_element_uncheck_modal: false,
+            pending_report_element_uncheck: None,
         }
     }
 
@@ -222,6 +236,24 @@ impl TaxelApp {
                     format!("Failed to refresh imported reports: {err}"),
                 ));
                 self.show_diagnostics_panel = true;
+            }
+        }
+    }
+
+    /// Applies a previously deferred uncheck action for a `reportElements`
+    /// checkbox after the user confirms the warning modal.
+    fn apply_pending_report_element_uncheck(&mut self) {
+        if let Some(pending) = self.pending_report_element_uncheck.take() {
+            if let Some(loaded) = self.loaded.as_mut() {
+                if let Some(section) = loaded.report.sections.get_mut(pending.section_idx) {
+                    if let Some(row) = section.rows.get_mut(pending.row_idx) {
+                        if let FactValue::Checkbox(checked) = &mut row.value {
+                            *checked = false;
+                        }
+                    }
+                }
+
+                loaded.report.update_disabled_states();
             }
         }
     }
@@ -402,7 +434,7 @@ impl App for TaxelApp {
                             let state = &mut self.section_states[tab];
                             let scroll_to = self.search.scroll_to_row.take();
 
-                            ui::draw_table(
+                            let pending_uncheck = ui::draw_table(
                                 &mut section.rows,
                                 &mut state.collapsed,
                                 &lang,
@@ -413,6 +445,15 @@ impl App for TaxelApp {
                                 state.show_required_only,
                                 state.show_filled_only,
                             );
+
+                            if let Some(row_idx) = pending_uncheck {
+                                self.pending_report_element_uncheck =
+                                    Some(PendingReportElementUncheck {
+                                        section_idx: tab,
+                                        row_idx,
+                                    });
+                                self.show_report_element_uncheck_modal = true;
+                            }
                         }
 
                         // Keep sidebar enabled/disabled states in sync with
@@ -501,6 +542,20 @@ impl App for TaxelApp {
                 } else if cancel {
                     self.show_download_modal = false;
                     self.pending_load_kind = None;
+                }
+            }
+
+            if self.show_report_element_uncheck_modal {
+                let mut confirm = false;
+                let mut cancel = false;
+                ui::draw_report_element_uncheck_modal(ctx, &mut confirm, &mut cancel);
+
+                if confirm {
+                    self.show_report_element_uncheck_modal = false;
+                    self.apply_pending_report_element_uncheck();
+                } else if cancel {
+                    self.show_report_element_uncheck_modal = false;
+                    self.pending_report_element_uncheck = None;
                 }
             }
         });

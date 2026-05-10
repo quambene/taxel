@@ -341,6 +341,29 @@ pub fn draw_unsaved_changes_modal(ui: &mut Ui, stay: &mut bool, continue_nav: &m
         });
 }
 
+/// Draws a modal dialog warning that unchecking a report element deletes
+/// entered values from the corresponding report section.
+pub fn draw_report_element_uncheck_modal(ui: &mut Ui, confirm: &mut bool, cancel: &mut bool) {
+    let modal = Modal::new(Id::new("report_element_uncheck_modal")).show(ui.ctx(), |ui| {
+        ui.heading("Uncheck report section?");
+        ui.add_space(8.0);
+        ui.label("Warning: entered values of this report section will be deleted after saving.");
+        ui.add_space(8.0);
+        ui.horizontal(|ui| {
+            if ui.button("Cancel").clicked() {
+                *cancel = true;
+            }
+            if ui.button("Uncheck").clicked() {
+                *confirm = true;
+            }
+        });
+    });
+
+    if modal.should_close() {
+        *cancel = true;
+    }
+}
+
 /// Draws a modal to copy a diagnostic message to the clipboard.
 pub fn draw_copy_message_modal(ui: &mut Ui, app: &mut TaxelApp) {
     let mut copied = false;
