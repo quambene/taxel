@@ -208,6 +208,10 @@ pub fn draw_shortcuts_modal(ui: &mut Ui, app: &mut TaxelApp) {
                 ui.strong("Esc");
                 ui.label("Cancel editing");
                 ui.end_row();
+
+                ui.strong("Ctrl+Space");
+                ui.label("Validate report");
+                ui.end_row();
             });
 
         ui.add_space(8.0);

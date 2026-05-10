@@ -382,16 +382,22 @@ impl App for TaxelApp {
                         EditAction::None
                     };
 
-                    // Support keyboard shortcuts Ctrl+S and ESC while editing.
+                    // Support keyboard shortcuts while editing and viewing.
                     let pending_section_switch =
                         self.editing_section.is_some_and(|s| s != self.selected_tab);
+                    let mut validate_pressed = false;
 
                     if editing && !pending_section_switch {
                         let save_shortcut = KeyboardShortcut::new(Modifiers::COMMAND, Key::S);
+                        let validate_shortcut =
+                            KeyboardShortcut::new(Modifiers::COMMAND, Key::Space);
                         let search_shortcut = KeyboardShortcut::new(Modifiers::COMMAND, Key::F);
                         let save_pressed = ui
                             .ctx()
                             .input_mut(|input| input.consume_shortcut(&save_shortcut));
+                        validate_pressed = ui
+                            .ctx()
+                            .input_mut(|input| input.consume_shortcut(&validate_shortcut));
                         let search_pressed = ui
                             .ctx()
                             .input_mut(|input| input.consume_shortcut(&search_shortcut));
@@ -408,10 +414,15 @@ impl App for TaxelApp {
                         }
                     } else if !editing && self.loaded.is_some() {
                         let edit_shortcut = KeyboardShortcut::new(Modifiers::COMMAND, Key::E);
+                        let validate_shortcut =
+                            KeyboardShortcut::new(Modifiers::COMMAND, Key::Space);
                         let search_shortcut = KeyboardShortcut::new(Modifiers::COMMAND, Key::F);
                         let edit_pressed = ui
                             .ctx()
                             .input_mut(|input| input.consume_shortcut(&edit_shortcut));
+                        validate_pressed = ui
+                            .ctx()
+                            .input_mut(|input| input.consume_shortcut(&validate_shortcut));
                         let search_pressed = ui
                             .ctx()
                             .input_mut(|input| input.consume_shortcut(&search_shortcut));
@@ -423,6 +434,10 @@ impl App for TaxelApp {
                         if edit_pressed {
                             action = EditAction::Start;
                         }
+                    }
+
+                    if validate_pressed {
+                        app::validate_report(self);
                     }
 
                     // Handle toolbar edit actions.
