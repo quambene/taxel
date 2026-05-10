@@ -19,6 +19,7 @@ pub const BASELINE_ROLE_URIS: &[&str] = &[
     "http://www.xbrl.de/taxonomies/de-gaap-ci/role/determinationOfTaxableIncome",
     "http://www.xbrl.de/taxonomies/de-gaap-ci/role/determinationOfTaxableIncomeBusinessPartnership",
     "http://www.xbrl.de/taxonomies/de-gaap-ci/role/changesEquityAccounts",
+    "http://www.xbrl.de/taxonomies/de-gaap-ci/role/notes",
 ];
 
 /// The set of facts that must be present in `ElsterReport` and `EBilanz`.
