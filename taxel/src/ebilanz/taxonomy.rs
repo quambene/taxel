@@ -13,6 +13,7 @@ pub const GCD_LABEL: &str = "GCD (Global Common Document)";
 /// - SGE (`determinationOfTaxableIncome`): `fpl.*` Mussfelder
 /// - SGEP (`determinationOfTaxableIncomeBusinessPartnership`): `fplgm.*` Mussfelder
 /// - KKE (`changesEquityAccounts`): `kke` Mussfeld
+/// - BAL (`notes`): `notes` Mussfelder
 pub const BASELINE_ROLE_URIS: &[&str] = &[
     GCD_ROLE_URI,
     "http://www.xbrl.de/taxonomies/de-gaap-ci/role/appropriationProfits",
