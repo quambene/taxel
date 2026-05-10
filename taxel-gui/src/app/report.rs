@@ -1178,13 +1178,16 @@ fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error
             ));
         }
         Err(err) => {
-            app.diagnostics.push(AppDiagnostic::new_error(
-                DiagnosticCategory::Validation,
-                format!(
-                    "Validation error: {err}\n{}",
-                    err.validation_response().unwrap_or_default()
-                ),
-            ));
+            // Display raw xml error in debug mode only.
+            if cfg!(debug_assertions) {
+                app.diagnostics.push(AppDiagnostic::new_error(
+                    DiagnosticCategory::Validation,
+                    format!(
+                        "Full validation error: {err}\n{}",
+                        err.validation_response().unwrap_or_default()
+                    ),
+                ));
+            }
 
             if let Some(validation_report) = err
                 .validation_report()
