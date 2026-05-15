@@ -155,10 +155,6 @@ pub fn restore_required_nil_tuple_children(
 /// `reportElements.*` fact in the instance. Used to determine which sections
 /// to include when rebuilding the instance after a report element selection
 /// change.
-///
-/// The baseline always includes GCD, EV, SGE, and SGEP because ERiC requires
-/// their Mussfeld facts to be present as nil even when the user has not
-/// selected those sections (see [`BASELINE_ROLE_URIS`]).
 pub fn active_roles(instance: &InstanceDocument) -> Vec<RoleUri> {
     let mut roles: Vec<RoleUri> = BASELINE_ROLE_URIS
         .iter()
@@ -239,6 +235,59 @@ pub fn remove_forbidden_facts(
             let local = fact.concept_name().local_name.as_str();
             local == "nt" || local.starts_with("nt.")
         });
+    }
+
+    // ERiC v6.9 rule 170125120: Anlagenspiegel dimensional facts require
+    // reportElements.BAL to be declared. When BAL is absent, remove all facts
+    // that reference a dimensional context (identified by non-empty dimensions).
+    // filter_facts_by's context pruning then removes the now-orphaned dimensional
+    // contexts. If fiscalYearBegin is non-nil and BAL is absent, ERiC rule
+    // 170405045 will correctly fire, requiring the user to provide actual
+    // Anlagenspiegel data — this cannot be satisfied with nil placeholder facts
+    // in v6.9.
+    let bal_active = instance.item_facts().iter().any(|fact| {
+        fact.concept_name().local_name == "genInfo.report.id.reportElement.reportElements.BAL"
+            && !fact.is_nil()
+    });
+
+    if !bal_active {
+        let dimensional_ctx_ids: HashSet<String> = instance
+            .contexts()
+            .iter()
+            .filter(|(_, ctx)| !ctx.dimensions.is_empty())
+            .map(|(id, _)| id.to_string())
+            .collect();
+
+        if !dimensional_ctx_ids.is_empty() {
+            filter_facts_by(instance, |fact| match fact {
+                Fact::Item(item) => dimensional_ctx_ids.contains(item.context_ref()),
+                Fact::Tuple(_) => false,
+            });
+        }
+    }
+
+    // ERiC v6.9 rule FehlendeAngabeBerichtsbestandteilKS (170405002): either
+    // `reportElements.KS` (account balances declared) or
+    // `reportElements.transmissionNotYetPossible` (free-text reason why not)
+    // must be non-nil. Both are new in v6.9. Default to declaring
+    // transmissionNotYetPossible when neither is set, because most filers will
+    // not be submitting account balances.
+    let ks_declared = instance.item_facts().iter().any(|f| {
+        f.concept_name().local_name == "genInfo.report.id.reportElement.reportElements.KS"
+            && !f.is_nil()
+    });
+    let transmission_declared = instance.item_facts().iter().any(|f| {
+        f.concept_name().local_name
+            == "genInfo.report.id.reportElement.reportElements.transmissionNotYetPossible"
+            && !f.is_nil()
+    });
+
+    if !ks_declared && !transmission_declared {
+        set_item_value(
+            instance,
+            "genInfo.report.id.reportElement.reportElements.transmissionNotYetPossible",
+            "Noch nicht möglich",
+        );
     }
 }
 
@@ -443,6 +492,18 @@ fn is_not_applicable_for_legal_form(
     Some(concept_legal_forms.is_disjoint(entity_legal_forms))
 }
 
+/// Sets the value of an item fact identified by `local_name` to `value` and
+/// clears its nil flag. No-op if the fact is not found.
+fn set_item_value(instance: &mut InstanceDocument, local_name: &str, value: &str) {
+    let idx = instance
+        .item_facts()
+        .iter()
+        .position(|f| f.concept_name().local_name == local_name);
+    if let Some(idx) = idx {
+        instance.set_fact_value(idx, value.to_string());
+    }
+}
+
 /// Filters facts from the instance document based on the given predicate,
 /// removing any facts (and their children) for which the predicate returns
 /// true.
@@ -470,12 +531,22 @@ fn filter_facts_by(instance: &mut InstanceDocument, should_remove: impl Fn(&Fact
         return;
     }
 
+    // Prune contexts no longer referenced by any remaining fact to prevent
+    // ERiC error 170205107 (unused context).
+    let referenced = referenced_context_ids(&filtered_facts);
+    let filtered_contexts = source
+        .contexts()
+        .iter()
+        .filter(|(id, _)| referenced.contains(&id.to_string()))
+        .map(|(id, ctx)| (id.clone(), ctx.clone()))
+        .collect();
+
     let role_refs = source.role_refs().to_vec();
     let arcrole_refs = source.arcrole_refs().to_vec();
 
     let mut filtered = InstanceDocument::new(
         source.schema_refs().to_vec(),
-        source.contexts().clone(),
+        filtered_contexts,
         source.units().clone(),
         filtered_facts,
         source.namespaces().clone(),
@@ -490,6 +561,28 @@ fn filter_facts_by(instance: &mut InstanceDocument, should_remove: impl Fn(&Fact
     }
 
     *instance = filtered;
+}
+
+/// Collects all context IDs referenced by item facts in the given fact slice.
+fn referenced_context_ids(facts: &[Fact]) -> HashSet<String> {
+    let mut ids = HashSet::new();
+    for fact in facts {
+        collect_context_ids_in_fact(fact, &mut ids);
+    }
+    ids
+}
+
+fn collect_context_ids_in_fact(fact: &Fact, ids: &mut HashSet<String>) {
+    match fact {
+        Fact::Item(item) => {
+            ids.insert(item.context_ref().to_string());
+        }
+        Fact::Tuple(tuple) => {
+            for child in tuple.children() {
+                collect_context_ids_in_fact(child, ids);
+            }
+        }
+    }
 }
 
 /// Recursively removes child facts that match the given predicate.
