@@ -34,7 +34,9 @@ eBilanz (short for _Elektronische Bilanz_) is the electronic transmission of the
 
 ### Install Taxel GUI
 
-To be released
+Prebuilt binaries and releases are not provided in this repository. Releases
+will be published in the
+[taxel-releases](https://github.com/IO-Propagator/taxel-releases) repo.
 
 ## Taxel CLI
 
