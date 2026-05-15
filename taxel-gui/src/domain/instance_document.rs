@@ -220,6 +220,26 @@ pub fn remove_forbidden_facts(
             )
         });
     }
+
+    // ERiC rule 170125120: all `nt` and `nt.*` concepts from the `notes` (BAL)
+    // baseline role require `reportElements.SA` to be declared. This mapping is
+    // ERiC-internal and not encoded in the taxonomy presentation linkbase: the
+    // `notes` role includes both the Anlagenspiegel hypercube facts (always
+    // needed) and the `nt.*` text-note items that only belong to SA.
+    // `filter_facts_by` (not cascade) is correct here because every `nt.*` tuple
+    // parent is itself an `nt.*` concept, so parent and children are removed
+    // together — no orphaned required children remain.
+    let sa_active = instance.item_facts().iter().any(|fact| {
+        fact.concept_name().local_name == "genInfo.report.id.reportElement.reportElements.SA"
+            && !fact.is_nil()
+    });
+
+    if !sa_active {
+        filter_facts_by(instance, |fact| {
+            let local = fact.concept_name().local_name.as_str();
+            local == "nt" || local.starts_with("nt.")
+        });
+    }
 }
 
 /// Returns `true` when the fact should be removed from the instance document
