@@ -291,7 +291,6 @@ pub static TAXONOMY_VERSION_TO_DATE: LazyLock<HashMap<&'static str, &'static str
             ("6.6", "2022-05-02"),
             ("6.7", "2023-04-01"),
             ("6.8", "2024-04-01"),
-            ("6.9", "2025-04-01"),
         ])
     });
 
@@ -313,6 +312,5 @@ pub static TAXONOMY_DATE_TO_VERSION: LazyLock<HashMap<&'static str, &'static str
             ("2022-05-02", "6.6"),
             ("2023-04-01", "6.7"),
             ("2024-04-01", "6.8"),
-            ("2025-04-01", "6.9"),
         ])
     });
