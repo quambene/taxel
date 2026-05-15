@@ -7,19 +7,12 @@ pub const GCD_LABEL: &str = "GCD (Global Common Document)";
 /// Role URIs that must always be passed to `InstanceDocument::from_sections`,
 /// regardless of which `reportElements.*` facts the user has activated.
 ///
-/// ERiC requires Mussfeld facts from these sections to be present as nil facts
-/// in the instance even when the corresponding report element is not selected:
-/// - EV (`appropriationProfits`): `incomeUse.gainLoss.*` Mussfelder
-/// - SGE (`determinationOfTaxableIncome`): `fpl.*` Mussfelder
-/// - SGEP (`determinationOfTaxableIncomeBusinessPartnership`): `fplgm.*` Mussfelder
-/// - KKE (`changesEquityAccounts`): `kke` Mussfeld
-/// - BAL (`notes`): `notes` Mussfelder
+/// `notes` is always included because ERiC requires Anlagenspiegel
+/// (`cube_.nt.ass.gross`) facts whenever `fiscalYearBegin` is set, and those
+/// dimensional facts are only generated when the `notes` presentation role is
+/// walked (see `create_instance_document`).
 pub const BASELINE_ROLE_URIS: &[&str] = &[
     GCD_ROLE_URI,
-    "http://www.xbrl.de/taxonomies/de-gaap-ci/role/appropriationProfits",
-    "http://www.xbrl.de/taxonomies/de-gaap-ci/role/determinationOfTaxableIncome",
-    "http://www.xbrl.de/taxonomies/de-gaap-ci/role/determinationOfTaxableIncomeBusinessPartnership",
-    "http://www.xbrl.de/taxonomies/de-gaap-ci/role/changesEquityAccounts",
     "http://www.xbrl.de/taxonomies/de-gaap-ci/role/notes",
 ];
 
