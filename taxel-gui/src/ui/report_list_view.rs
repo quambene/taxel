@@ -21,7 +21,7 @@ pub fn draw_report_list(
 
     if reports.is_empty() {
         ui.vertical_centered(|ui| {
-            ui.label("No reports imported or created yet.");
+            ui.label("Create or import a report to get started.");
         });
         return None;
     }

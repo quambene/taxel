@@ -21,7 +21,7 @@ pub fn draw_sidebar(ctx: &mut Ui, sections: &[ReportSection], selected: &mut usi
             ScrollArea::vertical().show(ui, |ui| {
                 if sections.is_empty() {
                     ui.add_space(6.0);
-                    ui.weak("Import or create a report to view sections.");
+                    ui.weak("Open a report to view sections.");
                     return;
                 }
 
