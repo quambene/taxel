@@ -12,6 +12,8 @@ pub struct Settings {
     pub zoom_input: String,
     /// Whether to use dark mode for the UI.
     pub dark_mode: bool,
+    /// Whether the user has accepted the Terms of Use and Privacy Notice.
+    pub terms_accepted: bool,
 }
 
 impl Settings {
@@ -29,10 +31,15 @@ impl Settings {
             .and_then(|storage| eframe::get_value::<bool>(storage, "dark_mode"))
             .unwrap_or(false);
 
+        let terms_accepted = storage
+            .and_then(|storage| eframe::get_value::<bool>(storage, "terms_accepted"))
+            .unwrap_or(false);
+
         Self {
             lang,
             zoom_input,
             dark_mode,
+            terms_accepted,
         }
     }
 
@@ -54,5 +61,6 @@ impl Settings {
         eframe::set_value(storage, "lang", &self.lang);
         eframe::set_value(storage, "zoom_input", &self.zoom_input);
         eframe::set_value(storage, "dark_mode", &self.dark_mode);
+        eframe::set_value(storage, "terms_accepted", &self.terms_accepted);
     }
 }

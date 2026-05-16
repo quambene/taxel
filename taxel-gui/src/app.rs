@@ -535,6 +535,10 @@ impl App for TaxelApp {
                     }
                 });
 
+            if !self.settings.terms_accepted {
+                ui::draw_terms_modal(ctx, self);
+            }
+
             if self.show_delete_modal {
                 ui::draw_delete_modal(ctx, self);
             }

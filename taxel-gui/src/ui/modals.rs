@@ -409,3 +409,45 @@ pub fn draw_copy_message_modal(ui: &mut Ui, app: &mut TaxelApp) {
         app.copy_message = None;
     }
 }
+
+/// Draws the terms-of-use modal on first launch. Non-dismissable: the user
+/// must check the checkbox and click Confirm to proceed.
+pub fn draw_terms_modal(ui: &mut Ui, app: &mut TaxelApp) {
+    let checkbox_id = Id::new("terms_checkbox");
+    let mut checked = ui
+        .ctx()
+        .data(|d| d.get_temp::<bool>(checkbox_id).unwrap_or(false));
+
+    Modal::new(Id::new("terms_modal")).show(ui.ctx(), |ui| {
+        ui.heading("Terms of Use & Privacy Notice");
+        ui.add_space(8.0);
+
+        ui.horizontal_wrapped(|ui| {
+            ui.spacing_mut().item_spacing.x = 0.0;
+            ui.checkbox(&mut checked, "");
+            ui.label("I agree to the ");
+            ui.hyperlink_to(
+                "Terms of Use",
+                "https://github.com/IO-Propagator/taxel-releases/blob/main/TERMS_OF_USE.md",
+            );
+            ui.label(" and have read the ");
+            ui.hyperlink_to(
+                "Privacy Notice",
+                "https://github.com/IO-Propagator/taxel-releases/blob/main/PRIVACY_NOTICE.md",
+            );
+            ui.label(".");
+        });
+
+        ui.add_space(8.0);
+
+        ui.add_enabled_ui(checked, |ui| {
+            if ui.button("Confirm").clicked() {
+                app.settings.terms_accepted = true;
+            }
+        });
+    });
+    // Intentionally do not `check modal.should_close()`. ESC must not dismiss this modal.
+
+    ui.ctx()
+        .data_mut(|data| data.insert_temp(checkbox_id, checked));
+}
