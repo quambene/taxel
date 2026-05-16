@@ -8,7 +8,7 @@ use crate::{
         remove_trade_accounting_facts, restore_required_nil_tuple_children,
         update_instance_document, FactValue, Report, ReportStatus, UpdateOutcome,
     },
-    infrastructure::report_store::reports_dir,
+    infrastructure::report_store::{confirmations_dir, reports_dir},
 };
 use anyhow::Context;
 use chrono::{Datelike, NaiveDate, Utc};
@@ -724,7 +724,10 @@ pub fn save_report(app: &mut TaxelApp) {
                         return Ok(());
                     }
 
-                    let snapshot = app.edit_snapshot.get(i).map(|s| s as &FactValue);
+                    let snapshot = app
+                        .edit_snapshot
+                        .get(i)
+                        .map(|fact_value| fact_value as &FactValue);
                     let outcome = update_instance_document(
                         instance,
                         &row.value,
@@ -871,10 +874,14 @@ fn handle_structural_change(
     let changed = app
         .loaded
         .as_ref()
-        .and_then(|l| l.report.sections.get(editing_tab))
+        .and_then(|loaded| loaded.report.sections.get(editing_tab))
         .is_some_and(|section| {
             section.rows.iter().enumerate().any(|(i, row)| {
-                is_target(&row.concept) && app.edit_snapshot.get(i).is_some_and(|s| s != &row.value)
+                is_target(&row.concept)
+                    && app
+                        .edit_snapshot
+                        .get(i)
+                        .is_some_and(|fact_value| fact_value != &row.value)
             })
         });
 
@@ -942,7 +949,10 @@ fn handle_end_date_change(app: &mut TaxelApp, editing_tab: usize) -> UpdateOutco
         .is_some_and(|section| {
             section.rows.iter().enumerate().any(|(i, row)| {
                 row.concept == CLOSING_DATE
-                    && app.edit_snapshot.get(i).is_some_and(|s| s != &row.value)
+                    && app
+                        .edit_snapshot
+                        .get(i)
+                        .is_some_and(|fact_value| fact_value != &row.value)
             })
         });
 
@@ -1323,13 +1333,44 @@ pub fn send_report(app: &mut TaxelApp) {
     let certificate_path = certificate_path.clone();
     let password = password.clone();
 
+    let confirmations_dir = match confirmations_dir() {
+        Ok(dir) => dir,
+        Err(err) => {
+            app.diagnostics.push(AppDiagnostic::new_error(
+                DiagnosticCategory::Send,
+                format!("Failed to prepare confirmations directory: {err}"),
+            ));
+            app.show_diagnostics_panel = true;
+            return;
+        }
+    };
+
+    let report_stem = report_path
+        .file_stem()
+        .and_then(|file_stem| file_stem.to_str())
+        .unwrap_or("confirmation");
+    let timestamp = Utc::now().format("%Y%m%d_%H%M%S");
+    let pdf_filename = format!("{report_stem}_{timestamp}.pdf");
+    let pdf_path = confirmations_dir.join(&pdf_filename);
+    let pdf_path_str = match pdf_path.to_str() {
+        Some(pdf_path) => pdf_path,
+        None => {
+            app.diagnostics.push(AppDiagnostic::new_error(
+                DiagnosticCategory::Send,
+                "Failed to convert PDF path to string".to_string(),
+            ));
+            app.show_diagnostics_panel = true;
+            return;
+        }
+    };
+
     match eric.send(
         xml,
         "Bilanz",
         taxonomy_version,
         &certificate_path,
         &password,
-        None,
+        Some(pdf_path_str),
     ) {
         Ok(response) => {
             if let Some(loaded) = app.loaded.as_mut() {
@@ -1342,7 +1383,8 @@ pub fn send_report(app: &mut TaxelApp) {
             app.diagnostics.push(AppDiagnostic::new_success(
                 DiagnosticCategory::Send,
                 format!(
-                    "Send completed successfully\n{}",
+                    "Send completed successfully\nConfirmation PDF saved to: {}\n{}",
+                    pdf_path.display(),
                     response.payload.server_response
                 ),
             ));

@@ -43,3 +43,4 @@
   - Copy diagnostic message on right click
   - Send report in test mode via env var `TEST_MARKER`
   - Add modal to confirm terms of use and privacy notice
+  - Print confirmation for sent report

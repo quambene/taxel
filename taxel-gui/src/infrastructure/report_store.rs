@@ -129,6 +129,25 @@ pub fn reports_dir() -> Result<PathBuf> {
     Ok(reports_dir)
 }
 
+/// Determines the path to the application's confirmations directory, which is
+/// typically located in the user's data directory.
+pub fn confirmations_dir() -> Result<PathBuf> {
+    let dir = dirs::data_dir()
+        .map(|dir| dir.join("taxel").join("confirmations"))
+        .context("Could not determine data directory")?;
+
+    if !dir.exists() {
+        fs::create_dir_all(&dir).with_context(|| {
+            format!(
+                "Failed to create confirmations directory: {}",
+                dir.display()
+            )
+        })?;
+    }
+
+    Ok(dir)
+}
+
 fn create_reports_dir_if_not_exists(reports_dir: &Path) -> Result<()> {
     if !reports_dir.exists() {
         fs::create_dir_all(reports_dir).with_context(|| {
