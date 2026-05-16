@@ -35,9 +35,3 @@ eframe = { version = "0.34.1", features = ["persistence"] }
 egui_extras = { version = "0.34.1", features = ["serde"] }
 rfd = "0.17.2"
 dioxus-devtools = "0.7.4"
-
-[patch.crates-io]
-# TODO: remove patch after 0.3.0 is published
-xbrl-rs = { git = 'https://github.com/quambene/xbrl-rs.git' }
-# TODO: remove patch after 0.6.0 is published
-eric-sdk = { git = 'https://github.com/quambene/eric-rs.git' }

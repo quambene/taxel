@@ -1540,7 +1540,8 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 [[package]]
 name = "eric-bindings"
 version = "0.5.1"
-source = "git+https://github.com/quambene/eric-rs.git#f7ff8da37f96a50d99283f2e5086921a42cca8db"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3120357d87c021956b18dc28adff90de3993a49db3c917e542fbcaa3ec741e39"
 dependencies = [
  "anyhow",
 ]
@@ -1548,7 +1549,8 @@ dependencies = [
 [[package]]
 name = "eric-sdk"
 version = "0.6.0"
-source = "git+https://github.com/quambene/eric-rs.git#f7ff8da37f96a50d99283f2e5086921a42cca8db"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8cb67aba9d3bf00de9b76ebbaae02c7b33e02eaf23356c0d7e12231902b0f93a"
 dependencies = [
  "anyhow",
  "eric-bindings",
@@ -6557,7 +6559,8 @@ checksum = "ea6fc2961e4ef194dcbfe56bb845534d0dc8098940c7e5c012a258bfec6701bd"
 [[package]]
 name = "xbrl-rs"
 version = "0.3.0"
-source = "git+https://github.com/quambene/xbrl-rs.git#b2663df09b5b525c9caa98f511fcfe7fdc132e98"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f88db2bb800f80cacda166baf5e9500bd755cce73256ff42d4a28ccabb514b16"
 dependencies = [
  "chrono",
  "indexmap 2.14.0",
