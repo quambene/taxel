@@ -1389,10 +1389,22 @@ pub fn send_report(app: &mut TaxelApp) {
                 ),
             ));
         }
-        Err(err) => app.diagnostics.push(AppDiagnostic::new_error(
-            DiagnosticCategory::Send,
-            format!("Send error: {err}"),
-        )),
+        Err(err) => {
+            let validation_error = err.validation_response().unwrap_or_default();
+            let server_error = err.server_response().unwrap_or_default();
+            let mut message = format!("Send error: {err}");
+
+            if !validation_error.is_empty() {
+                message.push_str(&format!("\nValidation error: {validation_error}"));
+            }
+
+            if !server_error.is_empty() {
+                message.push_str(&format!("\nServer error: {server_error}"));
+            }
+
+            app.diagnostics
+                .push(AppDiagnostic::new_error(DiagnosticCategory::Send, message));
+        }
     }
 
     app.show_diagnostics_panel = true;
