@@ -73,7 +73,10 @@ impl Search {
                     .unwrap_or("");
 
                 let value_str = match &row.value {
-                    FactValue::Text(text) => text.as_str(),
+                    FactValue::Text(text)
+                    | FactValue::BooleanDropdown(text)
+                    | FactValue::Integer(text) => text.as_str(),
+                    FactValue::Decimal { raw, .. } | FactValue::Date { raw, .. } => raw.as_str(),
                     FactValue::Checkbox(checkbox) => {
                         if *checkbox {
                             "true"

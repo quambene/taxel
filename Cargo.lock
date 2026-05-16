@@ -4889,6 +4889,7 @@ dependencies = [
  "quick-xml 0.29.0",
  "reqwest",
  "rfd",
+ "rust_decimal",
  "serde",
  "serde_json",
  "taxel",

@@ -666,6 +666,50 @@ pub fn save_report(app: &mut TaxelApp) {
 
     if let Some(loaded) = app.loaded.as_mut() {
         if let Some(section) = loaded.report.sections.get(editing_tab) {
+            // Reject the save if any typed value is syntactically invalid.
+            let invalid_facts: Vec<_> = section
+                .rows
+                .iter()
+                .filter(|row| !row.value.is_type_valid())
+                .map(|row| (&row.concept, &row.value))
+                .collect();
+
+            if !invalid_facts.is_empty() {
+                for invalid_fact in &invalid_facts {
+                    match &invalid_fact.1 {
+                        FactValue::Decimal { .. } => {
+                            app.diagnostics.push(AppDiagnostic::new_error_with_fact(
+                                DiagnosticCategory::Validation,
+                                format!(
+                                    "Invalid decimal value for fact '{}'. 2 decimals expected.",
+                                    invalid_fact.0
+                                ),
+                                invalid_fact.0,
+                            ));
+                        }
+                        FactValue::Date { .. } => {
+                            app.diagnostics.push(AppDiagnostic::new_error_with_fact(
+                                DiagnosticCategory::Validation,
+                                format!(
+                                    "Invalid date value for fact '{}'. Format YYYY-MM-DD expected.",
+                                    invalid_fact.0
+                                ),
+                                invalid_fact.0,
+                            ));
+                        }
+                        _ => {
+                            app.diagnostics.push(AppDiagnostic::new_error_with_fact(
+                                DiagnosticCategory::Validation,
+                                format!("Invalid value for fact '{}'", invalid_fact.0),
+                                invalid_fact.0,
+                            ));
+                        }
+                    }
+                }
+
+                return;
+            }
+
             let instance = &mut loaded.instance;
             let taxonomy = &loaded.taxonomy;
 

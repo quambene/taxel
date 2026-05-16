@@ -639,28 +639,10 @@ pub fn update_instance_document(
     match value {
         FactValue::Text(text) => {
             if let Some(idx) = fact_index {
-                // TODO: add lookup table for concepts.
-                let is_numeric = taxonomy
-                    .and_then(|tax| {
-                        tax.concepts()
-                            .find(|concept| concept.name.local_name == concept_name)
-                    })
-                    .map(|concept| concept.data_type.is_numeric())
-                    .unwrap_or(false);
-
                 if text.is_empty() {
                     instance.set_fact_nil(idx, true);
-
-                    if is_numeric {
-                        instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
-                    }
                 } else {
                     instance.set_fact_value(idx, text.clone());
-
-                    if is_numeric {
-                        instance
-                            .set_fact_attribute(idx, FactAttribute::Decimals(Decimals::Finite(2)));
-                    }
                 }
             }
             Ok(UpdateOutcome::NoChange)
@@ -762,6 +744,52 @@ pub fn update_instance_document(
             }
 
             Ok(UpdateOutcome::Rebuild)
+        }
+        FactValue::Decimal { raw, value } => {
+            if let Some(idx) = fact_index {
+                if raw.is_empty() {
+                    instance.set_fact_nil(idx, true);
+                    instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
+                } else if let Some(decimal) = value {
+                    instance.set_fact_value(idx, decimal.to_string());
+                    instance.set_fact_attribute(idx, FactAttribute::Decimals(Decimals::Finite(2)));
+                }
+            }
+            Ok(UpdateOutcome::NoChange)
+        }
+        FactValue::Integer(value) => {
+            if let Some(idx) = fact_index {
+                if value.is_empty() {
+                    instance.set_fact_nil(idx, true);
+                    instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
+                } else {
+                    instance.set_fact_value(idx, value.clone());
+                    instance.set_fact_attribute(idx, FactAttribute::Decimals(Decimals::Infinite));
+                }
+            }
+            Ok(UpdateOutcome::NoChange)
+        }
+        FactValue::BooleanDropdown(value) => {
+            if let Some(idx) = fact_index {
+                if value.is_empty() {
+                    instance.set_fact_nil(idx, true);
+                } else {
+                    instance.set_fact_value(idx, value.clone());
+                    instance.set_fact_nil(idx, false);
+                }
+            }
+            Ok(UpdateOutcome::NoChange)
+        }
+        FactValue::Date { raw, value } => {
+            if let Some(idx) = fact_index {
+                if raw.is_empty() {
+                    instance.set_fact_nil(idx, true);
+                } else if let Some(date) = value {
+                    instance.set_fact_value(idx, date.format("%Y-%m-%d").to_string());
+                    instance.set_fact_nil(idx, false);
+                }
+            }
+            Ok(UpdateOutcome::NoChange)
         }
     }
 }

@@ -173,6 +173,105 @@ pub fn draw_table(
                                 ui.label(display_label);
                             }
                         }
+                        FactValue::BooleanDropdown(selected) => {
+                            let display = match selected.as_str() {
+                                "true" => "true",
+                                "false" => "false",
+                                _ => "—",
+                            };
+
+                            if row_editing {
+                                ComboBox::from_id_salt(raw_idx)
+                                    .selected_text(display)
+                                    .show_ui(ui, |ui| {
+                                        ui.selectable_value(selected, String::new(), "—");
+                                        ui.selectable_value(selected, "true".to_owned(), "true");
+                                        ui.selectable_value(selected, "false".to_owned(), "false");
+                                    });
+                            } else {
+                                ui.label(display);
+                            }
+                        }
+                        FactValue::Decimal { raw, value } => {
+                            if row_editing && !rows[raw_idx].is_tuple {
+                                let valid = raw.is_empty()
+                                    || value.as_ref().is_some_and(|decimal| decimal.scale() == 2);
+                                let color = if valid {
+                                    ui.visuals().text_color()
+                                } else {
+                                    egui::Color32::RED
+                                };
+                                let resp =
+                                    ui.add(egui::TextEdit::singleline(raw).text_color(color));
+
+                                if resp.changed() {
+                                    // Filter to valid decimal characters.
+                                    let mut out = String::new();
+                                    let mut chars = raw.chars().peekable();
+
+                                    if chars.peek() == Some(&'-') {
+                                        out.push('-');
+                                        chars.next();
+                                    }
+
+                                    let mut seen_dot = false;
+
+                                    for char in chars {
+                                        if char == '.' && !seen_dot {
+                                            seen_dot = true;
+                                            out.push(char);
+                                        } else if char.is_ascii_digit() {
+                                            out.push(char);
+                                        }
+                                    }
+                                    *raw = out;
+                                    *value = raw.parse().ok();
+                                }
+                            } else {
+                                ui.label(raw.as_str());
+                            }
+                        }
+                        FactValue::Integer(text) => {
+                            if row_editing && !rows[raw_idx].is_tuple {
+                                let resp = ui.text_edit_singleline(text);
+
+                                if resp.changed() {
+                                    let mut out = String::new();
+                                    let mut chars = text.chars().peekable();
+                                    if chars.peek() == Some(&'-') {
+                                        out.push('-');
+                                        chars.next();
+                                    }
+                                    for char in chars {
+                                        if char.is_ascii_digit() {
+                                            out.push(char);
+                                        }
+                                    }
+                                    *text = out;
+                                }
+                            } else {
+                                ui.label(text.as_str());
+                            }
+                        }
+                        FactValue::Date { raw, value } => {
+                            if row_editing && !rows[raw_idx].is_tuple {
+                                let valid = raw.is_empty() || value.is_some();
+                                let color = if valid {
+                                    ui.visuals().text_color()
+                                } else {
+                                    egui::Color32::RED
+                                };
+                                let resp =
+                                    ui.add(egui::TextEdit::singleline(raw).text_color(color));
+
+                                if resp.changed() {
+                                    *value =
+                                        chrono::NaiveDate::parse_from_str(raw, "%Y-%m-%d").ok();
+                                }
+                            } else {
+                                ui.label(raw.as_str());
+                            }
+                        }
                     }
                 });
                 row.col(|ui| {
@@ -279,6 +378,8 @@ fn is_filled(row: &FactRow) -> bool {
         FactValue::Text(text) => !text.trim().is_empty(),
         FactValue::Checkbox(checked) => *checked,
         FactValue::Dropdown { selected, .. } => !selected.is_empty(),
+        FactValue::BooleanDropdown(s) | FactValue::Integer(s) => !s.is_empty(),
+        FactValue::Decimal { raw, .. } | FactValue::Date { raw, .. } => !raw.is_empty(),
     }
 }
 

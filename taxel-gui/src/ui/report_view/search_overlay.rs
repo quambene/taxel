@@ -130,6 +130,10 @@ pub fn draw_search_results_overlay(
                                                 FactValue::Dropdown { selected, .. } => {
                                                     !selected.is_empty()
                                                 }
+                                                FactValue::BooleanDropdown(s)
+                                                | FactValue::Integer(s) => !s.is_empty(),
+                                                FactValue::Decimal { raw, .. }
+                                                | FactValue::Date { raw, .. } => !raw.is_empty(),
                                             };
 
                                             if !is_filled {

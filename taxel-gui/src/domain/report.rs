@@ -1,4 +1,6 @@
 use crate::domain::ReportStatus;
+use chrono::NaiveDate;
+use rust_decimal::Decimal;
 use std::{collections::HashMap, path::PathBuf};
 use taxel::{
     ElsterReport, TaxonomyType, CLOSING_DATE, COMPANY_CITY, COMPANY_COUNTRY, COMPANY_HOUSE_NO,
@@ -9,7 +11,7 @@ use taxel::{
 use xbrl_rs::{
     Concept, ConceptView, Decimals, DocumentView, FactAttribute, FactAttributeName,
     InstanceDocument, ItemFact, Label, Particle, Period, TaxonomySet, TreeNode, TupleParticleView,
-    ROLE_LABEL, ROLE_TERSE,
+    XbrlType, ROLE_LABEL, ROLE_TERSE,
 };
 
 /// An imported fact value extracted from a source instance document for merging
@@ -36,11 +38,43 @@ pub enum FactValue {
         selected: String,
         options: Vec<(String, HashMap<String, String>)>,
     },
+    /// Scalar boolean fact — rendered as a true/false/nil dropdown. Payload is
+    /// "true", "false", or "" (nil).
+    BooleanDropdown(String),
+    /// Decimal/monetary/float fact — rendered as a numeric text input filtered
+    /// to digits, sign, and decimal point. `raw` is the edit buffer; `value`
+    /// is the parsed result (`None` when raw is empty = nil, or when raw is an
+    /// incomplete/invalid number).
+    Decimal { raw: String, value: Option<Decimal> },
+    /// Integer fact — rendered as a numeric text input filtered to digits and
+    /// optional leading sign. "" = nil.
+    Integer(String),
+    /// Date fact — rendered as a text input validated against YYYY-MM-DD.
+    /// `raw` is the edit buffer; `value` is the parsed result (`None` when
+    /// raw is empty = nil, or when the format is invalid).
+    Date {
+        raw: String,
+        value: Option<NaiveDate>,
+    },
 }
 
 impl Default for FactValue {
     fn default() -> Self {
         FactValue::Text(String::new())
+    }
+}
+
+impl FactValue {
+    /// Returns `false` when the user has typed something that cannot be parsed
+    /// into the expected type. Nil (empty raw) is always valid.
+    pub fn is_type_valid(&self) -> bool {
+        match self {
+            FactValue::Decimal { raw, value } => {
+                raw.is_empty() || value.as_ref().is_some_and(|decimal| decimal.scale() == 2)
+            }
+            FactValue::Date { raw, value } => raw.is_empty() || value.is_some(),
+            _ => true,
+        }
     }
 }
 
@@ -282,6 +316,10 @@ impl Report {
                     })
                     .and_then(|row| match &row.value {
                         FactValue::Text(text) if !text.is_empty() => Some(text.as_str()),
+                        FactValue::Date { raw, .. } if !raw.is_empty() => Some(raw.as_str()),
+                        FactValue::BooleanDropdown(s) | FactValue::Integer(s) if !s.is_empty() => {
+                            Some(s.as_str())
+                        }
                         _ => None,
                     })
             })
@@ -392,8 +430,15 @@ impl Report {
         for row in &mut section.rows {
             for &(concept, date) in &mappings {
                 if row.concept == concept {
-                    if let FactValue::Text(ref mut text) = row.value {
-                        *text = date.to_string();
+                    match &mut row.value {
+                        FactValue::Text(text) => {
+                            *text = date.to_string();
+                        }
+                        FactValue::Date { raw, value } => {
+                            *raw = date.to_string();
+                            *value = NaiveDate::parse_from_str(raw, "%Y-%m-%d").ok();
+                        }
+                        _ => {}
                     }
 
                     if let Some(idx) = row.fact_index {
@@ -446,6 +491,36 @@ impl Report {
                     FactValue::Checkbox(checked) => SourceImportValue::Checkbox(*checked),
                     FactValue::Dropdown { selected, .. } => {
                         SourceImportValue::Dropdown(selected.clone())
+                    }
+                    FactValue::BooleanDropdown(value) | FactValue::Integer(value) => {
+                        let is_nil = row
+                            .fact_index
+                            .and_then(|idx| source_item_facts.get(idx).map(|fact| fact.is_nil()))
+                            .unwrap_or(value.is_empty());
+                        SourceImportValue::Text {
+                            value: value.clone(),
+                            is_nil,
+                        }
+                    }
+                    FactValue::Decimal { raw, .. } => {
+                        let is_nil = row
+                            .fact_index
+                            .and_then(|idx| source_item_facts.get(idx).map(|fact| fact.is_nil()))
+                            .unwrap_or(raw.is_empty());
+                        SourceImportValue::Text {
+                            value: raw.clone(),
+                            is_nil,
+                        }
+                    }
+                    FactValue::Date { raw, .. } => {
+                        let is_nil = row
+                            .fact_index
+                            .and_then(|idx| source_item_facts.get(idx).map(|fact| fact.is_nil()))
+                            .unwrap_or(raw.is_empty());
+                        SourceImportValue::Text {
+                            value: raw.clone(),
+                            is_nil,
+                        }
                     }
                 };
 
@@ -545,6 +620,103 @@ impl Report {
                         // selection is staged here; tuple-child creation is
                         // deferred to Save via update_instance_document.
                         *selected = new_selected;
+                    }
+                    (
+                        FactValue::Decimal { raw, value: parsed },
+                        SourceImportValue::Text { value, is_nil },
+                    ) => {
+                        matched_count += 1;
+
+                        if let Some(idx) = row.fact_index {
+                            if is_nil {
+                                instance.set_fact_nil(idx, true);
+                                instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
+                            } else {
+                                instance.set_fact_value(idx, value.clone());
+                                instance.set_fact_attribute(
+                                    idx,
+                                    FactAttribute::Decimals(Decimals::Finite(2)),
+                                );
+                            }
+                        }
+
+                        let new_raw = if is_nil { String::new() } else { value };
+
+                        if *raw != new_raw {
+                            imported_count += 1;
+                        }
+
+                        *parsed = new_raw.parse::<Decimal>().ok();
+                        *raw = new_raw;
+                    }
+                    (FactValue::Integer(text), SourceImportValue::Text { value, is_nil }) => {
+                        matched_count += 1;
+
+                        if let Some(idx) = row.fact_index {
+                            if is_nil {
+                                instance.set_fact_nil(idx, true);
+                                instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
+                            } else {
+                                instance.set_fact_value(idx, value.clone());
+                                instance.set_fact_attribute(
+                                    idx,
+                                    FactAttribute::Decimals(Decimals::Infinite),
+                                );
+                            }
+                        }
+
+                        let new_text = if is_nil { String::new() } else { value };
+
+                        if *text != new_text {
+                            imported_count += 1;
+                        }
+
+                        *text = new_text;
+                    }
+                    (
+                        FactValue::BooleanDropdown(text),
+                        SourceImportValue::Text { value, is_nil },
+                    ) => {
+                        matched_count += 1;
+
+                        if let Some(idx) = row.fact_index {
+                            if is_nil {
+                                instance.set_fact_nil(idx, true);
+                            } else {
+                                instance.set_fact_value(idx, value.clone());
+                            }
+                        }
+
+                        let new_text = if is_nil { String::new() } else { value };
+
+                        if *text != new_text {
+                            imported_count += 1;
+                        }
+
+                        *text = new_text;
+                    }
+                    (
+                        FactValue::Date { raw, value: parsed },
+                        SourceImportValue::Text { value, is_nil },
+                    ) => {
+                        matched_count += 1;
+
+                        if let Some(idx) = row.fact_index {
+                            if is_nil {
+                                instance.set_fact_nil(idx, true);
+                            } else {
+                                instance.set_fact_value(idx, value.clone());
+                            }
+                        }
+
+                        let new_raw = if is_nil { String::new() } else { value };
+
+                        if *raw != new_raw {
+                            imported_count += 1;
+                        }
+
+                        *parsed = NaiveDate::parse_from_str(&new_raw, "%Y-%m-%d").ok();
+                        *raw = new_raw;
                     }
                     _ => {}
                 }
@@ -718,6 +890,35 @@ fn is_required(concept: Option<&Concept>, taxonomy: &TaxonomySet) -> bool {
         })
 }
 
+fn fact_value_for_type(data_type: &XbrlType, raw_value: &str, is_nil: bool) -> FactValue {
+    let raw = if is_nil {
+        String::new()
+    } else {
+        raw_value.to_string()
+    };
+    match data_type {
+        XbrlType::Boolean => FactValue::BooleanDropdown(raw),
+        XbrlType::Decimal
+        | XbrlType::Monetary
+        | XbrlType::Float
+        | XbrlType::Double
+        | XbrlType::Shares
+        | XbrlType::Fraction
+        | XbrlType::Percent
+        | XbrlType::PerShare
+        | XbrlType::Pure => {
+            let value = raw.parse::<Decimal>().ok();
+            FactValue::Decimal { raw, value }
+        }
+        XbrlType::Integer => FactValue::Integer(raw),
+        XbrlType::Date => {
+            let value = NaiveDate::parse_from_str(&raw, "%Y-%m-%d").ok();
+            FactValue::Date { raw, value }
+        }
+        _ => FactValue::Text(raw),
+    }
+}
+
 /// Recursively collects facts from the tree nodes and populates the fact table
 /// rows.
 ///
@@ -741,6 +942,9 @@ fn collect_node(
     let is_tuple_concept = concept
         .and_then(|concept| concept.content_model.as_ref())
         .is_some();
+    let data_type = concept
+        .map(|c| c.data_type.clone())
+        .unwrap_or(XbrlType::String);
 
     // Detect Choice content model on the current concept (only relevant for tuples).
     let choice_max = if !is_in_multi_choice {
@@ -855,7 +1059,7 @@ fn collect_node(
             value: if is_in_multi_choice {
                 FactValue::Checkbox(false)
             } else {
-                FactValue::default()
+                fact_value_for_type(&data_type, "", true)
             },
             has_children,
             fact_index: None,
@@ -876,7 +1080,7 @@ fn collect_node(
                     value: if is_in_multi_choice {
                         FactValue::Checkbox(!fact.is_nil())
                     } else {
-                        FactValue::Text(fact.value().to_string())
+                        fact_value_for_type(&data_type, fact.value(), fact.is_nil())
                     },
                     has_children,
                     fact_index: Some(idx),

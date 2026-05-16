@@ -52,6 +52,8 @@ pub fn navigate_to_fact(
                     FactValue::Text(text) => !text.trim().is_empty(),
                     FactValue::Checkbox(checked) => *checked,
                     FactValue::Dropdown { selected, .. } => !selected.is_empty(),
+                    FactValue::BooleanDropdown(s) | FactValue::Integer(s) => !s.is_empty(),
+                    FactValue::Decimal { raw, .. } | FactValue::Date { raw, .. } => !raw.is_empty(),
                 };
 
                 if !is_filled {
