@@ -21,7 +21,7 @@ pub fn draw_report_list(
 
     if reports.is_empty() {
         ui.vertical_centered(|ui| {
-            ui.label("No imported reports yet. Import report to add an XML file.");
+            ui.label("No reports imported or created yet.");
         });
         return None;
     }
