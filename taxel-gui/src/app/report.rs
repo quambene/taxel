@@ -913,7 +913,7 @@ fn handle_consolidation_range_change(app: &mut TaxelApp, editing_tab: usize) -> 
     let ea_selected = app
         .loaded
         .as_ref()
-        .and_then(|l| l.report.sections.get(editing_tab))
+        .and_then(|loaded| loaded.report.sections.get(editing_tab))
         .is_some_and(|section| {
             section.rows.iter().any(|row| {
                 row.concept == CONSOLIDATION_RANGE
@@ -945,7 +945,7 @@ fn handle_end_date_change(app: &mut TaxelApp, editing_tab: usize) -> UpdateOutco
     let changed = app
         .loaded
         .as_ref()
-        .and_then(|l| l.report.sections.get(editing_tab))
+        .and_then(|loaded| loaded.report.sections.get(editing_tab))
         .is_some_and(|section| {
             section.rows.iter().enumerate().any(|(i, row)| {
                 row.concept == CLOSING_DATE
@@ -963,7 +963,7 @@ fn handle_end_date_change(app: &mut TaxelApp, editing_tab: usize) -> UpdateOutco
     let new_end_date_str = app
         .loaded
         .as_ref()
-        .and_then(|l| l.report.sections.get(editing_tab))
+        .and_then(|loaded| loaded.report.sections.get(editing_tab))
         .and_then(|section| section.rows.iter().find(|row| row.concept == CLOSING_DATE))
         .and_then(|row| match &row.value {
             FactValue::Text(text) if !text.is_empty() => Some(text.clone()),
@@ -1303,13 +1303,21 @@ pub fn send_report(app: &mut TaxelApp) {
     }
 
     let report_path = loaded.report.path.clone();
+    let xml_result = loaded
+        .elster
+        .to_xml()
+        .context("Failed to serialize Elster report");
 
-    let Some(xml) = read_report(
-        &report_path,
-        &mut app.diagnostics,
-        &mut app.show_diagnostics_panel,
-    ) else {
-        return;
+    let xml = match xml_result {
+        Ok(xml) => xml,
+        Err(err) => {
+            app.diagnostics.push(AppDiagnostic::new_error(
+                DiagnosticCategory::Send,
+                err.to_string(),
+            ));
+            app.show_diagnostics_panel = true;
+            return;
+        }
     };
 
     let Some(eric) = &app.eric else {
@@ -1319,7 +1327,7 @@ pub fn send_report(app: &mut TaxelApp) {
     let taxonomy_version = app
         .loaded
         .as_ref()
-        .and_then(|l| l.taxonomy.date())
+        .and_then(|loaded| loaded.taxonomy.date())
         .and_then(|date| TAXONOMY_DATE_TO_VERSION.get(date));
 
     let Some(taxonomy_version) = taxonomy_version else {
@@ -1449,25 +1457,6 @@ pub fn delete_report(app: &mut TaxelApp) {
 fn clear_diagnostics_by_category(app: &mut TaxelApp, category: DiagnosticCategory) {
     app.diagnostics
         .retain(|diagnostic| diagnostic.category != category);
-}
-
-/// Reads the XML from `report_path`.
-fn read_report(
-    report_path: &Path,
-    diagnostics: &mut Vec<AppDiagnostic>,
-    show_error_panel: &mut bool,
-) -> Option<String> {
-    match fs::read_to_string(report_path) {
-        Ok(xml) => Some(xml),
-        Err(err) => {
-            diagnostics.push(AppDiagnostic::new_error(
-                DiagnosticCategory::App,
-                format!("Failed to read report file: {err}"),
-            ));
-            *show_error_panel = true;
-            None
-        }
-    }
 }
 
 /// Determines the taxonomy version string (e.g. `"6.8"`) from a set of
