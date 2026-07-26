@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD041 -->
 
-## v0.1.0 (unreleased)
+## v0.1.0 (2026-05-16)
 
 - fixed
   - Fix non-nil facts with empty string as value
