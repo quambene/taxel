@@ -454,7 +454,10 @@ impl Report {
     ///
     /// Use `import_report_elements` = `false` to skip importing report-element
     /// selections from the source report. This prevents deletion of existing
-    /// sections from the target report.
+    /// sections from the target report; the source's un-selected sections are
+    /// consequently left with no fact index and their values are not
+    /// imported. Selecting them is the user's job via the GCD checkboxes,
+    /// which trigger a rebuild.
     pub fn apply_imported_values(
         &mut self,
         source_report: &Report,

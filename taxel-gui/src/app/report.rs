@@ -304,6 +304,10 @@ fn read_and_import_values(app: &mut TaxelApp) -> Result<(usize, usize, PathBuf),
     let source_item_facts = source_instance.item_facts();
     source_report.populate(source_view, &source_item_facts, &source_taxonomy);
 
+    // Report-element selections are never imported: only sections already
+    // enabled in the target report receive values. Enabling a source's
+    // section requires a structural rebuild, which is left to the user via
+    // the existing checkbox toggle in the GCD tab.
     let (matched_count, imported_count) = loaded.report.apply_imported_values(
         &source_report,
         &source_item_facts,
