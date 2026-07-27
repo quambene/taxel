@@ -245,7 +245,17 @@ fn compute_value(
                     any_found = true;
                 }
             }
-            any_found.then(|| sum.round_dp(2))
+            // `round_dp` only reduces excess precision; it leaves the scale
+            // untouched (e.g. still 0) when the accumulated sum already has
+            // <= 2 decimal places, which is common since eBilanz facts are
+            // often whole-euro values with no decimal point in the XML.
+            // `rescale` unconditionally sets the scale to exactly 2 in both
+            // directions, matching what `FactValue::is_type_valid()` requires.
+            any_found.then(|| {
+                let mut total = sum;
+                total.rescale(2);
+                total
+            })
         }
     };
 
@@ -1390,6 +1400,19 @@ mod calculated_value_tests {
             .and_then(decimal_of)
     }
 
+    fn raw_of<'a>(section: &'a ReportSection, concept: &str) -> &'a str {
+        match &section
+            .rows
+            .iter()
+            .find(|row| row.concept == concept)
+            .unwrap()
+            .value
+        {
+            FactValue::Decimal { raw, .. } => raw,
+            _ => panic!("expected a Decimal fact"),
+        }
+    }
+
     #[test]
     fn sums_children_with_weight_one() {
         let mut section = section_with(
@@ -1533,6 +1556,58 @@ mod calculated_value_tests {
         );
         all_nil_section.recompute_calculated_values();
         assert_eq!(value_of(&all_nil_section, "total"), None);
+    }
+
+    #[test]
+    fn zero_sum_of_whole_number_children_still_has_two_decimal_places() {
+        // Children whose raw XBRL value has no decimal point at all (e.g.
+        // "0", common for whole-euro eBilanz facts) parse to a Decimal with
+        // scale 0. `round_dp` only trims excess precision and leaves a
+        // scale-0 value untouched, so a naive `sum.round_dp(2)` would store
+        // "0" instead of "0.00", failing `FactValue::is_type_valid()`'s
+        // `scale() == 2` requirement.
+        let mut section = section_with(
+            vec![
+                decimal_row("total", "I", None),
+                decimal_row("childA", "I", Some("0")),
+                decimal_row("childB", "I", Some("0")),
+            ],
+            HashMap::from([(
+                "total".to_owned(),
+                vec![
+                    ("childA".to_owned(), Decimal::ONE),
+                    ("childB".to_owned(), Decimal::ONE),
+                ],
+            )]),
+        );
+
+        section.recompute_calculated_values();
+
+        assert_eq!(value_of(&section, "total").unwrap().scale(), 2);
+        assert_eq!(raw_of(&section, "total"), "0.00");
+    }
+
+    #[test]
+    fn nonzero_whole_number_sum_still_has_two_decimal_places() {
+        let mut section = section_with(
+            vec![
+                decimal_row("total", "I", None),
+                decimal_row("childA", "I", Some("5")),
+                decimal_row("childB", "I", Some("5")),
+            ],
+            HashMap::from([(
+                "total".to_owned(),
+                vec![
+                    ("childA".to_owned(), Decimal::ONE),
+                    ("childB".to_owned(), Decimal::ONE),
+                ],
+            )]),
+        );
+
+        section.recompute_calculated_values();
+
+        assert_eq!(value_of(&section, "total").unwrap().scale(), 2);
+        assert_eq!(raw_of(&section, "total"), "10.00");
     }
 
     #[test]
