@@ -379,7 +379,7 @@ pub fn visible_rows(
 /// taxonomy-derived flags that aren't otherwise visible in the table.
 fn describe_flags(row: &FactRow) -> String {
     format!(
-        "Abstract: {}\nRequired: {}\nTuple: {}\nCalculated total: {}",
+        "Abstract: {}\nRequired: {}\nTuple: {}\nCalculated: {}",
         yes_no(row.is_abstract),
         yes_no(row.is_required),
         yes_no(row.is_tuple),
