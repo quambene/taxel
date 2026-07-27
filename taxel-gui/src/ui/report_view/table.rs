@@ -71,7 +71,8 @@ pub fn draw_table(
                             ui.visuals().selection.bg_fill.gamma_multiply(0.35),
                         );
                     }
-                    ui.label(&rows[raw_idx].concept);
+                    ui.label(&rows[raw_idx].concept)
+                        .on_hover_text(describe_flags(&rows[raw_idx]));
                 });
                 row.col(|ui| {
                     if is_highlighted {
@@ -372,6 +373,26 @@ pub fn visible_rows(
     }
 
     visible
+}
+
+/// Builds the hover-tooltip text for the ID column, listing the
+/// taxonomy-derived flags that aren't otherwise visible in the table.
+fn describe_flags(row: &FactRow) -> String {
+    format!(
+        "Abstract: {}\nRequired: {}\nTuple: {}\nCalculated total: {}",
+        yes_no(row.is_abstract),
+        yes_no(row.is_required),
+        yes_no(row.is_tuple),
+        yes_no(row.is_calculated),
+    )
+}
+
+fn yes_no(value: bool) -> &'static str {
+    if value {
+        "yes"
+    } else {
+        "no"
+    }
 }
 
 fn is_filled(row: &FactRow) -> bool {
