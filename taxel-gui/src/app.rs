@@ -491,6 +491,7 @@ impl App for TaxelApp {
                         // reportElements checkboxes while editing.
                         if editing {
                             table.update_disabled_states();
+                            table.recompute_calculated_values();
                         }
 
                         if !self.search.results.is_empty() {

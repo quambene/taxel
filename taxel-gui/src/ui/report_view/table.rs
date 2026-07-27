@@ -113,7 +113,8 @@ pub fn draw_table(
                             ui.visuals().selection.bg_fill.gamma_multiply(0.35),
                         );
                     }
-                    let row_editing = editing && !rows[raw_idx].is_abstract;
+                    let row_editing =
+                        editing && !rows[raw_idx].is_abstract && !rows[raw_idx].is_calculated;
 
                     match &mut rows[raw_idx].value {
                         FactValue::Text(text) => {

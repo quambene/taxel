@@ -6,7 +6,8 @@ use crate::{
     domain::{
         active_roles, create_instance_document, extract_period, remove_forbidden_facts,
         remove_trade_accounting_facts, restore_required_nil_tuple_children,
-        update_instance_document, FactValue, Report, ReportStatus, UpdateOutcome,
+        update_instance_document, write_calculated_values_to_instance, FactValue, Report,
+        ReportStatus, UpdateOutcome,
     },
     infrastructure::report_store::{confirmations_dir, reports_dir},
 };
@@ -1088,6 +1089,16 @@ fn rebuild_instance(
         debug!("Rebuild import: matched={matched}, imported={imported}");
 
         restore_required_nil_tuple_children(&mut fresh_instance, taxonomy);
+
+        // `apply_imported_values` may have copied a stale total from the
+        // source report for a calculated concept (e.g. if its children were
+        // reduced by `remove_trade_accounting_facts`). This path persists
+        // straight into `fresh_instance` without going through the normal
+        // save_report snapshot-diff, so totals must be reconciled here.
+        fresh_report.recompute_calculated_values();
+        for section in &fresh_report.sections {
+            write_calculated_values_to_instance(section, &mut fresh_instance);
+        }
     }
 
     {
