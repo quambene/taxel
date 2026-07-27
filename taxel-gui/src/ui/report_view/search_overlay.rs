@@ -147,6 +147,7 @@ pub fn draw_search_results_overlay(
                                         &state.collapsed,
                                         state.show_required_only,
                                         state.show_filled_only,
+                                        &[],
                                     );
                                     if let Some(visible_idx) =
                                         visible.iter().position(|&raw| raw == row_idx)

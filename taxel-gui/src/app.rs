@@ -475,6 +475,7 @@ impl App for TaxelApp {
                                 ui,
                                 state.show_required_only,
                                 state.show_filled_only,
+                                &self.edit_snapshot,
                             );
 
                             if let Some(row_idx) = pending_uncheck {

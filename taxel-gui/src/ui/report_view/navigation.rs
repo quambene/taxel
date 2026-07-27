@@ -67,6 +67,7 @@ pub fn navigate_to_fact(
             &state.collapsed,
             state.show_required_only,
             state.show_filled_only,
+            &[],
         );
 
         if let Some(vis_idx) = visible.iter().position(|&raw| raw == row_idx) {

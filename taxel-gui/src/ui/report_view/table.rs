@@ -11,6 +11,13 @@ use taxel::REPORT_ELEMENT_PREFIX;
 /// collapsed. Handles the toggle logic for expanding/collapsing rows with
 /// children. Returns the raw index of a row that the user attempted to uncheck
 /// (if any).
+///
+/// `edit_snapshot` is the section's row values as they were when editing
+/// started (empty when not editing). The "Filled" filter is evaluated
+/// against this snapshot rather than the live in-progress value, so clearing
+/// a field's text while typing doesn't cause its own row to vanish
+/// mid-edit — it only drops out once editing ends and the table is
+/// re-rendered against the freshly saved/cancelled values.
 #[allow(clippy::too_many_arguments)]
 pub fn draw_table(
     rows: &mut [FactRow],
@@ -22,9 +29,16 @@ pub fn draw_table(
     ui: &mut Ui,
     show_required_only: bool,
     show_filled_only: bool,
+    edit_snapshot: &[FactValue],
 ) -> Option<usize> {
     let row_height = ui.text_style_height(&TextStyle::Body) + ui.spacing().item_spacing.y;
-    let visible = visible_rows(rows, collapsed, show_required_only, show_filled_only);
+    let visible = visible_rows(
+        rows,
+        collapsed,
+        show_required_only,
+        show_filled_only,
+        edit_snapshot,
+    );
     let mut toggle: Option<usize> = None;
     let mut pending_report_element_uncheck: Option<usize> = None;
 
@@ -334,12 +348,18 @@ pub fn collapsed_at_depth(rows: &[FactRow], max_depth: usize) -> HashSet<usize> 
 /// `collapsed` stores raw indices, which are stable across expand/collapse
 /// operations. When `show_required_only` is true, only rows with
 /// `is_required = true` are included. When `show_filled_only` is true, only
-/// rows with non-empty values are included.
+/// rows with non-empty values are included — checked against `edit_snapshot`
+/// (the value when editing started) rather than the row's live in-progress
+/// value where available, so a row being actively edited doesn't disappear
+/// the instant its text is cleared. Pass an empty slice when there's no
+/// editing session in progress (or none relevant), which falls back to
+/// checking the row's current live value.
 pub fn visible_rows(
     rows: &[FactRow],
     collapsed: &HashSet<usize>,
     show_required_only: bool,
     show_filled_only: bool,
+    edit_snapshot: &[FactValue],
 ) -> Vec<usize> {
     let mut visible = Vec::new();
     let mut hidden_above_depth: Option<usize> = None;
@@ -359,11 +379,15 @@ pub fn visible_rows(
             continue;
         }
 
-        if show_filled_only && !is_filled(row) {
-            if row.has_children && collapsed.contains(&raw_idx) {
-                hidden_above_depth = Some(row.depth);
+        if show_filled_only {
+            let reference = edit_snapshot.get(raw_idx).unwrap_or(&row.value);
+
+            if !is_filled(reference) {
+                if row.has_children && collapsed.contains(&raw_idx) {
+                    hidden_above_depth = Some(row.depth);
+                }
+                continue;
             }
-            continue;
         }
 
         visible.push(raw_idx);
@@ -395,8 +419,8 @@ fn yes_no(value: bool) -> &'static str {
     }
 }
 
-fn is_filled(row: &FactRow) -> bool {
-    match &row.value {
+fn is_filled(value: &FactValue) -> bool {
+    match value {
         FactValue::Text(text) => !text.trim().is_empty(),
         FactValue::Checkbox(checked) => *checked,
         FactValue::Dropdown { selected, .. } => !selected.is_empty(),
@@ -419,5 +443,83 @@ pub fn ensure_row_visible(row_idx: usize, rows: &[FactRow], collapsed: &mut Hash
                 break;
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod visible_rows_tests {
+    use super::*;
+
+    fn decimal_row(concept: &str, raw: &str) -> FactRow {
+        FactRow {
+            concept: concept.to_owned(),
+            parent_concept: None,
+            labels: std::collections::HashMap::new(),
+            depth: 0,
+            context: "I".to_owned(),
+            unit: None,
+            value: FactValue::Decimal {
+                raw: raw.to_owned(),
+                value: raw.parse().ok(),
+            },
+            has_children: false,
+            fact_index: Some(0),
+            is_required: false,
+            is_abstract: false,
+            is_tuple: false,
+            is_calculated: false,
+        }
+    }
+
+    #[test]
+    fn filled_only_hides_empty_rows_when_not_editing() {
+        let rows = vec![decimal_row("a", "10.00"), decimal_row("b", "")];
+
+        let visible = visible_rows(&rows, &HashSet::new(), false, true, &[]);
+
+        assert_eq!(visible, vec![0]);
+    }
+
+    #[test]
+    fn filled_only_keeps_row_visible_while_its_live_value_is_cleared_mid_edit() {
+        // Simulates: editing started with "b" filled (captured in the
+        // snapshot), then the user clears the text box, so the *live* row
+        // value is now empty. The row must stay visible for the rest of the
+        // editing session — it should only drop out once editing ends and
+        // the table re-renders against the saved/cancelled value.
+        let rows = vec![decimal_row("a", "10.00"), decimal_row("b", "")];
+        let edit_snapshot = vec![
+            FactValue::Decimal {
+                raw: "10.00".to_owned(),
+                value: "10.00".parse().ok(),
+            },
+            FactValue::Decimal {
+                raw: "5.00".to_owned(),
+                value: "5.00".parse().ok(),
+            },
+        ];
+
+        let visible = visible_rows(&rows, &HashSet::new(), false, true, &edit_snapshot);
+
+        assert_eq!(visible, vec![0, 1]);
+    }
+
+    #[test]
+    fn filled_only_still_hides_a_row_that_was_already_empty_before_editing() {
+        let rows = vec![decimal_row("a", "10.00"), decimal_row("b", "")];
+        let edit_snapshot = vec![
+            FactValue::Decimal {
+                raw: "10.00".to_owned(),
+                value: "10.00".parse().ok(),
+            },
+            FactValue::Decimal {
+                raw: String::new(),
+                value: None,
+            },
+        ];
+
+        let visible = visible_rows(&rows, &HashSet::new(), false, true, &edit_snapshot);
+
+        assert_eq!(visible, vec![0]);
     }
 }
