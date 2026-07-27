@@ -158,7 +158,17 @@ impl ReportSection {
             return;
         }
 
-        let computed: HashMap<(String, String), Option<Decimal>> = {
+        // Only rows whose own concept is a genuine calculation-linkbase
+        // total (a key in `calc_children`) get overwritten here. Collected
+        // as `(row index, computed value)` — resolved via `row_index` while
+        // it's still in scope — rather than applied by re-scanning `rows`
+        // for every entry in `compute_value`'s memo, since that memo also
+        // contains every *leaf* concept touched during recursion (needed
+        // for memoization) and must never be written back: doing so would
+        // silently overwrite a leaf's live, hand-typed value with its own
+        // canonical `Decimal::to_string()` on every frame, e.g. turning a
+        // still-being-typed "100." back into "100".
+        let updates: Vec<(usize, Option<Decimal>)> = {
             let mut row_index: HashMap<(&str, &str), usize> = HashMap::new();
             for (i, row) in self.rows.iter().enumerate() {
                 if !row.context.is_empty() {
@@ -168,11 +178,13 @@ impl ReportSection {
             let contexts: HashSet<&str> = row_index.keys().map(|&(_, ctx)| ctx).collect();
 
             let mut memo = HashMap::new();
+            let mut updates = Vec::new();
+
             for &context in &contexts {
                 for concept in self.calc_children.keys() {
-                    if row_index.contains_key(&(concept.as_str(), context)) {
+                    if let Some(&idx) = row_index.get(&(concept.as_str(), context)) {
                         let mut visiting = HashSet::new();
-                        compute_value(
+                        let value = compute_value(
                             concept,
                             context,
                             &self.calc_children,
@@ -181,20 +193,16 @@ impl ReportSection {
                             &mut memo,
                             &mut visiting,
                         );
+                        updates.push((idx, value));
                     }
                 }
             }
-            memo
+
+            updates
         };
 
-        for ((concept, context), value) in computed {
-            if let Some(idx) = self
-                .rows
-                .iter()
-                .position(|row| row.concept == concept && row.context == context)
-            {
-                apply_computed_decimal(&mut self.rows[idx], value);
-            }
+        for (idx, value) in updates {
+            apply_computed_decimal(&mut self.rows[idx], value);
         }
     }
 }
@@ -1356,6 +1364,39 @@ fn build_labels_map<'a>(nodes: &'a [TreeNode<'a>]) -> HashMap<&'a str, HashMap<S
 #[cfg(test)]
 mod calculated_value_tests {
     use super::*;
+
+    #[test]
+    fn does_not_overwrite_a_leaf_rows_own_raw_text_mid_edit() {
+        // Regression test for a bug where `recompute_calculated_values`
+        // rewrote every row `compute_value` had visited during recursion —
+        // not just the total itself — since `compute_value` memoizes every
+        // concept it touches, leaves included. That silently clobbered a
+        // leaf's live, in-progress typed text with `Decimal::to_string()`
+        // of its own value every frame: typing "100." (a valid partial
+        // decimal, scale 0) got immediately rewritten back to "100",
+        // permanently eating the just-typed trailing dot.
+        let mut section = section_with(
+            vec![
+                decimal_row("total", "I", None),
+                decimal_row("leaf", "I", Some("10.00")),
+            ],
+            HashMap::from([("total".to_owned(), vec![("leaf".to_owned(), Decimal::ONE)])]),
+        );
+
+        // Simulate mid-typing: the leaf's raw text has a trailing dot that
+        // hasn't parsed to a 2-decimal value yet ("100." -> scale 0), which
+        // does NOT round-trip losslessly through `Decimal::to_string()`.
+        section.rows[1].value = FactValue::Decimal {
+            raw: "100.".to_owned(),
+            value: "100.".parse().ok(),
+        };
+
+        section.recompute_calculated_values();
+
+        assert_eq!(raw_of(&section, "leaf"), "100.");
+        // The total itself is still correctly (re)computed from the leaf.
+        assert_eq!(value_of(&section, "total"), Some(Decimal::new(10000, 2)));
+    }
 
     fn decimal_row(concept: &str, context: &str, value: Option<&str>) -> FactRow {
         let value = value.map(|v| v.parse::<Decimal>().unwrap());

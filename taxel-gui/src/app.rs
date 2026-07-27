@@ -492,7 +492,15 @@ impl App for TaxelApp {
                         // reportElements checkboxes while editing.
                         if editing {
                             table.update_disabled_states();
-                            table.recompute_calculated_values();
+
+                            // Only the section currently being edited can have
+                            // changed this frame, so recomputing every other
+                            // section's calculation tree here would be pure
+                            // per-frame waste (and, for reports with many
+                            // large sections, a real source of input lag).
+                            if let Some(section) = table.sections.get_mut(tab) {
+                                section.recompute_calculated_values();
+                            }
                         }
 
                         if !self.search.results.is_empty() {
