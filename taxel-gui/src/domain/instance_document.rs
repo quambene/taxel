@@ -823,7 +823,10 @@ fn write_decimal_fact(instance: &mut InstanceDocument, idx: usize, value: Option
 /// through the normal snapshot-diff path in `save_report`; this function is
 /// for the one path (`rebuild_instance`) that persists to `InstanceDocument`
 /// directly, bypassing that diff.
-pub fn write_calculated_values_to_instance(section: &ReportSection, instance: &mut InstanceDocument) {
+pub fn write_calculated_values_to_instance(
+    section: &ReportSection,
+    instance: &mut InstanceDocument,
+) {
     for row in &section.rows {
         if !row.is_calculated {
             continue;
