@@ -42,7 +42,7 @@ pub fn draw_search_results_overlay(
         .show(ctx, |ui| {
             Frame::popup(ui.style())
                 .stroke(Stroke::new(
-                    1.0,
+                    1.0_f32,
                     ui.visuals().widgets.noninteractive.bg_stroke.color,
                 ))
                 .show(ui, |ui| {

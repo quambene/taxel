@@ -46,7 +46,7 @@ pub fn draw_dark_button(ui: &mut Ui, label: &str) -> Response {
         ui.painter().rect_stroke(
             response.rect,
             cr,
-            Stroke::new(1.0, Color32::from_gray(200)),
+            Stroke::new(1.0_f32, Color32::from_gray(200)),
             StrokeKind::Middle,
         );
     }
