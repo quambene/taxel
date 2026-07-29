@@ -254,11 +254,13 @@ fn compute_value(
                 }
             }
             // `round_dp` only reduces excess precision; it leaves the scale
-            // untouched (e.g. still 0) when the accumulated sum already has
-            // <= 2 decimal places, which is common since eBilanz facts are
-            // often whole-euro values with no decimal point in the XML.
-            // `rescale` unconditionally sets the scale to exactly 2 in both
-            // directions, matching what `FactValue::is_type_valid()` requires.
+            // untouched (e.g. still 0) when the accumulated sum already has <=
+            // 2 decimal places, which is common since eBilanz facts are often
+            // whole-euro values with no decimal point in the XML. `rescale`
+            // unconditionally sets the scale to exactly 2 in both directions,
+            // matching what `FactValue::is_type_valid()` requires. If no child
+            // resolved to a value at all (the breakdown is entirely empty), the
+            // total is also empty (`None`).
             any_found.then(|| {
                 let mut total = sum;
                 total.rescale(2);
@@ -1364,6 +1366,26 @@ fn build_labels_map<'a>(nodes: &'a [TreeNode<'a>]) -> HashMap<&'a str, HashMap<S
 #[cfg(test)]
 mod calculated_value_tests {
     use super::*;
+
+    #[test]
+    fn empty_child_leaves_total_empty() {
+        // A total whose only child is empty (never filled) resolves to
+        // None itself — an empty breakdown means an empty total.
+        let mut section = section_with(
+            vec![
+                decimal_row("sub_total", "I", None),
+                decimal_row("breakdown_child", "I", None),
+            ],
+            HashMap::from([(
+                "sub_total".to_owned(),
+                vec![("breakdown_child".to_owned(), Decimal::ONE)],
+            )]),
+        );
+
+        section.recompute_calculated_values();
+
+        assert_eq!(value_of(&section, "sub_total"), None);
+    }
 
     #[test]
     fn does_not_overwrite_a_leaf_rows_own_raw_text_mid_edit() {
