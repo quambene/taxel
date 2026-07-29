@@ -447,7 +447,7 @@ pub fn ensure_row_visible(row_idx: usize, rows: &[FactRow], collapsed: &mut Hash
 }
 
 #[cfg(test)]
-mod visible_rows_tests {
+mod tests {
     use super::*;
 
     fn decimal_row(concept: &str, raw: &str) -> FactRow {

@@ -1364,7 +1364,7 @@ fn build_labels_map<'a>(nodes: &'a [TreeNode<'a>]) -> HashMap<&'a str, HashMap<S
 }
 
 #[cfg(test)]
-mod calculated_value_tests {
+mod tests {
     use super::*;
 
     #[test]
