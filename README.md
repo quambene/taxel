@@ -121,6 +121,7 @@ Rust bindings and SDK for ERiC were moved to <https://github.com/quambene/eric-r
 
 The `taxel` repository contains multiple crates with separate changelogs:
 
+- workspace: [view changelog](https://github.com/quambene/taxel/blob/main/CHANGELOG.md)
 - `taxel`: [view changelog](https://github.com/quambene/taxel/blob/main/taxel/CHANGELOG.md)
 - `taxel-cli`: [view changelog](https://github.com/quambene/taxel/blob/main/taxel-cli/CHANGELOG.md)
 - `taxel-gui`: [view changelog](https://github.com/quambene/taxel/blob/main/taxel-gui/CHANGELOG.md)
