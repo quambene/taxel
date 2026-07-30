@@ -7,6 +7,7 @@
 - added
   - Automatically aggregate calculated fact values (e.g. total assets, total equity and liabilities) from the taxonomy's calculation linkbase; aggregated facts are read-only
   - Show taxonomy info (abstract, required, tuple, calculated) in a tooltip on the fact ID
+  - Export fact values as CSV file
 - changed
   - Add description to "Import values" modal
 

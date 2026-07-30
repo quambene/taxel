@@ -322,6 +322,107 @@ fn read_and_import_values(app: &mut TaxelApp) -> Result<(usize, usize, PathBuf),
     Ok((matched_count, imported_count, source_path))
 }
 
+/// Exports the currently displayed fact values to a semicolon-delimited CSV
+/// file.
+///
+/// Columns are: Section, ID (concept), Depth, Name (label in the active UI
+/// language), Value, Unit, and Context. Only sections selected in the GCD
+/// section (i.e. not disabled) are exported. Within those sections, abstract
+/// parent rows are always included (they carry no value but provide the
+/// section/tree structure); other rows are only included if they have a
+/// non-empty value. This only reads already-in-memory report data, so it
+/// runs synchronously on the UI thread.
+pub fn export_values(app: &mut TaxelApp, dest: PathBuf) {
+    match write_values_csv(app, &dest) {
+        Ok(row_count) => {
+            app.diagnostics.push(AppDiagnostic::new_success(
+                DiagnosticCategory::Export,
+                format!("Exported {row_count} fact values to {}", dest.display()),
+            ));
+            app.show_diagnostics_panel = true;
+        }
+        Err(err) => {
+            app.diagnostics.push(AppDiagnostic::new_error(
+                DiagnosticCategory::Export,
+                format!("Failed to export values: {err}"),
+            ));
+            app.show_diagnostics_panel = true;
+        }
+    }
+}
+
+/// Writes fact rows across all GCD-selected (non-disabled) sections of the
+/// loaded report to `dest` as semicolon-delimited CSV, returning the number
+/// of rows written. Abstract rows are always kept; other rows are kept only
+/// if their value is non-empty.
+fn write_values_csv(app: &TaxelApp, dest: &Path) -> Result<usize, anyhow::Error> {
+    let loaded = app
+        .loaded
+        .as_ref()
+        .ok_or_else(|| anyhow::anyhow!("Cannot export values without a loaded report"))?;
+    let lang = &app.settings.lang;
+
+    let mut writer = csv::WriterBuilder::new().delimiter(b';').from_path(dest)?;
+    writer.write_record(["Section", "ID", "Depth", "Name", "Value", "Unit", "Context"])?;
+
+    let mut row_count = 0;
+
+    for section in &loaded.report.sections {
+        if section.disabled {
+            continue;
+        }
+
+        let section_name = section
+            .labels
+            .get(lang)
+            .map(String::as_str)
+            .unwrap_or(section.role.as_str());
+
+        for row in &section.rows {
+            let value = fact_value_to_string(&row.value, lang);
+
+            if !row.is_abstract && value.is_empty() {
+                continue;
+            }
+
+            let name = row.labels.get(lang).map(String::as_str).unwrap_or("");
+            writer.write_record([
+                section_name,
+                row.concept.as_str(),
+                row.depth.to_string().as_str(),
+                name,
+                value.as_str(),
+                row.unit.as_deref().unwrap_or(""),
+                row.context.as_str(),
+            ])?;
+            row_count += 1;
+        }
+    }
+
+    writer.flush()?;
+
+    Ok(row_count)
+}
+
+/// Renders a `FactValue` the same way the fact table displays it, for CSV
+/// export.
+fn fact_value_to_string(value: &FactValue, lang: &str) -> String {
+    match value {
+        FactValue::Text(text) => text.clone(),
+        FactValue::Checkbox(checked) => checked.to_string(),
+        FactValue::Dropdown { selected, options } => options
+            .iter()
+            .find(|(key, _)| key == selected)
+            .and_then(|(_, labels)| labels.get(lang))
+            .cloned()
+            .unwrap_or_else(|| selected.clone()),
+        FactValue::BooleanDropdown(selected) => selected.clone(),
+        FactValue::Decimal { raw, .. } => raw.clone(),
+        FactValue::Integer(text) => text.clone(),
+        FactValue::Date { raw, .. } => raw.clone(),
+    }
+}
+
 /// Loads an XBRL instance document from the specified path, discovers the
 /// referenced taxonomies, and populates the fact table with the extracted
 /// facts.

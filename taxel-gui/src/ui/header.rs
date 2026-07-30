@@ -42,6 +42,16 @@ pub fn draw_header(ui: &mut Ui, app: &mut TaxelApp) {
             app.show_import_values_modal = true;
         }
 
+        if app.loaded.is_some() && ui.button("Export values").clicked() {
+            if let Some(path) = FileDialog::new()
+                .add_filter("CSV", &["csv"])
+                .set_file_name(export_values_file_name(app))
+                .save_file()
+            {
+                app::export_values(app, path);
+            }
+        }
+
         if app.loaded.is_some() && ui.button("Validate report").clicked() {
             app::validate_report(app);
         }
@@ -97,6 +107,19 @@ fn draw_import_button(ui: &mut Ui, app: &mut TaxelApp) {
             app::import_report(app, path, ui.ctx());
         }
     }
+}
+
+/// Suggests a default CSV file name for "Export values", derived from the
+/// loaded report's file stem, e.g. "my-report_values.csv".
+fn export_values_file_name(app: &TaxelApp) -> String {
+    let stem = app
+        .loaded
+        .as_ref()
+        .and_then(|loaded| loaded.report.path.file_stem())
+        .and_then(|stem| stem.to_str())
+        .unwrap_or("report");
+
+    format!("{stem}_values.csv")
 }
 
 /// Draws a summary of errors and warnings in the header. Clicking on the

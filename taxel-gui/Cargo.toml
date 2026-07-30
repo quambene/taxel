@@ -26,6 +26,7 @@ trash = { workspace = true }
 zip = { workspace = true }
 reqwest = { workspace = true }
 rfd = { workspace = true }
+csv = { workspace = true }
 eframe = { workspace = true }
 egui_extras = { workspace = true }
 dioxus-devtools = { workspace = true }
