@@ -1,0 +1,8 @@
+[advisories]
+ignore = [
+    # quick-xml <0.41.0: quadratic run time on start tags with duplicate
+    # attributes, and unbounded namespace-declaration allocation in
+    # `NsReader` (memory-exhaustion DoS). Fixed upstream in 0.41.0.
+    "RUSTSEC-2026-0194",
+    "RUSTSEC-2026-0195",
+]
