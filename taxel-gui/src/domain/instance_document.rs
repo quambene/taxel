@@ -1,7 +1,8 @@
-use crate::domain::FactValue;
+use crate::domain::{FactValue, ReportSection};
 use anyhow::Context;
 use chrono::NaiveDate;
 use log::debug;
+use rust_decimal::Decimal;
 use std::collections::{HashMap, HashSet};
 use taxel::{BASELINE_ROLE_URIS, REPORT_ELEMENT_TO_ROLE_URI, REQUIRED_NIL_TUPLE_CHILDREN};
 use xbrl_rs::{
@@ -748,11 +749,9 @@ pub fn update_instance_document(
         FactValue::Decimal { raw, value } => {
             if let Some(idx) = fact_index {
                 if raw.is_empty() {
-                    instance.set_fact_nil(idx, true);
-                    instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
+                    write_decimal_fact(instance, idx, None);
                 } else if let Some(decimal) = value {
-                    instance.set_fact_value(idx, decimal.to_string());
-                    instance.set_fact_attribute(idx, FactAttribute::Decimals(Decimals::Finite(2)));
+                    write_decimal_fact(instance, idx, Some(*decimal));
                 }
             }
             Ok(UpdateOutcome::NoChange)
@@ -790,6 +789,51 @@ pub fn update_instance_document(
                 }
             }
             Ok(UpdateOutcome::NoChange)
+        }
+    }
+}
+
+/// Writes a decimal fact value (or clears it to nil when `value` is `None`),
+/// setting the `decimals` attribute consistently. Shared by
+/// [`update_instance_document`]'s `FactValue::Decimal` arm and
+/// [`write_calculated_values_to_instance`] so the two write paths can't
+/// drift apart.
+fn write_decimal_fact(instance: &mut InstanceDocument, idx: usize, value: Option<Decimal>) {
+    match value {
+        Some(decimal) => {
+            instance.set_fact_value(idx, decimal.to_string());
+            instance.set_fact_attribute(idx, FactAttribute::Decimals(Decimals::Finite(2)));
+        }
+        None => {
+            instance.set_fact_nil(idx, true);
+            instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
+        }
+    }
+}
+
+/// Writes every calculated-total row's current (recomputed) value into
+/// `instance`, bypassing [`update_instance_document`]'s snapshot/dropdown/
+/// tuple machinery since calculated rows are always plain `Decimal` facts.
+/// No-op for rows with `fact_index: None` (the concept isn't represented as
+/// a fact in this instance document).
+///
+/// This exists because [`Report::recompute_calculated_values`] only fixes
+/// the in-memory `FactRow` values shown in the table — it doesn't itself
+/// persist into `InstanceDocument`. Persistence for a live edit happens
+/// through the normal snapshot-diff path in `save_report`; this function is
+/// for the one path (`rebuild_instance`) that persists to `InstanceDocument`
+/// directly, bypassing that diff.
+pub fn write_calculated_values_to_instance(
+    section: &ReportSection,
+    instance: &mut InstanceDocument,
+) {
+    for row in &section.rows {
+        if !row.is_calculated {
+            continue;
+        }
+
+        if let (Some(idx), FactValue::Decimal { value, .. }) = (row.fact_index, &row.value) {
+            write_decimal_fact(instance, idx, *value);
         }
     }
 }

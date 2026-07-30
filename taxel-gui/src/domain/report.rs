@@ -1,7 +1,10 @@
 use crate::domain::ReportStatus;
 use chrono::NaiveDate;
 use rust_decimal::Decimal;
-use std::{collections::HashMap, path::PathBuf};
+use std::{
+    collections::{HashMap, HashSet},
+    path::PathBuf,
+};
 use taxel::{
     ElsterReport, TaxonomyType, CLOSING_DATE, COMPANY_CITY, COMPANY_COUNTRY, COMPANY_HOUSE_NO,
     COMPANY_NAME, COMPANY_STREET, COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, COMPANY_ZIP_CODE,
@@ -13,6 +16,10 @@ use xbrl_rs::{
     InstanceDocument, ItemFact, Label, Particle, Period, TaxonomySet, TreeNode, TupleParticleView,
     XbrlType, ROLE_LABEL, ROLE_TERSE,
 };
+
+/// The XBRL 2.1 arcrole marking a calculation-linkbase arc as a
+/// summation-item relationship (parent = weighted sum of children).
+const SUMMATION_ITEM_ARCROLE: &str = "http://www.xbrl.org/2003/arcrole/summation-item";
 
 /// An imported fact value extracted from a source instance document for merging
 /// into the current report. Carries nil-ness separately from the text value
@@ -109,6 +116,11 @@ pub struct FactRow {
     pub is_abstract: bool,
     /// Whether this row represents a tuple-origin concept in the tree.
     pub is_tuple: bool,
+    /// Whether this concept is a computed total per the calculation linkbase
+    /// for this section's role — the weighted, recursive sum of its
+    /// calculation children. Read-only; its value is derived, never
+    /// hand-edited.
+    pub is_calculated: bool,
 }
 
 /// One presentation section with its rows.
@@ -129,6 +141,157 @@ pub struct ReportSection {
     /// Disabled sections are still displayed in the sidebar but are visually
     /// de-emphasized and can't be edited.
     pub disabled: bool,
+    /// Calculation-linkbase children for this role, built once in `populate`
+    /// and reused by `recompute_calculated_values` on every edit so the
+    /// linkbase isn't reparsed per keystroke. Empty when the role has no
+    /// calculation network.
+    pub calc_children: HashMap<String, Vec<(String, Decimal)>>,
+}
+
+impl ReportSection {
+    /// Recomputes every calculated-total row's displayed value from its
+    /// calculation-linkbase children, bottom-up, restricted to same-context
+    /// siblings (a total only sums facts sharing its own `contextRef`, e.g.
+    /// current-period vs. prior-period columns are never mixed).
+    pub fn recompute_calculated_values(&mut self) {
+        if self.calc_children.is_empty() {
+            return;
+        }
+
+        // Only rows whose own concept is a genuine calculation-linkbase
+        // total (a key in `calc_children`) get overwritten here. Collected
+        // as `(row index, computed value)` — resolved via `row_index` while
+        // it's still in scope — rather than applied by re-scanning `rows`
+        // for every entry in `compute_value`'s memo, since that memo also
+        // contains every *leaf* concept touched during recursion (needed
+        // for memoization) and must never be written back: doing so would
+        // silently overwrite a leaf's live, hand-typed value with its own
+        // canonical `Decimal::to_string()` on every frame, e.g. turning a
+        // still-being-typed "100." back into "100".
+        let updates: Vec<(usize, Option<Decimal>)> = {
+            let mut row_index: HashMap<(&str, &str), usize> = HashMap::new();
+            for (i, row) in self.rows.iter().enumerate() {
+                if !row.context.is_empty() {
+                    row_index.insert((row.concept.as_str(), row.context.as_str()), i);
+                }
+            }
+            let contexts: HashSet<&str> = row_index.keys().map(|&(_, ctx)| ctx).collect();
+
+            let mut memo = HashMap::new();
+            let mut updates = Vec::new();
+
+            for &context in &contexts {
+                for concept in self.calc_children.keys() {
+                    if let Some(&idx) = row_index.get(&(concept.as_str(), context)) {
+                        let mut visiting = HashSet::new();
+                        let value = compute_value(
+                            concept,
+                            context,
+                            &self.calc_children,
+                            &row_index,
+                            &self.rows,
+                            &mut memo,
+                            &mut visiting,
+                        );
+                        updates.push((idx, value));
+                    }
+                }
+            }
+
+            updates
+        };
+
+        for (idx, value) in updates {
+            apply_computed_decimal(&mut self.rows[idx], value);
+        }
+    }
+}
+
+/// `None` in `calc_children` for `concept` means it's a calculation leaf; its
+/// value is read straight from its own row. `Some(children)` means it's a
+/// total: the weighted sum of `children` found in the same `context`. A
+/// child with no resolvable value (nil, or not rendered in this section)
+/// contributes nothing; if literally no child resolves to a value, the
+/// total itself resolves to `None` (left nil). `visiting` guards against infinite recursion on a
+/// circular/malformed calculation linkbase.
+#[allow(clippy::too_many_arguments)]
+fn compute_value(
+    concept: &str,
+    context: &str,
+    calc_children: &HashMap<String, Vec<(String, Decimal)>>,
+    row_index: &HashMap<(&str, &str), usize>,
+    rows: &[FactRow],
+    memo: &mut HashMap<(String, String), Option<Decimal>>,
+    visiting: &mut HashSet<(String, String)>,
+) -> Option<Decimal> {
+    let key = (concept.to_owned(), context.to_owned());
+    if let Some(cached) = memo.get(&key) {
+        return *cached;
+    }
+    if !visiting.insert(key.clone()) {
+        return None;
+    }
+
+    let value = match calc_children.get(concept) {
+        None => row_index
+            .get(&(concept, context))
+            .and_then(|&idx| decimal_of(&rows[idx])),
+        Some(children) => {
+            let mut sum = Decimal::ZERO;
+            let mut any_found = false;
+            for (child, weight) in children {
+                if let Some(v) = compute_value(
+                    child,
+                    context,
+                    calc_children,
+                    row_index,
+                    rows,
+                    memo,
+                    visiting,
+                ) {
+                    sum += *weight * v;
+                    any_found = true;
+                }
+            }
+            // `round_dp` only reduces excess precision; it leaves the scale
+            // untouched (e.g. still 0) when the accumulated sum already has <=
+            // 2 decimal places, which is common since eBilanz facts are often
+            // whole-euro values with no decimal point in the XML. `rescale`
+            // unconditionally sets the scale to exactly 2 in both directions,
+            // matching what `FactValue::is_type_valid()` requires. If no child
+            // resolved to a value at all (the breakdown is entirely empty), the
+            // total is also empty (`None`).
+            any_found.then(|| {
+                let mut total = sum;
+                total.rescale(2);
+                total
+            })
+        }
+    };
+
+    visiting.remove(&key);
+    memo.insert(key.clone(), value);
+    value
+}
+
+fn decimal_of(row: &FactRow) -> Option<Decimal> {
+    match &row.value {
+        FactValue::Decimal { value, .. } => *value,
+        _ => None,
+    }
+}
+
+fn apply_computed_decimal(row: &mut FactRow, computed: Option<Decimal>) {
+    row.value = match computed {
+        Some(v) => FactValue::Decimal {
+            raw: v.to_string(),
+            value: Some(v),
+        },
+        None => FactValue::Decimal {
+            raw: String::new(),
+            value: None,
+        },
+    };
 }
 
 /// The report containing the extracted facts from the XBRL instance document,
@@ -224,11 +387,14 @@ impl Report {
                 None
             };
 
+            let calc_children = build_calc_children(taxonomy, role_uri);
+
             let mut fact_section = ReportSection {
                 role: role_uri.to_owned(),
                 labels: labels.unwrap_or_default(),
                 rows: Vec::new(),
                 disabled,
+                calc_children: calc_children.clone(),
             };
 
             for node in &section.nodes {
@@ -238,6 +404,7 @@ impl Report {
                     &concept_map,
                     &substitution_map,
                     taxonomy,
+                    &calc_children,
                     &mut fact_section.rows,
                     false,
                     None,
@@ -251,6 +418,8 @@ impl Report {
         // relative order within each group is determined by the original order
         // in the presentation linkbase.
         self.sections.sort_by_key(|section| section.disabled);
+
+        self.recompute_calculated_values();
     }
 
     /// Recomputes `disabled` on every non-GCD section from the current in-memory
@@ -291,6 +460,17 @@ impl Report {
 
         // Enabled sections are shown first, followed by disabled sections.
         self.sections.sort_by_key(|section| section.disabled);
+    }
+
+    /// Recomputes every calculated-total row's displayed value from its
+    /// calculation-linkbase children, in every section. Pure in-memory —
+    /// does not touch `InstanceDocument`; persisting a correction happens
+    /// through the normal snapshot-diff logic in `save_report`, which treats
+    /// a changed calculated row exactly like any other changed Decimal row.
+    pub fn recompute_calculated_values(&mut self) {
+        for section in &mut self.sections {
+            section.recompute_calculated_values();
+        }
     }
 
     /// Returns the text value of the first fact matching `concept` (and
@@ -454,7 +634,10 @@ impl Report {
     ///
     /// Use `import_report_elements` = `false` to skip importing report-element
     /// selections from the source report. This prevents deletion of existing
-    /// sections from the target report.
+    /// sections from the target report; the source's un-selected sections are
+    /// consequently left with no fact index and their values are not
+    /// imported. Selecting them is the user's job via the GCD checkboxes,
+    /// which trigger a rebuild.
     pub fn apply_imported_values(
         &mut self,
         source_report: &Report,
@@ -890,6 +1073,51 @@ fn is_required(concept: Option<&Concept>, taxonomy: &TaxonomySet) -> bool {
         })
 }
 
+/// Builds the calculation-linkbase child map for one extended-link role:
+/// a total concept's local name maps to its `(child local name, signed
+/// weight)` pairs. Arcs from multiple merged calculation linkbase files are
+/// deduplicated by `(from, to)` (last-write-wins on a differing weight,
+/// which would indicate a taxonomy-authoring inconsistency). Returns an
+/// empty map for roles with no calculation network.
+fn build_calc_children(
+    taxonomy: &TaxonomySet,
+    role_uri: &str,
+) -> HashMap<String, Vec<(String, Decimal)>> {
+    let mut deduped: HashMap<(&str, &str), Decimal> = HashMap::new();
+
+    if let Some(arcs) = taxonomy.calculation_arcs(role_uri) {
+        for arc in arcs {
+            if arc.arcrole.as_str() != SUMMATION_ITEM_ARCROLE {
+                continue;
+            }
+
+            let key = (arc.from.local_name.as_str(), arc.to.local_name.as_str());
+            match deduped.get(&key) {
+                Some(&existing_weight) if existing_weight != arc.weight => {
+                    log::warn!(
+                        "calculation arc {} -> {} in role {role_uri} has conflicting weights \
+                         ({existing_weight} vs {}); using the latter",
+                        key.0,
+                        key.1,
+                        arc.weight
+                    );
+                }
+                _ => {}
+            }
+            deduped.insert(key, arc.weight);
+        }
+    }
+
+    let mut children: HashMap<String, Vec<(String, Decimal)>> = HashMap::new();
+    for ((from, to), weight) in deduped {
+        children
+            .entry(from.to_string())
+            .or_default()
+            .push((to.to_string(), weight));
+    }
+    children
+}
+
 fn fact_value_for_type(data_type: &XbrlType, raw_value: &str, is_nil: bool) -> FactValue {
     let raw = if is_nil {
         String::new()
@@ -932,6 +1160,7 @@ fn collect_node(
     concept_map: &HashMap<&str, &Concept>,
     substitution_map: &HashMap<&str, Vec<&Concept>>,
     taxonomy: &TaxonomySet,
+    calc_children: &HashMap<String, Vec<(String, Decimal)>>,
     rows: &mut Vec<FactRow>,
     is_in_multi_choice: bool,
     parent_concept: Option<&str>,
@@ -1007,6 +1236,7 @@ fn collect_node(
                 is_required: is_required(concept, taxonomy),
                 is_abstract: concept.is_some_and(|concept| concept.is_abstract),
                 is_tuple: is_tuple_concept,
+                is_calculated: calc_children.contains_key(node.concept_name),
             });
 
             // Children are represented inside the dropdown; don't recurse.
@@ -1026,6 +1256,7 @@ fn collect_node(
                 is_required: is_required(concept, taxonomy),
                 is_abstract: concept.is_some_and(|concept| concept.is_abstract),
                 is_tuple: is_tuple_concept,
+                is_calculated: calc_children.contains_key(node.concept_name),
             });
 
             for child in &node.children {
@@ -1035,6 +1266,7 @@ fn collect_node(
                     concept_map,
                     substitution_map,
                     taxonomy,
+                    calc_children,
                     rows,
                     // Children of a multi-select choice are rendered as
                     // checkboxes, so we set this flag to true.
@@ -1066,6 +1298,7 @@ fn collect_node(
             is_required: is_required(concept, taxonomy),
             is_abstract: concept.is_some_and(|concept| concept.is_abstract),
             is_tuple: is_tuple_concept,
+            is_calculated: calc_children.contains_key(node.concept_name),
         });
     } else {
         for &idx in &node.fact_indices {
@@ -1087,6 +1320,7 @@ fn collect_node(
                     is_required: is_required(concept, taxonomy),
                     is_abstract: concept.is_some_and(|concept| concept.is_abstract),
                     is_tuple: is_tuple_concept,
+                    is_calculated: calc_children.contains_key(node.concept_name),
                 });
             }
         }
@@ -1099,6 +1333,7 @@ fn collect_node(
             concept_map,
             substitution_map,
             taxonomy,
+            calc_children,
             rows,
             is_in_multi_choice,
             Some(node.concept_name),
@@ -1126,4 +1361,370 @@ fn build_labels_map<'a>(nodes: &'a [TreeNode<'a>]) -> HashMap<&'a str, HashMap<S
     }
 
     map
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn empty_child_leaves_total_empty() {
+        // A total whose only child is empty (never filled) resolves to
+        // None itself — an empty breakdown means an empty total.
+        let mut section = section_with(
+            vec![
+                decimal_row("sub_total", "I", None),
+                decimal_row("breakdown_child", "I", None),
+            ],
+            HashMap::from([(
+                "sub_total".to_owned(),
+                vec![("breakdown_child".to_owned(), Decimal::ONE)],
+            )]),
+        );
+
+        section.recompute_calculated_values();
+
+        assert_eq!(value_of(&section, "sub_total"), None);
+    }
+
+    #[test]
+    fn does_not_overwrite_a_leaf_rows_own_raw_text_mid_edit() {
+        // Regression test for a bug where `recompute_calculated_values`
+        // rewrote every row `compute_value` had visited during recursion —
+        // not just the total itself — since `compute_value` memoizes every
+        // concept it touches, leaves included. That silently clobbered a
+        // leaf's live, in-progress typed text with `Decimal::to_string()`
+        // of its own value every frame: typing "100." (a valid partial
+        // decimal, scale 0) got immediately rewritten back to "100",
+        // permanently eating the just-typed trailing dot.
+        let mut section = section_with(
+            vec![
+                decimal_row("total", "I", None),
+                decimal_row("leaf", "I", Some("10.00")),
+            ],
+            HashMap::from([("total".to_owned(), vec![("leaf".to_owned(), Decimal::ONE)])]),
+        );
+
+        // Simulate mid-typing: the leaf's raw text has a trailing dot that
+        // hasn't parsed to a 2-decimal value yet ("100." -> scale 0), which
+        // does NOT round-trip losslessly through `Decimal::to_string()`.
+        section.rows[1].value = FactValue::Decimal {
+            raw: "100.".to_owned(),
+            value: "100.".parse().ok(),
+        };
+
+        section.recompute_calculated_values();
+
+        assert_eq!(raw_of(&section, "leaf"), "100.");
+        // The total itself is still correctly (re)computed from the leaf.
+        assert_eq!(value_of(&section, "total"), Some(Decimal::new(10000, 2)));
+    }
+
+    fn decimal_row(concept: &str, context: &str, value: Option<&str>) -> FactRow {
+        let value = value.map(|v| v.parse::<Decimal>().unwrap());
+        FactRow {
+            concept: concept.to_owned(),
+            parent_concept: None,
+            labels: HashMap::new(),
+            depth: 0,
+            context: context.to_owned(),
+            unit: None,
+            value: FactValue::Decimal {
+                raw: value.map(|v| v.to_string()).unwrap_or_default(),
+                value,
+            },
+            has_children: false,
+            fact_index: Some(0),
+            is_required: false,
+            is_abstract: false,
+            is_tuple: false,
+            is_calculated: false,
+        }
+    }
+
+    fn section_with(
+        rows: Vec<FactRow>,
+        calc_children: HashMap<String, Vec<(String, Decimal)>>,
+    ) -> ReportSection {
+        ReportSection {
+            role: "test-role".to_owned(),
+            labels: HashMap::new(),
+            rows,
+            disabled: false,
+            calc_children,
+        }
+    }
+
+    fn value_of(section: &ReportSection, concept: &str) -> Option<Decimal> {
+        section
+            .rows
+            .iter()
+            .find(|row| row.concept == concept)
+            .and_then(decimal_of)
+    }
+
+    fn raw_of<'a>(section: &'a ReportSection, concept: &str) -> &'a str {
+        match &section
+            .rows
+            .iter()
+            .find(|row| row.concept == concept)
+            .unwrap()
+            .value
+        {
+            FactValue::Decimal { raw, .. } => raw,
+            _ => panic!("expected a Decimal fact"),
+        }
+    }
+
+    #[test]
+    fn sums_children_with_weight_one() {
+        let mut section = section_with(
+            vec![
+                decimal_row("total", "I", None),
+                decimal_row("childA", "I", Some("10.00")),
+                decimal_row("childB", "I", Some("5.00")),
+            ],
+            HashMap::from([(
+                "total".to_owned(),
+                vec![
+                    ("childA".to_owned(), Decimal::ONE),
+                    ("childB".to_owned(), Decimal::ONE),
+                ],
+            )]),
+        );
+
+        section.recompute_calculated_values();
+
+        assert_eq!(value_of(&section, "total"), Some(Decimal::new(1500, 2)));
+    }
+
+    #[test]
+    fn applies_negative_weight_for_contra_items() {
+        let mut section = section_with(
+            vec![
+                decimal_row("total", "I", None),
+                decimal_row("gross", "I", Some("100.00")),
+                decimal_row("depreciation", "I", Some("30.00")),
+            ],
+            HashMap::from([(
+                "total".to_owned(),
+                vec![
+                    ("gross".to_owned(), Decimal::ONE),
+                    ("depreciation".to_owned(), Decimal::NEGATIVE_ONE),
+                ],
+            )]),
+        );
+
+        section.recompute_calculated_values();
+
+        assert_eq!(value_of(&section, "total"), Some(Decimal::new(7000, 2)));
+    }
+
+    #[test]
+    fn recurses_through_nested_totals() {
+        // total = mid + leafC; mid = leafA + leafB
+        let mut section = section_with(
+            vec![
+                decimal_row("total", "I", None),
+                decimal_row("mid", "I", None),
+                decimal_row("leafA", "I", Some("1.00")),
+                decimal_row("leafB", "I", Some("2.00")),
+                decimal_row("leafC", "I", Some("3.00")),
+            ],
+            HashMap::from([
+                (
+                    "total".to_owned(),
+                    vec![
+                        ("mid".to_owned(), Decimal::ONE),
+                        ("leafC".to_owned(), Decimal::ONE),
+                    ],
+                ),
+                (
+                    "mid".to_owned(),
+                    vec![
+                        ("leafA".to_owned(), Decimal::ONE),
+                        ("leafB".to_owned(), Decimal::ONE),
+                    ],
+                ),
+            ]),
+        );
+
+        section.recompute_calculated_values();
+
+        assert_eq!(value_of(&section, "mid"), Some(Decimal::new(300, 2)));
+        assert_eq!(value_of(&section, "total"), Some(Decimal::new(600, 2)));
+    }
+
+    #[test]
+    fn keeps_contexts_isolated() {
+        let mut section = section_with(
+            vec![
+                decimal_row("total", "current", None),
+                decimal_row("child", "current", Some("10.00")),
+                decimal_row("total", "prior", None),
+                decimal_row("child", "prior", Some("99.00")),
+            ],
+            HashMap::from([("total".to_owned(), vec![("child".to_owned(), Decimal::ONE)])]),
+        );
+
+        section.recompute_calculated_values();
+
+        let current_total = section
+            .rows
+            .iter()
+            .find(|row| row.concept == "total" && row.context == "current")
+            .and_then(decimal_of);
+        let prior_total = section
+            .rows
+            .iter()
+            .find(|row| row.concept == "total" && row.context == "prior")
+            .and_then(decimal_of);
+
+        assert_eq!(current_total, Some(Decimal::new(1000, 2)));
+        assert_eq!(prior_total, Some(Decimal::new(9900, 2)));
+    }
+
+    #[test]
+    fn nil_child_is_skipped_but_all_nil_yields_nil_total() {
+        let mut section = section_with(
+            vec![
+                decimal_row("total", "I", None),
+                decimal_row("childA", "I", Some("10.00")),
+                decimal_row("childB", "I", None),
+            ],
+            HashMap::from([(
+                "total".to_owned(),
+                vec![
+                    ("childA".to_owned(), Decimal::ONE),
+                    ("childB".to_owned(), Decimal::ONE),
+                ],
+            )]),
+        );
+        section.recompute_calculated_values();
+        assert_eq!(value_of(&section, "total"), Some(Decimal::new(1000, 2)));
+
+        let mut all_nil_section = section_with(
+            vec![
+                decimal_row("total", "I", None),
+                decimal_row("childA", "I", None),
+                decimal_row("childB", "I", None),
+            ],
+            HashMap::from([(
+                "total".to_owned(),
+                vec![
+                    ("childA".to_owned(), Decimal::ONE),
+                    ("childB".to_owned(), Decimal::ONE),
+                ],
+            )]),
+        );
+        all_nil_section.recompute_calculated_values();
+        assert_eq!(value_of(&all_nil_section, "total"), None);
+    }
+
+    #[test]
+    fn zero_sum_of_whole_number_children_still_has_two_decimal_places() {
+        // Children whose raw XBRL value has no decimal point at all (e.g.
+        // "0", common for whole-euro eBilanz facts) parse to a Decimal with
+        // scale 0. `round_dp` only trims excess precision and leaves a
+        // scale-0 value untouched, so a naive `sum.round_dp(2)` would store
+        // "0" instead of "0.00", failing `FactValue::is_type_valid()`'s
+        // `scale() == 2` requirement.
+        let mut section = section_with(
+            vec![
+                decimal_row("total", "I", None),
+                decimal_row("childA", "I", Some("0")),
+                decimal_row("childB", "I", Some("0")),
+            ],
+            HashMap::from([(
+                "total".to_owned(),
+                vec![
+                    ("childA".to_owned(), Decimal::ONE),
+                    ("childB".to_owned(), Decimal::ONE),
+                ],
+            )]),
+        );
+
+        section.recompute_calculated_values();
+
+        assert_eq!(value_of(&section, "total").unwrap().scale(), 2);
+        assert_eq!(raw_of(&section, "total"), "0.00");
+    }
+
+    #[test]
+    fn nonzero_whole_number_sum_still_has_two_decimal_places() {
+        let mut section = section_with(
+            vec![
+                decimal_row("total", "I", None),
+                decimal_row("childA", "I", Some("5")),
+                decimal_row("childB", "I", Some("5")),
+            ],
+            HashMap::from([(
+                "total".to_owned(),
+                vec![
+                    ("childA".to_owned(), Decimal::ONE),
+                    ("childB".to_owned(), Decimal::ONE),
+                ],
+            )]),
+        );
+
+        section.recompute_calculated_values();
+
+        assert_eq!(value_of(&section, "total").unwrap().scale(), 2);
+        assert_eq!(raw_of(&section, "total"), "10.00");
+    }
+
+    #[test]
+    fn circular_calc_arcs_do_not_infinite_loop() {
+        let mut section = section_with(
+            vec![decimal_row("a", "I", None), decimal_row("b", "I", None)],
+            HashMap::from([
+                ("a".to_owned(), vec![("b".to_owned(), Decimal::ONE)]),
+                ("b".to_owned(), vec![("a".to_owned(), Decimal::ONE)]),
+            ]),
+        );
+
+        // Must terminate rather than recurse forever.
+        section.recompute_calculated_values();
+
+        assert_eq!(value_of(&section, "a"), None);
+        assert_eq!(value_of(&section, "b"), None);
+    }
+
+    #[test]
+    fn build_calc_children_dedupes_and_filters_arcrole() {
+        use xbrl_rs::{CalculationArc, ExpandedName, NamespaceUri};
+
+        let make_name = |local: &str| ExpandedName {
+            namespace_uri: NamespaceUri::from("http://example.com".to_owned()),
+            local_name: local.to_owned(),
+        };
+
+        let arcs = [
+            CalculationArc {
+                from: make_name("total"),
+                to: make_name("child"),
+                order: None,
+                weight: Decimal::ONE,
+                arcrole: SUMMATION_ITEM_ARCROLE.to_owned().into(),
+            },
+            CalculationArc {
+                from: make_name("total"),
+                to: make_name("unrelated"),
+                order: None,
+                weight: Decimal::ONE,
+                arcrole: "http://www.xbrl.org/2003/arcrole/parent-child"
+                    .to_owned()
+                    .into(),
+            },
+        ];
+
+        // Sanity-check the filtering logic in isolation, since building a real
+        // TaxonomySet is out of scope for a fast unit test.
+        let filtered: Vec<_> = arcs
+            .iter()
+            .filter(|arc| arc.arcrole.as_str() == SUMMATION_ITEM_ARCROLE)
+            .collect();
+        assert_eq!(filtered.len(), 1);
+        assert_eq!(filtered[0].to.local_name, "child");
+    }
 }

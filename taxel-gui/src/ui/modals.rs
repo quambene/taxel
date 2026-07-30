@@ -115,6 +115,11 @@ pub fn draw_import_values_modal(ui: &mut Ui, app: &mut TaxelApp) {
         ui.heading("Import values");
         ui.add_space(8.0);
 
+        ui.label(
+            "Only values for report sections already enabled in this report are imported. To import a section that's only enabled in the source report (e.g. an income statement), enable it in the target report first via the checkboxes in the GCD section, then import again.",
+        );
+        ui.add_space(8.0);
+
         ui.horizontal(|ui| {
             ui.label("Source XML");
             let path_label = app

@@ -475,6 +475,7 @@ impl App for TaxelApp {
                                 ui,
                                 state.show_required_only,
                                 state.show_filled_only,
+                                &self.edit_snapshot,
                             );
 
                             if let Some(row_idx) = pending_uncheck {
@@ -491,6 +492,15 @@ impl App for TaxelApp {
                         // reportElements checkboxes while editing.
                         if editing {
                             table.update_disabled_states();
+
+                            // Only the section currently being edited can have
+                            // changed this frame, so recomputing every other
+                            // section's calculation tree here would be pure
+                            // per-frame waste (and, for reports with many
+                            // large sections, a real source of input lag).
+                            if let Some(section) = table.sections.get_mut(tab) {
+                                section.recompute_calculated_values();
+                            }
                         }
 
                         if !self.search.results.is_empty() {

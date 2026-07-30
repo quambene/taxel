@@ -42,7 +42,7 @@ pub fn draw_search_results_overlay(
         .show(ctx, |ui| {
             Frame::popup(ui.style())
                 .stroke(Stroke::new(
-                    1.0,
+                    1.0_f32,
                     ui.visuals().widgets.noninteractive.bg_stroke.color,
                 ))
                 .show(ui, |ui| {
@@ -147,6 +147,7 @@ pub fn draw_search_results_overlay(
                                         &state.collapsed,
                                         state.show_required_only,
                                         state.show_filled_only,
+                                        &[],
                                     );
                                     if let Some(visible_idx) =
                                         visible.iter().position(|&raw| raw == row_idx)

@@ -3,7 +3,8 @@ taxel-py/src/ebilanz
 
 # Rust
 /target
-.cargo
+.cargo/*
+!.cargo/audit.toml
 
 # Python
 __pycache__
