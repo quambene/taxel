@@ -362,9 +362,7 @@ fn write_values_csv(app: &TaxelApp, dest: &Path) -> Result<usize, anyhow::Error>
         .ok_or_else(|| anyhow::anyhow!("Cannot export values without a loaded report"))?;
     let lang = &app.settings.lang;
 
-    let mut writer = csv::WriterBuilder::new()
-        .delimiter(b';')
-        .from_path(dest)?;
+    let mut writer = csv::WriterBuilder::new().delimiter(b';').from_path(dest)?;
     writer.write_record(["Section", "ID", "Depth", "Name", "Value", "Unit", "Context"])?;
 
     let mut row_count = 0;
