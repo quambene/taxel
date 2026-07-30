@@ -1,12 +1,14 @@
 <!-- markdownlint-disable MD041 -->
 
-## v0.2.0 (unreleased)
+## v0.1.1 (unreleased)
 
 - fixed
   - Fix missing decimal places for aggregated fact values that sum to zero or a whole number
 - added
   - Automatically aggregate calculated fact values (e.g. total assets, total equity and liabilities) from the taxonomy's calculation linkbase; aggregated facts are read-only
   - Show taxonomy info (abstract, required, tuple, calculated) in a tooltip on the fact ID
+- changed
+  - Add description to "Import values" modal
 
 ## v0.1.0 (2026-05-16)
 
