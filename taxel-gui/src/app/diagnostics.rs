@@ -20,6 +20,8 @@ pub enum DiagnosticCategory {
     Validation,
     /// Issues related to sending the report to the tax authority's API.
     Send,
+    /// Issues related to exporting fact values to a CSV file.
+    Export,
 }
 
 /// Collects all information about a diagnostics message to display in the

@@ -18,8 +18,9 @@ use eframe::{
 use eric_sdk::Eric;
 use report::LoadOutcome;
 pub use report::{
-    cancel_edit, delete_report, edit_report, import_report, import_values, poll_load_result,
-    save_report, send_report, start_load, validate_report, LoadKind, LoadedReport,
+    cancel_edit, delete_report, edit_report, export_values, import_report, import_values,
+    poll_load_result, save_report, send_report, start_load, validate_report, LoadKind,
+    LoadedReport,
 };
 pub use report_list::ReportOverview;
 pub use search::{RowHighlight, Search};
