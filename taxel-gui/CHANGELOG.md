@@ -4,6 +4,7 @@
 
 - fixed
   - Fix missing decimal places for aggregated fact values that sum to zero or a whole number
+  - Set/reset `test_marker` in report based on env var `TEST_MARKER`
 - added
   - Automatically aggregate calculated fact values (e.g. total assets, total equity and liabilities) from the taxonomy's calculation linkbase; aggregated facts are read-only
   - Show taxonomy info (abstract, required, tuple, calculated) in a tooltip on the fact ID

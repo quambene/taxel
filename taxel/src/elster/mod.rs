@@ -467,8 +467,8 @@ impl ElsterReport {
         write_text_element(writer, "DatenArt", &th.data_type)?;
         write_text_element(writer, "Vorgang", &th.operation)?;
 
-        if let Some(ref v) = th.test_marker {
-            write_text_element(writer, "Testmerker", v)?;
+        if let Some(ref test_marker) = th.test_marker {
+            write_text_element(writer, "Testmerker", test_marker)?;
         }
 
         write_text_element(writer, "HerstellerID", &th.manufacturer_id)?;
@@ -488,8 +488,8 @@ impl ElsterReport {
         }
         writer.write_event(Event::End(BytesEnd::new("Datei")))?;
 
-        if let Some(ref v) = th.client_version {
-            write_text_element(writer, "VersionClient", v)?;
+        if let Some(ref client_version) = th.client_version {
+            write_text_element(writer, "VersionClient", client_version)?;
         }
 
         writer.write_event(Event::End(BytesEnd::new("TransferHeader")))?;

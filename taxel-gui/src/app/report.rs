@@ -14,7 +14,7 @@ use crate::{
 use anyhow::Context;
 use chrono::{Datelike, NaiveDate, Utc};
 use eframe::egui::{self};
-use log::debug;
+use log::{debug, info};
 use reqwest::blocking::Client;
 use std::{
     collections::HashSet,
@@ -449,8 +449,14 @@ fn load_instance_document_and_taxonomy(
 
     let xml = fs::read_to_string(path)
         .with_context(|| format!("Failed to read Elster XML from {}", path.display()))?;
-    let elster_report = ElsterReport::parse(&xml)
+    let mut elster_report = ElsterReport::parse(&xml)
         .with_context(|| format!("Failed to parse ElsterReport from {}", path.display()))?;
+
+    elster_report.transfer_header.test_marker = env::var("TEST_MARKER").ok();
+
+    if let Some(test_marker) = &elster_report.transfer_header.test_marker {
+        info!("Using test marker {test_marker}");
+    }
 
     Ok(LoadOutcome::Ready(LoadedReport {
         taxonomy,
@@ -473,7 +479,7 @@ fn load_taxonomy_and_create_instance_document(
     let test_marker = env::var("TEST_MARKER").ok();
 
     if let Some(test_marker) = &test_marker {
-        debug!("Using test marker {test_marker}");
+        info!("Using test marker {test_marker}");
     }
 
     let taxonomy_date = TAXONOMY_VERSION_TO_DATE
