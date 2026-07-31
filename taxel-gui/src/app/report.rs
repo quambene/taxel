@@ -423,6 +423,29 @@ fn fact_value_to_string(value: &FactValue, lang: &str) -> String {
     }
 }
 
+/// Resets `elster_report`'s test marker to match the current `TEST_MARKER`
+/// environment variable.
+fn sync_test_marker(elster_report: &mut ElsterReport, path: &Path) -> Result<(), anyhow::Error> {
+    let current_test_marker = env::var("TEST_MARKER").ok();
+
+    if current_test_marker != elster_report.transfer_header.test_marker {
+        elster_report.transfer_header.test_marker = current_test_marker;
+
+        let xml = elster_report
+            .to_xml()
+            .context("Failed to serialize ElsterReport")?;
+
+        fs::write(path, xml)
+            .with_context(|| format!("Failed to write report to {}", path.display()))?;
+    }
+
+    if let Some(test_marker) = &elster_report.transfer_header.test_marker {
+        info!("Using test marker {test_marker}");
+    }
+
+    Ok(())
+}
+
 /// Loads an XBRL instance document from the specified path, discovers the
 /// referenced taxonomies, and populates the fact table with the extracted
 /// facts.
@@ -452,11 +475,7 @@ fn load_instance_document_and_taxonomy(
     let mut elster_report = ElsterReport::parse(&xml)
         .with_context(|| format!("Failed to parse ElsterReport from {}", path.display()))?;
 
-    elster_report.transfer_header.test_marker = env::var("TEST_MARKER").ok();
-
-    if let Some(test_marker) = &elster_report.transfer_header.test_marker {
-        info!("Using test marker {test_marker}");
-    }
+    sync_test_marker(&mut elster_report, path)?;
 
     Ok(LoadOutcome::Ready(LoadedReport {
         taxonomy,
