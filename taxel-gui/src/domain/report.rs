@@ -531,6 +531,15 @@ impl Report {
             (None, None) => None,
         };
 
+        if let Some(company_name) = company_name {
+            elster.transfer_header.submitter.name = company_name.to_string();
+        }
+
+        elster.transfer_header.submitter.street = street_full.clone();
+        elster.transfer_header.submitter.postal_code = zip_code.map(str::to_string);
+        elster.transfer_header.submitter.city = city.map(str::to_string);
+        elster.transfer_header.submitter.country = country.map(str::to_string);
+
         if let Some(payload_block) = elster.data_section.payload_blocks.first_mut() {
             if let Some(submitter) = payload_block.payload_header.submitter.as_mut() {
                 if let Some(company_name) = company_name {
