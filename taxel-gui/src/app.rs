@@ -19,8 +19,8 @@ use eric_sdk::Eric;
 use report::LoadOutcome;
 pub use report::{
     cancel_edit, delete_report, edit_report, export_values, import_report, import_values,
-    poll_load_result, save_report, save_report_as, send_report, start_load, validate_report,
-    LoadKind, LoadedReport,
+    poll_load_result, remove_report_from_list, save_report, save_report_as, send_report,
+    start_load, validate_report, LoadKind, LoadedReport,
 };
 pub use report_list::ReportOverview;
 pub use search::{RowHighlight, Search};
@@ -127,6 +127,9 @@ pub struct TaxelApp {
     pub show_report_element_uncheck_modal: bool,
     /// Pending report-element checkbox to uncheck on confirmation.
     pub pending_report_element_uncheck: Option<PendingReportElementUncheck>,
+    /// Path of the report pending removal-from-list confirmation, requested
+    /// via the per-row trash icon in the report list. `None` hides the modal.
+    pub pending_remove_report: Option<PathBuf>,
 }
 
 impl TaxelApp {
@@ -204,6 +207,7 @@ impl TaxelApp {
             new_report_form: NewReportForm::default(),
             show_report_element_uncheck_modal: false,
             pending_report_element_uncheck: None,
+            pending_remove_report: None,
         }
     }
 
@@ -333,13 +337,25 @@ impl App for TaxelApp {
                 .frame(central_frame)
                 .show_inside(ctx, |ui| {
                     if self.loaded.is_none() {
-                        if let Some(path) = ui::draw_report_list(
+                        if let Some(action) = ui::draw_report_list(
                             ui,
                             self.report_list.reports(),
                             self.loading.is_some(),
                             &self.settings.lang,
                         ) {
-                            app::start_load(self, LoadKind::Open(path), ui.ctx().clone(), false);
+                            match action {
+                                ui::ReportListAction::Open(path) => {
+                                    app::start_load(
+                                        self,
+                                        LoadKind::Open(path),
+                                        ui.ctx().clone(),
+                                        false,
+                                    );
+                                }
+                                ui::ReportListAction::Remove(path) => {
+                                    self.pending_remove_report = Some(path);
+                                }
+                            }
                         }
                         return;
                     }
@@ -552,6 +568,10 @@ impl App for TaxelApp {
 
             if self.show_delete_modal {
                 ui::draw_delete_modal(ctx, self);
+            }
+
+            if self.pending_remove_report.is_some() {
+                ui::draw_remove_report_modal(ctx, self);
             }
 
             if self.show_send_modal {

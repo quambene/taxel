@@ -11,6 +11,7 @@
   - Show taxonomy info (abstract, required, tuple, calculated) in a tooltip on the fact ID
   - Export fact values as CSV file
   - Save report at location ("Save as")
+  - Delete report from report list
 - changed
   - Add description to "Import values" modal
 

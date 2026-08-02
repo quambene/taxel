@@ -45,6 +45,47 @@ pub fn draw_delete_modal(ui: &mut Ui, app: &mut TaxelApp) {
     }
 }
 
+/// Draws the confirmation modal shown when the user clicks the per-row trash
+/// icon in the report list, before removing that entry (and trashing its
+/// file, if it still exists).
+pub fn draw_remove_report_modal(ui: &mut Ui, app: &mut TaxelApp) {
+    let Some(path) = app.pending_remove_report.clone() else {
+        return;
+    };
+
+    let filename = path
+        .file_name()
+        .and_then(|file_name| file_name.to_str())
+        .unwrap_or("this report");
+
+    let mut cancel = false;
+    let mut confirm = false;
+
+    let modal = Modal::new(Id::new("remove_report_modal")).show(ui.ctx(), |ui| {
+        ui.heading("Move report to Trash?");
+        ui.add_space(4.0);
+        ui.label(filename);
+        ui.add_space(8.0);
+        ui.horizontal(|ui| {
+            if ui.button("Cancel").clicked() {
+                cancel = true;
+            }
+            if ui.button("Move to Trash").clicked() {
+                confirm = true;
+            }
+        });
+    });
+
+    if modal.should_close() || cancel {
+        app.pending_remove_report = None;
+    }
+
+    if confirm {
+        app.pending_remove_report = None;
+        app::remove_report_from_list(app, path);
+    }
+}
+
 /// Draws the send report modal when the user clicks "Send report".
 pub fn draw_send_modal(ui: &mut Ui, app: &mut TaxelApp) {
     let mut cancel = false;

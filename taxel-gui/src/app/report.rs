@@ -1647,6 +1647,26 @@ pub fn delete_report(app: &mut TaxelApp) {
     }
 }
 
+/// Removes a report entry from the report list without requiring it to be
+/// loaded first. Used for entries whose file can no longer be found (e.g. it
+/// was moved or deleted outside the app) as well as entries whose file still
+/// exists, in which case it is moved to the OS trash first.
+pub fn remove_report_from_list(app: &mut TaxelApp, path: PathBuf) {
+    if path.exists() {
+        if let Err(err) = trash::delete(&path) {
+            app.diagnostics.push(AppDiagnostic::new_error(
+                DiagnosticCategory::App,
+                format!("Failed to move report to trash: {err}"),
+            ));
+            app.show_diagnostics_panel = true;
+            return;
+        }
+    }
+
+    app.report_list.remove_report(&path, &mut app.diagnostics);
+    app.show_diagnostics_panel = true;
+}
+
 /// Clears all diagnostics of the specified category from the app state. This is
 /// used to clear old validation errors when re-validating, or to clear old send
 /// errors when re-sending the report, while keeping other diagnostics (like app
