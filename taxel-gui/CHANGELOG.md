@@ -12,6 +12,7 @@
   - Export fact values as CSV file
   - Save report at location ("Save as")
   - Delete report from report list
+  - Open confirmation PDF after sending the report
 - changed
   - Add description to "Import values" modal
 

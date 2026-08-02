@@ -23,6 +23,7 @@ xbrl-rs = { workspace = true }
 eric-sdk = { workspace = true }
 dirs = { workspace = true }
 trash = { workspace = true }
+open = { workspace = true }
 zip = { workspace = true }
 reqwest = { workspace = true }
 rfd = { workspace = true }

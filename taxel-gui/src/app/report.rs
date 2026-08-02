@@ -1593,6 +1593,13 @@ pub fn send_report(app: &mut TaxelApp) {
                     response.payload.server_response
                 ),
             ));
+
+            if let Err(err) = open::that(&pdf_path) {
+                app.diagnostics.push(AppDiagnostic::new_warning(
+                    DiagnosticCategory::Send,
+                    format!("Confirmation PDF saved, but could not be opened automatically: {err}"),
+                ));
+            }
         }
         Err(err) => {
             let validation_error = err.validation_response().unwrap_or_default();

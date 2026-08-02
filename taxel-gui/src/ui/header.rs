@@ -38,8 +38,7 @@ pub fn draw_header(ui: &mut Ui, app: &mut TaxelApp) {
             app.show_delete_modal = true;
         }
 
-        if app.loaded.is_some() && app.editing_section.is_none() && ui.button("Save as").clicked()
-        {
+        if app.loaded.is_some() && app.editing_section.is_none() && ui.button("Save as").clicked() {
             if let Some(path) = FileDialog::new()
                 .add_filter("XML", &["xml"])
                 .set_file_name(save_as_file_name(app))
