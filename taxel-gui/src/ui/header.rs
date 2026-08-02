@@ -38,6 +38,17 @@ pub fn draw_header(ui: &mut Ui, app: &mut TaxelApp) {
             app.show_delete_modal = true;
         }
 
+        if app.loaded.is_some() && app.editing_section.is_none() && ui.button("Save as").clicked()
+        {
+            if let Some(path) = FileDialog::new()
+                .add_filter("XML", &["xml"])
+                .set_file_name(save_as_file_name(app))
+                .save_file()
+            {
+                app::save_report_as(app, path);
+            }
+        }
+
         if app.loaded.is_some() && ui.button("Import values").clicked() {
             app.show_import_values_modal = true;
         }
@@ -120,6 +131,17 @@ fn export_values_file_name(app: &TaxelApp) -> String {
         .unwrap_or("report");
 
     format!("{stem}_values.csv")
+}
+
+/// Suggests a default file name for "Save as", derived from the loaded
+/// report's current file name, e.g. "ebilanz_<uuid>.xml".
+fn save_as_file_name(app: &TaxelApp) -> String {
+    app.loaded
+        .as_ref()
+        .and_then(|loaded| loaded.report.path.file_name())
+        .and_then(|name| name.to_str())
+        .unwrap_or("report.xml")
+        .to_string()
 }
 
 /// Draws a summary of errors and warnings in the header. Clicking on the

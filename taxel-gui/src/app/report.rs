@@ -993,6 +993,62 @@ pub fn save_report(app: &mut TaxelApp) {
     app.edit_snapshot.clear();
 }
 
+/// Saves the currently loaded report to a new location chosen by the user,
+/// moves the previous file to the OS trash, and updates the report's path in
+/// memory and in the manifest so subsequent saves go to the new location.
+pub fn save_report_as(app: &mut TaxelApp, dest: PathBuf) {
+    let Some(loaded) = app.loaded.as_ref() else {
+        return;
+    };
+
+    let old_path = loaded.report.path.clone();
+
+    if dest == old_path {
+        return;
+    }
+
+    let result = loaded
+        .elster
+        .to_xml()
+        .context("Failed to serialize Elster report")
+        .and_then(|xml| fs::write(&dest, xml).context("Failed to write report to disk"));
+
+    match result {
+        Ok(()) => {
+            if old_path.exists() {
+                if let Err(err) = trash::delete(&old_path) {
+                    app.diagnostics.push(AppDiagnostic::new_error(
+                        DiagnosticCategory::App,
+                        format!(
+                            "Report saved to new location, but failed to move the previous file to trash: {err}"
+                        ),
+                    ));
+                }
+            }
+
+            if let Some(loaded) = app.loaded.as_mut() {
+                loaded.report.path = dest.clone();
+            }
+
+            app.report_list
+                .rename_report(&old_path, dest.clone(), &mut app.diagnostics);
+
+            app.diagnostics.push(AppDiagnostic::new_success(
+                DiagnosticCategory::App,
+                format!("Report saved to {}", dest.display()),
+            ));
+        }
+        Err(err) => {
+            app.diagnostics.push(AppDiagnostic::new_error(
+                DiagnosticCategory::App,
+                format!("Failed to save report to new location: {err}"),
+            ));
+        }
+    }
+
+    app.show_diagnostics_panel = true;
+}
+
 /// Detects if any row whose concept matches `is_target` changed vs the snapshot,
 /// then calls `rebuild`. Returns `Rebuild` on success or `NoChange` (with a
 /// diagnostic) on error. Shared by both structural-change handlers below.

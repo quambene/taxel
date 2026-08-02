@@ -163,6 +163,31 @@ impl ReportList {
         }
     }
 
+    /// Updates a report's path in memory (e.g. after "Save as" moved it to a
+    /// new location) and persists the updated manifest. Since the manifest is
+    /// keyed by path, this replaces the old entry with one at `new_path`.
+    pub fn rename_report(
+        &mut self,
+        old_path: &Path,
+        new_path: PathBuf,
+        diagnostics: &mut Vec<AppDiagnostic>,
+    ) {
+        if let Some(report) = self
+            .reports
+            .iter_mut()
+            .find(|report| report.path == old_path)
+        {
+            report.display_name = new_path
+                .file_name()
+                .and_then(|name| name.to_str())
+                .unwrap_or("unknown.xml")
+                .to_string();
+            report.path = new_path;
+        }
+
+        self.save(diagnostics);
+    }
+
     /// Removes a report from the list and persists the updated manifest.
     pub fn remove_report(&mut self, report_path: &Path, diagnostics: &mut Vec<AppDiagnostic>) {
         self.reports.retain(|report| report.path != report_path);
