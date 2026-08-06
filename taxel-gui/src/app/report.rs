@@ -925,6 +925,10 @@ pub fn save_report(app: &mut TaxelApp) {
         update_outcome = UpdateOutcome::Rebuild;
     }
 
+    if handle_income_statement_format_change(app, editing_tab) == UpdateOutcome::Rebuild {
+        update_outcome = UpdateOutcome::Rebuild;
+    }
+
     if let Some(loaded) = app.loaded.as_mut() {
         // Sync GCD facts to ElsterReport metadata and XBRL contexts.
         loaded
@@ -1178,6 +1182,60 @@ fn handle_end_date_change(app: &mut TaxelApp, editing_tab: usize) -> UpdateOutco
     if facts_after < facts_before {
         debug!(
             "balSheetClosingDate changed: removed {} forbidden facts",
+            facts_before - facts_after
+        );
+        UpdateOutcome::Rebuild
+    } else {
+        UpdateOutcome::NoChange
+    }
+}
+
+/// Detects changes to the `incomeStatementFormat` dropdown (GKV vs. UKV) and
+/// re-runs `remove_forbidden_facts` so the income statement only shows the
+/// selected format's line items. Returns `Rebuild` when facts were actually
+/// removed so the UI reflects the trimmed instance.
+fn handle_income_statement_format_change(app: &mut TaxelApp, editing_tab: usize) -> UpdateOutcome {
+    const INCOME_STATEMENT_FORMAT: &str = "genInfo.report.id.incomeStatementFormat";
+
+    let changed = app
+        .loaded
+        .as_ref()
+        .and_then(|loaded| loaded.report.sections.get(editing_tab))
+        .is_some_and(|section| {
+            section.rows.iter().enumerate().any(|(i, row)| {
+                row.concept == INCOME_STATEMENT_FORMAT
+                    && app
+                        .edit_snapshot
+                        .get(i)
+                        .is_some_and(|fact_value| fact_value != &row.value)
+            })
+        });
+
+    if !changed {
+        return UpdateOutcome::NoChange;
+    }
+
+    let Some(loaded) = app.loaded.as_mut() else {
+        return UpdateOutcome::NoChange;
+    };
+
+    let Some((_, end_date_str)) = extract_period(&loaded.instance) else {
+        return UpdateOutcome::NoChange;
+    };
+
+    let Ok(end_date) = NaiveDate::parse_from_str(&end_date_str, "%Y-%m-%d") else {
+        return UpdateOutcome::NoChange;
+    };
+
+    let facts_before = loaded.instance.facts().len();
+
+    remove_forbidden_facts(&mut loaded.instance, &loaded.taxonomy, &end_date);
+
+    let facts_after = loaded.instance.facts().len();
+
+    if facts_after < facts_before {
+        debug!(
+            "incomeStatementFormat changed: removed {} facts from the other format",
             facts_before - facts_after
         );
         UpdateOutcome::Rebuild

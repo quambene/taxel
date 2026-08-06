@@ -221,6 +221,62 @@ pub fn remove_forbidden_facts(
             )
         });
     }
+
+    // The income statement presentation role contains both the GKV
+    // (Gesamtkostenverfahren) and UKV (Umsatzkostenverfahren) breakdowns side
+    // by side. Once the user has picked one via `incomeStatementFormat`, hide
+    // the other breakdown's facts (identified via the taxonomy's
+    // `hgbref:typeOperatingResult` reference annotation) so only the selected
+    // format's line items remain. Leave both in place when neither format is
+    // explicitly selected yet.
+    const INCOME_STATEMENT_FORMAT_GKV: &str =
+        "genInfo.report.id.incomeStatementFormat.incomeStatementFormat.GKV";
+    const INCOME_STATEMENT_FORMAT_UKV: &str =
+        "genInfo.report.id.incomeStatementFormat.incomeStatementFormat.UKV";
+
+    let active_income_statement_format = instance
+        .item_facts()
+        .iter()
+        .find(|fact| {
+            !fact.is_nil()
+                && matches!(
+                    fact.concept_name().local_name.as_str(),
+                    INCOME_STATEMENT_FORMAT_GKV | INCOME_STATEMENT_FORMAT_UKV
+                )
+        })
+        .map(|fact| fact.concept_name().local_name.clone());
+
+    if let Some(active) = active_income_statement_format {
+        let hidden_format = if active == INCOME_STATEMENT_FORMAT_GKV {
+            "UKV"
+        } else {
+            "GKV"
+        };
+
+        filter_facts_by(instance, |fact| {
+            operating_result_type(fact, taxonomy) == Some(hidden_format)
+        });
+    }
+}
+
+/// Returns the concept's `hgbref:typeOperatingResult` reference annotation
+/// (`"GKV"`, `"UKV"`, or `"neutral"`), if present, indicating which income
+/// statement format (Gesamtkostenverfahren vs. Umsatzkostenverfahren) the
+/// concept belongs to.
+fn operating_result_type(fact: &Fact, taxonomy: &TaxonomySet) -> Option<&'static str> {
+    let concept = taxonomy.find_concept(fact.concept_name())?;
+    let id = concept.id.as_deref()?;
+    let references = taxonomy.references_for(id)?;
+
+    references.iter().find_map(|reference| {
+        reference.parts.iter().find_map(|part| {
+            (part.name == "hgbref:typeOperatingResult").then_some(match part.value.as_str() {
+                "GKV" => "GKV",
+                "UKV" => "UKV",
+                _ => "neutral",
+            })
+        })
+    })
 }
 
 /// Returns `true` when the fact should be removed from the instance document
