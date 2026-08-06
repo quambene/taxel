@@ -5,4 +5,6 @@ ignore = [
     # `NsReader` (memory-exhaustion DoS). Fixed upstream in 0.41.0.
     "RUSTSEC-2026-0194",
     "RUSTSEC-2026-0195",
+    # rkyv <0.8.17
+    "RUSTSEC-2026-0235",
 ]
