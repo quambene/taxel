@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD024 -->
+
 # Taxel
 
 [![build status](https://github.com/quambene/taxel/actions/workflows/ci.yml/badge.svg)](https://github.com/quambene/taxel/actions/workflows/ci.yml)
@@ -19,9 +21,10 @@ Supported features:
 - [What is eBilanz?](#what-is-ebilanz)
 - [Taxel GUI](#taxel-gui)
   - [Install Taxel GUI](#install-taxel-gui)
+  - [Usage](#usage)
 - [Taxel CLI](#taxel-cli)
   - [Install Taxel CLI](#install-taxel-cli)
-  - [Usage](#usage)
+  - [Usage](#usage-1)
   - [Testing](#testing)
 - [Rust bindings and SDK for the ELSTER Rich Client (ERiC)](#rust-bindings-and-sdk-for-the-elster-rich-client-eric)
 - [Changelog](#changelog)
@@ -37,6 +40,25 @@ eBilanz (short for _Elektronische Bilanz_) is the electronic transmission of the
 Prebuilt binaries and releases are not provided in this repository. Releases
 will be published in the
 [taxel-releases](https://github.com/IO-Propagator/taxel-releases) repo.
+
+### Usage
+
+1. Create new report
+1. Search for ID `genInfo.report.id.reportElement` in the GCD report section,
+   and select the relevant report elements (e.g. balance sheet and income
+   statement)
+1. Fill out GCD and selected report sections
+1. Validate report
+1. Send report (the report is sent to the respective tax authority, based on the
+   13-digit tax number in the GCD section).
+
+Instead of creating a new report, you can also load an existing report via
+button `Import report`. However, the taxonomy of the imported report is
+preserved which might be outdated.
+
+To import values from an existing report but using an up-to-date taxonomy,
+create a new report first. Then, import values of the existing report via button
+`Import values`. values`.
 
 ## Taxel CLI
 
