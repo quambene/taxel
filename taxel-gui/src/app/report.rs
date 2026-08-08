@@ -1191,55 +1191,19 @@ fn handle_end_date_change(app: &mut TaxelApp, editing_tab: usize) -> UpdateOutco
 }
 
 /// Detects changes to the `incomeStatementFormat` dropdown (GKV vs. UKV) and
-/// re-runs `remove_forbidden_facts` so the income statement only shows the
-/// selected format's line items. Returns `Rebuild` when facts were actually
-/// removed so the UI reflects the trimmed instance.
+/// rebuilds the instance so the income statement only shows the selected
+/// format's line items. A full rebuild (rather than an in-place filter) is
+/// necessary here because facts hidden by a previous format selection are
+/// permanently removed from the instance; only rebuilding from the taxonomy
+/// can bring the other format's facts back when the user switches to it (or
+/// clears the selection).
 fn handle_income_statement_format_change(app: &mut TaxelApp, editing_tab: usize) -> UpdateOutcome {
-    let changed = app
-        .loaded
-        .as_ref()
-        .and_then(|loaded| loaded.report.sections.get(editing_tab))
-        .is_some_and(|section| {
-            section.rows.iter().enumerate().any(|(i, row)| {
-                row.concept == INCOME_STATEMENT_FORMAT
-                    && app
-                        .edit_snapshot
-                        .get(i)
-                        .is_some_and(|fact_value| fact_value != &row.value)
-            })
-        });
-
-    if !changed {
-        return UpdateOutcome::NoChange;
-    }
-
-    let Some(loaded) = app.loaded.as_mut() else {
-        return UpdateOutcome::NoChange;
-    };
-
-    let Some((_, end_date_str)) = extract_period(&loaded.instance) else {
-        return UpdateOutcome::NoChange;
-    };
-
-    let Ok(end_date) = NaiveDate::parse_from_str(&end_date_str, "%Y-%m-%d") else {
-        return UpdateOutcome::NoChange;
-    };
-
-    let facts_before = loaded.instance.facts().len();
-
-    remove_forbidden_facts(&mut loaded.instance, &loaded.taxonomy, &end_date);
-
-    let facts_after = loaded.instance.facts().len();
-
-    if facts_after < facts_before {
-        debug!(
-            "incomeStatementFormat changed: removed {} facts from the other format",
-            facts_before - facts_after
-        );
-        UpdateOutcome::Rebuild
-    } else {
-        UpdateOutcome::NoChange
-    }
+    handle_structural_change(
+        app,
+        editing_tab,
+        |concept| concept == INCOME_STATEMENT_FORMAT,
+        |app| rebuild_instance(app, false),
+    )
 }
 
 /// Rebuilds the instance document and report from scratch, importing values
@@ -1365,6 +1329,37 @@ fn rebuild_instance(
                     }
                 }
             }
+        }
+    }
+
+    {
+        let taxonomy = &app
+            .loaded
+            .as_ref()
+            .context("No loaded report in app state")?
+            .taxonomy;
+
+        // Re-run structural filtering (income statement format, STU,
+        // legal-form, and date-based removal) now that the dropdown/checkbox
+        // selections above have been fully reconstructed in `fresh_instance`.
+        // The earlier call inside `create_instance_document` ran before
+        // those selections (and the imported company data) were known, so
+        // format/STU-dependent facts couldn't have been filtered correctly
+        // yet — without this second pass, switching `incomeStatementFormat`
+        // to a format that was previously hidden (or clearing it back to
+        // unset) would never bring the other format's facts back, since
+        // fact removal elsewhere in the app is a one-way operation.
+        let end_date_parsed = NaiveDate::parse_from_str(&end_date, "%Y-%m-%d")
+            .with_context(|| format!("Failed to parse end date '{end_date}'"))?;
+        remove_forbidden_facts(&mut fresh_instance, taxonomy, &end_date_parsed);
+        restore_required_nil_tuple_children(&mut fresh_instance, taxonomy);
+
+        let fresh_view = fresh_instance.view(taxonomy);
+        let fresh_item_facts = fresh_instance.item_facts();
+        fresh_report.populate(fresh_view, &fresh_item_facts, taxonomy);
+        fresh_report.recompute_calculated_values();
+        for section in &fresh_report.sections {
+            write_calculated_values_to_instance(section, &mut fresh_instance);
         }
     }
 

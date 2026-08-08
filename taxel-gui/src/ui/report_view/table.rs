@@ -143,6 +143,18 @@ pub fn draw_table(
                     }
                     let row_editing =
                         editing && !rows[raw_idx].is_abstract && !rows[raw_idx].is_calculated;
+                    let is_income_statement_format = rows[raw_idx].concept == INCOME_STATEMENT_FORMAT;
+
+                    // The income statement format only affects facts when the regular
+                    // `GuV` income statement is active — `GuVMicroBilG` has no UKV
+                    // variant, so switching format there discards nothing and doesn't
+                    // need confirmation. Only scan for this on the format row itself,
+                    // since a full-table scan per row would be O(n²) otherwise.
+                    let guv_active = is_income_statement_format
+                        && rows.iter().any(|row| {
+                            row.concept == "genInfo.report.id.reportElement.reportElements.GuV"
+                                && matches!(row.value, FactValue::Checkbox(true))
+                        });
 
                     match &mut rows[raw_idx].value {
                         FactValue::Text(text) => {
@@ -186,8 +198,6 @@ pub fn draw_table(
                                 });
 
                             if row_editing {
-                                let is_income_statement_format =
-                                    rows[raw_idx].concept == INCOME_STATEMENT_FORMAT;
                                 let previous = selected.clone();
 
                                 ComboBox::from_id_salt(raw_idx)
@@ -203,7 +213,10 @@ pub fn draw_table(
                                         }
                                     });
 
-                                if is_income_statement_format && *selected != previous {
+                                if is_income_statement_format
+                                    && guv_active
+                                    && *selected != previous
+                                {
                                     // Revert immediately; the app will ask for explicit
                                     // confirmation before actually switching the format,
                                     // since it discards the other format's entered values.
