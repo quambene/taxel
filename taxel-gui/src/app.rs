@@ -1,8 +1,8 @@
 mod diagnostics;
-mod report;
-mod report_list;
-mod search;
-mod settings;
+pub(crate) mod report;
+pub(crate) mod report_list;
+pub(crate) mod search;
+pub(crate) mod settings;
 
 use crate::{
     app::{self, report::NewReportForm, report_list::ReportList, settings::Settings},

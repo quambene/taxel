@@ -1190,7 +1190,13 @@ fn handle_end_date_change(app: &mut TaxelApp, editing_tab: usize) -> UpdateOutco
 /// from the current instance. Used by both `handle_consolidation_range_change`
 /// and `handle_report_element_change`. When `remove_trade_accounting` is true,
 /// facts forbidden for handelsrechtlicher Einzelabschluss are stripped.
-fn rebuild_instance(
+///
+/// `pub` (rather than the private visibility every other helper in this
+/// module has) solely so `lib.rs` can narrowly re-export it for
+/// `tests/rebuild_instance.rs`. The enclosing `app::report` module stays
+/// `pub(crate)`, so this specific `lib.rs` re-export is the only path that
+/// reaches it from outside the crate — not meant to be a stable public API.
+pub fn rebuild_instance(
     app: &mut TaxelApp,
     remove_trade_accounting: bool,
 ) -> Result<(), anyhow::Error> {
@@ -1309,6 +1315,37 @@ fn rebuild_instance(
                     }
                 }
             }
+        }
+    }
+
+    {
+        let taxonomy = &app
+            .loaded
+            .as_ref()
+            .context("No loaded report in app state")?
+            .taxonomy;
+
+        // Re-run legal-form and date-based removal now that company data has
+        // been imported into `fresh_instance`. The earlier call inside
+        // `create_instance_document` ran on a still-blank instance, where
+        // `entity_legal_forms` is always empty, so `should_remove_fact`
+        // skips legal-form filtering entirely (fails safe) — this second
+        // pass is the only place it actually applies during a rebuild.
+        // Doesn't help STU-based removal, which has the opposite polarity
+        // (removes rather than skips on the blank pass, so the damage is
+        // already done and can't be undone here).
+        let end_date_parsed = NaiveDate::parse_from_str(&end_date, "%Y-%m-%d")
+            .with_context(|| format!("Failed to parse end date '{end_date}'"))?;
+        remove_forbidden_facts(&mut fresh_instance, taxonomy, &end_date_parsed);
+        restore_required_nil_tuple_children(&mut fresh_instance, taxonomy);
+
+        let fresh_view = fresh_instance.view(taxonomy);
+        let fresh_item_facts = fresh_instance.item_facts();
+        fresh_report.populate(fresh_view, &fresh_item_facts, taxonomy);
+        fresh_report.recompute_calculated_values();
+
+        for section in &fresh_report.sections {
+            write_calculated_values_to_instance(section, &mut fresh_instance);
         }
     }
 

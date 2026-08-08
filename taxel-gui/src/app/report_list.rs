@@ -70,6 +70,12 @@ pub struct ReportList {
     reports: Vec<ReportOverview>,
 }
 
+impl Default for ReportList {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ReportList {
     pub fn new() -> Self {
         Self {
