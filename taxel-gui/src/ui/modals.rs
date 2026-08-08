@@ -418,32 +418,6 @@ pub fn draw_report_element_uncheck_modal(ui: &mut Ui, confirm: &mut bool, cancel
     }
 }
 
-/// Draws a modal dialog warning that switching the income statement format
-/// (Gesamtkostenverfahren vs. Umsatzkostenverfahren) deletes entered values
-/// from the other format's line items.
-pub fn draw_income_statement_format_modal(ui: &mut Ui, confirm: &mut bool, cancel: &mut bool) {
-    let modal = Modal::new(Id::new("income_statement_format_modal")).show(ui.ctx(), |ui| {
-        ui.heading("Change income statement format?");
-        ui.add_space(8.0);
-        ui.label(
-            "Warning: entered values of the other income statement format will be deleted after saving.",
-        );
-        ui.add_space(8.0);
-        ui.horizontal(|ui| {
-            if ui.button("Cancel").clicked() {
-                *cancel = true;
-            }
-            if ui.button("Change").clicked() {
-                *confirm = true;
-            }
-        });
-    });
-
-    if modal.should_close() {
-        *cancel = true;
-    }
-}
-
 /// Draws a modal to copy a diagnostic message to the clipboard.
 pub fn draw_copy_message_modal(ui: &mut Ui, app: &mut TaxelApp) {
     let mut copied = false;

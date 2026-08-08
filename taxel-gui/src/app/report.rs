@@ -28,8 +28,8 @@ use std::{
 };
 use taxel::{
     elster::Submitter, ElsterReport, TaxonomyType, BASELINE_ROLE_URIS, CLOSING_DATE,
-    COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, GCD_ROLE_URI, INCOME_STATEMENT_FORMAT,
-    REPORT_ELEMENT_PREFIX, REQUIRED_GCD_FACTS, TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE,
+    COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, GCD_ROLE_URI, REPORT_ELEMENT_PREFIX,
+    REQUIRED_GCD_FACTS, TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE,
 };
 use uuid::Uuid;
 use xbrl_rs::{InstanceDocument, RoleUri, TaxonomyLoader, TaxonomySet};
@@ -925,10 +925,6 @@ pub fn save_report(app: &mut TaxelApp) {
         update_outcome = UpdateOutcome::Rebuild;
     }
 
-    if handle_income_statement_format_change(app, editing_tab) == UpdateOutcome::Rebuild {
-        update_outcome = UpdateOutcome::Rebuild;
-    }
-
     if let Some(loaded) = app.loaded.as_mut() {
         // Sync GCD facts to ElsterReport metadata and XBRL contexts.
         loaded
@@ -1190,22 +1186,6 @@ fn handle_end_date_change(app: &mut TaxelApp, editing_tab: usize) -> UpdateOutco
     }
 }
 
-/// Detects changes to the `incomeStatementFormat` dropdown (GKV vs. UKV) and
-/// rebuilds the instance so the income statement only shows the selected
-/// format's line items. A full rebuild (rather than an in-place filter) is
-/// necessary here because facts hidden by a previous format selection are
-/// permanently removed from the instance; only rebuilding from the taxonomy
-/// can bring the other format's facts back when the user switches to it (or
-/// clears the selection).
-fn handle_income_statement_format_change(app: &mut TaxelApp, editing_tab: usize) -> UpdateOutcome {
-    handle_structural_change(
-        app,
-        editing_tab,
-        |concept| concept == INCOME_STATEMENT_FORMAT,
-        |app| rebuild_instance(app, false),
-    )
-}
-
 /// Rebuilds the instance document and report from scratch, importing values
 /// from the current instance. Used by both `handle_consolidation_range_change`
 /// and `handle_report_element_change`. When `remove_trade_accounting` is true,
@@ -1339,16 +1319,17 @@ fn rebuild_instance(
             .context("No loaded report in app state")?
             .taxonomy;
 
-        // Re-run structural filtering (income statement format, STU,
-        // legal-form, and date-based removal) now that the dropdown/checkbox
-        // selections above have been fully reconstructed in `fresh_instance`.
-        // The earlier call inside `create_instance_document` ran before
-        // those selections (and the imported company data) were known, so
-        // format/STU-dependent facts couldn't have been filtered correctly
-        // yet — without this second pass, switching `incomeStatementFormat`
-        // to a format that was previously hidden (or clearing it back to
-        // unset) would never bring the other format's facts back, since
-        // fact removal elsewhere in the app is a one-way operation.
+        // Re-run structural filtering (STU, legal-form, and date-based
+        // removal) now that the dropdown/checkbox selections above have been
+        // fully reconstructed in `fresh_instance`. The earlier call inside
+        // `create_instance_document` ran against a still-blank instance —
+        // `entity_legal_forms` is always empty and `reportElements.STU` is
+        // always nil at that point, since company data and checkbox
+        // selections haven't been imported yet — so legal-form and STU
+        // filtering never actually fire on that first pass. This second
+        // pass, run after `apply_imported_values` and the dropdown
+        // reconstruction above, is the only place that filtering correctly
+        // applies during a rebuild.
         let end_date_parsed = NaiveDate::parse_from_str(&end_date, "%Y-%m-%d")
             .with_context(|| format!("Failed to parse end date '{end_date}'"))?;
         remove_forbidden_facts(&mut fresh_instance, taxonomy, &end_date_parsed);

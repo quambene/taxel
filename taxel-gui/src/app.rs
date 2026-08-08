@@ -67,16 +67,6 @@ pub struct PendingReportElementUncheck {
     pub row_idx: usize,
 }
 
-/// Pending change for the `incomeStatementFormat` dropdown.
-pub struct PendingIncomeStatementFormatChange {
-    /// The section index containing the dropdown row.
-    pub section_idx: usize,
-    /// The raw row index within the section.
-    pub row_idx: usize,
-    /// The newly selected format value the user attempted to switch to.
-    pub new_value: String,
-}
-
 /// Main application struct for the Taxel GUI, managing the state of the app.
 pub struct TaxelApp {
     /// The currently loaded report together with its taxonomy, instance
@@ -137,12 +127,6 @@ pub struct TaxelApp {
     pub show_report_element_uncheck_modal: bool,
     /// Pending report-element checkbox to uncheck on confirmation.
     pub pending_report_element_uncheck: Option<PendingReportElementUncheck>,
-    /// Controls whether the income statement format change warning modal is
-    /// visible.
-    pub show_income_statement_format_modal: bool,
-    /// Pending `incomeStatementFormat` dropdown change to apply on
-    /// confirmation.
-    pub pending_income_statement_format_change: Option<PendingIncomeStatementFormatChange>,
     /// Path of the report pending removal-from-list confirmation, requested
     /// via the per-row trash icon in the report list. `None` hides the modal.
     pub pending_remove_report: Option<PathBuf>,
@@ -223,8 +207,6 @@ impl TaxelApp {
             new_report_form: NewReportForm::default(),
             show_report_element_uncheck_modal: false,
             pending_report_element_uncheck: None,
-            show_income_statement_format_modal: false,
-            pending_income_statement_format_change: None,
             pending_remove_report: None,
         }
     }
@@ -281,21 +263,6 @@ impl TaxelApp {
         }
     }
 
-    /// Applies a previously deferred `incomeStatementFormat` dropdown change
-    /// after the user confirms the warning modal.
-    fn apply_pending_income_statement_format_change(&mut self) {
-        if let Some(pending) = self.pending_income_statement_format_change.take() {
-            if let Some(loaded) = self.loaded.as_mut() {
-                if let Some(section) = loaded.report.sections.get_mut(pending.section_idx) {
-                    if let Some(row) = section.rows.get_mut(pending.row_idx) {
-                        if let FactValue::Dropdown { selected, .. } = &mut row.value {
-                            *selected = pending.new_value;
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
 
 impl App for TaxelApp {
@@ -516,7 +483,7 @@ impl App for TaxelApp {
                             let state = &mut self.section_states[tab];
                             let scroll_to = self.search.scroll_to_row.take();
 
-                            let pending = ui::draw_table(
+                            let pending_uncheck = ui::draw_table(
                                 &mut section.rows,
                                 &mut state.collapsed,
                                 &lang,
@@ -529,25 +496,13 @@ impl App for TaxelApp {
                                 &self.edit_snapshot,
                             );
 
-                            if let Some(row_idx) = pending.uncheck_report_element {
+                            if let Some(row_idx) = pending_uncheck {
                                 self.pending_report_element_uncheck =
                                     Some(PendingReportElementUncheck {
                                         section_idx: tab,
                                         row_idx,
                                     });
                                 self.show_report_element_uncheck_modal = true;
-                            }
-
-                            if let Some((row_idx, new_value)) =
-                                pending.income_statement_format_change
-                            {
-                                self.pending_income_statement_format_change =
-                                    Some(PendingIncomeStatementFormatChange {
-                                        section_idx: tab,
-                                        row_idx,
-                                        new_value,
-                                    });
-                                self.show_income_statement_format_modal = true;
                             }
                         }
 
@@ -668,20 +623,6 @@ impl App for TaxelApp {
                 } else if cancel {
                     self.show_report_element_uncheck_modal = false;
                     self.pending_report_element_uncheck = None;
-                }
-            }
-
-            if self.show_income_statement_format_modal {
-                let mut confirm = false;
-                let mut cancel = false;
-                ui::draw_income_statement_format_modal(ctx, &mut confirm, &mut cancel);
-
-                if confirm {
-                    self.show_income_statement_format_modal = false;
-                    self.apply_pending_income_statement_format_change();
-                } else if cancel {
-                    self.show_income_statement_format_modal = false;
-                    self.pending_income_statement_format_change = None;
                 }
             }
         });

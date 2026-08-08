@@ -4,10 +4,7 @@ use chrono::NaiveDate;
 use log::debug;
 use rust_decimal::Decimal;
 use std::collections::{HashMap, HashSet};
-use taxel::{
-    BASELINE_ROLE_URIS, INCOME_STATEMENT_FORMAT_GKV, INCOME_STATEMENT_FORMAT_UKV,
-    REPORT_ELEMENT_TO_ROLE_URI, REQUIRED_NIL_TUPLE_CHILDREN,
-};
+use taxel::{BASELINE_ROLE_URIS, REPORT_ELEMENT_TO_ROLE_URI, REQUIRED_NIL_TUPLE_CHILDREN};
 use xbrl_rs::{
     Concept, Context as XbrlContext, ContextId, Decimals, ElementParticle, EntityIdentifier,
     ExpandedName, Fact, FactAttribute, FactAttributeName, GroupParticle, InstanceDocument,
@@ -224,81 +221,6 @@ pub fn remove_forbidden_facts(
             )
         });
     }
-
-    // The `incomeStatement` (GuV) presentation role contains both the GKV
-    // (Gesamtkostenverfahren) and UKV (Umsatzkostenverfahren) breakdowns side
-    // by side. Once the user has picked one via `incomeStatementFormat`, hide
-    // the other breakdown's facts (identified via the taxonomy's
-    // `hgbref:typeOperatingResult` reference annotation) so only the selected
-    // format's line items remain. Leave both in place when neither format is
-    // explicitly selected yet.
-    //
-    // This must only run when `GuV` (the regular income statement) is
-    // active. `incomeStatementMicroBilG` (`GuVMicroBilG`) reuses the very
-    // same GKV-tagged concepts (e.g. `is.netIncome.regular.operatingTC.*`)
-    // for its own, format-invariant presentation — §267a HGB permits only
-    // Gesamtkostenverfahren there, so it has no UKV counterpart at all.
-    // Filtering by format while GuV is inactive would wrongly strip those
-    // shared concepts out of the MicroBilG section.
-    let guv_active = instance.item_facts().iter().any(|fact| {
-        fact.concept_name().local_name == "genInfo.report.id.reportElement.reportElements.GuV"
-            && !fact.is_nil()
-    });
-
-    if guv_active {
-        let active_income_statement_format = instance
-            .item_facts()
-            .iter()
-            .find(|fact| {
-                !fact.is_nil()
-                    && matches!(
-                        fact.concept_name().local_name.as_str(),
-                        INCOME_STATEMENT_FORMAT_GKV | INCOME_STATEMENT_FORMAT_UKV
-                    )
-            })
-            .map(|fact| fact.concept_name().local_name.clone());
-
-        if let Some(active) = active_income_statement_format {
-            let hidden_format = if active == INCOME_STATEMENT_FORMAT_GKV {
-                "UKV"
-            } else {
-                "GKV"
-            };
-
-            // Mussfeld facts of the hidden format must stay (as nil) even
-            // though they're not applicable — ERiC's plausibility check
-            // (error 170155092, "kein Fakt zum Mussfeld ... berichtet")
-            // requires every Mussfeld concept to be reported for context
-            // 'D' regardless of which format tag it carries. Only
-            // non-mandatory (Kannfeld) facts of the hidden format are
-            // actually removed. Mirrors the same exception already made for
-            // legal-form-based removal above.
-            filter_facts_by(instance, |fact| {
-                operating_result_type(fact, taxonomy) == Some(hidden_format)
-                    && !is_fiscal_mandatory_fact(fact, taxonomy)
-            });
-        }
-    }
-}
-
-/// Returns the concept's `hgbref:typeOperatingResult` reference annotation
-/// (`"GKV"`, `"UKV"`, or `"neutral"`), if present, indicating which income
-/// statement format (Gesamtkostenverfahren vs. Umsatzkostenverfahren) the
-/// concept belongs to.
-fn operating_result_type(fact: &Fact, taxonomy: &TaxonomySet) -> Option<&'static str> {
-    let concept = taxonomy.find_concept(fact.concept_name())?;
-    let id = concept.id.as_deref()?;
-    let references = taxonomy.references_for(id)?;
-
-    references.iter().find_map(|reference| {
-        reference.parts.iter().find_map(|part| {
-            (part.name == "hgbref:typeOperatingResult").then_some(match part.value.as_str() {
-                "GKV" => "GKV",
-                "UKV" => "UKV",
-                _ => "neutral",
-            })
-        })
-    })
 }
 
 /// Returns `true` when the fact should be removed from the instance document
