@@ -8,8 +8,8 @@ use std::{
 use taxel::{
     ElsterReport, TaxonomyType, CLOSING_DATE, COMPANY_CITY, COMPANY_COUNTRY, COMPANY_HOUSE_NO,
     COMPANY_NAME, COMPANY_STREET, COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, COMPANY_ZIP_CODE,
-    FISCAL_YEAR_BEGIN, FISCAL_YEAR_END, GCD_LABEL, GCD_ROLE_URI, REPORT_ELEMENT_PREFIX,
-    ROLE_URI_TO_REPORT_ELEMENT,
+    FISCAL_YEAR_BEGIN, FISCAL_YEAR_END, GCD_LABEL, GCD_ROLE_URI, INCOME_STATEMENT_FORMAT_GKV,
+    INCOME_STATEMENT_FORMAT_UKV, REPORT_ELEMENT_PREFIX, ROLE_URI_TO_REPORT_ELEMENT,
 };
 use xbrl_rs::{
     Concept, ConceptView, Decimals, DocumentView, FactAttribute, FactAttributeName,
@@ -361,6 +361,40 @@ impl Report {
         let labels_map = build_labels_map(gcd_nodes);
         let announced_roles = collect_announced_roles(gcd_nodes, item_facts);
 
+        // The income statement (`GuV`) presentation role contains both the
+        // GKV (Gesamtkostenverfahren) and UKV (Umsatzkostenverfahren)
+        // breakdowns side by side. Once the user has picked one via
+        // `incomeStatementFormat`, hide the other breakdown's *rows* — the
+        // underlying `InstanceDocument` is never touched by this, only what
+        // the table displays. Leave both visible when neither format is
+        // selected, or when `GuV` isn't the active report element (e.g.
+        // `GuVMicroBilG`, which reuses the same GKV-tagged concepts for its
+        // own format-invariant presentation and has no UKV counterpart at
+        // all — hiding by format there would wrongly prune it).
+        let guv_active = item_facts.iter().any(|fact| {
+            fact.concept_name().local_name == "genInfo.report.id.reportElement.reportElements.GuV"
+                && !fact.is_nil()
+        });
+        let hidden_operating_result = guv_active
+            .then(|| {
+                item_facts.iter().find_map(|fact| {
+                    let local = fact.concept_name().local_name.as_str();
+                    (!fact.is_nil()
+                        && matches!(
+                            local,
+                            INCOME_STATEMENT_FORMAT_GKV | INCOME_STATEMENT_FORMAT_UKV
+                        ))
+                    .then(|| {
+                        if local == INCOME_STATEMENT_FORMAT_GKV {
+                            "UKV"
+                        } else {
+                            "GKV"
+                        }
+                    })
+                })
+            })
+            .flatten();
+
         for section in &view.sections {
             let role_uri = section.role;
 
@@ -408,6 +442,7 @@ impl Report {
                     &mut fact_section.rows,
                     false,
                     None,
+                    hidden_operating_result,
                 );
             }
 
@@ -1082,6 +1117,27 @@ fn is_required(concept: Option<&Concept>, taxonomy: &TaxonomySet) -> bool {
         })
 }
 
+/// Returns the concept's `hgbref:typeOperatingResult` reference annotation
+/// (`"GKV"`, `"UKV"`, or `"neutral"`), if present, indicating which income
+/// statement format (Gesamtkostenverfahren vs. Umsatzkostenverfahren) the
+/// concept belongs to. This is a display-only classification — it never
+/// affects which facts exist in the `InstanceDocument`, only which rows
+/// `Report::populate` builds for the table.
+fn operating_result_type(concept: Option<&Concept>, taxonomy: &TaxonomySet) -> Option<&'static str> {
+    let id = concept?.id.as_deref()?;
+    let references = taxonomy.references_for(id)?;
+
+    references.iter().find_map(|reference| {
+        reference.parts.iter().find_map(|part| {
+            (part.name == "hgbref:typeOperatingResult").then_some(match part.value.as_str() {
+                "GKV" => "GKV",
+                "UKV" => "UKV",
+                _ => "neutral",
+            })
+        })
+    })
+}
+
 /// Builds the calculation-linkbase child map for one extended-link role:
 /// a total concept's local name maps to its `(child local name, signed
 /// weight)` pairs. Arcs from multiple merged calculation linkbase files are
@@ -1173,10 +1229,22 @@ fn collect_node(
     rows: &mut Vec<FactRow>,
     is_in_multi_choice: bool,
     parent_concept: Option<&str>,
+    hidden_operating_result: Option<&'static str>,
 ) {
+    let concept = concept_map.get(node.concept_name).copied();
+
+    // Prune the whole subtree when this concept belongs to the currently
+    // hidden GKV/UKV branch — no row for it, and no recursion into its
+    // children, since each concept carries its own `hgbref:typeOperatingResult`
+    // tag rather than inheriting one from its parent.
+    if let Some(hidden) = hidden_operating_result {
+        if operating_result_type(concept, taxonomy) == Some(hidden) {
+            return;
+        }
+    }
+
     let labels = resolve_labels(node);
     let has_children = !node.children.is_empty();
-    let concept = concept_map.get(node.concept_name).copied();
     let is_tuple_concept = concept
         .and_then(|concept| concept.content_model.as_ref())
         .is_some();
@@ -1281,6 +1349,7 @@ fn collect_node(
                     // checkboxes, so we set this flag to true.
                     true,
                     Some(node.concept_name),
+                    hidden_operating_result,
                 );
             }
 
@@ -1346,6 +1415,7 @@ fn collect_node(
             rows,
             is_in_multi_choice,
             Some(node.concept_name),
+            hidden_operating_result,
         );
     }
 }
@@ -1394,6 +1464,35 @@ mod tests {
         section.recompute_calculated_values();
 
         assert_eq!(value_of(&section, "sub_total"), None);
+    }
+
+    #[test]
+    fn missing_child_row_is_treated_as_absent_not_zero() {
+        // A calc child with no row at all — e.g. pruned from the table
+        // because `collect_node` hid it as part of a GKV/UKV branch not
+        // currently selected — must not error and must not be treated as a
+        // zero contributor. The total still resolves purely from whichever
+        // sibling's row is present, exactly like `is.netIncome.eat` (which
+        // sums the GKV and UKV branch roots as siblings) must keep working
+        // when only one branch has rows.
+        let mut section = section_with(
+            vec![
+                decimal_row("total", "I", None),
+                decimal_row("present_child", "I", Some("10.00")),
+                // "missing_child" has no row at all.
+            ],
+            HashMap::from([(
+                "total".to_owned(),
+                vec![
+                    ("present_child".to_owned(), Decimal::ONE),
+                    ("missing_child".to_owned(), Decimal::ONE),
+                ],
+            )]),
+        );
+
+        section.recompute_calculated_values();
+
+        assert_eq!(value_of(&section, "total"), Some(Decimal::new(1000, 2)));
     }
 
     #[test]
