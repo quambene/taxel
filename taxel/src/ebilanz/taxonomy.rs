@@ -67,6 +67,13 @@ pub const COMPANY_TAX_NUMBER: &str = "genInfo.company.id.idNo.type.companyId.ST1
 /// The parent fact of `COMPANY_TAX_NUMBER` is used to uniquely identify the tax
 /// number fact.
 pub const COMPANY_TAX_NUMBER_PARENT: &str = "genInfo.company.id.idNo";
+/// Dropdown fact selecting the income statement format (Gesamtkostenverfahren
+/// vs. Umsatzkostenverfahren).
+pub const INCOME_STATEMENT_FORMAT: &str = "genInfo.report.id.incomeStatementFormat";
+pub const INCOME_STATEMENT_FORMAT_GKV: &str =
+    "genInfo.report.id.incomeStatementFormat.incomeStatementFormat.GKV";
+pub const INCOME_STATEMENT_FORMAT_UKV: &str =
+    "genInfo.report.id.incomeStatementFormat.incomeStatementFormat.UKV";
 
 /// The eBilanz taxonomy module to use for a new report. Each variant
 /// corresponds to a specific set of schema ref URLs (plus the always-included

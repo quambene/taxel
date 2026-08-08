@@ -28,8 +28,8 @@ use std::{
 };
 use taxel::{
     elster::Submitter, ElsterReport, TaxonomyType, BASELINE_ROLE_URIS, CLOSING_DATE,
-    COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, GCD_ROLE_URI, REPORT_ELEMENT_PREFIX,
-    REQUIRED_GCD_FACTS, TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE,
+    COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, GCD_ROLE_URI, INCOME_STATEMENT_FORMAT,
+    REPORT_ELEMENT_PREFIX, REQUIRED_GCD_FACTS, TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE,
 };
 use uuid::Uuid;
 use xbrl_rs::{InstanceDocument, RoleUri, TaxonomyLoader, TaxonomySet};
@@ -1195,8 +1195,6 @@ fn handle_end_date_change(app: &mut TaxelApp, editing_tab: usize) -> UpdateOutco
 /// selected format's line items. Returns `Rebuild` when facts were actually
 /// removed so the UI reflects the trimmed instance.
 fn handle_income_statement_format_change(app: &mut TaxelApp, editing_tab: usize) -> UpdateOutcome {
-    const INCOME_STATEMENT_FORMAT: &str = "genInfo.report.id.incomeStatementFormat";
-
     let changed = app
         .loaded
         .as_ref()

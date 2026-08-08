@@ -4,7 +4,10 @@ use chrono::NaiveDate;
 use log::debug;
 use rust_decimal::Decimal;
 use std::collections::{HashMap, HashSet};
-use taxel::{BASELINE_ROLE_URIS, REPORT_ELEMENT_TO_ROLE_URI, REQUIRED_NIL_TUPLE_CHILDREN};
+use taxel::{
+    BASELINE_ROLE_URIS, INCOME_STATEMENT_FORMAT_GKV, INCOME_STATEMENT_FORMAT_UKV,
+    REPORT_ELEMENT_TO_ROLE_URI, REQUIRED_NIL_TUPLE_CHILDREN,
+};
 use xbrl_rs::{
     Concept, Context as XbrlContext, ContextId, Decimals, ElementParticle, EntityIdentifier,
     ExpandedName, Fact, FactAttribute, FactAttributeName, GroupParticle, InstanceDocument,
@@ -229,11 +232,6 @@ pub fn remove_forbidden_facts(
     // `hgbref:typeOperatingResult` reference annotation) so only the selected
     // format's line items remain. Leave both in place when neither format is
     // explicitly selected yet.
-    const INCOME_STATEMENT_FORMAT_GKV: &str =
-        "genInfo.report.id.incomeStatementFormat.incomeStatementFormat.GKV";
-    const INCOME_STATEMENT_FORMAT_UKV: &str =
-        "genInfo.report.id.incomeStatementFormat.incomeStatementFormat.UKV";
-
     let active_income_statement_format = instance
         .item_facts()
         .iter()
