@@ -13,8 +13,9 @@
   - Save report at location ("Save as")
   - Delete report from report list
   - Open confirmation PDF after sending the report
-  - Filter income statement based on selected income statement format (e.g.
-    "Gesamtkostenverfahren" or "Umsatzkostenverfahren")
+  - Filter income statement for report element
+    `genInfo.report.id.reportElement.reportElements.GuV` based on selected
+    income statement format ("Gesamtkostenverfahren" or "Umsatzkostenverfahren")
 - changed
   - Add description to "Import values" modal
 
