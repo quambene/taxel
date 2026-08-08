@@ -262,7 +262,6 @@ impl TaxelApp {
             }
         }
     }
-
 }
 
 impl App for TaxelApp {

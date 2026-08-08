@@ -1123,7 +1123,10 @@ fn is_required(concept: Option<&Concept>, taxonomy: &TaxonomySet) -> bool {
 /// concept belongs to. This is a display-only classification — it never
 /// affects which facts exist in the `InstanceDocument`, only which rows
 /// `Report::populate` builds for the table.
-fn operating_result_type(concept: Option<&Concept>, taxonomy: &TaxonomySet) -> Option<&'static str> {
+fn operating_result_type(
+    concept: Option<&Concept>,
+    taxonomy: &TaxonomySet,
+) -> Option<&'static str> {
     let id = concept?.id.as_deref()?;
     let references = taxonomy.references_for(id)?;
 
