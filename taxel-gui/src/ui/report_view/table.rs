@@ -5,12 +5,25 @@ use crate::{
 use eframe::egui::{self, Align, ComboBox, TextStyle, Ui};
 use egui_extras::{Column, TableBuilder};
 use std::collections::HashSet;
-use taxel::REPORT_ELEMENT_PREFIX;
+use taxel::{INCOME_STATEMENT_FORMAT, REPORT_ELEMENT_PREFIX};
+
+/// Structural row actions the user attempted while editing that require
+/// explicit confirmation before being applied, returned by [`draw_table`].
+#[derive(Default)]
+pub struct PendingRowActions {
+    /// Raw index of a `reportElements.*` checkbox the user attempted to
+    /// uncheck.
+    pub uncheck_report_element: Option<usize>,
+    /// Raw index and newly selected value of an `incomeStatementFormat`
+    /// dropdown change the user attempted.
+    pub income_statement_format_change: Option<(usize, String)>,
+}
 
 /// Draw the fact table in the main panel, showing only the rows that are not
 /// collapsed. Handles the toggle logic for expanding/collapsing rows with
-/// children. Returns the raw index of a row that the user attempted to uncheck
-/// (if any).
+/// children. Returns the structural row actions the user attempted this
+/// frame (if any), so the caller can ask for confirmation before applying
+/// them.
 ///
 /// `edit_snapshot` is the section's row values as they were when editing
 /// started (empty when not editing). The "Filled" filter is evaluated
@@ -30,7 +43,7 @@ pub fn draw_table(
     show_required_only: bool,
     show_filled_only: bool,
     edit_snapshot: &[FactValue],
-) -> Option<usize> {
+) -> PendingRowActions {
     let row_height = ui.text_style_height(&TextStyle::Body) + ui.spacing().item_spacing.y;
     let visible = visible_rows(
         rows,
@@ -40,7 +53,7 @@ pub fn draw_table(
         edit_snapshot,
     );
     let mut toggle: Option<usize> = None;
-    let mut pending_report_element_uncheck: Option<usize> = None;
+    let mut pending = PendingRowActions::default();
 
     let mut builder = TableBuilder::new(ui)
         .resizable(true)
@@ -154,7 +167,7 @@ pub fn draw_table(
                                     // Revert immediately; the app will ask for explicit
                                     // confirmation before actually unchecking.
                                     *checked = true;
-                                    pending_report_element_uncheck = Some(raw_idx);
+                                    pending.uncheck_report_element = Some(raw_idx);
                                 }
                             } else {
                                 ui.add_enabled(false, egui::Checkbox::new(checked, ""));
@@ -173,6 +186,10 @@ pub fn draw_table(
                                 });
 
                             if row_editing {
+                                let is_income_statement_format =
+                                    rows[raw_idx].concept == INCOME_STATEMENT_FORMAT;
+                                let previous = selected.clone();
+
                                 ComboBox::from_id_salt(raw_idx)
                                     .selected_text(display_label)
                                     .show_ui(ui, |ui| {
@@ -185,6 +202,16 @@ pub fn draw_table(
                                             ui.selectable_value(selected, key.clone(), label);
                                         }
                                     });
+
+                                if is_income_statement_format && *selected != previous {
+                                    // Revert immediately; the app will ask for explicit
+                                    // confirmation before actually switching the format,
+                                    // since it discards the other format's entered values.
+                                    let new_value = selected.clone();
+                                    *selected = previous;
+                                    pending.income_statement_format_change =
+                                        Some((raw_idx, new_value));
+                                }
                             } else {
                                 ui.label(display_label);
                             }
@@ -331,7 +358,7 @@ pub fn draw_table(
         }
     }
 
-    pending_report_element_uncheck
+    pending
 }
 
 /// Compute which visible-list indices should be collapsed to show only rows up
