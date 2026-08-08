@@ -12,8 +12,8 @@
 use std::path::PathBuf;
 use taxel::{elster::Submitter, ElsterReport, TaxonomyType, GCD_ROLE_URI};
 use taxel_gui::{
-    create_instance_document, rebuild_instance, update_instance_document, FactValue,
-    LoadedReport, NewReportForm, Report, ReportList, Search, SectionState, Settings, TaxelApp,
+    create_instance_document, rebuild_instance, update_instance_document, FactValue, LoadedReport,
+    NewReportForm, Report, ReportList, Search, SectionState, Settings, TaxelApp,
 };
 use xbrl_rs::{InstanceDocument, RoleUri, TaxonomySet};
 

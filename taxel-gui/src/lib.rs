@@ -4,7 +4,6 @@ mod infrastructure;
 mod ui;
 
 pub use app::TaxelApp;
-
 // Narrowly re-exported (not a stable public API) solely so
 // `tests/rebuild_instance.rs` can exercise `rebuild_instance` against real
 // taxonomy fixtures without the whole `app`/`domain` module trees being
