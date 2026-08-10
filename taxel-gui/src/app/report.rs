@@ -4,8 +4,6 @@ use crate::{
         SectionState, TaxelApp, APP_NAME, APP_VERSION, VENDOR_ID,
     },
     domain::{
-        active_roles, create_instance_document, extract_period, remove_forbidden_facts,
-        remove_trade_accounting_facts, restore_required_nil_tuple_children,
         update_instance_document, write_calculated_values_to_instance, FactValue, Report,
         ReportStatus, UpdateOutcome,
     },
@@ -27,9 +25,11 @@ use std::{
     time::{Duration, SystemTime},
 };
 use taxel::{
-    elster::Submitter, ElsterReport, TaxonomyType, BASELINE_ROLE_URIS, CLOSING_DATE,
-    COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, GCD_ROLE_URI, REPORT_ELEMENT_PREFIX,
-    REQUIRED_GCD_FACTS, TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE,
+    active_roles, create_instance_document, elster::Submitter, extract_fact_name, extract_period,
+    remove_forbidden_facts, remove_trade_accounting_facts, restore_required_nil_tuple_children,
+    taxonomy_version_from_schema_refs, ElsterReport, TaxonomyType, BASELINE_ROLE_URIS,
+    CLOSING_DATE, COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, GCD_ROLE_URI,
+    REPORT_ELEMENT_PREFIX, REQUIRED_GCD_FACTS, TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE,
 };
 use uuid::Uuid;
 use xbrl_rs::{InstanceDocument, RoleUri, TaxonomyLoader, TaxonomySet};
@@ -153,7 +153,7 @@ pub fn poll_load_result(app: &mut TaxelApp) {
                     .map(|(start, end)| (Some(start), Some(end)))
                     .unwrap_or((None, None));
                 let taxonomy_version =
-                    extract_taxonomy_version_from_schema_refs(loaded.instance.schema_refs())
+                    taxonomy_version_from_schema_refs(loaded.instance.schema_refs())
                         .map(|v| v.to_owned());
 
                 app.upsert_report(
@@ -621,7 +621,7 @@ fn load_taxonomies(
         if taxonomies_missing {
             debug!("Taxonomy files still missing after primary download, trying zip fallback");
 
-            let version = extract_taxonomy_version_from_schema_refs(&schema_refs)
+            let version = taxonomy_version_from_schema_refs(&schema_refs)
                 .context("Cannot determine taxonomy version for zip fallback")?;
             let date = TAXONOMY_VERSION_TO_DATE
                 .get(version)
@@ -1207,7 +1207,7 @@ pub fn rebuild_instance(
     let source_instance = loaded.instance.clone();
     let report_path = loaded.report.path.clone();
     let taxonomy_type = loaded.report.taxonomy_type.clone();
-    let taxonomy_version = extract_taxonomy_version_from_schema_refs(source_instance.schema_refs());
+    let taxonomy_version = taxonomy_version_from_schema_refs(source_instance.schema_refs());
     let taxonomy_date =
         taxonomy_version.and_then(|version| TAXONOMY_VERSION_TO_DATE.get(version).copied());
     let (start_date, end_date) = extract_period(&source_instance).unwrap_or_default();
@@ -1718,39 +1718,6 @@ pub fn remove_report_from_list(app: &mut TaxelApp, path: PathBuf) {
 fn clear_diagnostics_by_category(app: &mut TaxelApp, category: DiagnosticCategory) {
     app.diagnostics
         .retain(|diagnostic| diagnostic.category != category);
-}
-
-/// Determines the taxonomy version string (e.g. `"6.8"`) from a set of
-/// schema ref URLs by reverse-looking up the date embedded in the URL.
-pub fn extract_taxonomy_version_from_schema_refs(schema_refs: &[String]) -> Option<&'static str> {
-    schema_refs.iter().find_map(|schema_ref| {
-        TAXONOMY_VERSION_TO_DATE
-            .iter()
-            .find(|(_, date)| schema_ref.contains(*date))
-            .map(|(version, _)| *version)
-    })
-}
-
-/// Extracts the XBRL concept local name from an ERiC `Feldidentifikator` value.
-///
-/// Input examples:
-/// - `"gcd:genInfo.report.id.accountingStandard"` → `"genInfo.report.id.accountingStandard"`
-/// - `"/Kontext[1]/gcd:genInfo.report.period.fiscalYearBegin[1]"` → `"genInfo.report.period.fiscalYearBegin"`
-fn extract_fact_name(field_identifier: &str) -> &str {
-    // Take the last `/`-delimited path segment.
-    let segment = field_identifier
-        .rsplit('/')
-        .next()
-        .unwrap_or(field_identifier);
-
-    // Strip namespace prefix (everything up to and including `:`).
-    let local = segment
-        .split_once(':')
-        .map(|(_, namespace)| namespace)
-        .unwrap_or(segment);
-
-    // Strip trailing XPath index such as `[1]`.
-    local.rfind('[').map(|pos| &local[..pos]).unwrap_or(local)
 }
 
 /// Returns the path to the application's taxonomy directory, which is located

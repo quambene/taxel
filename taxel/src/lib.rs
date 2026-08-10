@@ -1,6 +1,8 @@
 mod csv;
 mod ebilanz;
 pub mod elster;
+mod eric;
+mod instance_document;
 mod ods;
 mod xbrl;
 mod xml;
@@ -11,14 +13,21 @@ pub use crate::{
         Writer as CsvWriter, WriterBuilder as CsvWriterBuilder,
     },
     ebilanz::{
-        TaxonomyType, BASELINE_ROLE_URIS, CLOSING_DATE, COMPANY_CITY, COMPANY_COUNTRY,
-        COMPANY_HOUSE_NO, COMPANY_NAME, COMPANY_STREET, COMPANY_TAX_NUMBER,
-        COMPANY_TAX_NUMBER_PARENT, COMPANY_ZIP_CODE, FISCAL_YEAR_BEGIN, FISCAL_YEAR_END, GCD_LABEL,
-        GCD_ROLE_URI, REPORT_ELEMENT_PREFIX, REPORT_ELEMENT_TO_ROLE_URI, REQUIRED_GCD_FACTS,
-        REQUIRED_NIL_TUPLE_CHILDREN, ROLE_URI_TO_REPORT_ELEMENT, TAXONOMY_DATE_TO_VERSION,
-        TAXONOMY_TYPES, TAXONOMY_VERSION_TO_DATE,
+        taxonomy_version_from_schema_refs, TaxonomyType, BASELINE_ROLE_URIS, CLOSING_DATE,
+        COMPANY_CITY, COMPANY_COUNTRY, COMPANY_HOUSE_NO, COMPANY_NAME, COMPANY_STREET,
+        COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, COMPANY_ZIP_CODE, FISCAL_YEAR_BEGIN,
+        FISCAL_YEAR_END, GCD_LABEL, GCD_ROLE_URI, REPORT_ELEMENT_PREFIX,
+        REPORT_ELEMENT_TO_ROLE_URI, REQUIRED_GCD_FACTS, REQUIRED_NIL_TUPLE_CHILDREN,
+        ROLE_URI_TO_REPORT_ELEMENT, TAXONOMY_DATE_TO_VERSION, TAXONOMY_TYPES,
+        TAXONOMY_VERSION_TO_DATE,
     },
     elster::{ElsterReport, TEST_MARKER},
+    eric::extract_fact_name,
+    instance_document::{
+        active_roles, create_instance_document, create_item_fact, ensure_nil_tuple_child,
+        extract_period, remove_forbidden_facts, remove_trade_accounting_facts,
+        restore_required_nil_tuple_children,
+    },
 };
 use log::warn;
 pub use quick_xml::{Reader, Writer};

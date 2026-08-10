@@ -314,3 +314,15 @@ pub static TAXONOMY_DATE_TO_VERSION: LazyLock<HashMap<&'static str, &'static str
             ("2024-04-01", "6.8"),
         ])
     });
+
+/// Derives the eBilanz taxonomy version (e.g. `"6.8"`) from a set of
+/// `link:schemaRef` URLs, by reverse-looking up the date embedded in the URL
+/// against [`TAXONOMY_VERSION_TO_DATE`].
+pub fn taxonomy_version_from_schema_refs(schema_refs: &[String]) -> Option<&'static str> {
+    schema_refs.iter().find_map(|schema_ref| {
+        TAXONOMY_VERSION_TO_DATE
+            .iter()
+            .find(|(_, date)| schema_ref.contains(*date))
+            .map(|(version, _)| *version)
+    })
+}

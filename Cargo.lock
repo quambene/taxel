@@ -4926,12 +4926,14 @@ name = "taxel"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "chrono",
  "csv",
  "env_logger",
  "log",
  "quick-xml 0.29.0",
  "serde",
  "spreadsheet-ods",
+ "xbrl-rs",
 ]
 
 [[package]]

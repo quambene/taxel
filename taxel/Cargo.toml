@@ -16,3 +16,5 @@ serde = { workspace = true, features = ["derive"] }
 quick-xml = { workspace = true }
 csv = { workspace = true }
 spreadsheet-ods = { workspace = true }
+xbrl-rs = { workspace = true }
+chrono = { workspace = true }
