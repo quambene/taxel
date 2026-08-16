@@ -5,6 +5,7 @@ use crate::{
     ROLE_URI_TO_REPORT_ELEMENT,
 };
 use chrono::NaiveDate;
+use csv::Writer as CsvWriter;
 use rust_decimal::Decimal;
 use std::{
     collections::{HashMap, HashSet},
@@ -912,6 +913,75 @@ impl Report {
         }
 
         (matched_count, imported_count)
+    }
+
+    /// Writes fact rows across all enabled (non-disabled) sections to
+    /// `writer` as semicolon-delimited CSV, returning the number of rows
+    /// written. Abstract rows are always kept; other rows are kept only if
+    /// their value is non-empty.
+    pub fn write_values_csv<W: std::io::Write>(
+        &self,
+        lang: &str,
+        writer: &mut CsvWriter<W>,
+    ) -> Result<usize, anyhow::Error> {
+        writer.write_record(["Section", "ID", "Depth", "Name", "Value", "Unit", "Context"])?;
+
+        let mut row_count = 0;
+
+        for section in &self.sections {
+            if section.disabled {
+                continue;
+            }
+
+            let section_name = section
+                .labels
+                .get(lang)
+                .map(String::as_str)
+                .unwrap_or(section.role.as_str());
+
+            for row in &section.rows {
+                let value = fact_value_to_string(&row.value, lang);
+
+                if !row.is_abstract && value.is_empty() {
+                    continue;
+                }
+
+                let name = row.labels.get(lang).map(String::as_str).unwrap_or("");
+                writer.write_record([
+                    section_name,
+                    row.concept.as_str(),
+                    row.depth.to_string().as_str(),
+                    name,
+                    value.as_str(),
+                    row.unit.as_deref().unwrap_or(""),
+                    row.context.as_str(),
+                ])?;
+                row_count += 1;
+            }
+        }
+
+        writer.flush()?;
+
+        Ok(row_count)
+    }
+}
+
+/// Renders a `FactValue` the same way the fact table displays it, for CSV
+/// export.
+fn fact_value_to_string(value: &FactValue, lang: &str) -> String {
+    match value {
+        FactValue::Text(text) => text.clone(),
+        FactValue::Checkbox(checked) => checked.to_string(),
+        FactValue::Dropdown { selected, options } => options
+            .iter()
+            .find(|(key, _)| key == selected)
+            .and_then(|(_, labels)| labels.get(lang))
+            .cloned()
+            .unwrap_or_else(|| selected.clone()),
+        FactValue::BooleanDropdown(selected) => selected.clone(),
+        FactValue::Decimal { raw, .. } => raw.clone(),
+        FactValue::Integer(text) => text.clone(),
+        FactValue::Date { raw, .. } => raw.clone(),
     }
 }
 

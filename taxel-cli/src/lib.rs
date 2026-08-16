@@ -33,6 +33,11 @@ pub fn app() -> App<'static> {
                 .about("Import fact values from one xml file into another"),
         )
         .subcommand(
+            SubCommand::with_name(cmd::EXPORT)
+                .args(cmd::export_args())
+                .about("Export fact values from an xml file to a csv file"),
+        )
+        .subcommand(
             SubCommand::with_name(cmd::DOWNLOAD)
                 .args(cmd::download_args())
                 .about("Download and cache an eBilanz taxonomy"),

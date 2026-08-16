@@ -23,6 +23,7 @@ pub const TARGET_FILE: &str = "target-file";
 pub const SOURCE_FILE: &str = "source-file";
 pub const IMPORT_REPORT_ELEMENTS: &str = "import-report-elements";
 pub const TAXONOMY_PATH: &str = "taxonomy-path";
+pub const LANG: &str = "lang";
 
 pub fn get_one<'a>(matches: &'a ArgMatches, id: &str) -> Result<&'a str, anyhow::Error> {
     match matches.get_one::<String>(id) {
@@ -223,4 +224,14 @@ pub fn resolve_taxonomy_dir(matches: &ArgMatches) -> Result<PathBuf, anyhow::Err
         Some(path) => Ok(PathBuf::from(path)),
         None => taxel::taxonomy_dir(),
     }
+}
+
+pub fn lang() -> Arg<'static> {
+    Arg::new(LANG)
+        .long(LANG)
+        .required(false)
+        .takes_value(true)
+        .default_value("en")
+        .possible_values(["en", "de"])
+        .help("The language used for section and fact labels in the exported csv file.")
 }
