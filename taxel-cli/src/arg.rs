@@ -8,8 +8,6 @@ pub const VERBOSE: &str = "verbose";
 
 // args for subcommands
 pub const XML_FILE: &str = "xml-file";
-pub const CSV_FILE: &str = "csv-file";
-pub const TEMPLATE_FILE: &str = "template-file";
 pub const OUTPUT_FILE: &str = "output-file";
 pub const LOG_DIR: &str = "log-dir";
 pub const TAX_TYPE: &str = "tax-type";
@@ -42,22 +40,6 @@ pub fn xml_file() -> Arg<'static> {
         .required(true)
         .takes_value(true)
         .help("The path to the XML file to be validated.")
-}
-
-pub fn csv_file() -> Arg<'static> {
-    Arg::new(CSV_FILE)
-        .long(CSV_FILE)
-        .required(false)
-        .takes_value(true)
-        .help("The path to the csv file used to generate the xml file.")
-}
-
-pub fn template_file() -> Arg<'static> {
-    Arg::new(TEMPLATE_FILE)
-        .long(TEMPLATE_FILE)
-        .required(true)
-        .takes_value(true)
-        .help("The path to the template file used to generate the xml file.")
 }
 
 pub fn output_file() -> Arg<'static> {

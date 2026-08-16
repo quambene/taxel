@@ -77,16 +77,29 @@ _Note:_ Run `cargo install --path ./taxel-cli` again to update to the latest ver
 ### Usage
 
 ``` bash
-# Extract values from xml file
-taxel extract \
-    --xml-file "my_ebilanz.xml" \
-    --output-file "my_ebilanz.csv"
+# Download and cache an eBilanz taxonomy
+taxel download \
+    --taxonomy-version 6.8 \
+    --taxonomy-type core-fiscal
 
-# Generate xml file from csv file
-taxel generate \
-     --csv-file "my_ebilanz.csv" \
-     --template-file "templates/elster_v11_ebilanz_v6.5_test.xml" \
-     --output-file "my_bilanz.xml"
+# Build a new, taxonomy-valid eBilanz xml file from scratch
+taxel new \
+    --start-date 2024-01-01 \
+    --end-date 2024-12-31 \
+    --taxonomy-version 6.8 \
+    --taxonomy-type core-fiscal \
+    --output-file "my_bilanz.xml"
+
+# Import fact values from one xml file into another
+taxel import \
+    --target-file "my_bilanz.xml" \
+    --source-file "my_ebilanz.xml" \
+    --output-file "my_bilanz.xml"
+
+# Export fact values from an xml file to a csv file
+taxel export \
+    --xml-file "my_bilanz.xml" \
+    --output-file "my_bilanz.csv"
 
 # Validate xml file
 taxel validate \

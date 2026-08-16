@@ -13,16 +13,6 @@ pub fn app() -> App<'static> {
                 .help("Shows what is going on"),
         )
         .subcommand(
-            SubCommand::with_name(cmd::EXTRACT)
-                .args(cmd::extract_args())
-                .about("Extract tag values from xml file"),
-        )
-        .subcommand(
-            SubCommand::with_name(cmd::GENERATE)
-                .args(cmd::generate_args())
-                .about("Generate xml file"),
-        )
-        .subcommand(
             SubCommand::with_name(cmd::NEW)
                 .args(cmd::new_args())
                 .about("Build a new, taxonomy-valid eBilanz xml file from scratch"),
