@@ -4928,12 +4928,16 @@ dependencies = [
  "anyhow",
  "chrono",
  "csv",
+ "dirs",
  "env_logger",
  "log",
  "quick-xml 0.29.0",
+ "reqwest",
+ "rust_decimal",
  "serde",
  "spreadsheet-ods",
  "xbrl-rs",
+ "zip",
 ]
 
 [[package]]
@@ -4946,6 +4950,7 @@ dependencies = [
  "eric-sdk",
  "log",
  "taxel",
+ "xbrl-rs",
 ]
 
 [[package]]
@@ -4964,7 +4969,6 @@ dependencies = [
  "log",
  "open",
  "quick-xml 0.29.0",
- "reqwest",
  "rfd",
  "rust_decimal",
  "serde",
@@ -4973,7 +4977,6 @@ dependencies = [
  "trash",
  "uuid",
  "xbrl-rs",
- "zip",
 ]
 
 [[package]]

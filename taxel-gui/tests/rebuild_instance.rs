@@ -13,7 +13,7 @@ use std::path::PathBuf;
 use taxel::{create_instance_document, elster::Submitter, ElsterReport, TaxonomyType, GCD_ROLE_URI};
 use taxel_gui::{
     rebuild_instance, update_instance_document, FactValue, LoadedReport, NewReportForm, Report,
-    ReportList, Search, SectionState, Settings, TaxelApp,
+    ReportList, ReportStatus, Search, SectionState, Settings, TaxelApp,
 };
 use xbrl_rs::{InstanceDocument, RoleUri, TaxonomySet};
 
@@ -124,6 +124,7 @@ fn rebuild_removes_facts_not_applicable_to_entity_legal_form() {
             instance,
             elster,
             report,
+            status: ReportStatus::Draft,
         }),
         eric: None,
         report_list: ReportList::new(),

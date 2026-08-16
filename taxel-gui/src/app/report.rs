@@ -13,27 +13,25 @@ use anyhow::Context;
 use chrono::{Datelike, NaiveDate, Utc};
 use eframe::egui::{self};
 use log::{debug, info};
-use reqwest::blocking::Client;
 use std::{
     collections::HashSet,
     env,
     fs::{self},
-    io::{self, Cursor},
     path::{Path, PathBuf},
     sync::mpsc,
     thread,
-    time::{Duration, SystemTime},
+    time::SystemTime,
 };
 use taxel::{
     active_roles, create_instance_document, elster::Submitter, extract_fact_name, extract_period,
-    remove_forbidden_facts, remove_trade_accounting_facts, restore_required_nil_tuple_children,
-    taxonomy_version_from_schema_refs, ElsterReport, TaxonomyType, BASELINE_ROLE_URIS,
-    CLOSING_DATE, COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, GCD_ROLE_URI,
-    REPORT_ELEMENT_PREFIX, REQUIRED_GCD_FACTS, TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE,
+    load_taxonomies, remove_forbidden_facts, remove_trade_accounting_facts,
+    restore_required_nil_tuple_children, taxonomy_dir, taxonomy_version_from_schema_refs,
+    ElsterReport, TaxonomyType, BASELINE_ROLE_URIS, CLOSING_DATE, COMPANY_TAX_NUMBER,
+    COMPANY_TAX_NUMBER_PARENT, GCD_ROLE_URI, REPORT_ELEMENT_PREFIX, REQUIRED_GCD_FACTS,
+    TAXONOMY_DATE_TO_VERSION, TAXONOMY_VERSION_TO_DATE,
 };
 use uuid::Uuid;
-use xbrl_rs::{InstanceDocument, RoleUri, TaxonomyLoader, TaxonomySet};
-use zip::ZipArchive;
+use xbrl_rs::{InstanceDocument, RoleUri, TaxonomySet};
 
 /// Discriminates how a report reaches the background load thread.
 #[derive(Clone)]
@@ -55,6 +53,10 @@ pub struct LoadedReport {
     pub instance: InstanceDocument,
     pub elster: ElsterReport,
     pub report: Report,
+    /// The report's lifecycle status. Lives here rather than on `Report`
+    /// (shared with `taxel-cli`, which has no persisted report status to
+    /// track) since `taxel-gui` is the only consumer that needs it.
+    pub status: ReportStatus,
 }
 
 /// The result of a background load operation.
@@ -288,7 +290,8 @@ fn read_and_import_values(app: &mut TaxelApp) -> Result<(usize, usize, PathBuf),
         InstanceDocument::from_file(&source_path).context("Failed to parse source XML")?;
     let source_schema_refs = source_instance.schema_refs().to_vec();
     let source_schema_ref_paths = source_instance.schema_ref_paths();
-    let source_taxonomy = load_taxonomies(source_schema_refs, &source_schema_ref_paths, false)?
+    let source_taxonomy =
+        load_taxonomies(source_schema_refs, &source_schema_ref_paths, false, &taxonomy_dir()?)?
         .context("Source taxonomy not available on disk. Open the source report first so its taxonomy is downloaded.")?;
 
     let Some(loaded) = app.loaded.as_mut() else {
@@ -459,7 +462,9 @@ fn load_instance_document_and_taxonomy(
     let schema_refs: Vec<String> = instance.schema_refs().to_vec();
     let schema_ref_paths = instance.schema_ref_paths();
 
-    let Some(taxonomy) = load_taxonomies(schema_refs, &schema_ref_paths, allow_download)? else {
+    let Some(taxonomy) =
+        load_taxonomies(schema_refs, &schema_ref_paths, allow_download, &taxonomy_dir()?)?
+    else {
         return Ok(LoadOutcome::NeedsDownload);
     };
 
@@ -482,6 +487,7 @@ fn load_instance_document_and_taxonomy(
         instance,
         report,
         elster: elster_report,
+        status: ReportStatus::Draft,
     }))
 }
 
@@ -513,10 +519,7 @@ fn load_taxonomy_and_create_instance_document(
     let schema_refs = form.taxonomy_type.schema_refs(taxonomy_date);
     let namespace_prefix = form.taxonomy_type.namespace_prefix();
     let namespace_uri = form.taxonomy_type.namespace_uri(taxonomy_date);
-    let schema_ref_paths: Vec<String> = schema_refs
-        .iter()
-        .filter_map(|url| url.split("/taxonomies/").nth(1).map(str::to_string))
-        .collect();
+    let schema_ref_paths = taxel::schema_ref_paths(&schema_refs);
 
     let Some(taxonomy) = load_taxonomies(
         schema_refs,
@@ -525,6 +528,7 @@ fn load_taxonomy_and_create_instance_document(
             .map(|path| path.as_str())
             .collect::<Vec<&str>>(),
         allow_download,
+        &taxonomy_dir()?,
     )?
     else {
         return Ok(LoadOutcome::NeedsDownload);
@@ -578,133 +582,8 @@ fn load_taxonomy_and_create_instance_document(
         instance,
         report,
         elster,
+        status: ReportStatus::Draft,
     }))
-}
-
-/// Loads the taxonomies required for the given schema refs. If they are missing
-/// and `allow_download` is false, returns Ok(None) so the UI can ask for
-/// confirmation before downloading.
-fn load_taxonomies(
-    schema_refs: Vec<String>,
-    schema_ref_paths: &[&str],
-    allow_download: bool,
-) -> Result<Option<TaxonomySet>, anyhow::Error> {
-    let taxonomy_dir = taxonomy_dir()?;
-    let loader = TaxonomyLoader::new()?;
-
-    let taxonomies_missing = schema_ref_paths
-        .iter()
-        .any(|path| !taxonomy_dir.join(path).exists());
-
-    if taxonomies_missing {
-        if !allow_download {
-            return Ok(None);
-        }
-
-        if !taxonomy_dir.exists() {
-            fs::create_dir_all(&taxonomy_dir).with_context(|| {
-                format!(
-                    "Failed to create taxonomy directory: {}",
-                    taxonomy_dir.display()
-                )
-            })?;
-        }
-
-        let taxonomies_missing = match loader.download_all(&schema_refs, &taxonomy_dir) {
-            Ok(result) => !result.failed.is_empty(),
-            Err(err) => {
-                debug!("Primary taxonomy download returned error: {err}");
-                true
-            }
-        };
-
-        if taxonomies_missing {
-            debug!("Taxonomy files still missing after primary download, trying zip fallback");
-
-            let version = taxonomy_version_from_schema_refs(&schema_refs)
-                .context("Cannot determine taxonomy version for zip fallback")?;
-            let date = TAXONOMY_VERSION_TO_DATE
-                .get(version)
-                .with_context(|| format!("No date known for taxonomy version {version}"))?;
-
-            download_taxonomy_zip(version, date, &taxonomy_dir)
-                .with_context(|| format!("Zip fallback failed for taxonomy v{version}"))?;
-        }
-    }
-
-    let taxonomy = TaxonomySet::discover(schema_refs, taxonomy_dir)?;
-
-    Ok(Some(taxonomy))
-}
-
-/// Downloads the bundled taxonomy zip for `version`/`date` from
-/// `https://www.xbrl.de/german-gaap-taxonomy-v{version}-{date}.zip` and
-/// extracts all entries under the `xbrl/` subfolder into `taxonomy_dir`.
-fn download_taxonomy_zip(
-    version: &str,
-    date: &str,
-    taxonomy_dir: &Path,
-) -> Result<(), anyhow::Error> {
-    let url = format!("https://www.xbrl.de/german-gaap-taxonomy-v{version}-{date}.zip");
-    debug!("Downloading taxonomy zip from {url}");
-
-    let client = Client::builder()
-        .timeout(Duration::from_secs(120))
-        .build()?;
-    let response = client
-        .get(&url)
-        .send()
-        .with_context(|| format!("Failed to GET {url}"))?;
-
-    if !response.status().is_success() {
-        return Err(anyhow::anyhow!(
-            "Taxonomy zip download returned HTTP {}",
-            response.status()
-        ));
-    }
-
-    let bytes = response
-        .bytes()
-        .context("Failed to read taxonomy zip body")?;
-    let cursor = Cursor::new(bytes);
-    let mut archive = ZipArchive::new(cursor).context("Failed to open taxonomy zip")?;
-
-    for i in 0..archive.len() {
-        let mut entry = archive.by_index(i)?;
-        let entry_name = entry.name().to_owned();
-
-        // The zip has a top-level folder:
-        // german-gaap-taxonomy-v6.9-2025-04-01/xbrl/de-gcd-2025-04-01/... Find
-        // "/xbrl/" anywhere in the path and take the remainder.
-        let Some(xbrl_pos) = entry_name.find("/xbrl/") else {
-            continue;
-        };
-        let relative = &entry_name[xbrl_pos + "/xbrl/".len()..];
-
-        if relative.is_empty() {
-            continue;
-        }
-
-        let dest = taxonomy_dir.join(relative);
-
-        if !dest.starts_with(taxonomy_dir) {
-            continue;
-        }
-
-        if entry.is_dir() {
-            fs::create_dir_all(&dest)?;
-        } else {
-            if let Some(parent) = dest.parent() {
-                fs::create_dir_all(parent)?;
-            }
-            let mut outfile = fs::File::create(&dest)
-                .with_context(|| format!("Failed to create {}", dest.display()))?;
-
-            io::copy(&mut entry, &mut outfile)?;
-        }
-    }
-
-    Ok(())
 }
 
 /// Applies a successfully loaded or created report to the app state.
@@ -722,7 +601,7 @@ fn finish_load(app: &mut TaxelApp, mut loaded: LoadedReport) {
         .iter()
         .find(|overview| overview.path == loaded.report.path)
     {
-        loaded.report.status = overview.report_status;
+        loaded.status = overview.report_status;
     }
 
     app.section_states = loaded
@@ -1366,7 +1245,7 @@ pub fn validate_report(app: &mut TaxelApp) {
         return;
     };
 
-    loaded.report.status = ReportStatus::Draft;
+    loaded.status = ReportStatus::Draft;
     app.report_list
         .set_report_status(&loaded.report.path, ReportStatus::Draft);
     app.report_list.save(&mut app.diagnostics);
@@ -1451,7 +1330,7 @@ fn serialize_and_validate_report(app: &mut TaxelApp) -> Result<(), anyhow::Error
     match eric.validate(xml, "Bilanz", taxonomy_version, None) {
         Ok(response) => {
             if let Some(loaded) = app.loaded.as_mut() {
-                loaded.report.status = ReportStatus::Validated;
+                loaded.status = ReportStatus::Validated;
                 app.report_list
                     .set_report_status(&loaded.report.path, ReportStatus::Validated);
                 app.report_list.save(&mut app.diagnostics);
@@ -1527,7 +1406,7 @@ pub fn send_report(app: &mut TaxelApp) {
         return;
     };
 
-    if loaded.report.status != ReportStatus::Validated {
+    if loaded.status != ReportStatus::Validated {
         app.diagnostics.push(AppDiagnostic::new_error(
             DiagnosticCategory::Send,
             "Validate the report first and make sure that all errors are resolved".to_string(),
@@ -1616,7 +1495,7 @@ pub fn send_report(app: &mut TaxelApp) {
     ) {
         Ok(response) => {
             if let Some(loaded) = app.loaded.as_mut() {
-                loaded.report.status = ReportStatus::Sent;
+                loaded.status = ReportStatus::Sent;
                 app.report_list
                     .set_report_status(&loaded.report.path, ReportStatus::Sent);
                 app.report_list.save(&mut app.diagnostics);
@@ -1718,12 +1597,4 @@ pub fn remove_report_from_list(app: &mut TaxelApp, path: PathBuf) {
 fn clear_diagnostics_by_category(app: &mut TaxelApp, category: DiagnosticCategory) {
     app.diagnostics
         .retain(|diagnostic| diagnostic.category != category);
-}
-
-/// Returns the path to the application's taxonomy directory, which is located
-/// in the user's data directory.
-fn taxonomy_dir() -> Result<PathBuf, anyhow::Error> {
-    dirs::data_dir()
-        .map(|dir| dir.join("taxel").join("taxonomies"))
-        .context("Could not determine data directory")
 }

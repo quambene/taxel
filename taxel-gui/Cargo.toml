@@ -24,8 +24,6 @@ eric-sdk = { workspace = true }
 dirs = { workspace = true }
 trash = { workspace = true }
 open = { workspace = true }
-zip = { workspace = true }
-reqwest = { workspace = true }
 rfd = { workspace = true }
 csv = { workspace = true }
 eframe = { workspace = true }

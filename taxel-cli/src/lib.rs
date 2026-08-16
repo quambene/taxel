@@ -23,6 +23,21 @@ pub fn app() -> App<'static> {
                 .about("Generate xml file"),
         )
         .subcommand(
+            SubCommand::with_name(cmd::NEW)
+                .args(cmd::new_args())
+                .about("Build a new, taxonomy-valid eBilanz xml file from scratch"),
+        )
+        .subcommand(
+            SubCommand::with_name(cmd::IMPORT)
+                .args(cmd::import_args())
+                .about("Import fact values from one xml file into another"),
+        )
+        .subcommand(
+            SubCommand::with_name(cmd::DOWNLOAD)
+                .args(cmd::download_args())
+                .about("Download and cache an eBilanz taxonomy"),
+        )
+        .subcommand(
             SubCommand::with_name(cmd::VALIDATE)
                 .args(cmd::validate_args())
                 .about("Validate xml file"),

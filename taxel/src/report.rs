@@ -1,15 +1,14 @@
-use crate::domain::ReportStatus;
+use crate::{
+    ElsterReport, TaxonomyType, CLOSING_DATE, COMPANY_CITY, COMPANY_COUNTRY, COMPANY_HOUSE_NO,
+    COMPANY_NAME, COMPANY_STREET, COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, COMPANY_ZIP_CODE,
+    FISCAL_YEAR_BEGIN, FISCAL_YEAR_END, GCD_LABEL, GCD_ROLE_URI, REPORT_ELEMENT_PREFIX,
+    ROLE_URI_TO_REPORT_ELEMENT,
+};
 use chrono::NaiveDate;
 use rust_decimal::Decimal;
 use std::{
     collections::{HashMap, HashSet},
     path::PathBuf,
-};
-use taxel::{
-    ElsterReport, TaxonomyType, CLOSING_DATE, COMPANY_CITY, COMPANY_COUNTRY, COMPANY_HOUSE_NO,
-    COMPANY_NAME, COMPANY_STREET, COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, COMPANY_ZIP_CODE,
-    FISCAL_YEAR_BEGIN, FISCAL_YEAR_END, GCD_LABEL, GCD_ROLE_URI, REPORT_ELEMENT_PREFIX,
-    ROLE_URI_TO_REPORT_ELEMENT,
 };
 use xbrl_rs::{
     Concept, ConceptView, Decimals, DocumentView, FactAttribute, FactAttributeName,
@@ -302,8 +301,6 @@ pub struct Report {
     pub path: PathBuf,
     /// The taxonomy type, derived from the schema ref URLs in the instance document.
     pub taxonomy_type: TaxonomyType,
-    /// The report status for lifecycle management.
-    pub status: ReportStatus,
     /// The sections in the order they appear in the presentation linkbase.
     pub sections: Vec<ReportSection>,
     /// Role URIs for sections that could not be mapped to a known report
@@ -316,7 +313,6 @@ impl Report {
         Self {
             path,
             taxonomy_type,
-            status: ReportStatus::Draft,
             sections: Vec::new(),
             role_mapping_errors: Vec::new(),
         }

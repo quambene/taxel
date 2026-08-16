@@ -16,6 +16,9 @@ fn main() -> Result<(), anyhow::Error> {
     match matches.subcommand() {
         Some((cmd::EXTRACT, matches)) => cmd::extract(matches),
         Some((cmd::GENERATE, matches)) => cmd::generate(matches),
+        Some((cmd::NEW, matches)) => cmd::new(matches),
+        Some((cmd::IMPORT, matches)) => cmd::import(matches),
+        Some((cmd::DOWNLOAD, matches)) => cmd::download(matches),
         Some((cmd::VALIDATE, matches)) => cmd::validate(matches),
         Some((cmd::SEND, matches)) => cmd::send(matches),
         _ => Err(anyhow!("Subcommand not found")),

@@ -18,3 +18,7 @@ csv = { workspace = true }
 spreadsheet-ods = { workspace = true }
 xbrl-rs = { workspace = true }
 chrono = { workspace = true }
+rust_decimal = { workspace = true }
+reqwest = { workspace = true }
+zip = { workspace = true }
+dirs = { workspace = true }

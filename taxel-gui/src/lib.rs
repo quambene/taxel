@@ -17,4 +17,4 @@ pub use app::{
     SectionState,
 };
 #[doc(hidden)]
-pub use domain::{update_instance_document, FactValue, Report};
+pub use domain::{update_instance_document, FactValue, Report, ReportStatus};

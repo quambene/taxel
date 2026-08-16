@@ -4,6 +4,8 @@ pub mod elster;
 mod eric;
 mod instance_document;
 mod ods;
+mod report;
+mod taxonomy_loader;
 mod xbrl;
 mod xml;
 
@@ -28,6 +30,8 @@ pub use crate::{
         extract_period, remove_forbidden_facts, remove_trade_accounting_facts,
         restore_required_nil_tuple_children,
     },
+    report::{FactRow, FactValue, Report, ReportSection},
+    taxonomy_loader::{download_taxonomy, load_taxonomies, schema_ref_paths, taxonomy_dir},
 };
 use log::warn;
 pub use quick_xml::{Reader, Writer};
