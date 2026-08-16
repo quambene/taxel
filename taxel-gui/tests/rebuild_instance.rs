@@ -10,7 +10,9 @@
 //! a stable public API.
 
 use std::path::PathBuf;
-use taxel::{create_instance_document, elster::Submitter, ElsterReport, TaxonomyType, GCD_ROLE_URI};
+use taxel::{
+    create_instance_document, elster::Submitter, ElsterReport, TaxonomyType, GCD_ROLE_URI,
+};
 use taxel_gui::{
     rebuild_instance, update_instance_document, FactValue, LoadedReport, NewReportForm, Report,
     ReportList, ReportStatus, Search, SectionState, Settings, TaxelApp,

@@ -111,7 +111,11 @@ pub fn load_taxonomies(
 /// Downloads the bundled taxonomy zip for `version`/`date` from
 /// `https://www.xbrl.de/german-gaap-taxonomy-v{version}-{date}.zip` and
 /// extracts all entries under the `xbrl/` subfolder into `taxonomy_dir`.
-fn download_taxonomy_zip(version: &str, date: &str, taxonomy_dir: &Path) -> Result<(), anyhow::Error> {
+fn download_taxonomy_zip(
+    version: &str,
+    date: &str,
+    taxonomy_dir: &Path,
+) -> Result<(), anyhow::Error> {
     let url = format!("https://www.xbrl.de/german-gaap-taxonomy-v{version}-{date}.zip");
     debug!("Downloading taxonomy zip from {url}");
 

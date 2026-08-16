@@ -5,7 +5,9 @@ use anyhow::Context;
 use clap::{Arg, ArgMatches};
 use log::debug;
 use std::path::Path;
-use taxel::{load_taxonomies, taxonomy_version_from_schema_refs, CsvWriterBuilder, Report, TaxonomyType};
+use taxel::{
+    load_taxonomies, taxonomy_version_from_schema_refs, CsvWriterBuilder, Report, TaxonomyType,
+};
 use xbrl_rs::InstanceDocument;
 
 pub fn export_args() -> [Arg<'static>; 4] {

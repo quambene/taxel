@@ -407,8 +407,12 @@ fn load_instance_document_and_taxonomy(
     let schema_refs: Vec<String> = instance.schema_refs().to_vec();
     let schema_ref_paths = instance.schema_ref_paths();
 
-    let Some(taxonomy) =
-        load_taxonomies(schema_refs, &schema_ref_paths, allow_download, &taxonomy_dir()?)?
+    let Some(taxonomy) = load_taxonomies(
+        schema_refs,
+        &schema_ref_paths,
+        allow_download,
+        &taxonomy_dir()?,
+    )?
     else {
         return Ok(LoadOutcome::NeedsDownload);
     };
