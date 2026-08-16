@@ -90,8 +90,8 @@ taxel new \
     --taxonomy-type core-fiscal \
     --output-file "my_bilanz.xml"
 
-# Import fact values from one xml file into another
-taxel import \
+# Merge fact values from one xml file into another
+taxel merge \
     --target-file "my_bilanz.xml" \
     --source-file "my_ebilanz.xml" \
     --output-file "my_bilanz.xml"

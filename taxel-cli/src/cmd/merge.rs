@@ -11,7 +11,7 @@ use taxel::{
 };
 use xbrl_rs::InstanceDocument;
 
-pub fn import_args() -> [Arg<'static>; 5] {
+pub fn merge_args() -> [Arg<'static>; 5] {
     [
         arg::target_file(),
         arg::source_file(),
@@ -25,7 +25,7 @@ pub fn import_args() -> [Arg<'static>; 5] {
     ]
 }
 
-pub fn import(matches: &ArgMatches) -> Result<(), anyhow::Error> {
+pub fn merge(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let target_path = PathBuf::from(arg::get_one(matches, TARGET_FILE)?);
     let source_path = PathBuf::from(arg::get_one(matches, SOURCE_FILE)?);
     let import_report_elements = matches.is_present(IMPORT_REPORT_ELEMENTS);
@@ -35,7 +35,7 @@ pub fn import(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let taxonomy_path = arg::get_maybe_one(matches, arg::TAXONOMY_PATH);
 
     debug!(
-        "Run `taxel import` with configuration:\n{TARGET_FILE}={}\n{SOURCE_FILE}={}\n\
+        "Run `taxel merge` with configuration:\n{TARGET_FILE}={}\n{SOURCE_FILE}={}\n\
          {IMPORT_REPORT_ELEMENTS}={import_report_elements}\n{OUTPUT_FILE}={output_file}",
         target_path.display(),
         source_path.display(),
@@ -52,7 +52,7 @@ pub fn import(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let target_taxonomy_type_flag = arg::taxonomy_type_flag_value(&target_taxonomy_type);
     let target_version = taxonomy_version_from_schema_refs(&target_schema_refs);
 
-    // Never download here: `import` is a pure, offline file transformation.
+    // Never download here: `merge` is a pure, offline file transformation.
     // Missing taxonomies are fetched explicitly via `taxel download`.
     let target_taxonomy =
         load_taxonomies(target_schema_refs, &target_schema_ref_paths, false, &taxonomy_dir)?
@@ -140,13 +140,13 @@ pub fn import(matches: &ArgMatches) -> Result<(), anyhow::Error> {
 
     fs::write(&output_path, &xml).with_context(|| {
         format!(
-            "Failed to write imported report to {}",
+            "Failed to write merged report to {}",
             output_path.display()
         )
     })?;
 
     println!(
-        "Imported values into {} (matched facts: {matched_count}, updated facts: {imported_count})",
+        "Merged values into {} (matched facts: {matched_count}, updated facts: {imported_count})",
         output_path.display()
     );
 

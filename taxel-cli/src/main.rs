@@ -15,7 +15,7 @@ fn main() -> Result<(), anyhow::Error> {
 
     match matches.subcommand() {
         Some((cmd::NEW, matches)) => cmd::new(matches),
-        Some((cmd::IMPORT, matches)) => cmd::import(matches),
+        Some((cmd::MERGE, matches)) => cmd::merge(matches),
         Some((cmd::EXPORT, matches)) => cmd::export(matches),
         Some((cmd::DOWNLOAD, matches)) => cmd::download(matches),
         Some((cmd::VALIDATE, matches)) => cmd::validate(matches),

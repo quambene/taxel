@@ -18,9 +18,9 @@ pub fn app() -> App<'static> {
                 .about("Build a new, taxonomy-valid eBilanz xml file from scratch"),
         )
         .subcommand(
-            SubCommand::with_name(cmd::IMPORT)
-                .args(cmd::import_args())
-                .about("Import fact values from one xml file into another"),
+            SubCommand::with_name(cmd::MERGE)
+                .args(cmd::merge_args())
+                .about("Merge fact values from one xml file into another"),
         )
         .subcommand(
             SubCommand::with_name(cmd::EXPORT)
