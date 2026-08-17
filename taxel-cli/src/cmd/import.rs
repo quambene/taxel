@@ -29,6 +29,9 @@ pub fn import_args() -> [Arg<'static>; 5] {
 
 /// Reapply fact values from a CSV file (produced by `taxel export`) into an
 /// XBRL file.
+///
+/// Missing taxonomies are not downloaded automatically. Use `taxel download` to
+/// fetch the required taxonomies first.
 pub fn import(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let xml_file = arg::get_one(matches, XML_FILE)?;
     let csv_file = arg::get_one(matches, CSV_FILE)?;
@@ -51,8 +54,6 @@ pub fn import(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let taxonomy_type_flag = arg::taxonomy_type_flag_value(&taxonomy_type);
     let version = taxonomy_version_from_schema_refs(&schema_refs);
 
-    // Never download here: `import` is a pure, offline file transformation.
-    // Missing taxonomies are fetched explicitly via `taxel download`.
     let taxonomy = load_taxonomies(schema_refs, &schema_ref_paths, false, &taxonomy_dir)?
         .with_context(|| match version {
             Some(version) => {
