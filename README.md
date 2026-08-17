@@ -101,6 +101,12 @@ taxel export \
     --xml-file "my_bilanz.xml" \
     --output-file "my_bilanz.csv"
 
+# Import fact values from a csv file exported via `taxel export`
+taxel import \
+    --xml-file "my_bilanz.xml" \
+    --csv-file "my_bilanz.csv" \
+    --output-file "my_bilanz.xml"
+
 # Validate xml file
 taxel validate \
     --tax-type "Bilanz" \

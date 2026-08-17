@@ -28,6 +28,11 @@ pub fn app() -> App<'static> {
                 .about("Export fact values from an xml file to a csv file"),
         )
         .subcommand(
+            SubCommand::with_name(cmd::IMPORT)
+                .args(cmd::import_args())
+                .about("Import fact values from a csv file exported via `taxel export`"),
+        )
+        .subcommand(
             SubCommand::with_name(cmd::DOWNLOAD)
                 .args(cmd::download_args())
                 .about("Download and cache an eBilanz taxonomy"),

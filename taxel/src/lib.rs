@@ -30,7 +30,7 @@ pub use crate::{
         extract_period, remove_forbidden_facts, remove_trade_accounting_facts,
         restore_required_nil_tuple_children,
     },
-    report::{FactRow, FactValue, Report, ReportSection},
+    report::{CsvImportOutcome, FactRow, FactValue, Report, ReportSection},
     taxonomy_loader::{download_taxonomy, load_taxonomies, schema_ref_paths, taxonomy_dir},
 };
 use log::warn;
