@@ -5,8 +5,14 @@ use crate::arg::{self, CSV_FILE, IMPORT_REPORT_ELEMENTS, OUTPUT_FILE, XML_FILE};
 use anyhow::Context;
 use clap::{Arg, ArgMatches};
 use log::debug;
-use std::{fs, path::{Path, PathBuf}};
-use taxel::{load_taxonomies, taxonomy_version_from_schema_refs, CsvReaderBuilder, ElsterReport, Report, TaxonomyType};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
+use taxel::{
+    load_taxonomies, taxonomy_version_from_schema_refs, CsvReaderBuilder, ElsterReport, Report,
+    TaxonomyType,
+};
 use xbrl_rs::InstanceDocument;
 
 pub fn import_args() -> [Arg<'static>; 5] {
@@ -96,8 +102,12 @@ pub fn import(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     elster.set_payload_xbrl(xbrl_bytes);
     let xml = elster.to_xml()?;
 
-    fs::write(&output_path, &xml)
-        .with_context(|| format!("Failed to write imported report to {}", output_path.display()))?;
+    fs::write(&output_path, &xml).with_context(|| {
+        format!(
+            "Failed to write imported report to {}",
+            output_path.display()
+        )
+    })?;
 
     println!(
         "Applied CSV values to {}: matched {} rows, updated {} facts",

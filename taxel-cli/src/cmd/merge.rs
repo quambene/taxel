@@ -138,12 +138,8 @@ pub fn merge(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     elster.set_payload_xbrl(xbrl_bytes);
     let xml = elster.to_xml()?;
 
-    fs::write(&output_path, &xml).with_context(|| {
-        format!(
-            "Failed to write merged report to {}",
-            output_path.display()
-        )
-    })?;
+    fs::write(&output_path, &xml)
+        .with_context(|| format!("Failed to write merged report to {}", output_path.display()))?;
 
     println!(
         "Merged values into {} (matched facts: {matched_count}, updated facts: {imported_count})",
