@@ -1,5 +1,6 @@
+use anyhow::anyhow;
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, sync::LazyLock};
+use std::{collections::HashMap, fmt, str::FromStr, sync::LazyLock};
 
 pub const GCD_ROLE_URI: &str = "http://www.xbrl.de/taxonomies/de-gcd/role/gcd";
 pub const GCD_LABEL: &str = "GCD (Global Common Document)";
@@ -197,6 +198,44 @@ impl TaxonomyType {
     /// is populated with known combinations of taxonomy type and language.
     pub fn label(&self, language: &str) -> Option<&'static str> {
         TAXONOMY_TYPE_LABELS.get(&(self, language)).copied()
+    }
+}
+
+/// Formats a `TaxonomyType` as its canonical kebab-case identifier (e.g.
+/// `"core-fiscal-microbilg"`). The inverse of `FromStr::from_str`. Used as
+/// the `--taxonomy-type` CLI flag value and to build copy-pasteable `taxel
+/// download` suggestions in error messages.
+impl fmt::Display for TaxonomyType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let value = match self {
+            TaxonomyType::CoreFiscal => "core-fiscal",
+            TaxonomyType::CoreFiscalMicroBilG => "core-fiscal-microbilg",
+            TaxonomyType::SupplementaryFiscal => "supplementary-fiscal",
+            TaxonomyType::SupplementaryFiscalMicroBilG => "supplementary-fiscal-microbilg",
+            TaxonomyType::CreditInstitution => "credit-institution",
+            TaxonomyType::PaymentInstitution => "payment-institution",
+            TaxonomyType::Insurance => "insurance",
+        };
+        write!(f, "{value}")
+    }
+}
+
+/// Parses a canonical kebab-case identifier (e.g. `"core-fiscal-microbilg"`)
+/// into a `TaxonomyType`. The inverse of `Display`.
+impl FromStr for TaxonomyType {
+    type Err = anyhow::Error;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        Ok(match value {
+            "core-fiscal" => TaxonomyType::CoreFiscal,
+            "core-fiscal-microbilg" => TaxonomyType::CoreFiscalMicroBilG,
+            "supplementary-fiscal" => TaxonomyType::SupplementaryFiscal,
+            "supplementary-fiscal-microbilg" => TaxonomyType::SupplementaryFiscalMicroBilG,
+            "credit-institution" => TaxonomyType::CreditInstitution,
+            "payment-institution" => TaxonomyType::PaymentInstitution,
+            "insurance" => TaxonomyType::Insurance,
+            other => return Err(anyhow!("Unknown taxonomy type '{other}'")),
+        })
     }
 }
 

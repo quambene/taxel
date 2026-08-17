@@ -42,21 +42,20 @@ pub fn export(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let schema_refs: Vec<String> = instance.schema_refs().to_vec();
     let schema_ref_paths = instance.schema_ref_paths();
     let taxonomy_type = TaxonomyType::from_schema_refs(instance.schema_refs()).unwrap_or_default();
-    let taxonomy_type_flag = arg::taxonomy_type_flag_value(&taxonomy_type);
     let version = taxonomy_version_from_schema_refs(&schema_refs);
 
     let taxonomy = load_taxonomies(schema_refs, &schema_ref_paths, false, &taxonomy_dir)?
         .with_context(|| match version {
             Some(version) => {
                 let mut suggestion = format!(
-                    "taxel download --taxonomy-version {version} --taxonomy-type {taxonomy_type_flag}"
+                    "taxel download --taxonomy-version {version} --taxonomy-type {taxonomy_type}"
                 );
                 if let Some(path) = taxonomy_path {
                     suggestion.push_str(&format!(" --taxonomy-path {path}"));
                 }
 
                 format!(
-                    "Taxonomy v{version} ({taxonomy_type_flag}) is not downloaded yet in {}. Run \
+                    "Taxonomy v{version} ({taxonomy_type}) is not downloaded yet in {}. Run \
                      `{suggestion}` first.",
                     taxonomy_dir.display()
                 )

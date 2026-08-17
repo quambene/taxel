@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use clap::{Arg, ArgMatches};
 use std::path::PathBuf;
-use taxel::{TaxonomyType, TAXONOMY_VERSION_TO_DATE};
+use taxel::TAXONOMY_VERSION_TO_DATE;
 
 // args for command
 pub const VERBOSE: &str = "verbose";
@@ -165,36 +165,6 @@ pub fn taxonomy_type() -> Arg<'static> {
             "insurance",
         ])
         .help("The eBilanz taxonomy module.")
-}
-
-/// Parses a `--taxonomy-type` flag value into a `TaxonomyType`. The inverse
-/// of [`taxonomy_type_flag_value`].
-pub fn parse_taxonomy_type(value: &str) -> Result<TaxonomyType, anyhow::Error> {
-    Ok(match value {
-        "core-fiscal" => TaxonomyType::CoreFiscal,
-        "core-fiscal-microbilg" => TaxonomyType::CoreFiscalMicroBilG,
-        "supplementary-fiscal" => TaxonomyType::SupplementaryFiscal,
-        "supplementary-fiscal-microbilg" => TaxonomyType::SupplementaryFiscalMicroBilG,
-        "credit-institution" => TaxonomyType::CreditInstitution,
-        "payment-institution" => TaxonomyType::PaymentInstitution,
-        "insurance" => TaxonomyType::Insurance,
-        other => return Err(anyhow!("Unknown taxonomy type '{other}'")),
-    })
-}
-
-/// Formats a `TaxonomyType` back into its `--taxonomy-type` flag value. The
-/// inverse of [`parse_taxonomy_type`]; used to build copy-pasteable
-/// `taxel download` suggestions in error messages.
-pub fn taxonomy_type_flag_value(taxonomy_type: &TaxonomyType) -> &'static str {
-    match taxonomy_type {
-        TaxonomyType::CoreFiscal => "core-fiscal",
-        TaxonomyType::CoreFiscalMicroBilG => "core-fiscal-microbilg",
-        TaxonomyType::SupplementaryFiscal => "supplementary-fiscal",
-        TaxonomyType::SupplementaryFiscalMicroBilG => "supplementary-fiscal-microbilg",
-        TaxonomyType::CreditInstitution => "credit-institution",
-        TaxonomyType::PaymentInstitution => "payment-institution",
-        TaxonomyType::Insurance => "insurance",
-    }
 }
 
 pub fn taxonomy_path() -> Arg<'static> {

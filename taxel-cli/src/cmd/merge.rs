@@ -53,7 +53,6 @@ pub fn merge(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let target_schema_ref_paths = target_instance.schema_ref_paths();
     let target_taxonomy_type =
         TaxonomyType::from_schema_refs(target_instance.schema_refs()).unwrap_or_default();
-    let target_taxonomy_type_flag = arg::taxonomy_type_flag_value(&target_taxonomy_type);
     let target_version = taxonomy_version_from_schema_refs(&target_schema_refs);
 
     let target_taxonomy =
@@ -61,14 +60,14 @@ pub fn merge(matches: &ArgMatches) -> Result<(), anyhow::Error> {
             .with_context(|| match target_version {
                 Some(version) => {
                     let mut suggestion = format!(
-                        "taxel download --taxonomy-version {version} --taxonomy-type {target_taxonomy_type_flag}"
+                        "taxel download --taxonomy-version {version} --taxonomy-type {target_taxonomy_type}"
                     );
                     if let Some(path) = taxonomy_path {
                         suggestion.push_str(&format!(" --taxonomy-path {path}"));
                     }
 
                     format!(
-                        "Taxonomy v{version} ({target_taxonomy_type_flag}) for the target file is \
+                        "Taxonomy v{version} ({target_taxonomy_type}) for the target file is \
                          not downloaded yet in {}. Run `{suggestion}` first.",
                         taxonomy_dir.display()
                     )
@@ -97,7 +96,6 @@ pub fn merge(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let source_schema_ref_paths = source_instance.schema_ref_paths();
     let source_taxonomy_type =
         TaxonomyType::from_schema_refs(source_instance.schema_refs()).unwrap_or_default();
-    let source_taxonomy_type_flag = arg::taxonomy_type_flag_value(&source_taxonomy_type);
     let source_version = taxonomy_version_from_schema_refs(&source_schema_refs);
 
     let source_taxonomy =
@@ -105,14 +103,14 @@ pub fn merge(matches: &ArgMatches) -> Result<(), anyhow::Error> {
             .with_context(|| match source_version {
                 Some(version) => {
                     let mut suggestion = format!(
-                        "taxel download --taxonomy-version {version} --taxonomy-type {source_taxonomy_type_flag}"
+                        "taxel download --taxonomy-version {version} --taxonomy-type {source_taxonomy_type}"
                     );
                     if let Some(path) = taxonomy_path {
                         suggestion.push_str(&format!(" --taxonomy-path {path}"));
                     }
 
                     format!(
-                        "Taxonomy v{version} ({source_taxonomy_type_flag}) for the source file is \
+                        "Taxonomy v{version} ({source_taxonomy_type}) for the source file is \
                          not downloaded yet in {}. Run `{suggestion}` first.",
                         taxonomy_dir.display()
                     )

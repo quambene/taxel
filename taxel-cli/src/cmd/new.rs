@@ -7,7 +7,7 @@ use log::debug;
 use std::{env, fs, path::PathBuf};
 use taxel::{
     create_instance_document, elster::Submitter, load_taxonomies, schema_ref_paths, ElsterReport,
-    Report, BASELINE_ROLE_URIS, TAXONOMY_VERSION_TO_DATE,
+    Report, TaxonomyType, BASELINE_ROLE_URIS, TAXONOMY_VERSION_TO_DATE,
 };
 use xbrl_rs::RoleUri;
 
@@ -34,13 +34,13 @@ pub fn new(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let start_date = arg::get_one(matches, START_DATE)?;
     let end_date = arg::get_one(matches, END_DATE)?;
     let taxonomy_version = arg::get_one(matches, TAXONOMY_VERSION)?;
-    let taxonomy_type = arg::parse_taxonomy_type(arg::get_one(matches, TAXONOMY_TYPE)?)?;
+    let taxonomy_type: TaxonomyType = arg::get_one(matches, TAXONOMY_TYPE)?.parse()?;
     let output_file = arg::get_one(matches, OUTPUT_FILE)?;
     let output_path = PathBuf::from(output_file);
 
     debug!(
         "Run `taxel new` with configuration:\n{START_DATE}={start_date}\n{END_DATE}={end_date}\n\
-         {TAXONOMY_VERSION}={taxonomy_version}\n{TAXONOMY_TYPE}={taxonomy_type:?}\n{OUTPUT_FILE}={output_file}",
+         {TAXONOMY_VERSION}={taxonomy_version}\n{TAXONOMY_TYPE}={taxonomy_type}\n{OUTPUT_FILE}={output_file}",
     );
 
     let vendor_id = env::var("VENDOR_ID").unwrap_or_else(|_| env!("VENDOR_ID").to_string());
@@ -58,18 +58,17 @@ pub fn new(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let taxonomy_dir = arg::resolve_taxonomy_dir(matches)?;
     let taxonomy_path = arg::get_maybe_one(matches, arg::TAXONOMY_PATH);
 
-    let taxonomy_type_flag = arg::taxonomy_type_flag_value(&taxonomy_type);
     let taxonomy = load_taxonomies(schema_refs, &path_refs, false, &taxonomy_dir)?.with_context(
         || {
             let mut suggestion = format!(
-                "taxel download --taxonomy-version {taxonomy_version} --taxonomy-type {taxonomy_type_flag}"
+                "taxel download --taxonomy-version {taxonomy_version} --taxonomy-type {taxonomy_type}"
             );
             if let Some(path) = taxonomy_path {
                 suggestion.push_str(&format!(" --taxonomy-path {path}"));
             }
 
             format!(
-                "Taxonomy v{taxonomy_version} ({taxonomy_type_flag}) is not downloaded yet in {}. \
+                "Taxonomy v{taxonomy_version} ({taxonomy_type}) is not downloaded yet in {}. \
                  Run `{suggestion}` first.",
                 taxonomy_dir.display()
             )
