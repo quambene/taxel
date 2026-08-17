@@ -1,4 +1,5 @@
 use crate::{
+    csv::{CsvExportRow, CsvImportOutcome},
     ElsterReport, TaxonomyType, CLOSING_DATE, COMPANY_CITY, COMPANY_COUNTRY, COMPANY_HOUSE_NO,
     COMPANY_NAME, COMPANY_STREET, COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, COMPANY_ZIP_CODE,
     FISCAL_YEAR_BEGIN, FISCAL_YEAR_END, GCD_LABEL, GCD_ROLE_URI, REPORT_ELEMENT_PREFIX,
@@ -7,7 +8,6 @@ use crate::{
 use chrono::NaiveDate;
 use csv::{Reader as CsvReader, Writer as CsvWriter};
 use rust_decimal::Decimal;
-use serde::Deserialize;
 use std::{
     collections::{HashMap, HashSet},
     path::PathBuf,
@@ -21,44 +21,6 @@ use xbrl_rs::{
 /// The XBRL 2.1 arcrole marking a calculation-linkbase arc as a
 /// summation-item relationship (parent = weighted sum of children).
 const SUMMATION_ITEM_ARCROLE: &str = "http://www.xbrl.org/2003/arcrole/summation-item";
-
-/// The outcome of [`Report::apply_csv_values`].
-#[derive(Debug)]
-pub struct CsvImportOutcome {
-    /// CSV rows that matched an existing fact (whether or not the value changed).
-    pub matched: usize,
-    /// CSV rows whose value differed from the current fact and were written.
-    pub updated: usize,
-    /// Human-readable notices for CSV rows that couldn't be matched or
-    /// couldn't be written (e.g. `Dropdown` fields).
-    pub warnings: Vec<String>,
-}
-
-/// A single row as written by [`Report::write_values_csv`], read back by
-/// [`Report::apply_csv_values`].
-#[derive(Debug, Deserialize)]
-struct CsvExportRow {
-    #[serde(rename = "Section")]
-    #[allow(dead_code)]
-    section: String,
-    #[serde(rename = "ID")]
-    id: String,
-    #[serde(rename = "Parent")]
-    parent: String,
-    #[serde(rename = "Depth")]
-    #[allow(dead_code)]
-    depth: usize,
-    #[serde(rename = "Name")]
-    #[allow(dead_code)]
-    name: String,
-    #[serde(rename = "Value")]
-    value: String,
-    #[serde(rename = "Unit")]
-    unit: String,
-    #[serde(rename = "Context")]
-    #[allow(dead_code)]
-    context: String,
-}
 
 /// An imported fact value extracted from a source instance document for merging
 /// into the current report. Carries nil-ness separately from the text value

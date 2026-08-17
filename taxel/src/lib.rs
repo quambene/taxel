@@ -11,7 +11,7 @@ mod xml;
 
 pub use crate::{
     csv::{
-        read_tags, write_tags, Reader as CsvReader, ReaderBuilder as CsvReaderBuilder, Trim,
+        CsvImportOutcome, Reader as CsvReader, ReaderBuilder as CsvReaderBuilder, Trim,
         Writer as CsvWriter, WriterBuilder as CsvWriterBuilder,
     },
     ebilanz::{
@@ -30,7 +30,7 @@ pub use crate::{
         extract_period, remove_forbidden_facts, remove_trade_accounting_facts,
         restore_required_nil_tuple_children,
     },
-    report::{CsvImportOutcome, FactRow, FactValue, Report, ReportSection},
+    report::{FactRow, FactValue, Report, ReportSection},
     taxonomy_loader::{download_taxonomy, load_taxonomies, schema_ref_paths, taxonomy_dir},
 };
 use log::warn;
@@ -93,38 +93,5 @@ impl Tags {
         if let Some(entry) = entry {
             warn!("Key not supported: '{key}', removing value: '{entry:#?}'",);
         }
-    }
-
-    /// Add required target tags for processing eBilanz.
-    pub fn add_required_tags(&mut self) {
-        self.insert("Verfahren", Some("ElsterBilanz"));
-        self.insert("DatenArt", Some("Bilanz"));
-        self.insert("Vorgang", Some("send-Auth"));
-        self.insert("HerstellerID", Some("00000"));
-        self.insert("Kompression", Some("GZIP"));
-        self.insert("Verschluesselung", Some("CMSEncryptedData"));
-        self.insert("VersionClient", Some("1"));
-        self.insert("ProduktName", Some("Taxel"));
-        self.insert("ProduktVersion", Some("0.1.0"));
-        self.insert("Testmerker", Some("700000004"));
-    }
-
-    /// Remove unsupported tags
-    /// TODO: populate content from multiple selection and dropdown fields from CSV to XBRL file
-    pub fn remove_unsupported_tags(&mut self) {
-        // dropdown fields
-        self.remove("de-gcd:genInfo.report.id.reportType.reportType.JA");
-        self.remove("de-gcd:genInfo.report.id.reportStatus.reportStatus.E");
-        self.remove("de-gcd:genInfo.report.id.revisionStatus.revisionStatus.E");
-        self.remove("de-gcd:genInfo.report.id.reportElement.reportElements.B");
-        self.remove("de-gcd:genInfo.report.id.reportElement.reportElements.GuVMicroBilG");
-        self.remove("de-gcd:genInfo.report.id.reportElement.reportElements.BVV");
-        self.remove("de-gcd:genInfo.report.id.statementType.statementType.E");
-        self.remove("de-gcd:genInfo.report.id.incomeStatementendswithBalProfit ");
-        self.remove("de-gcd:genInfo.report.id.accountingStandard.accountingStandard.AO");
-        self.remove("de-gcd:genInfo.report.id.incomeStatementFormat.incomeStatementFormat.GKV");
-        self.remove("de-gcd:genInfo.report.id.consolidationRange.consolidationRange.EA");
-        self.remove("de-gcd:genInfo.company.id.incomeClassification.trade");
-        self.remove("de-gcd:genInfo.company.id.shareholder.legalStatus.legalStatus.KOER");
     }
 }
