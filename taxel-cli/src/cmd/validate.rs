@@ -20,6 +20,7 @@ pub fn validate_args() -> [Arg<'static>; 5] {
     ]
 }
 
+/// Validate xml file according to the given taxonomy.
 pub fn validate(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let xml_file = arg::get_one(matches, arg::XML_FILE)?;
     let tax_type = arg::get_one(matches, arg::TAX_TYPE)?;

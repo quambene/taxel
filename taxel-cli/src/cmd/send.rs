@@ -21,6 +21,7 @@ pub fn send_args() -> [Arg<'static>; 5] {
     ]
 }
 
+/// Send an eBilanz XBRL report to the tax authorities.
 pub fn send(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let certificate_path = env::var("CERTIFICATE_PATH").unwrap();
     let certificate_path = Path::new(&certificate_path);

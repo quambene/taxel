@@ -27,6 +27,8 @@ pub fn import_args() -> [Arg<'static>; 5] {
     ]
 }
 
+/// Reapply fact values from a CSV file (produced by `taxel export`) into an
+/// XBRL file.
 pub fn import(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let xml_file = arg::get_one(matches, XML_FILE)?;
     let csv_file = arg::get_one(matches, CSV_FILE)?;

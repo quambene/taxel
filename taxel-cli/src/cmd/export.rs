@@ -21,6 +21,10 @@ pub fn export_args() -> [Arg<'static>; 4] {
     ]
 }
 
+/// Export fact values from an XBRL file to a semicolon-delimited CSV file.
+///
+/// Missing taxonomies are not downloaded automatically. Use `taxel download` to
+/// fetch the required taxonomies first.
 pub fn export(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let xml_file = arg::get_one(matches, XML_FILE)?;
     let lang = arg::get_one(matches, LANG)?;
@@ -41,8 +45,6 @@ pub fn export(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let taxonomy_type_flag = arg::taxonomy_type_flag_value(&taxonomy_type);
     let version = taxonomy_version_from_schema_refs(&schema_refs);
 
-    // Never download here: `export` is a pure, offline file transformation.
-    // Missing taxonomies are fetched explicitly via `taxel download`.
     let taxonomy = load_taxonomies(schema_refs, &schema_ref_paths, false, &taxonomy_dir)?
         .with_context(|| match version {
             Some(version) => {
@@ -65,6 +67,7 @@ pub fn export(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let view = instance.view(&taxonomy);
     let item_facts = instance.item_facts();
     let mut report = Report::new(xml_file.into(), taxonomy_type);
+
     report.populate(view, &item_facts, &taxonomy);
 
     let mut writer = CsvWriterBuilder::new()

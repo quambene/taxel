@@ -26,6 +26,10 @@ pub fn new_args() -> [Arg<'static>; 6] {
     ]
 }
 
+/// Build a new, taxonomy-valid eBilanz XBRL report from scratch.
+///
+/// Missing taxonomies are not downloaded automatically. Use `taxel download` to
+/// fetch the required taxonomies first.
 pub fn new(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let start_date = arg::get_one(matches, START_DATE)?;
     let end_date = arg::get_one(matches, END_DATE)?;
@@ -54,8 +58,6 @@ pub fn new(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let taxonomy_dir = arg::resolve_taxonomy_dir(matches)?;
     let taxonomy_path = arg::get_maybe_one(matches, arg::TAXONOMY_PATH);
 
-    // Never download here: `new` is a pure, offline file transformation.
-    // Missing taxonomies are fetched explicitly via `taxel download`.
     let taxonomy_type_flag = arg::taxonomy_type_flag_value(&taxonomy_type);
     let taxonomy = load_taxonomies(schema_refs, &path_refs, false, &taxonomy_dir)?.with_context(
         || {

@@ -25,6 +25,10 @@ pub fn merge_args() -> [Arg<'static>; 5] {
     ]
 }
 
+/// Merge fact values from one XBRL file into another.
+///
+/// Missing taxonomies are not downloaded automatically. Use `taxel download` to
+/// fetch the required taxonomies first.
 pub fn merge(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let target_path = PathBuf::from(arg::get_one(matches, TARGET_FILE)?);
     let source_path = PathBuf::from(arg::get_one(matches, SOURCE_FILE)?);
@@ -52,8 +56,6 @@ pub fn merge(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let target_taxonomy_type_flag = arg::taxonomy_type_flag_value(&target_taxonomy_type);
     let target_version = taxonomy_version_from_schema_refs(&target_schema_refs);
 
-    // Never download here: `merge` is a pure, offline file transformation.
-    // Missing taxonomies are fetched explicitly via `taxel download`.
     let target_taxonomy =
         load_taxonomies(target_schema_refs, &target_schema_ref_paths, false, &taxonomy_dir)?
             .with_context(|| match target_version {

@@ -12,6 +12,7 @@ pub fn download_args() -> [Arg<'static>; 3] {
     ]
 }
 
+/// Download and cache an eBilanz taxonomy for offline use by `new`/`import` subcommands.
 pub fn download(matches: &ArgMatches) -> Result<(), anyhow::Error> {
     let version = arg::get_one(matches, TAXONOMY_VERSION)?;
     let taxonomy_type = arg::parse_taxonomy_type(arg::get_one(matches, TAXONOMY_TYPE)?)?;
