@@ -28,7 +28,8 @@ pub use crate::{
     instance_document::{
         active_roles, create_instance_document, create_item_fact, ensure_nil_tuple_child,
         extract_period, remove_forbidden_facts, remove_trade_accounting_facts,
-        restore_required_nil_tuple_children,
+        restore_required_nil_tuple_children, update_instance_document,
+        write_calculated_values_to_instance, UpdateOutcome,
     },
     report::{FactRow, FactValue, Report, ReportSection},
     taxonomy_loader::{download_taxonomy, load_taxonomies, schema_ref_paths, taxonomy_dir},
