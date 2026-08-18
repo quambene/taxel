@@ -931,41 +931,31 @@ pub fn update_instance_document(
                 if raw.is_empty() {
                     write_decimal_fact(instance, idx, None);
                 } else if let Some(decimal) = value {
-                    write_decimal_fact(instance, idx, Some(*decimal));
+                    let formatted = decimal.to_string();
+                    write_decimal_fact(instance, idx, Some(&formatted));
                 }
             }
             Ok(UpdateOutcome::NoChange)
         }
         FactValue::Integer(value) => {
             if let Some(idx) = fact_index {
-                if value.is_empty() {
-                    instance.set_fact_nil(idx, true);
-                    instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
-                } else {
-                    instance.set_fact_value(idx, value.clone());
-                    instance.set_fact_attribute(idx, FactAttribute::Decimals(Decimals::Infinite));
-                }
+                write_integer_fact(instance, idx, (!value.is_empty()).then_some(value.as_str()));
             }
             Ok(UpdateOutcome::NoChange)
         }
         FactValue::BooleanDropdown(value) => {
             if let Some(idx) = fact_index {
-                if value.is_empty() {
-                    instance.set_fact_nil(idx, true);
-                } else {
-                    instance.set_fact_value(idx, value.clone());
-                    instance.set_fact_nil(idx, false);
-                }
+                write_plain_fact(instance, idx, (!value.is_empty()).then_some(value.as_str()));
             }
             Ok(UpdateOutcome::NoChange)
         }
         FactValue::Date { raw, value } => {
             if let Some(idx) = fact_index {
                 if raw.is_empty() {
-                    instance.set_fact_nil(idx, true);
+                    write_plain_fact(instance, idx, None);
                 } else if let Some(date) = value {
-                    instance.set_fact_value(idx, date.format("%Y-%m-%d").to_string());
-                    instance.set_fact_nil(idx, false);
+                    let formatted = date.format("%Y-%m-%d").to_string();
+                    write_plain_fact(instance, idx, Some(&formatted));
                 }
             }
             Ok(UpdateOutcome::NoChange)
@@ -973,21 +963,50 @@ pub fn update_instance_document(
     }
 }
 
-/// Writes a decimal fact value (or clears it to nil when `value` is `None`),
-/// setting the `decimals` attribute consistently. Shared by
-/// [`update_instance_document`]'s `FactValue::Decimal` arm and
-/// [`write_calculated_values_to_instance`] so the two write paths can't
-/// drift apart.
-fn write_decimal_fact(instance: &mut InstanceDocument, idx: usize, value: Option<Decimal>) {
+/// Writes a decimal-typed fact's formatted string value (or clears it to nil
+/// when `value` is `None`), setting the `decimals` attribute to `Finite(2)`
+/// consistently. Shared by every write path that persists a
+/// `FactValue::Decimal` — [`update_instance_document`],
+/// [`write_calculated_values_to_instance`], and `Report::apply_imported_values`/
+/// `Report::apply_csv_values` — so they can't drift apart.
+pub(crate) fn write_decimal_fact(instance: &mut InstanceDocument, idx: usize, value: Option<&str>) {
     match value {
-        Some(decimal) => {
-            instance.set_fact_value(idx, decimal.to_string());
+        Some(value) => {
+            instance.set_fact_value(idx, value.to_string());
             instance.set_fact_attribute(idx, FactAttribute::Decimals(Decimals::Finite(2)));
         }
         None => {
             instance.set_fact_nil(idx, true);
             instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
         }
+    }
+}
+
+/// Writes an integer-typed fact's string value (or clears it to nil when
+/// `value` is `None`), setting the `decimals` attribute to `Infinite`
+/// consistently. Shared by [`update_instance_document`] and
+/// `Report::apply_imported_values`/`Report::apply_csv_values`.
+pub(crate) fn write_integer_fact(instance: &mut InstanceDocument, idx: usize, value: Option<&str>) {
+    match value {
+        Some(value) => {
+            instance.set_fact_value(idx, value.to_string());
+            instance.set_fact_attribute(idx, FactAttribute::Decimals(Decimals::Infinite));
+        }
+        None => {
+            instance.set_fact_nil(idx, true);
+            instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
+        }
+    }
+}
+
+/// Writes a fact's string value with no numeric attribute (or clears it to
+/// nil when `value` is `None`). Used for `FactValue::BooleanDropdown` and
+/// `FactValue::Date`. Shared by [`update_instance_document`] and
+/// `Report::apply_imported_values`/`Report::apply_csv_values`.
+pub(crate) fn write_plain_fact(instance: &mut InstanceDocument, idx: usize, value: Option<&str>) {
+    match value {
+        Some(value) => instance.set_fact_value(idx, value.to_string()),
+        None => instance.set_fact_nil(idx, true),
     }
 }
 
@@ -1014,7 +1033,8 @@ pub fn write_calculated_values_to_instance(
         }
 
         if let (Some(idx), FactValue::Decimal { value, .. }) = (row.fact_index, &row.value) {
-            write_decimal_fact(instance, idx, *value);
+            let formatted = value.as_ref().map(Decimal::to_string);
+            write_decimal_fact(instance, idx, formatted.as_deref());
         }
     }
 }

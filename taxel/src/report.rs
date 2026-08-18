@@ -1,5 +1,6 @@
 use crate::{
     csv::{CsvExportRow, CsvImportOutcome},
+    instance_document::{write_decimal_fact, write_integer_fact, write_plain_fact},
     ElsterReport, TaxonomyType, CLOSING_DATE, COMPANY_CITY, COMPANY_COUNTRY, COMPANY_HOUSE_NO,
     COMPANY_NAME, COMPANY_STREET, COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, COMPANY_ZIP_CODE,
     FISCAL_YEAR_BEGIN, FISCAL_YEAR_END, GCD_LABEL, GCD_ROLE_URI, REPORT_ELEMENT_PREFIX,
@@ -809,16 +810,7 @@ impl Report {
                         matched_count += 1;
 
                         if let Some(idx) = row.fact_index {
-                            if is_nil {
-                                instance.set_fact_nil(idx, true);
-                                instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
-                            } else {
-                                instance.set_fact_value(idx, value.clone());
-                                instance.set_fact_attribute(
-                                    idx,
-                                    FactAttribute::Decimals(Decimals::Finite(2)),
-                                );
-                            }
+                            write_decimal_fact(instance, idx, (!is_nil).then_some(value.as_str()));
                         }
 
                         let new_raw = if is_nil { String::new() } else { value };
@@ -834,16 +826,7 @@ impl Report {
                         matched_count += 1;
 
                         if let Some(idx) = row.fact_index {
-                            if is_nil {
-                                instance.set_fact_nil(idx, true);
-                                instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
-                            } else {
-                                instance.set_fact_value(idx, value.clone());
-                                instance.set_fact_attribute(
-                                    idx,
-                                    FactAttribute::Decimals(Decimals::Infinite),
-                                );
-                            }
+                            write_integer_fact(instance, idx, (!is_nil).then_some(value.as_str()));
                         }
 
                         let new_text = if is_nil { String::new() } else { value };
@@ -861,11 +844,7 @@ impl Report {
                         matched_count += 1;
 
                         if let Some(idx) = row.fact_index {
-                            if is_nil {
-                                instance.set_fact_nil(idx, true);
-                            } else {
-                                instance.set_fact_value(idx, value.clone());
-                            }
+                            write_plain_fact(instance, idx, (!is_nil).then_some(value.as_str()));
                         }
 
                         let new_text = if is_nil { String::new() } else { value };
@@ -883,11 +862,7 @@ impl Report {
                         matched_count += 1;
 
                         if let Some(idx) = row.fact_index {
-                            if is_nil {
-                                instance.set_fact_nil(idx, true);
-                            } else {
-                                instance.set_fact_value(idx, value.clone());
-                            }
+                            write_plain_fact(instance, idx, (!is_nil).then_some(value.as_str()));
                         }
 
                         let new_raw = if is_nil { String::new() } else { value };
@@ -1118,49 +1093,23 @@ impl Report {
                         *text = new_value;
                     }
                     FactValue::Decimal { raw, value: parsed } => {
-                        if is_nil {
-                            instance.set_fact_nil(idx, true);
-                            instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
-                        } else {
-                            instance.set_fact_value(idx, new_value.clone());
-                            instance.set_fact_attribute(
-                                idx,
-                                FactAttribute::Decimals(Decimals::Finite(2)),
-                            );
-                        }
+                        write_decimal_fact(instance, idx, (!is_nil).then_some(new_value.as_str()));
 
                         *parsed = new_value.parse::<Decimal>().ok();
                         *raw = new_value;
                     }
                     FactValue::Integer(text) => {
-                        if is_nil {
-                            instance.set_fact_nil(idx, true);
-                            instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
-                        } else {
-                            instance.set_fact_value(idx, new_value.clone());
-                            instance.set_fact_attribute(
-                                idx,
-                                FactAttribute::Decimals(Decimals::Infinite),
-                            );
-                        }
+                        write_integer_fact(instance, idx, (!is_nil).then_some(new_value.as_str()));
 
                         *text = new_value;
                     }
                     FactValue::BooleanDropdown(text) => {
-                        if is_nil {
-                            instance.set_fact_nil(idx, true);
-                        } else {
-                            instance.set_fact_value(idx, new_value.clone());
-                        }
+                        write_plain_fact(instance, idx, (!is_nil).then_some(new_value.as_str()));
 
                         *text = new_value;
                     }
                     FactValue::Date { raw, value: parsed } => {
-                        if is_nil {
-                            instance.set_fact_nil(idx, true);
-                        } else {
-                            instance.set_fact_value(idx, new_value.clone());
-                        }
+                        write_plain_fact(instance, idx, (!is_nil).then_some(new_value.as_str()));
 
                         *parsed = NaiveDate::parse_from_str(&new_value, "%Y-%m-%d").ok();
                         *raw = new_value;
