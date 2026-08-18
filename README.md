@@ -58,7 +58,7 @@ preserved which might be outdated.
 
 To import values from an existing report but using an up-to-date taxonomy,
 create a new report first. Then, import values of the existing report via button
-`Import values`. values`.
+`Import values`.
 
 ## Taxel CLI
 
