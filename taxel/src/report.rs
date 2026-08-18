@@ -1,15 +1,17 @@
-use crate::domain::ReportStatus;
-use chrono::NaiveDate;
-use rust_decimal::Decimal;
-use std::{
-    collections::{HashMap, HashSet},
-    path::PathBuf,
-};
-use taxel::{
+use crate::{
+    csv::{CsvExportRow, CsvImportOutcome},
+    instance_document::{write_decimal_fact, write_integer_fact, write_plain_fact},
     ElsterReport, TaxonomyType, CLOSING_DATE, COMPANY_CITY, COMPANY_COUNTRY, COMPANY_HOUSE_NO,
     COMPANY_NAME, COMPANY_STREET, COMPANY_TAX_NUMBER, COMPANY_TAX_NUMBER_PARENT, COMPANY_ZIP_CODE,
     FISCAL_YEAR_BEGIN, FISCAL_YEAR_END, GCD_LABEL, GCD_ROLE_URI, REPORT_ELEMENT_PREFIX,
     ROLE_URI_TO_REPORT_ELEMENT,
+};
+use chrono::NaiveDate;
+use csv::{Reader as CsvReader, Writer as CsvWriter};
+use rust_decimal::Decimal;
+use std::{
+    collections::{HashMap, HashSet},
+    path::PathBuf,
 };
 use xbrl_rs::{
     Concept, ConceptView, Decimals, DocumentView, FactAttribute, FactAttributeName,
@@ -302,8 +304,6 @@ pub struct Report {
     pub path: PathBuf,
     /// The taxonomy type, derived from the schema ref URLs in the instance document.
     pub taxonomy_type: TaxonomyType,
-    /// The report status for lifecycle management.
-    pub status: ReportStatus,
     /// The sections in the order they appear in the presentation linkbase.
     pub sections: Vec<ReportSection>,
     /// Role URIs for sections that could not be mapped to a known report
@@ -316,7 +316,6 @@ impl Report {
         Self {
             path,
             taxonomy_type,
-            status: ReportStatus::Draft,
             sections: Vec::new(),
             role_mapping_errors: Vec::new(),
         }
@@ -656,18 +655,14 @@ impl Report {
         import_report_elements: bool,
     ) -> (usize, usize) {
         // Keyed by `(concept, parent, unit)`; collapsed to `None` when multiple
-        // source rows share the key but disagree on value (conflicting contexts).
-        let mut source_map: HashMap<
-            (String, Option<String>, Option<String>),
-            Option<SourceImportValue>,
-        > = HashMap::new();
-
-        for source_section in &source_report.sections {
-            for row in &source_section.rows {
-                if !import_report_elements && row.concept.starts_with(REPORT_ELEMENT_PREFIX) {
-                    continue;
-                }
-
+        // source rows share the key but disagree on value (conflicting contexts,
+        // or e.g. children of a repeating tuple that share no other aspect).
+        let entries = source_report
+            .sections
+            .iter()
+            .flat_map(|section| section.rows.iter())
+            .filter(|row| import_report_elements || !row.concept.starts_with(REPORT_ELEMENT_PREFIX))
+            .map(|row| {
                 let source_value = match &row.value {
                     FactValue::Text(text) => {
                         let is_nil = row
@@ -721,15 +716,10 @@ impl Report {
                     row.parent_concept.clone(),
                     row.unit.clone(),
                 );
-                source_map
-                    .entry(key)
-                    .and_modify(|current| match current {
-                        Some(existing) if *existing == source_value => {}
-                        _ => *current = None,
-                    })
-                    .or_insert_with(|| Some(source_value));
-            }
-        }
+
+                (key, source_value)
+            });
+        let source_map = collapse_conflicting(entries);
 
         let mut matched_count = 0usize;
         let mut imported_count = 0usize;
@@ -820,16 +810,7 @@ impl Report {
                         matched_count += 1;
 
                         if let Some(idx) = row.fact_index {
-                            if is_nil {
-                                instance.set_fact_nil(idx, true);
-                                instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
-                            } else {
-                                instance.set_fact_value(idx, value.clone());
-                                instance.set_fact_attribute(
-                                    idx,
-                                    FactAttribute::Decimals(Decimals::Finite(2)),
-                                );
-                            }
+                            write_decimal_fact(instance, idx, (!is_nil).then_some(value.as_str()));
                         }
 
                         let new_raw = if is_nil { String::new() } else { value };
@@ -845,16 +826,7 @@ impl Report {
                         matched_count += 1;
 
                         if let Some(idx) = row.fact_index {
-                            if is_nil {
-                                instance.set_fact_nil(idx, true);
-                                instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
-                            } else {
-                                instance.set_fact_value(idx, value.clone());
-                                instance.set_fact_attribute(
-                                    idx,
-                                    FactAttribute::Decimals(Decimals::Infinite),
-                                );
-                            }
+                            write_integer_fact(instance, idx, (!is_nil).then_some(value.as_str()));
                         }
 
                         let new_text = if is_nil { String::new() } else { value };
@@ -872,11 +844,7 @@ impl Report {
                         matched_count += 1;
 
                         if let Some(idx) = row.fact_index {
-                            if is_nil {
-                                instance.set_fact_nil(idx, true);
-                            } else {
-                                instance.set_fact_value(idx, value.clone());
-                            }
+                            write_plain_fact(instance, idx, (!is_nil).then_some(value.as_str()));
                         }
 
                         let new_text = if is_nil { String::new() } else { value };
@@ -894,11 +862,7 @@ impl Report {
                         matched_count += 1;
 
                         if let Some(idx) = row.fact_index {
-                            if is_nil {
-                                instance.set_fact_nil(idx, true);
-                            } else {
-                                instance.set_fact_value(idx, value.clone());
-                            }
+                            write_plain_fact(instance, idx, (!is_nil).then_some(value.as_str()));
                         }
 
                         let new_raw = if is_nil { String::new() } else { value };
@@ -916,6 +880,312 @@ impl Report {
         }
 
         (matched_count, imported_count)
+    }
+
+    /// Writes fact rows across all enabled (non-disabled) sections to
+    /// `writer` as semicolon-delimited CSV, returning the number of rows
+    /// written. Abstract rows are always kept; other rows are kept only if
+    /// their value is non-empty. Calculated-total rows (`is_calculated`) are
+    /// never written: `is_calculated` is computed per presentation section,
+    /// so the same underlying fact can be a plain leaf in one section and a
+    /// calculation-linkbase total (a *recomputed* display value, not its own
+    /// stored value) in another — exporting whichever happened to be in an
+    /// enabled section would silently record a derived number as if it were
+    /// the fact's real value. Calculated totals are read-only everywhere
+    /// else in this codebase (recomputed from their children after every
+    /// edit); this keeps CSV export/import consistent with that.
+    pub fn write_values_csv<W: std::io::Write>(
+        &self,
+        lang: &str,
+        writer: &mut CsvWriter<W>,
+    ) -> Result<usize, anyhow::Error> {
+        writer.write_record([
+            "Section", "ID", "Parent", "Depth", "Name", "Value", "Unit", "Context",
+        ])?;
+
+        let mut row_count = 0;
+
+        for section in &self.sections {
+            if section.disabled {
+                continue;
+            }
+
+            let section_name = section
+                .labels
+                .get(lang)
+                .map(String::as_str)
+                .unwrap_or(section.role.as_str());
+
+            for row in &section.rows {
+                if row.is_calculated {
+                    continue;
+                }
+
+                let value = fact_value_to_string(&row.value, lang);
+
+                if !row.is_abstract && value.is_empty() {
+                    continue;
+                }
+
+                let name = row.labels.get(lang).map(String::as_str).unwrap_or("");
+                writer.write_record([
+                    section_name,
+                    row.concept.as_str(),
+                    row.parent_concept.as_deref().unwrap_or(""),
+                    row.depth.to_string().as_str(),
+                    name,
+                    value.as_str(),
+                    row.unit.as_deref().unwrap_or(""),
+                    row.context.as_str(),
+                ])?;
+                row_count += 1;
+            }
+        }
+
+        writer.flush()?;
+
+        Ok(row_count)
+    }
+
+    /// Reapplies values from a CSV previously produced by
+    /// [`Self::write_values_csv`] — possibly on a *different* document (e.g.
+    /// a newer taxonomy version's report; the same "export, then build a new
+    /// report, then bring values back in" workflow [`Self::apply_imported_values`]
+    /// supports for XML sources). Facts are matched by `(concept, parent,
+    /// unit)`, the same key and the same conflict-collapse strategy
+    /// [`Self::apply_imported_values`] uses via [`collapse_conflicting`] —
+    /// deliberately *not* `context`, which differs across documents, and not
+    /// a positional index, which has no meaning outside the document it was
+    /// computed from. CSV rows that share a key but disagree on value (e.g.
+    /// children of a repeating tuple, which carry no aspect of their own to
+    /// tell instances apart) are left unresolved and reported as a warning
+    /// rather than guessed at.
+    ///
+    /// `Dropdown` fields are never written — [`fact_value_to_string`] renders
+    /// a dropdown's display label, not its underlying concept key, so
+    /// reversing it would reintroduce exactly the kind of ambiguity this
+    /// method's matching strategy avoids. Calculated-total fields
+    /// (`is_calculated`) are never written either, for the reason documented
+    /// on [`Self::write_values_csv`] — this is defense in depth, since that
+    /// method no longer exports them, but a hand-edited or older CSV could
+    /// still reference one. Rows for either, and CSV rows with no matching
+    /// fact, are reported as warnings rather than failing the whole import.
+    ///
+    /// Use `import_report_elements = false` to skip CSV rows for
+    /// report-element selections, mirroring [`Self::apply_imported_values`].
+    pub fn apply_csv_values<R: std::io::Read>(
+        &mut self,
+        csv_reader: &mut CsvReader<R>,
+        instance: &mut InstanceDocument,
+        taxonomy: &TaxonomySet,
+        import_report_elements: bool,
+    ) -> Result<CsvImportOutcome, anyhow::Error> {
+        let mut warnings = Vec::new();
+        let mut rows = Vec::new();
+
+        for record in csv_reader.deserialize() {
+            let csv_row: CsvExportRow = record?;
+
+            if !import_report_elements && csv_row.id.starts_with(REPORT_ELEMENT_PREFIX) {
+                continue;
+            }
+
+            rows.push(csv_row);
+        }
+
+        let entries = rows.iter().map(|csv_row| {
+            let key = (
+                csv_row.id.clone(),
+                (!csv_row.parent.is_empty()).then(|| csv_row.parent.clone()),
+                (!csv_row.unit.is_empty()).then(|| csv_row.unit.clone()),
+            );
+            (key, csv_row.value.clone())
+        });
+        let value_map = collapse_conflicting(entries);
+        let mut matched_keys = HashSet::new();
+
+        let mut matched = 0usize;
+        let mut updated = 0usize;
+
+        for section_idx in 0..self.sections.len() {
+            for row_idx in 0..self.sections[section_idx].rows.len() {
+                let row = &self.sections[section_idx].rows[row_idx];
+                let key = (
+                    row.concept.clone(),
+                    row.parent_concept.clone(),
+                    row.unit.clone(),
+                );
+
+                let Some(value) = value_map.get(&key) else {
+                    continue;
+                };
+                matched_keys.insert(key.clone());
+
+                let Some(new_value) = value.clone() else {
+                    warnings.push(format!(
+                        "ambiguous values for '{}' under parent '{}': multiple csv rows \
+                         disagree, skipped",
+                        key.0,
+                        key.1.as_deref().unwrap_or("")
+                    ));
+                    continue;
+                };
+
+                matched += 1;
+
+                if fact_value_to_string(&row.value, "en") == new_value {
+                    continue;
+                }
+
+                if matches!(row.value, FactValue::Dropdown { .. }) {
+                    warnings.push(format!(
+                        "dropdown field '{}' is not supported by `taxel import` yet, skipped",
+                        row.concept
+                    ));
+                    continue;
+                }
+
+                if row.is_calculated {
+                    warnings.push(format!(
+                        "'{}' is a calculated total and cannot be set directly, skipped",
+                        row.concept
+                    ));
+                    continue;
+                }
+
+                // Dropdown rows always have `fact_index: None` — a tuple
+                // choice with nothing selected has no fact to point at — and
+                // are already filtered out above, so every row reaching this
+                // point has a real fact_index.
+                let Some(idx) = row.fact_index else {
+                    continue;
+                };
+
+                let is_nil = new_value.is_empty();
+                let concept = row.concept.clone();
+                let row = &mut self.sections[section_idx].rows[row_idx];
+
+                match &mut row.value {
+                    FactValue::Text(text) => {
+                        let is_numeric = taxonomy
+                            .concepts()
+                            .find(|concept_def| concept_def.name.local_name == concept)
+                            .map(|concept_def| concept_def.data_type.is_numeric())
+                            .unwrap_or(false);
+
+                        if is_nil {
+                            instance.set_fact_nil(idx, true);
+
+                            if is_numeric {
+                                instance.clear_fact_attribute(idx, FactAttributeName::Decimals);
+                            }
+                        } else {
+                            instance.set_fact_value(idx, new_value.clone());
+
+                            if is_numeric {
+                                instance.set_fact_attribute(
+                                    idx,
+                                    FactAttribute::Decimals(Decimals::Finite(2)),
+                                );
+                            }
+                        }
+
+                        *text = new_value;
+                    }
+                    FactValue::Decimal { raw, value: parsed } => {
+                        write_decimal_fact(instance, idx, (!is_nil).then_some(new_value.as_str()));
+
+                        *parsed = new_value.parse::<Decimal>().ok();
+                        *raw = new_value;
+                    }
+                    FactValue::Integer(text) => {
+                        write_integer_fact(instance, idx, (!is_nil).then_some(new_value.as_str()));
+
+                        *text = new_value;
+                    }
+                    FactValue::BooleanDropdown(text) => {
+                        write_plain_fact(instance, idx, (!is_nil).then_some(new_value.as_str()));
+
+                        *text = new_value;
+                    }
+                    FactValue::Date { raw, value: parsed } => {
+                        write_plain_fact(instance, idx, (!is_nil).then_some(new_value.as_str()));
+
+                        *parsed = NaiveDate::parse_from_str(&new_value, "%Y-%m-%d").ok();
+                        *raw = new_value;
+                    }
+                    FactValue::Checkbox(checked) => {
+                        let new_checked = new_value.parse::<bool>().unwrap_or(false);
+                        instance.set_fact_nil(idx, !new_checked);
+                        *checked = new_checked;
+                    }
+                    FactValue::Dropdown { .. } => unreachable!("filtered out above"),
+                }
+
+                updated += 1;
+            }
+        }
+
+        for (concept, parent, unit) in value_map.keys() {
+            if matched_keys.contains(&(concept.clone(), parent.clone(), unit.clone())) {
+                continue;
+            }
+
+            warnings.push(format!(
+                "no matching fact for '{concept}' under parent '{}'",
+                parent.as_deref().unwrap_or("")
+            ));
+        }
+
+        Ok(CsvImportOutcome {
+            matched,
+            updated,
+            warnings,
+        })
+    }
+}
+
+/// Groups `(key, value)` pairs into a map, collapsing an entry to `None`
+/// when multiple pairs share a key but disagree on value. Used wherever a
+/// source of facts (another document, or a CSV export) may contain several
+/// rows that legitimately share a disambiguating key — e.g. children of a
+/// repeating tuple, which carry no XBRL aspect of their own to distinguish
+/// one instance from another — so a value is only applied when every row
+/// sharing that key agrees on it; otherwise the caller must not guess which
+/// one is meant.
+fn collapse_conflicting<K, V>(entries: impl Iterator<Item = (K, V)>) -> HashMap<K, Option<V>>
+where
+    K: Eq + std::hash::Hash,
+    V: PartialEq,
+{
+    let mut map = HashMap::new();
+    for (key, value) in entries {
+        map.entry(key)
+            .and_modify(|current: &mut Option<V>| match current {
+                Some(existing) if *existing == value => {}
+                _ => *current = None,
+            })
+            .or_insert_with(|| Some(value));
+    }
+    map
+}
+
+/// Renders a `FactValue` the same way the fact table displays it, for CSV
+/// export.
+fn fact_value_to_string(value: &FactValue, lang: &str) -> String {
+    match value {
+        FactValue::Text(text) => text.clone(),
+        FactValue::Checkbox(checked) => checked.to_string(),
+        FactValue::Dropdown { selected, options } => options
+            .iter()
+            .find(|(key, _)| key == selected)
+            .and_then(|(_, labels)| labels.get(lang))
+            .cloned()
+            .unwrap_or_else(|| selected.clone()),
+        FactValue::BooleanDropdown(selected) => selected.clone(),
+        FactValue::Decimal { raw, .. } => raw.clone(),
+        FactValue::Integer(text) => text.clone(),
+        FactValue::Date { raw, .. } => raw.clone(),
     }
 }
 
@@ -1735,5 +2005,30 @@ mod tests {
             .collect();
         assert_eq!(filtered.len(), 1);
         assert_eq!(filtered[0].to.local_name, "child");
+    }
+
+    #[test]
+    fn collapse_conflicting_keeps_a_single_entry() {
+        let map = collapse_conflicting([("a", 1)].into_iter());
+        assert_eq!(map.get("a"), Some(&Some(1)));
+    }
+
+    #[test]
+    fn collapse_conflicting_keeps_agreeing_duplicates() {
+        let map = collapse_conflicting([("a", 1), ("a", 1)].into_iter());
+        assert_eq!(map.get("a"), Some(&Some(1)));
+    }
+
+    #[test]
+    fn collapse_conflicting_collapses_disagreeing_duplicates_to_none() {
+        let map = collapse_conflicting([("a", 1), ("a", 2)].into_iter());
+        assert_eq!(map.get("a"), Some(&None));
+    }
+
+    #[test]
+    fn collapse_conflicting_tracks_keys_independently() {
+        let map = collapse_conflicting([("a", 1), ("b", 2), ("a", 2)].into_iter());
+        assert_eq!(map.get("a"), Some(&None));
+        assert_eq!(map.get("b"), Some(&Some(2)));
     }
 }

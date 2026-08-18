@@ -13,14 +13,29 @@ pub fn app() -> App<'static> {
                 .help("Shows what is going on"),
         )
         .subcommand(
-            SubCommand::with_name(cmd::EXTRACT)
-                .args(cmd::extract_args())
-                .about("Extract tag values from xml file"),
+            SubCommand::with_name(cmd::NEW)
+                .args(cmd::new_args())
+                .about("Build a new, taxonomy-valid eBilanz xml file from scratch"),
         )
         .subcommand(
-            SubCommand::with_name(cmd::GENERATE)
-                .args(cmd::generate_args())
-                .about("Generate xml file"),
+            SubCommand::with_name(cmd::MERGE)
+                .args(cmd::merge_args())
+                .about("Merge fact values from one xml file into another"),
+        )
+        .subcommand(
+            SubCommand::with_name(cmd::EXPORT)
+                .args(cmd::export_args())
+                .about("Export fact values from an xml file to a csv file"),
+        )
+        .subcommand(
+            SubCommand::with_name(cmd::IMPORT)
+                .args(cmd::import_args())
+                .about("Import fact values from a csv file exported via `taxel export`"),
+        )
+        .subcommand(
+            SubCommand::with_name(cmd::DOWNLOAD)
+                .args(cmd::download_args())
+                .about("Download and cache an eBilanz taxonomy"),
         )
         .subcommand(
             SubCommand::with_name(cmd::VALIDATE)
