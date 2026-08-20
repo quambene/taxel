@@ -77,19 +77,19 @@ _Note:_ Run `cargo install --path ./taxel-cli` again to update to the latest ver
 
 ### Usage
 
-``` bash
+``` txt
 USAGE:
     taxel [OPTIONS] [SUBCOMMAND]
 ```
 
-``` bash
+``` txt
 OPTIONS:
     -h, --help       Print help information
     -V, --version    Print version information
         --verbose    Shows what is going on
 ```
 
-``` bash
+``` txt
 SUBCOMMANDS:
     download    Download and cache an eBilanz taxonomy
     export      Export fact values from an xml file to a csv file
