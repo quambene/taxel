@@ -25,6 +25,7 @@ Supported features:
 - [Taxel CLI](#taxel-cli)
   - [Install Taxel CLI](#install-taxel-cli)
   - [Usage](#usage-1)
+  - [Examples](#examples)
   - [Testing](#testing)
 - [Rust bindings and SDK for the ELSTER Rich Client (ERiC)](#rust-bindings-and-sdk-for-the-elster-rich-client-eric)
 - [Changelog](#changelog)
@@ -77,6 +78,32 @@ _Note:_ Run `cargo install --path ./taxel-cli` again to update to the latest ver
 ### Usage
 
 ``` bash
+USAGE:
+    taxel [OPTIONS] [SUBCOMMAND]
+```
+
+``` bash
+OPTIONS:
+    -h, --help       Print help information
+    -V, --version    Print version information
+        --verbose    Shows what is going on
+```
+
+``` bash
+SUBCOMMANDS:
+    download    Download and cache an eBilanz taxonomy
+    export      Export fact values from an xml file to a csv file
+    help        Print this message or the help of the given subcommand(s)
+    import      Import fact values from a csv file exported via `taxel export`
+    merge       Merge fact values from one xml file into another
+    new         Build a new, taxonomy-valid eBilanz xml file from scratch
+    send        Validate and send xml file
+    validate    Validate xml file
+```
+
+### Examples
+
+``` bash
 # Download and cache an eBilanz taxonomy
 taxel download \
     --taxonomy-version 6.8 \
@@ -88,49 +115,49 @@ taxel new \
     --end-date 2024-12-31 \
     --taxonomy-version 6.8 \
     --taxonomy-type core-fiscal \
-    --output-file "my_bilanz.xml"
+    --output-file "my_ebilanz.xml"
 
 # Merge fact values from one xml file into another
 taxel merge \
-    --target-file "my_bilanz.xml" \
-    --source-file "my_ebilanz.xml" \
-    --output-file "my_bilanz.xml"
+    --source-file "my_ebilanz_old.xml" \
+    --target-file "my_ebilanz_new.xml" \
+    --output-file "my_ebilanz_merged.xml"
 
 # Export fact values from an xml file to a csv file
 taxel export \
-    --xml-file "my_bilanz.xml" \
-    --output-file "my_bilanz.csv"
+    --xml-file "my_ebilanz.xml" \
+    --output-file "my_ebilanz.csv"
 
 # Import fact values from a csv file exported via `taxel export`
 taxel import \
-    --xml-file "my_bilanz.xml" \
-    --csv-file "my_bilanz.csv" \
-    --output-file "my_bilanz.xml"
+    --xml-file "my_ebilanz.xml" \
+    --csv-file "my_ebilanz.csv" \
+    --output-file "my_ebilanz_imported.xml"
 
 # Validate xml file
 taxel validate \
     --tax-type "Bilanz" \
-    --tax-version 6.4 \
-    --xml-file "my_tax_data.xml"
+    --tax-version 6.8 \
+    --xml-file "my_ebilanz.xml"
 
 # Validate xml file and print confirmation as pdf file
 taxel validate \
     --tax-type "Bilanz" \
-    --tax-version 6.4 \
-    --xml-file "my_tax_data.xml" \
+    --tax-version 6.8 \
+    --xml-file "my_ebilanz.xml" \
     --print "my_eBilanz.pdf"
 
 # Send xml file to tax authorities
 taxel send \
     --tax-type "Bilanz" \
-    --tax-version 6.4 \
-    --xml-file "my_tax_data.xml" \
+    --tax-version 6.8 \
+    --xml-file "my_ebilanz.xml" \
 
 # Send xml file to tax authorities and print confirmation as pdf file
 taxel send \
     --tax-type "Bilanz" \
-    --tax-version 6.4 \
-    --xml-file "my_tax_data.xml" \
+    --tax-version 6.8 \
+    --xml-file "my_ebilanz.xml" \
     --print "my_eBilanz.pdf"
 ```
 
