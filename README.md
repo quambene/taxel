@@ -78,8 +78,7 @@ _Note:_ Run `cargo install --path ./taxel-cli` again to update to the latest ver
 ### Usage
 
 ``` txt
-USAGE:
-    taxel [OPTIONS] [SUBCOMMAND]
+taxel [OPTIONS] [SUBCOMMAND]
 ```
 
 ``` txt
